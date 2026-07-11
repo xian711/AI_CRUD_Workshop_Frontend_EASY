@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CRUD 工作坊 EASY 版 — Step-by-Step 學習手冊</title>
+<style>
+  :root{
+    --brand:#C8232C;
+    --brand-dark:#9E1B22;
+    --brand-soft:#FBEDED;
+    --ink:#1c1d21;
+    --ink-soft:#54565e;
+    --line:#e7e3e3;
+    --bg:#f6f4f3;
+    --card:#ffffff;
+    --ok:#1a8a4a;
+    --warn:#b8860b;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(30,20,20,.06),0 10px 30px rgba(30,20,20,.05);
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ── top progress nav ── */
+  header.topnav{
+    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
+    backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:var(--maxw);margin:0 auto;padding:10px 20px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .topnav .brand{font-weight:800;color:var(--brand);letter-spacing:.3px;white-space:nowrap;font-size:15px;}
+  .topnav nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+  .topnav nav a{
+    text-decoration:none;color:var(--ink-soft);font-size:13px;font-weight:600;
+    padding:5px 11px;border-radius:999px;border:1px solid transparent;transition:.15s;
+  }
+  .topnav nav a:hover{color:var(--brand);background:var(--brand-soft);}
+
+  /* ── hero ── */
+  .hero{
+    max-width:var(--maxw);margin:34px auto 10px;padding:0 20px;
+  }
+  .hero-card{
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);
+    color:#fff;border-radius:20px;padding:38px 34px;box-shadow:var(--shadow);
+  }
+  .hero-card .eyebrow{opacity:.9;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+  .hero-card h1{margin:10px 0 14px;font-size:30px;line-height:1.3;font-weight:800;}
+  .hero-card p{margin:0;font-size:16px;opacity:.96;max-width:60ch;}
+  .hero-meta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 13px;font-size:13px;font-weight:600;}
+
+  main{max-width:var(--maxw);margin:0 auto;padding:0 20px 80px;}
+
+  /* ── outline table ── */
+  .outline{margin:26px 0;}
+  .outline h2{font-size:18px;margin:0 0 12px;color:var(--ink);}
+
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  td code,p code,li code{background:#f0edec;color:var(--brand-dark);padding:1.5px 6px;border-radius:5px;font-size:.9em;font-family:"Cascadia Code",Consolas,monospace;}
+
+  /* ── step cards ── */
+  section.step{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    margin:26px 0;padding:0;overflow:hidden;scroll-margin-top:70px;border:1px solid var(--line);
+  }
+  .step-head{
+    display:flex;align-items:center;gap:15px;padding:22px 28px;
+    border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--brand-soft),transparent);
+  }
+  .step-num{
+    flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:0 4px 10px rgba(200,35,44,.3);
+  }
+  .step-head h2{margin:0;font-size:21px;font-weight:800;}
+  .step-head .t{margin-left:auto;font-size:12.5px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;}
+  .star{display:inline-block;background:var(--brand);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
+  .step-body{padding:8px 28px 26px;}
+
+  /* ── labelled blocks ── */
+  .block{margin:22px 0 8px;}
+  .block-title{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;margin:0 0 6px;}
+  .block-title .ico{font-size:19px;}
+  .goal{background:var(--brand-soft);border-left:4px solid var(--brand);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .goal ol,.goal ul{margin:6px 0 0;padding-left:22px;}
+  .why{background:#f3f6f4;border-left:4px solid var(--ok);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .why .block-title{color:#166b3c;}
+
+  h3{font-size:16px;margin:22px 0 8px;color:var(--brand-dark);}
+  p{margin:10px 0;}
+  ol,ul{padding-left:24px;margin:10px 0;}
+  li{margin:5px 0;}
+
+  blockquote{
+    margin:16px 0;padding:12px 18px;background:#fbf9f8;border-left:4px solid var(--brand);
+    border-radius:8px;color:var(--ink-soft);font-size:14.5px;
+  }
+  blockquote strong{color:var(--brand-dark);}
+
+  pre{
+    background:#1e1f26;color:#e6e6ea;border-radius:10px;padding:16px 18px;overflow-x:auto;
+    font-family:"Cascadia Code",Consolas,monospace;font-size:13.5px;line-height:1.65;margin:14px 0;
+  }
+  pre code{background:none;color:inherit;padding:0;}
+
+  /* ── figures ── */
+  figure{margin:20px 0;}
+  figure img{
+    width:100%;max-width:100%;height:auto;display:block;border-radius:12px;
+    box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);
+  }
+  figcaption{margin-top:9px;font-size:13.5px;color:var(--ink-soft);text-align:center;font-style:italic;}
+  .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0;}
+  .fig-grid figure{margin:0;}
+
+  .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:16px 0;}
+  .flow b{color:#ffb3b8;}
+
+  /* ── checklist ── */
+  .checklist{list-style:none;padding:0;margin:14px 0;}
+  .checklist li{position:relative;padding:9px 12px 9px 40px;border-bottom:1px dashed var(--line);}
+  .checklist li::before{
+    content:"";position:absolute;left:10px;top:12px;width:19px;height:19px;border:2px solid var(--brand);border-radius:5px;
+  }
+  .badge-ok{color:var(--ok);font-weight:700;}
+  .badge-warn{color:var(--warn);font-weight:700;}
+
+  .footer{max-width:var(--maxw);margin:0 auto;padding:26px 20px 50px;color:var(--ink-soft);font-size:13.5px;text-align:center;}
+
+  @media (max-width:680px){
+    body{font-size:15px;}
+    .hero-card{padding:26px 22px;}
+    .hero-card h1{font-size:23px;}
+    .step-body{padding:6px 18px 22px;}
+    .step-head{padding:18px 18px;}
+    .step-head h2{font-size:18px;}
+    .step-head .t{display:none;}
+    .fig-grid{grid-template-columns:1fr;}
+    .topnav .brand{font-size:13px;}
+    th,td{padding:9px 10px;font-size:13.5px;}
+  }
+
+  /* ── dark theme ── */
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
+      --brand-soft:#2b1f20;--shadow:0 2px 10px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
+    }
+    header.topnav{background:rgba(28,24,23,.92);}
+    .topnav nav a:hover{color:#ff9ba1;}
+    td code,p code,li code{background:#2c2827;color:#ff9ba1;}
+    blockquote{background:#241f1e;}
+    .why{background:#1b241d;}
+    .goal{background:#2b1f20;}
+    figure img{border-color:#33302f;}
+  }
+  :root[data-theme="dark"]{
+    --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
+    --brand-soft:#2b1f20;
+  }
+  :root[data-theme="light"]{
+    --ink:#1c1d21;--ink-soft:#54565e;--line:#e7e3e3;--bg:#f6f4f3;--card:#ffffff;--brand-soft:#FBEDED;
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="topnav-inner">
+    <span class="brand">AI CRUD 工作坊 · EASY</span>
+    <nav>
+      <a href="#step0">Step 0</a>
+      <a href="#step1">Step 1</a>
+      <a href="#step2">Step 2</a>
+      <a href="#step3">Step 3</a>
+      <a href="#step4">Step 4</a>
+      <a href="#step5">Step 5</a>
+      <a href="#done">完課檢核</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-card">
+    <div class="eyebrow">Step-by-Step 學習手冊</div>
+    <h1>用「範本 + harness + AI」<br>把全新 CRUD 模組壓進一小時</h1>
+    <p>這份手冊帶你把整堂課從頭走一遍。每一步都有「要做到什麼、怎麼做、會看到什麼、為什麼」——課後照著走，也能自己重現。</p>
+    <div class="hero-meta">
+      <span class="chip">⏱ 約 120 分鐘</span>
+      <span class="chip">🛠 全程動手做</span>
+      <span class="chip">🧭 step0 → step5</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <div class="outline">
+    <h2>課程大綱</h2>
+    <p>照順序走、不要跳步——後面會用到前面的產出。這門課給<strong>會寫程式、但還沒用過 AI harness 開發</strong>的工程師；不要求會 Vue／Nuxt，不需要提示詞經驗。</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Step</th><th>這一章在做什麼</th><th>時間</th></tr></thead>
+      <tbody>
+        <tr><td><b>step0</b></td><td>課程說明、前置檢查</td><td>10 分</td></tr>
+        <tr><td><b>step1</b></td><td>為什麼要 harness（有／沒有 harness 產出對比）</td><td>15 分</td></tr>
+        <tr><td><b>step2</b></td><td>CRUD 快速完工秘笈（玩範本 → 系統文件 → harness 三件套 → Design System → 範本程式）</td><td>35 分</td></tr>
+        <tr><td><b>step3</b></td><td>複製範本開發新模組（PRD → AI 生成 → 反覆修正）<span class="star">重頭戲</span></td><td>40 分</td></tr>
+        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 視覺審查 ＋ 雙 AI 對抗審查</td><td>15 分</td></tr>
+        <tr><td><b>step5</b></td><td>課程總結、回去怎麼用</td><td>5 分</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ STEP 0 ═══════════ -->
+  <section class="step" id="step0">
+    <div class="step-head">
+      <div class="step-num">0</div>
+      <h2>課程說明與前置檢查</h2>
+      <span class="t">10 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>知道這門課要教什麼、怎麼進行。</li>
+          <li>確認機器準備好了（Node.js、pnpm、git、port 3100、磁碟空間）。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <ol>
+        <li>讀一遍 <code>START_HERE.md</code>，確認上完課要帶走三件能力：看得出有無 harness 的差別、能用 AI 生成新模組、能設計並執行一輪 LOOP 驗證。</li>
+        <li>每個 step 都有自己的資料夾與 <code>README.md</code>，照 step0 → step5 順序走。</li>
+        <li>開課前先跑前置檢查：</li>
+      </ol>
+      <pre><code>cd step0_course_intro
+.\preflight.ps1</code></pre>
+      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若出現 <code>[FAIL]</code>，照腳本印出的修復提示處理後重跑一次。</p>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>腳本逐項印出 Node.js、pnpm、git、port 3100、磁碟空間的檢查結果，最後一行是「前置檢查全數通過，可以開課！」。</p>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        這堂課全程動手做，環境沒備好會卡在半路。前置檢查一次把常見坑（沒裝 pnpm、3100 埠被占用）攔在開課前，省得上課才發現跑不起來。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 1 ═══════════ -->
+  <section class="step" id="step1">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <h2>為什麼要有 harness？</h2>
+      <span class="t">15 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>用「同一句需求、只差有沒有附規矩」的兩個產出，親眼看出差別。</li>
+          <li>知道差別從哪來：規則（CODE-RULES）、範本、系統文件。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES）＋設計系統（色票、間距）＋標準範本</strong>。沒有它，AI 每次都在隨興發揮；有了它，產出從「路人硬湊」變成「像老手照團隊規矩寫的程式」。</p>
+      <ol>
+        <li>打開 <code>demo/PROMPT.md</code>，確認兩版給 AI 的需求<strong>是同一句</strong>，只差有沒有附規矩。</li>
+        <li>雙擊 <code>demo/no-harness.html</code>（沒 harness 版）。</li>
+        <li>雙擊 <code>demo/with-harness.html</code>（有 harness 版）。</li>
+        <li>兩個視窗並排逐項對照。兩版都真的能新增／刪除，功能一模一樣，差的是「品質」。</li>
+      </ol>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>左邊沒 harness＝藍色陽春頁，顏色亂配、中英夾雜、沒有驗證；右邊有 harness＝品牌紅 <code>#C8232C</code> 完整頁，必填標紅星、空白擋下、刪除跳二次確認。</p>
+      <div class="fig-grid">
+        <figure>
+          <img src="images/step1_no_harness.png" alt="沒 harness：藍色陽春頁">
+          <figcaption>沒 harness：藍色系、硬編碼色碼、中英夾雜、按刪除直接刪。</figcaption>
+        </figure>
+        <figure>
+          <img src="images/step1_with_harness.png" alt="有 harness：品牌紅完整驗證頁">
+          <figcaption>有 harness：品牌紅、全繁中、必填加紅星、電話驗證、刪除跳確認框。</figcaption>
+        </figure>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>對應規則</th></tr></thead>
+        <tbody>
+          <tr><td>顏色來源</td><td><code>#0000ff</code> 硬編碼散落</td><td>全走 <code>:root</code> 語意變數</td><td>禁止硬編碼 hex/px</td></tr>
+          <tr><td>品牌一致性</td><td>藍色系，跟品牌無關</td><td>品牌紅 <code>#C8232C</code> 系</td><td>依功能類別選色</td></tr>
+          <tr><td>用字語言</td><td><code>Add</code>／<code>刪除</code> 夾雜</td><td>全繁中、中英加半形空格</td><td>一致語言</td></tr>
+          <tr><td>輸入驗證</td><td>空白也能新增</td><td>空白擋下、<code>PHONE_PATTERN</code></td><td>純函式驗證＋具名常數</td></tr>
+          <tr><td>刪除操作</td><td>按下去直接刪</td><td>二次確認，鈕寫明動作</td><td>危險操作二次確認</td></tr>
+          <tr><td>手機適配</td><td>窄螢幕表格擠爆</td><td><code>@media</code> 手機也能操作</td><td>響應式</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。一句話結論：<strong>同一句需求，差的不是 AI 智商，是你給不給規矩。</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 2 ═══════════ -->
+  <section class="step" id="step2">
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <h2>CRUD 快速完工秘笈</h2>
+      <span class="t">35 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>記住公式：<strong>範本給骨架、harness 給規矩、AI 出勞力。</strong></li>
+          <li>把現成範本當使用者操作一輪，建立心智模型。</li>
+          <li>認得 harness 三件套、Design System、範本八個核心檔。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>這一節分五個資料夾，照順序走：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>資料夾</th><th>是什麼</th><th>在這裡做什麼</th></tr></thead>
+        <tbody>
+          <tr><td><code>2.1_play_template</code></td><td>玩一輪範本</td><td>把現成範本當使用者操作一遍</td></tr>
+          <tr><td><code>2.2_docs</code></td><td>範本的 SRS / SDD</td><td>需要時查規格</td></tr>
+          <tr><td><code>2.3_harness</code></td><td>AI 的規矩三件套</td><td>讀懂 AI 每次會遵守的鐵律</td></tr>
+          <tr><td><code>2.4_design_system</code></td><td>Design System 與 token</td><td>知道顏色／間距一律走 token</td></tr>
+          <tr><td><code>2.5_sample_app</code></td><td>人員 CRUD 範例（正本）</td><td>安裝啟動、對照 8 核心檔</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <ol>
+        <li>安裝並啟動範本：</li>
+      </ol>
+      <pre><code>cd 2.5_sample_app/sample-app
+pnpm install      # 首次安裝依賴，順帶產生型別
+pnpm dev          # 啟動 dev server</code></pre>
+      <ol start="2">
+        <li>開瀏覽器到 <code>http://localhost:3100/template/crud</code>（開根網址會自動導向）。</li>
+        <li>逐一操作 CRUD 五個檢查點：新增一筆、進檢視頁編輯、刪除跳確認、關鍵字＋狀態篩選後複製網址開新分頁、匯出 CSV。</li>
+        <li>加分：編輯時清空必填欄位按儲存（看紅字）、把視窗縮到手機寬度（看表格變卡片）。</li>
+        <li>認識規矩：讀 <code>2.3_harness/CLAUDE.md</code>（專案憲法，AI 每次對話自動讀）與 <code>2.4_design_system</code>。</li>
+      </ol>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <div class="fig-grid">
+        <figure><img src="images/step2_template_list.png" alt="範本人員 CRUD 列表頁"><figcaption>範本列表頁：表格＋篩選＋分頁＋匯出 CSV。</figcaption></figure>
+        <figure><img src="images/step2_template_form.png" alt="範本新增表單"><figcaption>新增表單：Label 在上、必填加紅星、送出防重複。</figcaption></figure>
+        <figure><img src="images/step2_template_detail.png" alt="範本檢視頁"><figcaption>檢視頁：單筆明細，可切到編輯。</figcaption></figure>
+        <figure><img src="images/step2_template_confirm.png" alt="刪除二次確認框"><figcaption>刪除確認框：鈕寫「刪除人員」而非空泛的「確認」。</figcaption></figure>
+      </div>
+      <div class="fig-grid">
+        <figure><img src="images/step2_design_system.png" alt="Design System 展示頁"><figcaption>Design System：色票、間距、字級集中管理，AI 照這份配色。</figcaption></figure>
+        <figure><img src="images/step2_diagrams.png" alt="UML 七圖"><figcaption>UML 七圖：把資料模型與流程畫清楚的系統文件。</figcaption></figure>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>操作</th><th>你應該看到</th></tr></thead>
+        <tbody>
+          <tr><td>新增人員 → 儲存</td><td>成功 toast，列表出現新增那筆</td></tr>
+          <tr><td>進檢視頁 → 編輯 → 儲存</td><td>值更新，回列表反映變更</td></tr>
+          <tr><td>垃圾桶 → 二次確認</td><td>鈕寫「刪除人員」，按下才刪</td></tr>
+          <tr><td>打「陳」＋狀態篩選 → 複製網址開新分頁</td><td>表格即時過濾，新分頁完整還原篩選與排序</td></tr>
+          <tr><td>匯出 CSV</td><td>匯出的是<strong>篩選＋排序後的全量</strong>，非只當頁</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>範本給骨架</strong>：列表／明細／驗證／CSV／URL 同步／刪除確認全寫好了，複製改名即繼承。<strong>harness 給規矩</strong>：<code>CLAUDE.md</code> 是專案憲法，AI 每次對話自動讀，不會亂換套件、不硬編碼顏色。<strong>AI 出勞力</strong>：改欄位、改文案這種重複勞動交給 AI，你只負責決策與驗收。三者湊齊，一個全新 CRUD 模組半小時就能長出符合規範、可跑的骨架。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 3 ═══════════ -->
+  <section class="step" id="step3">
+    <div class="step-head">
+      <div class="step-num">3</div>
+      <h2>複製範本開發新模組<span class="star">重頭戲</span></h2>
+      <span class="t">40 分</span>
+    </div>
+    <div class="step-body">
+      <blockquote><strong>這一步你不寫程式，你當的是「提需求、做決策、驗成果」的人。</strong> 寫程式的粗活是 AI 的事。</blockquote>
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>讀懂 PRD，理解「PRD 給全貌，不是這堂課的範圍」。</li>
+          <li>把需求丟給 AI，讓它<strong>先出選擇題釐清範圍</strong>，你拍板。</li>
+          <li>打開瀏覽器驗收與修正，重現列表、表單、驗證、刪除、手機五件事。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>要長出的新模組是<strong>中心裝備物資</strong>（跑在 <code>/equipment/crud</code>），用的是跟 step2 同一套範本＋harness。</p>
+
+      <h3>⓪ 準備工作區（3.0）</h3>
+      <p>動手之前，先把範本複製成自己的工作專案，並確認 AI Agent 的工作目錄就是這個專案根目錄（不然 AI 讀不到題目文件與 harness）。</p>
+      <pre><code># 在工作坊根目錄執行：複製範本成你的工作專案
+Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
+# 把題目文件複製進專案根目錄（AI 才讀得到）
+Copy-Item step3_new_module\PRD-中心裝備物資.md, step3_new_module\SCOPE-課堂範圍決策.md step3_new_module\my-equipment-app\
+cd step3_new_module\my-equipment-app
+pnpm install
+# 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
+      <blockquote>harness 四件（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。</blockquote>
+
+      <h3>① 讀 PRD（3.1）</h3>
+      <p>打開 <code>PRD-中心裝備物資.md</code>。這份 PRD 是從真實災防平台現有頁面<strong>逆向整理</strong>出來的，記的是「現況」不是「理想」——連缺口都照實記（例如白紙黑字寫「品項沒有刪除功能」）。標「原始碼未見／TODO」的地方＝待你決策。26 欄＋借用歸還＋維保提醒，兩小時做不完，很正常。</p>
+
+      <h3>② 貼起手 prompt，讓 AI 先問問題（3.2）</h3>
+      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。從 <code>PROMPTS.md</code> 複製【起手 prompt】整段貼上——這段同時交代「先讀 CLAUDE.md → CODE-RULES → 使用說明 → PRD、先別寫程式、要用選擇題問範圍」。</p>
+      <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 列任務 → 你確認 → AI 逐項做並回報。</strong></p>
+      <div class="flow">你：貼<b>【起手 prompt】</b>
+   ▼
+AI：依序讀 CLAUDE.md → CODE-RULES → 使用說明 → PRD
+   ▼
+AI：先不寫程式，改用<b>「選擇題」</b>問你範圍（每題 2-4 選項＋建議）
+   ▼
+你：一題一題拍板（可直接採納建議）
+   ▼
+AI：輸出<b>「任務清單」</b>（8-10 個），停下等你確認
+   ▼
+你：說<b>「開工」</b>
+   ▼
+AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
+
+      <h3>③ 一題一題拍板</h3>
+      <p>AI 會問六題，逐題拍板（可直接採納建議選項）：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>AI 會問</th><th>課堂拍板</th></tr></thead>
+        <tbody>
+          <tr><td>Q1</td><td>欄位做多少？</td><td>核心 <strong>12 欄</strong>（不是全部 26 欄）</td></tr>
+          <tr><td>Q2</td><td>PRD 沒有刪除功能，怎麼辦？</td><td><strong>補上硬刪除＋確認彈窗</strong>（CRUD 要有 D）</td></tr>
+          <tr><td>Q3</td><td>借用／歸還、維保、照片、匯入 Excel？</td><td><strong>全部範圍外</strong></td></tr>
+          <tr><td>Q4</td><td>匯出？</td><td><strong>CSV 匯出</strong>（範本現成工具，成本趨近零）</td></tr>
+          <tr><td>Q5</td><td>編碼規則？</td><td><strong>簡化版</strong>（不含機關前綴、不做同碼累加數量）</td></tr>
+          <tr><td>Q6</td><td>存放地點？</td><td><strong>單一文字欄位</strong>（不做級聯地址）</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <blockquote>六題不用背。重點是理解：<strong>每題都是在「完整 PRD」和「兩小時課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼 <code>PROMPTS.md</code> 的【釐清階段】救援 prompt 打斷它。</blockquote>
+
+      <h3>④ 確認任務清單、說「開工」</h3>
+      <p>AI 會產出 8-10 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除、T7 CSV、T8 SRS/SDD、T9 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
+
+      <h3>⑤ 驗收與修正（3.3）</h3>
+      <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿 <code>SCOPE-課堂範圍決策.md</code> 的欄位規格逐項對照。</p>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <figure><img src="images/step3_clarify.png" alt="AI 先出釐清選擇題"><figcaption>AI 不急著寫程式，而是把岔路攤成選擇題、每題附建議——這代表 harness 在運作。</figcaption></figure>
+      <figure><img src="images/step3_equipment_list.png" alt="裝備物資列表頁"><figcaption>裝備物資列表：24 筆種子、每頁 20 筆、「分類→項目」升冪，狀態標籤綠／黃／紅。</figcaption></figure>
+      <div class="fig-grid">
+        <figure><img src="images/step3_equipment_form.png" alt="新增表單含連動下拉與編碼預覽"><figcaption>新增表單：選定分類＋項目後，標題即時顯示自動編碼。</figcaption></figure>
+        <figure><img src="images/step3_cascade_dropdown.png" alt="分類→項目連動下拉"><figcaption>連動下拉：先選分類，項目才可選，且只出現該分類的項目。</figcaption></figure>
+      </div>
+      <div class="fig-grid">
+        <figure><img src="images/step3_form_validation.png" alt="空表單驗證 4 欄紅字＋toast"><figcaption>驗證：空表單直接儲存 → 4 欄紅字＋toast，停在表單頁不離開。</figcaption></figure>
+        <figure><img src="images/step3_delete_confirm.png" alt="刪除品項確認框"><figcaption>刪除：垃圾桶 → 二次確認彈窗 → 按「刪除」才真的刪。</figcaption></figure>
+      </div>
+      <figure><img src="images/step3_equipment_mobile.png" alt="手機卡片檢視"><figcaption>手機卡片：縮到手機寬度，表格自動變卡片清單，資訊等價。</figcaption></figure>
+
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>驗收點</th><th>期望</th></tr></thead>
+        <tbody>
+          <tr><td>列表</td><td>桌機表格、每頁 20 筆、「分類→項目」升冪、顯示總筆數</td></tr>
+          <tr><td>連動下拉</td><td>先選分類，項目才可選，只出現該分類項目</td></tr>
+          <tr><td>新增</td><td>選定分類＋項目後標題即時顯示編碼；必填未填仍可按儲存，會顯示欄位紅字並 toast 提示「請修正 N 個欄位」</td></tr>
+          <tr><td>刪除</td><td>垃圾桶 → 二次確認 → 才刪</td></tr>
+          <tr><td>CSV 匯出</td><td>匯出全量（非當頁），含 BOM 中文不亂碼</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>修正心法（三條）：</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>心法</th><th>怎麼做</th></tr></thead>
+        <tbody>
+          <tr><td>一次只修一個問題</td><td>一則訊息只提一件事，改完再看下一件</td></tr>
+          <tr><td>描述「看到什麼 vs 期望什麼」</td><td>「我看到日期是 2026/7/1，期望顯示成 2026-07-01」</td></tr>
+          <tr><td>兩次修不好就重新描述</td><td>換個說法重講一次，別繼續在同一串盧</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤開、你拍板，範圍才會小而完整——這跟 spec-kit 的 clarify 是同一個道理：<strong>先問對問題，再寫對程式。</strong> 另外，那 24 筆 mock 資料的欄位名（<code>qty</code>、<code>unit</code>、<code>keeper</code>、<code>status</code>…）<strong>就是未來接後端 API 的介面</strong>，現在定好之後不再改，所以驗收時順手看一眼命名合不合理。卡住時 <code>solution-app/</code> 有參考解，但先自己做、真的卡兩次以上再看——直接抄答案學不到「怎麼提需求、怎麼驗收」，那才是這堂課的重點。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 4 ═══════════ -->
+  <section class="step" id="step4">
+    <div class="step-head">
+      <div class="step-num">4</div>
+      <h2>LOOP 工程 × E2E 驗證</h2>
+      <span class="t">15 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>理解 LOOP 工程：<strong>先給 AI 一個會給出紅/綠的自動驗證，再叫它自己修到綠。</strong></li>
+          <li>跑一次 7 條 E2E 測試，看到全綠。</li>
+          <li>記住兩條關鍵規則：兩次停損、修測試不修 App。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <ol>
+        <li>先確認 solution-app 在跑（另一個視窗別關）：</li>
+      </ol>
+      <pre><code>cd ../step3_new_module/solution-app
+pnpm dev          # http://localhost:3100</code></pre>
+      <ol start="2">
+        <li>再跑 E2E：</li>
+      </ol>
+      <pre><code>cd step4_loop_e2e
+powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
+      <p>腳本會：確認 3100 有回應且是本 App → 裝相依（已裝就跳過）→ 跑 7 條測試 → 印 PASS/FAIL 總結（exit 0＝全綠、1＝有紅）。</p>
+      <ol start="3">
+        <li>要啟動 LOOP，一段話就夠（可直接貼）：</li>
+      </ol>
+      <pre><code>跑 step4_loop_e2e/run-e2e.ps1。
+若有紅字，找出原因、修正後再跑一次，直到 7 條全綠。
+規則：同一個問題連續修兩次還沒好就停下來回報（不要無限撞牆）。
+只准修測試，不准為了過測試去改 solution-app 的程式；
+若判斷是 App 真的有 bug，記下來回報，但不要動 App。</code></pre>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p><code>run-e2e.ps1</code> 印出 7 條測試全數 <code>ok</code>，最後 <code>7 passed</code>、<code>EXITCODE=0</code>。</p>
+      <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>run-e2e.ps1 實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0。</figcaption></figure>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>編號</th><th>驗什麼</th><th>CRUD 觀念</th></tr></thead>
+        <tbody>
+          <tr><td>E1</td><td><code>/equipment/crud</code> 看得到表格、「共 24 筆」</td><td>Read</td></tr>
+          <tr><td>E2</td><td>輸入「發電機」縮到 2 筆、清除後恢復 24 筆</td><td>Filter</td></tr>
+          <tr><td>E3</td><td>new → 選分類→項目→編碼自動預覽 <code>PW-GEN-003</code> → 儲存 → 共 25 筆</td><td>Create</td></tr>
+          <tr><td>E4</td><td>new 直接儲存 → 出現「請選擇分類」且停在表單頁</td><td>Validation</td></tr>
+          <tr><td>E5</td><td>刪除 → 確認框 → 取消不變、確認 -1</td><td>Delete</td></tr>
+          <tr><td>E6</td><td><code>/template/crud</code> 正常載入</td><td>Regression（沒改壞範本）</td></tr>
+          <tr><td>E7</td><td>編輯品項：改數量與存放地點，儲存後新值生效</td><td>Update</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>兩次停損規則</strong>：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。<strong>修測試不修 App</strong>：LOOP 很會「為了讓燈變綠」而作弊（放寬斷言、改壞 App 邏輯），用這條把它框住。另外，寫測試的 AI 不適合審自己（它傾向相信自己寫對了），收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。
+      </div>
+      <blockquote><strong>建置紀律補充：</strong>這套測試第一次跑就全綠，靠的是「先 probe 探 DOM、再寫 selector」——探路的成本，遠低於用死站點瞎猜 selector 反覆跑紅的成本。細節見 <code>EVIDENCE-建置實錄.md</code>。</blockquote>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 5 ═══════════ -->
+  <section class="step" id="step5">
+    <div class="step-head">
+      <div class="step-num">5</div>
+      <h2>課程總結與回去怎麼用</h2>
+      <span class="t">5 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>收攏四個 step 各帶走一個觀念。</li>
+          <li>知道回公司落地的三個步驟。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p><strong>課程回顧：</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Step</th><th>帶走的觀念</th></tr></thead>
+        <tbody>
+          <tr><td>step1</td><td>同一句需求，有沒有附「規矩」（harness），產出天差地遠——差的不是功能，是像不像同一個團隊做的。</td></tr>
+          <tr><td>step2</td><td>一個成熟模組＝範本（骨架）＋系統文件＋harness 三件套＋Design System，缺一塊 AI 就會自由發揮出風險。</td></tr>
+          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS/SDD → 生成程式與假資料 → 人工反覆修正；AI 主動提問代表 harness 在運作。</td></tr>
+          <tr><td>step4</td><td>可以讓 AI 自己跑「改→驗→再改」，但收尾一定要有人或另一個 AI 用 E2E 視覺審查、對抗審查把關。</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>回去怎麼用（三步驟）：</strong></p>
+      <ol>
+        <li><strong>把 harness 三件套帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、後端 harness 參考複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
+        <li><strong>把既有標準頁面整理成範本</strong>——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。</li>
+        <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
+      </ol>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        harness 方法<strong>不綁框架</strong>：不是 Nuxt 也適用，三件套換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，搭 <code>aspnet-api-ai-harness-v5</code> 做一個 .NET API CRUD 模組。
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 完課檢核 ═══════════ -->
+  <section class="step" id="done">
+    <div class="step-head">
+      <div class="step-num">✓</div>
+      <h2>完課檢核表</h2>
+    </div>
+    <div class="step-body">
+      <p>全部打勾，代表你真的走完了：</p>
+      <ul class="checklist">
+        <li>前置檢查 <code>preflight.ps1</code> 全數通過</li>
+        <li>並排看過 no-harness 與 with-harness 兩頁，說得出至少三個差別</li>
+        <li>範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現</li>
+        <li>看過 Design System 與 harness 三件套，知道顏色／間距走 token</li>
+        <li>讀懂 PRD，理解「PRD 給全貌，不是這堂課的範圍」</li>
+        <li>貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）</li>
+        <li>六題範圍逐題拍板，確認任務清單後才說「開工」</li>
+        <li>裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現</li>
+        <li><code>run-e2e.ps1</code> 跑出 7 條全綠、exit 0</li>
+        <li>說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則</li>
+      </ul>
+
+      <h3>回去怎麼用（三步驟速記）</h3>
+      <ol>
+        <li><strong>帶三件套</strong>：CLAUDE.md ＋ CODE-RULES ＋ harness 參考，複製進你的專案、改成公司規則。</li>
+        <li><strong>整範本</strong>：挑最成熟的 CRUD 頁，拆「複製區 vs 共用區」。</li>
+        <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。</li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  AI CRUD 工作坊 EASY 版 · Step-by-Step 學習手冊　—　範本給骨架、harness 給規矩、AI 出勞力。
+</div>
+
+</body>
+</html>

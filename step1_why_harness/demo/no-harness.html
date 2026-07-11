@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Volunteer List</title>
+<style>
+  body { font-family: Arial; margin: 20px; }
+  h1 { color: #0000ff; }
+  table { border: 1px solid gray; }
+  th { background-color: lightblue; padding: 5px; }
+  td { border: 1px solid #cccccc; padding: 5px; }
+  .addbtn { background-color: blue; color: white; padding: 6px; }
+  input { margin: 3px; }
+</style>
+</head>
+<body>
+
+<h1>防災 Volunteer 名單</h1>
+
+<div>
+  姓名: <input type="text" id="name">
+  電話: <input type="text" id="phone">
+  血型: <input type="text" id="blood" placeholder="A/B/AB/O">
+  <button class="addbtn" onclick="add()">Add</button>
+</div>
+
+<br>
+
+<table id="tb">
+  <tr>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>血型</th>
+    <th>操作</th>
+  </tr>
+</table>
+
+<script>
+  var list = [
+    { name: "王小明", phone: "0912345678", blood: "O" },
+    { name: "陳美麗", phone: "0987654321", blood: "A" }
+  ];
+
+  function render() {
+    var t = document.getElementById("tb");
+    t.innerHTML = "<tr><th>Name</th><th>Phone</th><th>血型</th><th>操作</th></tr>";
+    for (var i = 0; i < list.length; i++) {
+      var row = t.insertRow(-1);
+      row.insertCell(0).innerHTML = list[i].name;
+      row.insertCell(1).innerHTML = list[i].phone;
+      row.insertCell(2).innerHTML = list[i].blood;
+      row.insertCell(3).innerHTML = "<button style='color:red' onclick='del(" + i + ")'>刪除</button>";
+    }
+  }
+
+  function add() {
+    var name = document.getElementById("name").value;
+    var phone = document.getElementById("phone").value;
+    var blood = document.getElementById("blood").value;
+    list.push({ name: name, phone: phone, blood: blood });
+    alert("新增 OK!");
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    document.getElementById("blood").value = "";
+    render();
+  }
+
+  function del(i) {
+    list.splice(i, 1);
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>

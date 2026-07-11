@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML 圖面 — CRUD 標準範本</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --sub: #555;
+    --accent: #0084d1;
+    --line: #d9d9d9;
+    --bg-soft: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    color: var(--ink);
+    background: #fff;
+    font-size: 20px;
+    line-height: 1.7;
+  }
+  header {
+    padding: 48px 6vw 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 { font-size: 44px; margin: 0 0 8px; }
+  header p  { font-size: 22px; color: var(--sub); margin: 0; }
+  nav {
+    padding: 16px 6vw;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+    font-size: 19px;
+  }
+  nav a { color: var(--accent); text-decoration: none; margin-right: 20px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+  section {
+    padding: 40px 4vw 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  section h2 {
+    font-size: 34px;
+    margin: 0 0 6px;
+    color: var(--accent);
+  }
+  section p.desc {
+    font-size: 21px;
+    color: var(--sub);
+    margin: 0 0 20px;
+  }
+  .mermaid {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+  }
+  .mermaid svg { max-width: none !important; }
+  footer {
+    padding: 28px 6vw 60px;
+    font-size: 18px;
+    color: var(--sub);
+  }
+  @media print { nav { display: none; } section { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>UML 圖面 — CRUD 標準範本</h1>
+  <p>對應文件：doc/crud-template/SRS-CRUD標準範本-v1.0.md、SDD-CRUD標準範本-v1.1.md ｜ 展示路徑：/template/crud</p>
+</header>
+
+<nav>
+  <a href="#uc">① 用例圖</a>
+  <a href="#arch">② 檔案架構圖</a>
+  <a href="#class">③ 類別圖（資料層）</a>
+  <a href="#state">④ 頁面模式狀態圖</a>
+  <a href="#seq-list">⑤ 循序圖：查詢與 URL 同步</a>
+  <a href="#seq-save">⑥ 循序圖：新增／編輯儲存</a>
+  <a href="#seq-del">⑦ 循序圖：刪除</a>
+</nav>
+
+<section id="uc">
+  <h2>① 用例圖（UC-T-01 ～ UC-T-06）</h2>
+  <p class="desc">承辦人員透過列表頁與明細頁完成六個核心用例；全部條件狀態同步於 URL，可分享與還原。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':60,'rankSpacing':70}}}%%
+flowchart LR
+  actor(("👤 承辦人員"))
+  subgraph SYS["CRUD 標準範本（/template/crud）"]
+    UC1(["UC-T-01 查詢瀏覽人員清單<br/>（篩選・排序・分頁）"])
+    UC2(["UC-T-02 檢視人員明細"])
+    UC3(["UC-T-03 新增人員"])
+    UC4(["UC-T-04 編輯人員"])
+    UC5(["UC-T-05 刪除人員<br/>（二次確認）"])
+    UC6(["UC-T-06 匯出 CSV<br/>（篩選＋排序後全量）"])
+  end
+  actor --> UC1
+  actor --> UC2
+  actor --> UC3
+  actor --> UC4
+  actor --> UC5
+  actor --> UC6
+  UC1 -. «include» URL 狀態同步 .-> UC1
+  UC2 -. «extend» .-> UC4
+  </pre>
+</section>
+
+<section id="arch">
+  <h2>② 檔案架構圖（8 個新檔 + 共用資產）</h2>
+  <p class="desc">頁面薄、邏輯下沉：狀態工廠與純函式可被任何新模組複製重用；共用元件直接取用既有資產（藍色）。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'20px'},'flowchart':{'nodeSpacing':40,'rankSpacing':60}}}%%
+flowchart TB
+  subgraph PAGES["pages/template/crud/"]
+    LIST["index.vue<br/>列表頁：篩選・排序・分頁・匯出・刪除"]
+    DETAIL["[id].vue<br/>明細頁：檢視／編輯／新增 三合一"]
+  end
+  subgraph TPLCOMP["components/template/"]
+    FF["TemplateFormField.vue<br/>label＋錯誤紅字＋data-field 錨點"]
+    SB["TemplateStatusBadge.vue<br/>狀態→樣式查表"]
+  end
+  subgraph COMPOSABLES["composables/"]
+    MEMBERS["useTemplateMembers.ts<br/>型別＋種子＋async CRUD API"]
+    LISTPAGE["useTemplateListPage.ts<br/>篩選＋分頁＋URL 同步工廠"]
+  end
+  subgraph UTILS["utils/（純函式）"]
+    VAL["templateValidation.ts<br/>validateFields＋格式常數"]
+    CSV["templateCsv.ts<br/>exportCsv（RFC 4180＋BOM）"]
+  end
+  subgraph SHARED["既有共用資產（不修改）"]
+    direction LR
+    S1["AppTableFooter"]
+    S2["AppSortHeader<br/>+ useTableSort"]
+    S3["AppConfirmModal"]
+    S4["AppAddressPicker"]
+    S5["AppDatePicker"]
+    S6["CardOutlined / ViewField"]
+    S7["taiwanAddress.ts"]
+  end
+  LIST --> LISTPAGE
+  LIST --> MEMBERS
+  LIST --> CSV
+  LIST --> SB
+  LIST --> S1 & S2 & S3 & S6 & S7
+  DETAIL --> MEMBERS
+  DETAIL --> VAL
+  DETAIL --> FF
+  DETAIL --> S4 & S5 & S6
+  MEMBERS -. 後端接軌縫：useFetch('/api/template/members') .-> API[("未來後端 API")]
+  style SHARED fill:#e8f4fb,stroke:#0084d1
+  style API fill:#fff4e0,stroke:#e6a23c,stroke-dasharray: 5 5
+  </pre>
+</section>
+
+<section id="class">
+  <h2>③ 類別圖（資料模型與模組介面）</h2>
+  <p class="desc">TemplateMember 17 欄涵蓋教學代表型態；CRUD API 全非同步（Promise），未來換後端不動呼叫端。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'}}}%%
+classDiagram
+  class TemplateMember {
+    +string id  「M-001」
+    +string name
+    +'男'|'女' gender
+    +string birthDate  YYYY-MM-DD
+    +TemplateIdType idType
+    +string nationalId
+    +string phone
+    +string email
+    +string residenceCounty
+    +string residenceTownship
+    +string residenceAddress
+    +string groupName
+    +TemplatePositionCode positionCode
+    +string[] qualifications
+    +'在職'|'停用' status
+    +string note
+    +string updatedAt  系統寫入
+  }
+  class useTemplateMembers {
+    +records: Readonly Ref~TemplateMember[]~
+    +getById(id) Promise~TemplateMember?~ 深拷貝
+    +create(input) Promise~TemplateMember~
+    +update(id, input) Promise~TemplateMember~
+    +remove(id) Promise~void~
+  }
+  class useTemplateListPage {
+    +filters: reactive~F~
+    +page / pageSize: Ref~number~
+    +showAdvanced: Ref~boolean~
+    +advancedActiveCount: Computed~number~
+    +resetFilters() void
+    +buildReturnQuery() string
+    -writeQuery() 僅寫非預設值・debounce・卸載清理
+  }
+  class templateValidation {
+    &lt;&lt;pure functions&gt;&gt;
+    +validateFields(form, rules) errors
+    +PHONE_PATTERN / TW_ID_PATTERN / EMAIL_PATTERN
+  }
+  class templateCsv {
+    &lt;&lt;pure functions&gt;&gt;
+    +exportCsv(filename, columns, rows) void
+  }
+  class TEMPLATE_POSITION_META {
+    &lt;&lt;lookup table&gt;&gt;
+    director: 主任 w1
+    deputy: 副主任 w2
+    leader: 組長 w3
+    member: 組員 w4
+  }
+  useTemplateMembers "1" --> "*" TemplateMember : 管理（module 單例）
+  useTemplateMembers ..> TEMPLATE_POSITION_META : positionTitleOf()
+  useTemplateListPage ..> TemplateMember : 泛型過濾對象
+  templateValidation ..> TemplateMember : 驗證 BR-T-01~03
+  templateCsv ..> TemplateMember : 匯出 FR-T-501
+  </pre>
+</section>
+
+<section id="state">
+  <h2>④ 頁面模式狀態圖（/template/crud/[id]）</h2>
+  <p class="desc">一條路由三種模式：以 id==='new' 與 ?mode=edit 判定（FR-T-301），return query 全程攜帶以還原列表狀態（FR-T-602）。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'21px'}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> 列表頁
+  列表頁 --> 檢視模式 : 點列／檢視鈕<br/>（攜帶 return）
+  列表頁 --> 新增模式 : 「新增人員」<br/>id = 'new'
+  列表頁 --> 編輯模式 : 列上編輯鈕<br/>?mode=edit
+  檢視模式 --> 編輯模式 : 「編輯」<br/>router.replace 加 mode=edit
+  編輯模式 --> 列表頁 : 儲存成功／取消<br/>navigateBack(return)
+  新增模式 --> 列表頁 : 儲存成功／取消
+  檢視模式 --> 列表頁 : 「返回」
+  編輯模式 --> 編輯模式 : 驗證失敗<br/>欄位紅字＋聚焦第一錯誤
+  新增模式 --> 新增模式 : 驗證失敗
+  note right of 檢視模式 : 查無 id → 「查無資料」空狀態＋返回鈕（不白屏）
+  </pre>
+</section>
+
+<section id="seq-list">
+  <h2>⑤ 循序圖：查詢與 URL 狀態同步（FR-T-101~105・601）</h2>
+  <p class="desc">篩選變更即時過濾並重設頁碼；URL 僅寫入非預設值（debounce 300ms），卸載時清理排程防止跨頁污染（審查發現的必修項）。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':240}}}%%
+sequenceDiagram
+  autonumber
+  actor U as 承辦人員
+  participant P as index.vue（列表頁）
+  participant LP as useTemplateListPage
+  participant M as useTemplateMembers
+  participant R as vue-router（URL）
+
+  U->>P: 進入 /template/crud?county=臺東縣&page=2
+  P->>LP: 建構（defaultFilters, advancedKeys）
+  LP->>R: 讀取 query 還原 filters/page/size
+  LP-->>P: filters（進階條件有值 → 自動展開進階區）
+  P->>M: records（響應式清單）
+  P->>P: filtered → sorted（useTableSort）→ paged（computed 鏈）
+  U->>P: 輸入關鍵字「王」
+  P->>LP: filters.q = '王'
+  LP->>LP: page 重設為 1（FR-T-104）
+  Note over LP,R: debounce 300ms 後僅寫入非預設值（FR-T-601）
+  LP->>R: router.replace({ q:'王', county:'臺東縣' })
+  U->>P: 點「匯出 CSV」
+  P->>P: exportCsv（sortedRows 全量・BOM・RFC 4180）
+  Note over P,LP: 元件卸載 → onScopeDispose 清除 debounce 排程<br/>＋路徑守衛（防止把列表 query 寫到明細頁 URL）
+  </pre>
+</section>
+
+<section id="seq-save">
+  <h2>⑥ 循序圖：新增／編輯儲存（FR-T-301~305・BR-T-01~03）</h2>
+  <p class="desc">驗證是純函式：規則資料化、與 UI 分離；錯誤顯示於欄位下方紅字並聚焦第一個錯誤欄位，不是只有 toast。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':250}}}%%
+sequenceDiagram
+  autonumber
+  actor U as 承辦人員
+  participant D as [id].vue（明細頁）
+  participant V as templateValidation（純函式）
+  participant M as useTemplateMembers
+  participant T as useToast
+
+  U->>D: 進入 /template/crud/new?return=…
+  D->>D: mode = create・空白表單（reactive 深拷貝）
+  U->>D: 填寫欄位、按「儲存」（Teleport 麵包屑動作列）
+  D->>D: payload = trim 正規化後的表單
+  D->>V: validateFields(payload, rulesFor(payload))
+  alt 有錯誤（例：電話格式不符 BR-T-03）
+    V-->>D: { phone: '請輸入 09 開頭的 10 碼手機號碼', … }
+    D->>D: 欄位下方紅字（TemplateFormField error）
+    D->>D: 聚焦第一個錯誤欄位（data-field → .focus()）
+    D->>T: 「請修正 N 個欄位」
+    U->>D: 修正該欄位 → 只清除該欄位錯誤
+  else 全部通過
+    V-->>D: {}（空物件）
+    D->>M: create(payload)
+    M->>M: 產生 id（M-025）＋ updatedAt（本地時區）
+    M-->>D: 新 TemplateMember（深拷貝）
+    D->>T: 「已新增人員（綠色）」
+    D->>D: navigateBack(return) → 列表狀態完整還原
+  end
+  </pre>
+</section>
+
+<section id="seq-del">
+  <h2>⑦ 循序圖：刪除（UC-T-05・FR-T-401~402・BR-T-04）</h2>
+  <p class="desc">刪除必經二次確認且文案含姓名；當頁因刪除變空時自動退回前一頁。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':250}}}%%
+sequenceDiagram
+  autonumber
+  actor U as 承辦人員
+  participant P as index.vue（列表頁）
+  participant C as AppConfirmModal（danger）
+  participant M as useTemplateMembers
+  participant T as useToast
+
+  U->>P: 點列上「刪除」（@click.stop 不觸發檢視）
+  P->>C: 開啟確認框「確定刪除【王小明】？」
+  alt 取消
+    U->>C: 「取消」／Esc／點遮罩
+    C-->>P: 關閉，不動資料
+  else 確認
+    U->>C: 「確認」
+    C-->>P: confirm 事件（不自動關閉）
+    P->>M: remove(id)
+    M-->>P: 完成
+    P->>P: 自行關閉 modal（v-model = false）
+    P->>T: 「已刪除（綠色）」
+    P->>P: 當頁清空 → page 退回前一頁（FR-T-402）
+  end
+  </pre>
+</section>
+
+<footer>
+  <p>圖面基準：SDD-CRUD標準範本-v1.1（含實作階段勘誤）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；投影教學建議瀏覽器縮放 125%。</p>
+</footer>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+</script>
+</body>
+</html>

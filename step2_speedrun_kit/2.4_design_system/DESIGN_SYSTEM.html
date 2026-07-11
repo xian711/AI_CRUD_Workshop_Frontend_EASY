@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System 視覺展示 — 防災協作中心</title>
+<style>
+/* ============================================================
+   本頁「吃自己的狗糧」：所有樣式都引用下列 token（取自
+   tokens/design-token.css 與 comp-tokens.css 的真實值）。
+   一律用 var(--ui-...)，頁面本身不硬編碼色值。
+   ============================================================ */
+:root{
+  /* ---- REF：中性灰階（只列本頁用到的） ---- */
+  --ui-ref-color-neutral-50:#fafafa;
+  --ui-ref-color-neutral-100:#f5f5f5;
+  --ui-ref-color-neutral-200:#e5e5e5;
+  --ui-ref-color-neutral-300:#d4d4d4;
+  --ui-ref-color-neutral-400:#a1a1a1;
+  --ui-ref-color-neutral-500:#737373;
+  --ui-ref-color-neutral-600:#525252;
+  --ui-ref-color-neutral-700:#404040;
+  --ui-ref-color-neutral-800:#262626;
+  --ui-ref-color-neutral-900:#171717;
+  --ui-ref-color-neutral-950:#0a0a0a;
+  --ui-ref-color-white:#ffffff;
+  /* ---- REF：功能色來源 ---- */
+  --ui-ref-color-green-50:#effdf5;  --ui-ref-color-green-500:#00c16a; --ui-ref-color-green-600:#00a155; --ui-ref-color-green-900:#0a5331;
+  --ui-ref-color-amber-50:#fffbeb;  --ui-ref-color-amber-400:#ffba00; --ui-ref-color-amber-500:#fd9a00; --ui-ref-color-amber-900:#7b3306;
+  --ui-ref-color-red-50:#fef2f2;    --ui-ref-color-red-500:#fb2c36;   --ui-ref-color-red-600:#e7000b;   --ui-ref-color-red-900:#82181a;
+  --ui-ref-color-pink-50:#fdf2f8;   --ui-ref-color-pink-400:#fb64b6;  --ui-ref-color-pink-500:#f6339a;  --ui-ref-color-pink-900:#861043;
+  --ui-ref-color-blue-700:#1447e6;
+
+  /* ---- REF：字級 / 間距 / 圓角 ---- */
+  --ui-ref-font-size-14:14px; --ui-ref-font-size-16:16px; --ui-ref-font-size-18:18px;
+  --ui-ref-font-size-20:20px; --ui-ref-font-size-24:24px; --ui-ref-font-size-32:32px; --ui-ref-font-size-48:48px;
+  --ui-ref-spacing-0:0px; --ui-ref-spacing-2:2px; --ui-ref-spacing-4:4px; --ui-ref-spacing-8:8px;
+  --ui-ref-spacing-16:16px; --ui-ref-spacing-24:24px; --ui-ref-spacing-40:40px;
+  --ui-ref-radius-0:0px; --ui-ref-radius-2:2px; --ui-ref-radius-4:4px; --ui-ref-radius-8:8px; --ui-ref-radius-16:16px; --ui-ref-radius-full:999px;
+
+  /* ---- SYS：色彩語意（品牌紅 #C8232C） ---- */
+  --ui-sys-color-primary:#C8232C;
+  --ui-sys-color-primary-hover:#A01D24;
+  --ui-sys-color-primary-container:#FFF0F0;
+  --ui-sys-color-on-primary:#FFFFFF;
+  --ui-sys-color-on-primary-container:#6B0C10;
+  --ui-sys-color-secondary:var(--ui-ref-color-neutral-300);
+  --ui-sys-color-secondary-hover:var(--ui-ref-color-neutral-400);
+  --ui-sys-color-secondary-container:var(--ui-ref-color-neutral-200);
+  --ui-sys-color-on-secondary:var(--ui-ref-color-neutral-700);
+  --ui-sys-color-success:var(--ui-ref-color-green-500);
+  --ui-sys-color-success-container:var(--ui-ref-color-green-50);
+  --ui-sys-color-warning:var(--ui-ref-color-amber-400);
+  --ui-sys-color-warning-container:var(--ui-ref-color-amber-50);
+  --ui-sys-color-error:var(--ui-ref-color-red-500);
+  --ui-sys-color-error-hover:var(--ui-ref-color-red-600);
+  --ui-sys-color-error-container:var(--ui-ref-color-red-50);
+  --ui-sys-color-info:var(--ui-ref-color-pink-400);
+  --ui-sys-color-info-container:var(--ui-ref-color-pink-50);
+  --ui-sys-color-surface:var(--ui-ref-color-white);
+  --ui-sys-color-surface-variant:var(--ui-ref-color-neutral-50);
+  --ui-sys-color-surface-page:#F5F6F8;
+  --ui-sys-color-on-surface:var(--ui-ref-color-neutral-950);
+  --ui-sys-color-on-surface-variant:var(--ui-ref-color-neutral-700);
+  --ui-sys-color-outline:var(--ui-ref-color-neutral-500);
+  --ui-sys-color-outline-variant:var(--ui-ref-color-neutral-200);
+  --ui-sys-color-disabled:var(--ui-ref-color-neutral-300);
+  --ui-sys-color-on-disabled:var(--ui-ref-color-neutral-400);
+
+  /* ---- SYS：字級 typescale ---- */
+  --ui-sys-font-size-display-large:var(--ui-ref-font-size-48);
+  --ui-sys-font-size-display-medium:var(--ui-ref-font-size-32);
+  --ui-sys-font-size-headline-large:var(--ui-ref-font-size-24);
+  --ui-sys-font-size-headline-medium:var(--ui-ref-font-size-20);
+  --ui-sys-font-size-body-large:var(--ui-ref-font-size-20);
+  --ui-sys-font-size-body-medium:var(--ui-ref-font-size-18);
+  --ui-sys-font-size-body-small:var(--ui-ref-font-size-14);
+  --ui-sys-font-size-label-large:var(--ui-ref-font-size-18);
+  --ui-sys-font-size-label-medium:var(--ui-ref-font-size-16);
+  --ui-sys-font-size-label-small:var(--ui-ref-font-size-14);
+  /* ---- SYS：字重 ---- */
+  --ui-sys-font-weight-default:400;
+  --ui-sys-font-weight-emphasis:500;
+  --ui-sys-font-weight-strong:600;
+  --ui-sys-font-weight-heavy:700;
+  /* ---- SYS：間距 ---- */
+  --ui-sys-spacing-none:var(--ui-ref-spacing-0);
+  --ui-sys-spacing-xxs:var(--ui-ref-spacing-2);
+  --ui-sys-spacing-extra-small:var(--ui-ref-spacing-4);
+  --ui-sys-spacing-small:var(--ui-ref-spacing-8);
+  --ui-sys-spacing-medium:var(--ui-ref-spacing-16);
+  --ui-sys-spacing-large:var(--ui-ref-spacing-24);
+  --ui-sys-spacing-extra-large:var(--ui-ref-spacing-40);
+  /* ---- SYS：圓角 ---- */
+  --ui-sys-shape-corner-none:var(--ui-ref-radius-0);
+  --ui-sys-shape-corner-extra-small:var(--ui-ref-radius-2);
+  --ui-sys-shape-corner-small:var(--ui-ref-radius-4);
+  --ui-sys-shape-corner-medium:var(--ui-ref-radius-8);
+  --ui-sys-shape-corner-large:var(--ui-ref-radius-16);
+  --ui-sys-shape-corner-full:var(--ui-ref-radius-full);
+  /* ---- SYS：陰影 ---- */
+  --ui-sys-elevation-small:0 1px 3px rgba(0,0,0,.06);
+  --ui-sys-elevation-large:0 8px 16px rgba(0,0,0,.10);
+  --ui-sys-elevation-modal:0 20px 60px rgba(0,0,0,.18);
+  /* ---- SYS：字族（無外部 webfont，用系統字備援；有裝 Noto Sans TC 會自動採用） ---- */
+  --ui-sys-font-family-default:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --ui-sys-font-family-code:"Fira Code","Cascadia Code",Consolas,monospace;
+}
+
+/* ---- 全域重置與版型 ---- */
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--ui-sys-color-surface-page);
+  color:var(--ui-sys-color-on-surface);
+  font-family:var(--ui-sys-font-family-default);
+  font-size:var(--ui-sys-font-size-body-medium);
+  line-height:1.6;
+}
+.layout{display:flex;max-width:1280px;margin:0 auto;}
+
+/* ---- 側邊導覽 ---- */
+.sidenav{
+  position:sticky;top:0;align-self:flex-start;
+  width:220px;flex:0 0 220px;height:100vh;overflow-y:auto;
+  padding:var(--ui-sys-spacing-large) var(--ui-sys-spacing-medium);
+  background:var(--ui-sys-color-surface);
+  border-right:1px solid var(--ui-sys-color-outline-variant);
+}
+.sidenav .brand{
+  font-weight:var(--ui-sys-font-weight-heavy);
+  font-size:var(--ui-sys-font-size-label-large);
+  color:var(--ui-sys-color-primary);
+  margin-bottom:var(--ui-sys-spacing-large);
+  line-height:1.3;
+}
+.sidenav a{
+  display:block;text-decoration:none;
+  color:var(--ui-sys-color-on-surface-variant);
+  font-size:var(--ui-sys-font-size-label-medium);
+  font-weight:var(--ui-sys-font-weight-emphasis);
+  padding:var(--ui-sys-spacing-small);
+  border-radius:var(--ui-sys-shape-corner-medium);
+  margin-bottom:var(--ui-sys-spacing-extra-small);
+}
+.sidenav a:hover{background:var(--ui-sys-color-surface-variant);color:var(--ui-sys-color-primary);}
+
+/* ---- 主內容 ---- */
+main{flex:1 1 auto;min-width:0;padding:var(--ui-sys-spacing-extra-large) var(--ui-sys-spacing-large);}
+section{
+  background:var(--ui-sys-color-surface);
+  border-radius:var(--ui-sys-shape-corner-large);
+  padding:var(--ui-sys-spacing-large);
+  margin-bottom:var(--ui-sys-spacing-large);
+  box-shadow:var(--ui-sys-elevation-small);
+}
+h1{font-size:var(--ui-sys-font-size-display-medium);font-weight:var(--ui-sys-font-weight-heavy);margin:0 0 var(--ui-sys-spacing-small);line-height:1.2;}
+h2{font-size:var(--ui-sys-font-size-headline-large);font-weight:var(--ui-sys-font-weight-heavy);margin:0 0 var(--ui-sys-spacing-medium);
+   padding-bottom:var(--ui-sys-spacing-small);border-bottom:2px solid var(--ui-sys-color-primary);color:var(--ui-sys-color-on-surface);}
+h3{font-size:var(--ui-sys-font-size-headline-medium);font-weight:var(--ui-sys-font-weight-strong);margin:var(--ui-sys-spacing-large) 0 var(--ui-sys-spacing-small);}
+p{margin:0 0 var(--ui-sys-spacing-small);}
+.lead{font-size:var(--ui-sys-font-size-body-large);color:var(--ui-sys-color-on-surface-variant);}
+.muted{color:var(--ui-sys-color-on-surface-variant);font-size:var(--ui-sys-font-size-body-small);}
+code,.mono{font-family:var(--ui-sys-font-family-code);
+  background:var(--ui-sys-color-surface-variant);
+  border:1px solid var(--ui-sys-color-outline-variant);
+  border-radius:var(--ui-sys-shape-corner-small);
+  padding:2px 6px;font-size:var(--ui-sys-font-size-label-small);}
+
+/* ---- Hero ---- */
+.hero{background:linear-gradient(135deg,var(--ui-sys-color-primary),var(--ui-sys-color-primary-hover));
+  color:var(--ui-sys-color-on-primary);border:none;}
+.hero h1{color:var(--ui-sys-color-on-primary);}
+.hero .lead{color:rgba(255,255,255,.9);}
+.hero .pill{display:inline-block;background:rgba(255,255,255,.18);border-radius:var(--ui-sys-shape-corner-full);
+  padding:var(--ui-sys-spacing-extra-small) var(--ui-sys-spacing-medium);font-size:var(--ui-sys-font-size-label-small);
+  font-weight:var(--ui-sys-font-weight-strong);margin-bottom:var(--ui-sys-spacing-medium);}
+
+/* ---- 三層架構圖（純 CSS） ---- */
+.arch{display:flex;flex-direction:column;gap:var(--ui-sys-spacing-small);margin-top:var(--ui-sys-spacing-medium);}
+.layer{border-radius:var(--ui-sys-shape-corner-medium);padding:var(--ui-sys-spacing-medium);border:2px solid;}
+.layer .tag{font-weight:var(--ui-sys-font-weight-heavy);font-size:var(--ui-sys-font-size-label-large);display:block;margin-bottom:var(--ui-sys-spacing-extra-small);}
+.layer .desc{font-size:var(--ui-sys-font-size-body-small);}
+.layer.comp{background:var(--ui-sys-color-primary-container);border-color:var(--ui-sys-color-primary);color:var(--ui-sys-color-on-primary-container);}
+.layer.sys{background:var(--ui-sys-color-surface-variant);border-color:var(--ui-sys-color-outline);color:var(--ui-sys-color-on-surface);}
+.layer.ref{background:var(--ui-sys-color-surface);border-color:var(--ui-sys-color-outline-variant);color:var(--ui-sys-color-on-surface-variant);}
+.arrow{text-align:center;font-weight:var(--ui-sys-font-weight-heavy);color:var(--ui-sys-color-primary);font-size:var(--ui-sys-font-size-headline-medium);}
+.arrow small{display:block;font-size:var(--ui-sys-font-size-label-small);color:var(--ui-sys-color-on-surface-variant);font-weight:var(--ui-sys-font-weight-default);}
+.chain{margin-top:var(--ui-sys-spacing-medium);background:var(--ui-sys-color-on-surface);color:var(--ui-sys-color-surface);
+  border-radius:var(--ui-sys-shape-corner-medium);padding:var(--ui-sys-spacing-medium);overflow-x:auto;
+  font-family:var(--ui-sys-font-family-code);font-size:var(--ui-sys-font-size-label-small);line-height:1.8;}
+.chain .k-comp{color:#ff9ea3;} .chain .k-sys{color:#8ec5ff;} .chain .k-ref{color:#9ae6b4;}
+
+/* ---- 色票牆 ---- */
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--ui-sys-spacing-medium);}
+.swatch{border:1px solid var(--ui-sys-color-outline-variant);border-radius:var(--ui-sys-shape-corner-medium);overflow:hidden;background:var(--ui-sys-color-surface);}
+.swatch .chip{height:72px;}
+.swatch .meta{padding:var(--ui-sys-spacing-small);}
+.swatch .name{font-size:var(--ui-sys-font-size-label-small);font-weight:var(--ui-sys-font-weight-strong);word-break:break-all;line-height:1.4;}
+.swatch .hex{font-family:var(--ui-sys-font-family-code);font-size:var(--ui-sys-font-size-label-small);color:var(--ui-sys-color-on-surface-variant);}
+.swatch .use{font-size:12px;color:var(--ui-sys-color-on-surface-variant);margin-top:2px;}
+
+/* ---- 字級展示 ---- */
+.type-row{display:flex;align-items:baseline;gap:var(--ui-sys-spacing-medium);padding:var(--ui-sys-spacing-small) 0;border-bottom:1px solid var(--ui-sys-color-outline-variant);flex-wrap:wrap;}
+.type-row .sample{flex:1 1 260px;min-width:0;}
+.type-row .spec{font-family:var(--ui-sys-font-family-code);font-size:var(--ui-sys-font-size-label-small);color:var(--ui-sys-color-on-surface-variant);white-space:nowrap;}
+
+/* ---- 間距尺規 ---- */
+.ruler-row{display:flex;align-items:center;gap:var(--ui-sys-spacing-medium);margin-bottom:var(--ui-sys-spacing-small);flex-wrap:wrap;}
+.ruler-row .bar{background:var(--ui-sys-color-primary);height:16px;border-radius:var(--ui-sys-shape-corner-extra-small);}
+.ruler-row .label{font-family:var(--ui-sys-font-family-code);font-size:var(--ui-sys-font-size-label-small);width:220px;flex:0 0 auto;}
+
+/* ---- 元件示例 ---- */
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--ui-sys-spacing-large);}
+.demo-box{border:1px solid var(--ui-sys-color-outline-variant);border-radius:var(--ui-sys-shape-corner-medium);padding:var(--ui-sys-spacing-medium);background:var(--ui-sys-color-surface);}
+.demo-box .demo-title{font-weight:var(--ui-sys-font-weight-strong);font-size:var(--ui-sys-font-size-label-large);margin-bottom:var(--ui-sys-spacing-medium);}
+.demo-note{font-size:12px;color:var(--ui-sys-color-on-surface-variant);margin-top:var(--ui-sys-spacing-small);line-height:1.6;}
+.demo-note code{font-size:12px;padding:1px 4px;}
+
+/* 按鈕（仿 --ui-comp-button-*） */
+.btn{display:inline-flex;align-items:center;justify-content:center;
+  padding:var(--ui-sys-spacing-small) var(--ui-sys-spacing-medium);
+  border-radius:var(--ui-sys-shape-corner-medium);
+  font-size:var(--ui-sys-font-size-label-medium);font-weight:var(--ui-sys-font-weight-strong);
+  border:1px solid transparent;cursor:pointer;font-family:inherit;margin:0 var(--ui-sys-spacing-extra-small) var(--ui-sys-spacing-extra-small) 0;}
+.btn-primary{background:var(--ui-sys-color-primary);color:var(--ui-sys-color-on-primary);}
+.btn-primary:hover{background:var(--ui-sys-color-primary-hover);}
+.btn-secondary{background:var(--ui-sys-color-secondary);color:var(--ui-sys-color-on-secondary);}
+.btn-secondary:hover{background:var(--ui-sys-color-secondary-hover);}
+.btn-error{background:var(--ui-sys-color-error);color:var(--ui-sys-color-on-primary);}
+.btn-error:hover{background:var(--ui-sys-color-error-hover);}
+.btn-disabled{background:var(--ui-sys-color-disabled);color:var(--ui-sys-color-on-disabled);cursor:not-allowed;}
+
+/* 輸入框（仿 --ui-comp-input-*） */
+.field{margin-bottom:var(--ui-sys-spacing-medium);}
+.field label{display:block;font-size:var(--ui-sys-font-size-label-medium);font-weight:var(--ui-sys-font-weight-emphasis);
+  color:var(--ui-sys-color-on-surface-variant);margin-bottom:var(--ui-sys-spacing-extra-small);}
+.field input{width:100%;padding:var(--ui-sys-spacing-small) var(--ui-sys-spacing-medium);
+  border-radius:var(--ui-sys-shape-corner-medium);border:1px solid var(--ui-sys-color-outline-variant);
+  background:var(--ui-sys-color-surface-variant);font-family:inherit;font-size:var(--ui-sys-font-size-body-medium);
+  color:var(--ui-sys-color-on-surface);}
+.field.err input{border-color:var(--ui-sys-color-error);background:var(--ui-sys-color-error-container);}
+.field.err label{color:var(--ui-sys-color-error);}
+.field .helper{font-size:var(--ui-sys-font-size-label-small);margin-top:var(--ui-sys-spacing-extra-small);color:var(--ui-sys-color-on-surface-variant);}
+.field.err .helper{color:var(--ui-sys-color-error);}
+.field input:focus{outline:none;border-color:var(--ui-sys-color-primary);background:var(--ui-sys-color-surface);
+  box-shadow:0 0 0 3px var(--ui-sys-color-primary-container);}
+
+/* badge（仿 --ui-comp-badge-*，膠囊 rounded-full） */
+.badge{display:inline-block;border-radius:var(--ui-sys-shape-corner-full);
+  padding:var(--ui-sys-spacing-extra-small) var(--ui-sys-spacing-small);
+  font-size:var(--ui-sys-font-size-label-small);font-weight:var(--ui-sys-font-weight-strong);
+  margin:0 var(--ui-sys-spacing-extra-small) var(--ui-sys-spacing-extra-small) 0;}
+.badge-primary{background:var(--ui-sys-color-primary-container);color:var(--ui-sys-color-on-primary-container);}
+.badge-success{background:var(--ui-sys-color-success-container);color:var(--ui-sys-color-success);}
+.badge-warning{background:var(--ui-sys-color-warning-container);color:var(--ui-sys-color-warning);}
+.badge-error{background:var(--ui-sys-color-error-container);color:var(--ui-sys-color-error);}
+.badge-neutral{background:var(--ui-sys-color-surface-variant);color:var(--ui-sys-color-on-surface-variant);}
+
+/* 卡片示例 */
+.mini-card{border-radius:var(--ui-sys-shape-corner-large);padding:var(--ui-sys-spacing-large);
+  background:var(--ui-sys-color-surface);box-shadow:var(--ui-sys-elevation-large);}
+.mini-card .t{font-size:var(--ui-sys-font-size-headline-medium);font-weight:var(--ui-sys-font-weight-heavy);margin-bottom:var(--ui-sys-spacing-small);}
+.mini-card.underlined{box-shadow:none;border-bottom:2px solid var(--ui-sys-color-primary);border-radius:var(--ui-sys-shape-corner-large) var(--ui-sys-shape-corner-large) 0 0;}
+
+/* 表格示例（仿 --ui-comp-table-*） */
+table.demo{width:100%;border-collapse:collapse;border:1px solid var(--ui-sys-color-outline-variant);
+  border-radius:var(--ui-sys-shape-corner-medium);overflow:hidden;}
+table.demo th{background:var(--ui-sys-color-surface-variant);color:var(--ui-sys-color-on-surface-variant);
+  font-weight:var(--ui-sys-font-weight-strong);text-align:left;
+  padding:var(--ui-sys-spacing-small) var(--ui-sys-spacing-medium);font-size:var(--ui-sys-font-size-label-medium);
+  border-bottom:1px solid var(--ui-sys-color-outline-variant);}
+table.demo td{padding:var(--ui-sys-spacing-small) var(--ui-sys-spacing-medium);font-size:var(--ui-sys-font-size-label-medium);
+  color:var(--ui-sys-color-on-surface);border-bottom:1px solid var(--ui-sys-color-outline-variant);}
+table.demo tr:last-child td{border-bottom:none;}
+
+/* ---- do / don't 卡片 ---- */
+.dd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--ui-sys-spacing-medium);}
+.dd{border-radius:var(--ui-sys-shape-corner-medium);overflow:hidden;border:1px solid var(--ui-sys-color-outline-variant);}
+.dd .head{padding:var(--ui-sys-spacing-small) var(--ui-sys-spacing-medium);font-weight:var(--ui-sys-font-weight-strong);
+  font-size:var(--ui-sys-font-size-label-medium);}
+.dd.bad .head{background:var(--ui-sys-color-error-container);color:var(--ui-sys-color-error);}
+.dd.good .head{background:var(--ui-sys-color-success-container);color:var(--ui-sys-color-success);}
+.dd pre{margin:0;padding:var(--ui-sys-spacing-medium);background:var(--ui-sys-color-surface-variant);
+  font-family:var(--ui-sys-font-family-code);font-size:var(--ui-sys-font-size-label-small);
+  color:var(--ui-sys-color-on-surface);overflow-x:auto;white-space:pre;line-height:1.7;}
+
+/* ---- AI 摘要 ---- */
+.ai-box{background:var(--ui-sys-color-surface-variant);border-left:4px solid var(--ui-sys-color-primary);
+  border-radius:0 var(--ui-sys-shape-corner-medium) var(--ui-sys-shape-corner-medium) 0;padding:var(--ui-sys-spacing-large);}
+.ai-box ul{margin:0;padding-left:var(--ui-sys-spacing-large);}
+.ai-box li{margin-bottom:var(--ui-sys-spacing-small);}
+
+/* ---- 響應式 ---- */
+@media (max-width:820px){
+  .sidenav{display:none;}
+  main{padding:var(--ui-sys-spacing-medium);}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- 側邊導覽（可跳段落） -->
+  <nav class="sidenav">
+    <div class="brand">防災協作中心<br>Design System</div>
+    <a href="#intro">總覽 · 三層架構</a>
+    <a href="#colors">色彩色票牆</a>
+    <a href="#type">字級與間距</a>
+    <a href="#components">元件示例</a>
+    <a href="#rules">常見違規對照</a>
+    <a href="#ai">給 AI 的重點摘要</a>
+  </nav>
+
+  <main>
+    <!-- 1. 總覽 + 三層架構 -->
+    <section id="intro" class="hero">
+      <span class="pill">單一事實來源：tokens/*.css</span>
+      <h1>一套「顏色、字級、間距都不用背」的設計系統</h1>
+      <p class="lead">所有視覺數值都收斂成 <strong>Token（CSS 變數）</strong>，分成三層。你寫元件時只查最上層、不碰原始色碼，改版時只改一個變數、全站同步。這頁本身就是用這套 Token 畫出來的。</p>
+    </section>
+
+    <section>
+      <h2>三層架構：COMP → SYS → REF（只能往上引用）</h2>
+      <p class="muted">由下往上引用：元件層引用語意層、語意層引用原始層。<strong>不可跨層、不可向下、不可硬編碼 hex。</strong></p>
+      <div class="arch">
+        <div class="layer comp">
+          <span class="tag">COMP 層 · 元件 Token</span>
+          <span class="desc">逐元件的視覺決策，元件實作只查這層。<code>--ui-comp-button-bg-primary-default</code>、<code>--ui-comp-input-border-focus</code></span>
+        </div>
+        <div class="arrow">▲<small>var() 向上引用 ✅</small></div>
+        <div class="layer sys">
+          <span class="tag">SYS 層 · 語意別名</span>
+          <span class="desc">把原始值賦予意義，設計決策集中在這層。<code>--ui-sys-color-primary</code>、<code>--ui-sys-spacing-medium</code>、<code>--ui-sys-elevation-large</code></span>
+        </div>
+        <div class="arrow">▲<small>var() 向上引用 ✅</small></div>
+        <div class="layer ref">
+          <span class="tag">REF 層 · 原始數值</span>
+          <span class="desc">最底層的實際色碼與尺寸（Tailwind 色票、px 間距、圓角）。<strong>開發時禁止直接使用。</strong><code>#C8232C</code>、<code>--ui-ref-spacing-16 = 16px</code></span>
+        </div>
+      </div>
+
+      <h3>引用鏈範例：一顆主要按鈕的背景</h3>
+      <div class="chain">
+<span class="k-comp">--ui-comp-button-bg-primary-default</span>  ──▶  引用 SYS
+    └─ <span class="k-sys">--ui-sys-color-primary</span>            ──▶  引用 REF
+          └─ <span class="k-ref">#C8232C</span>  (品牌紅，實際渲染色)
+      </div>
+      <p class="demo-note" style="margin-top:16px;">
+        ✅ <code>COMP → SYS → REF</code> 正確方向
+        ❌ <code>COMP → REF</code> 跨層（跳過 SYS）
+        ❌ <code>COMP → 硬編碼 #hex</code>
+        ❌ <code>SYS → COMP</code> 向下引用
+      </p>
+    </section>
+
+    <!-- 2. 色彩色票牆 -->
+    <section id="colors">
+      <h2>色彩色票牆</h2>
+      <p class="muted">以下 hex 全部取自 <code>tokens/design-token.css</code> 實檔。<strong>寫程式一律引用 token 別名，禁止把 hex 打進 code。</strong></p>
+
+      <h3>主色 Primary（品牌紅 #C8232C）</h3>
+      <p class="muted">⚠️ 重點：主色是<strong>紅色</strong>不是藍色。舊文件寫的 sky-600 已作廢，一律以實檔為準。</p>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary)"></div><div class="meta"><div class="name">color-primary</div><div class="hex">#C8232C</div><div class="use">主要行動 / 品牌 / 選中態</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-hover)"></div><div class="meta"><div class="name">primary-hover</div><div class="hex">#A01D24</div><div class="use">hover / pressed</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container)"></div><div class="meta"><div class="name">primary-container</div><div class="hex">#FFF0F0</div><div class="use">focus ring / 淺容器</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-on-primary);border-bottom:1px solid var(--ui-sys-color-outline-variant)"></div><div class="meta"><div class="name">on-primary</div><div class="hex">#FFFFFF</div><div class="use">紅底上的白字</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-on-primary-container)"></div><div class="meta"><div class="name">on-primary-container</div><div class="hex">#6B0C10</div><div class="use">淺紅容器上的深字</div></div></div>
+      </div>
+
+      <h3>次要色 Secondary（中性灰，非彩色）</h3>
+      <p class="muted">⚠️ 重點：次要色是<strong>中性灰</strong>，刻意不用彩色，避免與功能色搶色。</p>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-secondary)"></div><div class="meta"><div class="name">secondary</div><div class="hex">#d4d4d4</div><div class="use">neutral-300 · 次要按鈕</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-secondary-hover)"></div><div class="meta"><div class="name">secondary-hover</div><div class="hex">#a1a1a1</div><div class="use">neutral-400</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-secondary-container)"></div><div class="meta"><div class="name">secondary-container</div><div class="hex">#e5e5e5</div><div class="use">neutral-200</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-on-secondary)"></div><div class="meta"><div class="name">on-secondary</div><div class="hex">#404040</div><div class="use">neutral-700 · 次要色上字</div></div></div>
+      </div>
+
+      <h3>功能色 Semantic（success / warning / error / info）</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-success)"></div><div class="meta"><div class="name">success</div><div class="hex">#00c16a</div><div class="use">green-500 · 完成 / 確認</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-success-container)"></div><div class="meta"><div class="name">success-container</div><div class="hex">#effdf5</div><div class="use">green-50</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-warning)"></div><div class="meta"><div class="name">warning</div><div class="hex">#ffba00</div><div class="use">amber-400 · 注意 / 待辦</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-warning-container)"></div><div class="meta"><div class="name">warning-container</div><div class="hex">#fffbeb</div><div class="use">amber-50</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-error)"></div><div class="meta"><div class="name">error</div><div class="hex">#fb2c36</div><div class="use">red-500 · 錯誤 / 刪除</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-error-container)"></div><div class="meta"><div class="name">error-container</div><div class="hex">#fef2f2</div><div class="use">red-50</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-info)"></div><div class="meta"><div class="name">info</div><div class="hex">#fb64b6</div><div class="use">pink-400 · 一般提示</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-info-container)"></div><div class="meta"><div class="name">info-container</div><div class="hex">#fdf2f8</div><div class="use">pink-50</div></div></div>
+      </div>
+
+      <h3>中性灰階 Neutral（表面 / 文字 / 邊框來源）</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-50);border-bottom:1px solid var(--ui-sys-color-outline-variant)"></div><div class="meta"><div class="name">neutral-50</div><div class="hex">#fafafa</div><div class="use">surface-variant / 頁面</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-100)"></div><div class="meta"><div class="name">neutral-100</div><div class="hex">#f5f5f5</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-200)"></div><div class="meta"><div class="name">neutral-200</div><div class="hex">#e5e5e5</div><div class="use">outline-variant · 邊框</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-300)"></div><div class="meta"><div class="name">neutral-300</div><div class="hex">#d4d4d4</div><div class="use">secondary / disabled</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-400)"></div><div class="meta"><div class="name">neutral-400</div><div class="hex">#a1a1a1</div><div class="use">on-disabled</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-500)"></div><div class="meta"><div class="name">neutral-500</div><div class="hex">#737373</div><div class="use">outline · 強調邊框</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-600)"></div><div class="meta"><div class="name">neutral-600</div><div class="hex">#525252</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-700)"></div><div class="meta"><div class="name">neutral-700</div><div class="hex">#404040</div><div class="use">on-surface-variant · 次要字</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-800)"></div><div class="meta"><div class="name">neutral-800</div><div class="hex">#262626</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-900)"></div><div class="meta"><div class="name">neutral-900</div><div class="hex">#171717</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-ref-color-neutral-950)"></div><div class="meta"><div class="name">neutral-950</div><div class="hex">#0a0a0a</div><div class="use">on-surface · 主要字</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-surface-page);border-bottom:1px solid var(--ui-sys-color-outline-variant)"></div><div class="meta"><div class="name">surface-page</div><div class="hex">#F5F6F8</div><div class="use">業務頁面主背景</div></div></div>
+      </div>
+    </section>
+
+    <!-- 3. 字級與間距 -->
+    <section id="type">
+      <h2>字級與間距</h2>
+
+      <h3>字級 Typescale（實際渲染大小）</h3>
+      <p class="muted">字族預設 Noto Sans TC（本頁未載外部 webfont，改用系統中文字備援）。字重：400 default / 500 emphasis / 600 strong / 700 heavy。</p>
+      <div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-display-large);font-weight:700;line-height:1.2;">防災協作 Display L</div><div class="spec">display-large · 48px · heavy</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-display-medium);font-weight:700;">防災協作 Display M</div><div class="spec">display-medium · 32px</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-headline-large);font-weight:700;">頁面主標 Headline L</div><div class="spec">headline-large · 24px · 頁面標題</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-headline-medium);font-weight:600;">卡片標題 Headline M</div><div class="spec">headline-medium · 20px · 卡片標題</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-body-large);">主要內文 Body L</div><div class="spec">body-large · 20px · 主要內文</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-body-medium);">一般內文 Body M（Input / Table）</div><div class="spec">body-medium · 18px</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-label-large);font-weight:600;">UI 標籤 Label L（Tab / Stepper）</div><div class="spec">label-large · 18px</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-label-medium);font-weight:600;">次要標籤 Label M</div><div class="spec">label-medium · 16px</div></div>
+        <div class="type-row"><div class="sample" style="font-size:var(--ui-sys-font-size-label-small);font-weight:600;">Badge / 說明 Label S</div><div class="spec">label-small · 14px</div></div>
+      </div>
+
+      <h3>間距尺規 Spacing（實際 token 值）</h3>
+      <p class="muted">Tailwind 簡寫：<code>*-xs</code>=4 / <code>*-sm</code>=8 / <code>*-md</code>=16 / <code>*-lg</code>=24 / <code>*-xl</code>=40。間距刻意用固定 px，不跟字體縮放。</p>
+      <div>
+        <div class="ruler-row"><div class="label">spacing-xxs · 2px</div><div class="bar" style="width:2px;"></div></div>
+        <div class="ruler-row"><div class="label">spacing-extra-small · 4px (xs)</div><div class="bar" style="width:4px;"></div></div>
+        <div class="ruler-row"><div class="label">spacing-small · 8px (sm)</div><div class="bar" style="width:8px;"></div></div>
+        <div class="ruler-row"><div class="label">spacing-medium · 16px (md)</div><div class="bar" style="width:16px;"></div></div>
+        <div class="ruler-row"><div class="label">spacing-large · 24px (lg)</div><div class="bar" style="width:24px;"></div></div>
+        <div class="ruler-row"><div class="label">spacing-extra-large · 40px (xl)</div><div class="bar" style="width:40px;"></div></div>
+      </div>
+
+      <h3>圓角 Radius（實際 token 值）</h3>
+      <div class="swatch-grid" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container);height:56px;margin:8px;border-radius:var(--ui-sys-shape-corner-extra-small);border:2px solid var(--ui-sys-color-primary);"></div><div class="meta"><div class="name">extra-small</div><div class="hex">2px</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container);height:56px;margin:8px;border-radius:var(--ui-sys-shape-corner-small);border:2px solid var(--ui-sys-color-primary);"></div><div class="meta"><div class="name">small</div><div class="hex">4px · Tag</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container);height:56px;margin:8px;border-radius:var(--ui-sys-shape-corner-medium);border:2px solid var(--ui-sys-color-primary);"></div><div class="meta"><div class="name">medium</div><div class="hex">8px · Button/Input</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container);height:56px;margin:8px;border-radius:var(--ui-sys-shape-corner-large);border:2px solid var(--ui-sys-color-primary);"></div><div class="meta"><div class="name">large</div><div class="hex">16px · Card/Modal</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ui-sys-color-primary-container);height:56px;margin:8px;border-radius:var(--ui-sys-shape-corner-full);border:2px solid var(--ui-sys-color-primary);"></div><div class="meta"><div class="name">full</div><div class="hex">999px · Badge</div></div></div>
+      </div>
+    </section>
+
+    <!-- 4. 元件示例 -->
+    <section id="components">
+      <h2>元件示例（純 HTML/CSS 仿製 + 該用哪個 token）</h2>
+      <div class="demo-grid">
+
+        <div class="demo-box">
+          <div class="demo-title">按鈕 Button</div>
+          <button class="btn btn-primary">主要按鈕</button>
+          <button class="btn btn-secondary">次要按鈕</button>
+          <button class="btn btn-error">危險刪除</button>
+          <button class="btn btn-disabled" disabled>已停用</button>
+          <div class="demo-note">
+            主要 → <code>--ui-comp-button-bg-primary-default</code>（= primary）<br>
+            次要 → <code>--ui-comp-button-bg-secondary-*</code>（中性灰）<br>
+            危險 → <code>--ui-comp-button-bg-error-*</code>；圓角 <code>--ui-comp-button-radius</code>（8px）<br>
+            五態必補齊：default / hover / focus / active / disabled
+          </div>
+        </div>
+
+        <div class="demo-box">
+          <div class="demo-title">輸入框 Input（含錯誤狀態）</div>
+          <div class="field">
+            <label>單位名稱</label>
+            <input type="text" value="第一救災大隊">
+            <div class="helper">請輸入正式單位全名</div>
+          </div>
+          <div class="field err">
+            <label>聯絡電話</label>
+            <input type="text" value="09-abc">
+            <div class="helper">格式錯誤，請輸入正確號碼</div>
+          </div>
+          <div class="demo-note">
+            label 永遠在上方，不可用 placeholder 取代<br>
+            預設 → <code>--ui-comp-input-border-default</code><br>
+            錯誤 → <code>--ui-comp-input-border-error</code> + <code>--ui-comp-input-bg-error</code>
+          </div>
+        </div>
+
+        <div class="demo-box">
+          <div class="demo-title">狀態徽章 Badge（膠囊）</div>
+          <span class="badge badge-primary">已核准</span>
+          <span class="badge badge-success">正常</span>
+          <span class="badge badge-warning">待處理</span>
+          <span class="badge badge-error">逾期</span>
+          <span class="badge badge-neutral">草稿</span>
+          <div class="demo-note">
+            形狀必須膠囊 <code>--ui-comp-badge-radius</code>（rounded-full 999px）<br>
+            <code>--ui-comp-badge-bg-{變體}</code> + <code>--ui-comp-badge-text-{變體}</code><br>
+            字級 label-small(14px)、字重 strong(600)；只讀不可點
+          </div>
+        </div>
+
+        <div class="demo-box">
+          <div class="demo-title">卡片 Card</div>
+          <div class="mini-card" style="margin-bottom:16px;">
+            <div class="t">浮起卡片 Elevated</div>
+            <div class="muted">帶陰影 <code>--ui-comp-card-shadow-elevated</code>（0 8px 16px .10）</div>
+          </div>
+          <div class="mini-card underlined">
+            <div class="t">底線卡片 Underlined</div>
+            <div class="muted">底部 2px 品牌紅（mnd 風格）</div>
+          </div>
+          <div class="demo-note">
+            圓角 16px <code>--ui-comp-card-radius</code>、內距 24px <code>--ui-comp-card-padding</code>
+          </div>
+        </div>
+
+        <div class="demo-box" style="grid-column:1/-1;">
+          <div class="demo-title">表格 Table</div>
+          <table class="demo">
+            <thead><tr><th>單位</th><th>類別</th><th>狀態</th></tr></thead>
+            <tbody>
+              <tr><td>第一救災大隊</td><td>消防</td><td><span class="badge badge-success">開設中</span></td></tr>
+              <tr><td>市立醫院急救站</td><td>醫療</td><td><span class="badge badge-warning">待命</span></td></tr>
+              <tr><td>轄區派出所</td><td>警察</td><td><span class="badge badge-neutral">未開設</span></td></tr>
+            </tbody>
+          </table>
+          <div class="demo-note">
+            表頭 <code>--ui-comp-table-header-bg</code>（surface-variant）+ 字重 strong<br>
+            儲存格 <code>--ui-comp-table-cell-text</code> / 框線 <code>--ui-comp-table-cell-border</code>（outline-variant）；外框圓角 8px
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. 常見違規對照 -->
+    <section id="rules">
+      <h2>常見違規對照（❌ 硬編碼 vs ✅ 用 token）</h2>
+      <div class="dd-grid">
+
+        <div class="dd bad"><div class="head">❌ 硬編碼色值 / 間距 / 字級</div>
+<pre>&lt;div class="bg-[#C8232C]
+  p-[12px] text-[14px]"&gt;…&lt;/div&gt;</pre></div>
+        <div class="dd good"><div class="head">✅ 用語意別名</div>
+<pre>&lt;div class="bg-primary
+  p-sm text-label-small"&gt;…&lt;/div&gt;</pre></div>
+
+        <div class="dd bad"><div class="head">❌ 直接用 REF 原始 token（跨層）</div>
+<pre>&lt;span class="text-[var(
+  --ui-ref-color-red-500)]"&gt;…</pre></div>
+        <div class="dd good"><div class="head">✅ 用 SYS 語意</div>
+<pre>&lt;span class="text-error"&gt;…&lt;/span&gt;</pre></div>
+
+        <div class="dd bad"><div class="head">❌ 次要色用彩色</div>
+<pre>&lt;UButton color="secondary"
+  class="bg-blue-500"&gt;次要&lt;/UButton&gt;</pre></div>
+        <div class="dd good"><div class="head">✅ 次要 = 中性灰（neutral-300）</div>
+<pre>&lt;UButton color="secondary"&gt;
+  次要&lt;/UButton&gt;</pre></div>
+
+        <div class="dd bad"><div class="head">❌ Badge 不用膠囊 / Input 缺 label</div>
+<pre>&lt;span class="rounded-md"&gt;狀態&lt;/span&gt;
+&lt;UInput placeholder="姓名" /&gt;</pre></div>
+        <div class="dd good"><div class="head">✅ 膠囊 Badge + 獨立 label</div>
+<pre>&lt;UBadge color="primary"&gt;狀態&lt;/UBadge&gt;
+&lt;UFormGroup label="姓名"&gt;
+  &lt;UInput placeholder="請輸入姓名" /&gt;
+&lt;/UFormGroup&gt;</pre></div>
+
+        <div class="dd bad"><div class="head">❌ 用 !important / scoped 強蓋元件</div>
+<pre>&lt;style scoped&gt;
+:deep(.btn){background:#C8232C
+  !important;}
+&lt;/style&gt;</pre></div>
+        <div class="dd good"><div class="head">✅ 改用 app.config.ts 綁 token</div>
+<pre>// app.config.ts
+ui.button.color.primary.solid:
+  'bg-[var(--ui-comp-button-bg
+   -primary-default)] ...'</pre></div>
+
+      </div>
+    </section>
+
+    <!-- 6. 給 AI 的重點摘要 -->
+    <section id="ai">
+      <h2>把規則餵給 AI 時的重點摘要</h2>
+      <p class="muted">要 AI 幫忙寫這套系統的畫面時，把下面幾條貼進提示詞，命中率最高：</p>
+      <div class="ai-box">
+        <ul>
+          <li><strong>三層 Token，只能往上引用：</strong>COMP → SYS → REF。元件實作優先用 <code>--ui-comp-*</code>；沒有對應 COMP 才退用 <code>--ui-sys-*</code>；<strong>永遠不要碰 <code>--ui-ref-*</code> 或硬編碼 hex/px</strong>。</li>
+          <li><strong>主色是品牌紅 <code>#C8232C</code></strong>（<code>--ui-sys-color-primary</code>），不是藍色。舊文件寫的 sky-600 一律忽略，以 <code>tokens/design-token.css</code> 為單一事實來源。</li>
+          <li><strong>次要色是中性灰</strong>（neutral-300），刻意非彩色。次要按鈕不要塗成藍或綠。</li>
+          <li><strong>功能色語意固定：</strong>success=綠、warning=琥珀、error=紅、info=粉。每個都有配套 <code>-hover</code> / <code>-container</code> / <code>-on-*</code>。</li>
+          <li><strong>間距 / 圓角 / 字級一律用語意簡寫</strong>（<code>p-md</code>、<code>rounded-lg</code>、<code>text-body-medium</code>），禁止 arbitrary value（<code>p-[16px]</code>、<code>text-[18px]</code>）。</li>
+          <li><strong>元件硬規則：</strong>Button 五態齊全（default/hover/focus/active/disabled）；Input 的 label 永遠在上方；Badge 必須膠囊 <code>rounded-full</code> 且只讀；Card 圓角 16px / 內距 24px。</li>
+          <li><strong>不要用 <code>!important</code> 或 <code>&lt;style scoped&gt;</code> 覆蓋 Nuxt UI</strong>，要改樣式走 <code>app.config.ts</code> 綁 COMP token。</li>
+          <li><strong>無障礙：</strong>focus ring 用對應 <code>-container</code> 色；顏色不作為唯一資訊（狀態同時給文字/圖示）；支援字體縮放至 150% 不破版。</li>
+        </ul>
+      </div>
+      <p class="muted" style="margin-top:24px;">
+        延伸閱讀（同資料夾）：<code>docs/design-system-手冊.md</code>（完整規則與決策樹）、<code>docs/元件目錄.md</code>（共用元件 API）、<code>tokens/design-token.css</code> 與 <code>tokens/comp-tokens.css</code>（token 實檔）。
+      </p>
+    </section>
+
+    <p class="muted" style="text-align:center;padding:24px 0;">防災協作中心 Design System · 本頁所有數值取自 tokens/*.css 實檔，並以自家 token 渲染（吃自己的狗糧）。</p>
+  </main>
+</div>
+</body>
+</html>
