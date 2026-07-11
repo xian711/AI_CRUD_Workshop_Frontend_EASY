@@ -1,6 +1,6 @@
 # AI CRUD 工作坊 — Frontend EASY 版
 
-> 一句話：**範本給骨架、harness 給規矩、AI 出勞力**——2 小時學會用「CRUD 標準範本＋AI harness」把新模組從三天壓到一小時內完工。
+> 一句話：**範本給骨架、harness 給規矩、AI 出勞力**——2 小時學會用「CRUD 標準範本＋AI harness」開發新模組；課程目標是讓新模組的骨架在一小時內長出來（依 AI Agent 與網路情況而異）。
 
 ## 快速開始（學員）
 
@@ -21,11 +21,12 @@ cd step0_course_intro
 |--------|------|:---:|
 | [step0_course_intro/](step0_course_intro/) | 課程說明、前置檢查、大綱與預期效益 | 10 分 |
 | [step1_why_harness/](step1_why_harness/) | 為什麼要 harness：同一句需求，有／沒有 harness 的產出對比 demo | 15 分 |
-| [step2_speedrun_kit/](step2_speedrun_kit/) | 快速完工秘笈：玩範本 → SRS/SDD → harness 三件套 → Design System → 範本程式 | 35 分 |
-| [step3_new_module/](step3_new_module/) | 複製範本開發新模組：真實 PRD → AI 釐清選擇題 → 任務清單 → 生成 → 驗收 | 40 分 |
-| [step4_loop_e2e/](step4_loop_e2e/) | 加速技：LOOP 工程＋E2E 視覺審查＋雙 AI 對抗審查 | 15 分 |
-| [step5_wrapup/](step5_wrapup/) | 課程總結、回去公司怎麼用 | 5 分 |
+| [step2_speedrun_kit/](step2_speedrun_kit/) | 快速完工秘笈：玩範本 → SRS/SDD → harness 四件 → Design System → 範本程式 | 40 分 |
+| [step3_new_module/](step3_new_module/) | 複製範本開發新模組：真實 PRD → AI 釐清選擇題 → 任務清單 → 生成 → 驗收 | 35 分 |
+| [step4_loop_e2e/](step4_loop_e2e/) | 加速技：LOOP 工程（紅→判因→修→綠實作 lab）＋E2E 功能驗證＋雙 AI 對抗審查 | 15 分 |
+| [step5_wrapup/](step5_wrapup/) | 課程總結、評量量表（RUBRIC）、回去公司怎麼用 | 5 分 |
 | [HANDBOOK/](HANDBOOK/) | step-by-step 圖文學習手冊（16 張實拍截圖） | 課後自學 |
+| [instructor/](instructor/) | 講師專用：時間軸手冊、SCOPE 答案、checkpoint 套用腳本（學員請勿先看） | 講師 |
 
 ## 兩個可以跑的專案
 

@@ -179,7 +179,7 @@ import {
   categoryLabelOf,
   categoryOrderOf,
   statusLabelOf,
-  todayString,
+  equipmentTodayString,
   EQUIPMENT_CATEGORIES,
   EQUIPMENT_STATUS_OPTIONS,
   type EquipmentItem,
@@ -338,7 +338,7 @@ function handleExport() {
     { label: '採購日期', value: row => row.purchaseDate },
     { label: '備註', value: row => row.specNote },
   ]
-  const stamp = todayString().replace(/-/g, '') // 本地時區日期
+  const stamp = equipmentTodayString().replace(/-/g, '') // 本地時區日期
   exportCsv(`裝備物資清單-${stamp}.csv`, columns, sortedRows.value)
   toast.add({ title: `已匯出 ${sortedRows.value.length} 筆`, color: 'green', icon: 'i-heroicons-check-circle' })
 }

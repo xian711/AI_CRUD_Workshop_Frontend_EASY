@@ -1,6 +1,6 @@
 # AI CRUD 工作坊 EASY 版 — Step-by-Step 學習手冊
 
-> **一句話**：用「範本 + harness + AI」把一個全新的 CRUD 模組，從三天的工作量壓縮到一小時做出堪用骨架。
+> **一句話**：用「範本 + harness + AI」把一個全新的 CRUD 模組，長出堪用骨架。課程目標：讓新 CRUD 模組的骨架在一小時內長出來（實測數據隨試教梯次更新）。
 >
 > 這份手冊帶你把整堂課從頭走一遍。每一步都有「要做到什麼、怎麼做、會看到什麼、為什麼」，課後照著走也能自己重現。
 
@@ -12,9 +12,9 @@
 |------|--------------|:---:|
 | step0 | 課程說明、前置檢查 | 10 分 |
 | step1 | 為什麼要 harness（有／沒有 harness 產出對比） | 15 分 |
-| step2 | CRUD 快速完工秘笈（玩範本 → 系統文件 → harness 三件套 → Design System → 範本程式） | 35 分 |
-| step3 | 複製範本開發新模組（PRD → AI 生成 → 反覆修正）**← 重頭戲** | 40 分 |
-| step4 | LOOP 工程（改→驗→再改）＋ E2E 視覺審查 ＋ 雙 AI 對抗審查 | 15 分 |
+| step2 | CRUD 快速完工秘笈（玩範本 → 系統文件 → harness 四件 → Design System → 範本程式） | 40 分 |
+| step3 | 複製範本開發新模組（PRD → AI 生成 → 反覆修正）**← 重頭戲** | 35 分 |
+| step4 | LOOP 工程（改→驗→再改）＋ E2E 功能驗證＋失敗截圖診斷 ＋ 雙 AI 對抗審查 | 15 分 |
 | step5 | 課程總結、回去怎麼用 | 5 分 |
 
 **這門課給誰**：會寫程式、但還沒用過 AI harness 開發的工程師。不要求會 Vue／Nuxt，看得懂前端程式碼會更順。不需要提示詞經驗，課程會示範怎麼下指令。
@@ -102,7 +102,7 @@ harness 就是你交給 AI 的一套「規矩」：**專案規則（CODE-RULES�
 
 1. 記住快速完工的公式：**範本給骨架、harness 給規矩、AI 出勞力。**
 2. 把現成範本當使用者操作一輪，建立心智模型。
-3. 認得 harness 三件套、Design System、範本八個核心檔。
+3. 認得前端 harness 四件、Design System、範本八個核心檔。
 
 ### 👣 跟著做
 
@@ -112,7 +112,7 @@ harness 就是你交給 AI 的一套「規矩」：**專案規則（CODE-RULES�
 |---|---|---|
 | `2.1_play_template` | 玩一輪範本 | 把現成範本當使用者操作一遍 |
 | `2.2_docs` | 範本的 SRS / SDD | 需要時查規格 |
-| `2.3_harness` | AI 的規矩三件套 | 讀懂 AI 每次會遵守的鐵律 |
+| `2.3_harness` | AI 的規矩四件 | 讀懂 AI 每次會遵守的鐵律 |
 | `2.4_design_system` | Design System 與 token | 知道顏色／間距一律走 token |
 | `2.5_sample_app` | 人員 CRUD 範例（範本正本） | 安裝啟動、對照 8 核心檔 |
 
@@ -192,12 +192,14 @@ harness 就是你交給 AI 的一套「規矩」：**專案規則（CODE-RULES�
 ```powershell
 # 在工作坊根目錄執行：複製範本成你的工作專案
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
-# 把題目文件複製進專案根目錄（AI 才讀得到）
-Copy-Item step3_new_module\PRD-中心裝備物資.md, step3_new_module\SCOPE-課堂範圍決策.md step3_new_module\my-equipment-app\
+# 只把 PRD 放進專案（AI 才讀得到需求）
+Copy-Item step3_new_module\PRD-中心裝備物資.md step3_new_module\my-equipment-app\
 cd step3_new_module\my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
 ```
+
+> **範圍答案由講師在你完成六題釐清後發放**（`instructor/SCOPE-課堂範圍決策.md`），先別偷看。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。
 
 > harness 四件（`CLAUDE.md`、`CODE-RULES-ui-本專案.md`、`design-system-summary.md`、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。
 
@@ -249,7 +251,7 @@ AI 會產出 8-10 個小到能單獨驗收的任務（T1 資料模型與 mock、
 
 **⑤ 驗收與修正（3.3）**
 
-確認 dev server 在跑（port 3100），打開 <http://localhost:3100/equipment/crud>，拿 `SCOPE-課堂範圍決策.md` 的欄位規格逐項對照。
+確認 dev server 在跑（port 3100），打開 <http://localhost:3100/equipment/crud>，拿講師發放的 `SCOPE-課堂範圍決策.md`（`instructor/SCOPE-課堂範圍決策.md`）欄位規格逐項對照。
 
 ### 👀 你應該看到
 
@@ -341,6 +343,19 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
    若判斷是 App 真的有 bug，記下來回報，但不要動 App。
    ```
 
+4. 動手經歷一次「紅 → 判因 → 修 → 綠」（LOOP 真正的重點，不是只看一次綠）：
+
+   ```powershell
+   cd lab-red-to-green
+   powershell -ExecutionPolicy Bypass -File .\inject-bug.ps1   # 讓 E4 變紅
+   cd ..
+   powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1      # 看失敗訊息，判斷是 App bug 還是測試 bug
+   cd lab-red-to-green
+   powershell -ExecutionPolicy Bypass -File .\restore.ps1      # 修回（或自己把驗證規則加回去）
+   cd ..
+   powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1      # 再跑一次，確認回到 7/7 綠
+   ```
+
 ### 👀 你應該看到
 
 `run-e2e.ps1` 印出 7 條測試全數 `ok`，最後 `7 passed`、`EXITCODE=0`。
@@ -359,9 +374,13 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
 | E6 | `/template/crud` 正常載入 | Regression（沒改壞範本） |
 | E7 | 編輯品項：改數量與存放地點，儲存後新值生效 | Update |
 
+跑 `inject-bug.ps1` 後再跑一次 `run-e2e.ps1`，會看到 **E4 變紅**（等不到「請選擇分類」錯誤訊息）；跑 `restore.ps1`（或自己修回驗證規則）後再跑一次，7 條會**全部變回綠**。
+
 ### 💡 為什麼
 
-**兩次停損規則**：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。**修測試不修 App**：LOOP 很會「為了讓燈變綠」而作弊（放寬斷言、改壞 App 邏輯），用這條把它框住。另外，寫測試的 AI 不適合審自己（它傾向相信自己寫對了），收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。
+**兩次停損規則**：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。**修測試不修 App**：LOOP 很會「為了讓燈變綠」而作弊（放寬斷言、改壞 App 邏輯），用這條把它框住。另外，寫測試的 AI 不適合審自己（它傾向相信自己寫對了），收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。**LOOP 的核心是經歷紅到綠，不是看到綠**——只跑出一次全綠只證明現在沒壞，真正學到的是變紅之後怎麼判因、怎麼修。
+
+> 這 7 條測試是**功能驗證＋失敗截圖診斷**（失敗時自動存一張截圖，給人也給 AI 判讀用），不是 pixel 比對的視覺回歸。**真正的視覺審查＝人逐張看截圖**（本手冊 16 張就是這樣審的），不是靠自動化斷言能取代的。
 
 > **建置紀律補充**：這套測試第一次跑就全綠，靠的是「先 probe 探 DOM、再寫 selector」——探路的成本，遠低於用死站點瞎猜 selector 反覆跑紅的成本。細節見 `EVIDENCE-建置實錄.md`。
 
@@ -381,19 +400,19 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
 | Step | 帶走的觀念 |
 |---|---|
 | step1 | 同一句需求，有沒有附「規矩」（harness），產出天差地遠——差的不是功能，是像不像同一個團隊做的。 |
-| step2 | 一個成熟模組＝範本（骨架）＋系統文件（SRS/SDD）＋harness 三件套（規矩）＋Design System（視覺語言），缺一塊 AI 就會自由發揮出風險。 |
+| step2 | 一個成熟模組＝範本（骨架）＋系統文件（SRS/SDD）＋harness 四件（規矩）＋Design System（視覺語言），缺一塊 AI 就會自由發揮出風險。 |
 | step3 | 正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS/SDD → 生成程式與假資料 → 人工反覆修正；AI 主動提問代表 harness 在運作。 |
-| step4 | 可以讓 AI 自己跑「改→驗→再改」，但收尾一定要有人或另一個 AI 用 E2E 視覺審查、對抗審查把關，不能只靠 AI 說「做完了」。 |
+| step4 | 可以讓 AI 自己跑「改→驗→再改」，但收尾一定要有人或另一個 AI 用 E2E 功能驗證＋失敗截圖診斷、對抗審查把關，不能只靠 AI 說「做完了」。 |
 
 **回去怎麼用（三步驟）：**
 
-1. **把 harness 三件套帶進你的專案**——把 `CLAUDE.md`、`CODE-RULES-ui-本專案.md`、後端 harness 參考複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。
+1. **把前端 harness 四件帶進你的專案**——把 `CLAUDE.md`、`CODE-RULES-ui-本專案.md`、`design-system-summary.md`、使用說明（後端另有 harness 參考可比照）複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。
 2. **把既有標準頁面整理成範本**——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。
 3. **新需求走完整流程**——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。
 
 ### 💡 為什麼
 
-harness 方法**不綁框架**：不是 Nuxt 也適用，三件套換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，搭 `aspnet-api-ai-harness-v5` 做一個 .NET API CRUD 模組。
+harness 方法**不綁框架**：不是 Nuxt 也適用，四件內容換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，搭 `aspnet-api-ai-harness-v5` 做一個 .NET API CRUD 模組。
 
 ---
 
@@ -404,16 +423,17 @@ harness 方法**不綁框架**：不是 Nuxt 也適用，三件套換成你們�
 - [ ] 前置檢查 `preflight.ps1` 全數通過
 - [ ] 並排看過 no-harness 與 with-harness 兩頁，說得出至少三個差別
 - [ ] 範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現
-- [ ] 看過 Design System 與 harness 三件套，知道顏色／間距走 token
+- [ ] 看過 Design System 與前端 harness 四件，知道顏色／間距走 token
 - [ ] 讀懂 PRD，理解「PRD 給全貌，不是這堂課的範圍」
 - [ ] 貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）
 - [ ] 六題範圍逐題拍板，確認任務清單後才說「開工」
 - [ ] 裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現
 - [ ] `run-e2e.ps1` 跑出 7 條全綠、exit 0
+- [ ] 完成一次紅→判因→修→綠（留下四項證據）
 - [ ] 說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則
 
 ## 回去怎麼用（三步驟速記）
 
-1. **帶三件套**：CLAUDE.md ＋ CODE-RULES ＋ harness 參考，複製進你的專案、改成公司規則。
+1. **帶四件**：CLAUDE.md ＋ CODE-RULES ＋ design-system-summary ＋ 使用說明，複製進你的專案、改成公司規則。
 2. **整範本**：挑最成熟的 CRUD 頁，拆「複製區 vs 共用區」。
 3. **走流程**：PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。

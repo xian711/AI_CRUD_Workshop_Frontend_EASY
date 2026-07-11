@@ -10,7 +10,7 @@
 | T4 | 建資料層 `composables/useEquipmentItems.ts` | ✅ | 12 欄型別＋10 分類/項目查表＋ITEM_CODE_MAP＋24 筆種子＋async CRUD＋編碼產生 |
 | T5 | 複製兩元件 `EquipmentFormField.vue`／`EquipmentStatusBadge.vue` | ✅ | 命名空間隔離；狀態徽章綠/黃/紅查表配色 |
 | T6 | 建列表頁 `pages/equipment/crud/index.vue`（345 行） | ✅ | 關鍵字＋分類＋狀態篩選、點表頭排序、分頁 20、URL 同步、CSV 匯出、刪除確認 |
-| T7 | 建明細頁 `pages/equipment/crud/[id].vue`（424 行） | ✅ | 三態頁、分類→項目連動、編碼即時預覽、欄位級驗證（含電話/數量/採購日）、聚焦錯誤欄 |
+| T7 | 建明細頁 `pages/equipment/crud/[id].vue`（431 行，R1/R2 修正後） | ✅ | 三態頁、分類→項目連動、編碼即時預覽、欄位級驗證（含電話/數量/採購日）、聚焦錯誤欄 |
 | T8 | 導覽入口：`layouts/template.vue` navLinks 加「裝備物資」 | ✅ | 範本人員 CRUD 兩項不動，僅新增一項 |
 | T9 | 驗證：`pnpm build` 0 error → dev 煙霧測試兩路由 → 關 dev server | ✅ | build 0 error；/equipment/crud 與 /template/crud 皆 HTTP 200；標題已編入 bundle；關掉自起的 PID 37980 |
 
@@ -30,4 +30,4 @@
 ## 紀律確認
 
 - 未動 `06_tests`／未升任何套件／未重構範本既有程式；共用三檔零改動。
-- CODE-RULES 自檢：零硬編碼 hex／px（走 token 別名）、零 `console.log`、行數達標（列表 345≤420、明細 424≤550）、AppSafeTeleport 保留 hard-load 安全、「全部」哨兵非空字串、UI 全繁中。
+- CODE-RULES 自檢：零硬編碼 hex／px（走 token 別名）、零 `console.log`、行數達標（列表 345≤420、明細 431≤550；R1/R2 修正後）、AppSafeTeleport 保留 hard-load 安全、「全部」哨兵非空字串、UI 全繁中。

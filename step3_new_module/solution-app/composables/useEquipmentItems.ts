@@ -145,8 +145,11 @@ function ensureSeeded(): void {
   seeded = true
 }
 
-/** 今天日期（本地時區 YYYY-MM-DD）：勿用 toISOString()——其為 UTC，台灣時區早上 8 點前會差一天 */
-export function todayString(): string {
+/**
+ * 今天日期（本地時區 YYYY-MM-DD）：勿用 toISOString()——其為 UTC，台灣時區早上 8 點前會差一天。
+ * 具名前綴 equipment，避免與範本 useTemplateMembers 的 todayString 撞名造成 Nuxt 重複自動匯入警告（R2 P2-7）。
+ */
+export function equipmentTodayString(): string {
   const now = new Date()
   const month = String(now.getMonth() + 1).padStart(2, '0')
   const day = String(now.getDate()).padStart(2, '0')

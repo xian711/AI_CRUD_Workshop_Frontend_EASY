@@ -217,7 +217,7 @@ import {
   useEquipmentItems,
   categoryLabelOf,
   nextEquipmentCode,
-  todayString,
+  equipmentTodayString,
   itemsOfCategory,
   EQUIPMENT_CATEGORIES,
   EQUIPMENT_STATUS_META,
@@ -259,7 +259,7 @@ onUnmounted(() => {
 // ── 下拉選項 ──
 const categoryOptions = EQUIPMENT_CATEGORIES.map(c => ({ label: c.label, value: c.value }))
 const statusOptions = EQUIPMENT_STATUS_OPTIONS.map(value => ({ label: EQUIPMENT_STATUS_META[value], value }))
-const today = todayString()
+const today = equipmentTodayString()
 
 // 項目連動：一般分類給標準項目清單；「其他」分類改文字輸入
 const itemOptions = computed(() => itemsOfCategory(form.categoryKey))

@@ -97,6 +97,74 @@ try {
     Add-Result -Name "磁碟剩餘空間 >= 2GB" -Pass $false -Detail "檢查失敗：$($_.Exception.Message)" -FixHint "請手動確認系統磁碟至少有 2GB 剩餘空間"
 }
 
+# 6. ExecutionPolicy 可執行腳本（FAIL 級）
+try {
+    $cuPolicy = Get-ExecutionPolicy -Scope CurrentUser
+    $lmPolicy = Get-ExecutionPolicy -Scope LocalMachine
+    $effectivePolicy = Get-ExecutionPolicy
+    $blockedPolicies = @('Restricted', 'AllSigned')
+    if ($blockedPolicies -contains $effectivePolicy) {
+        Add-Result -Name "ExecutionPolicy 可執行腳本" -Pass $false -Detail "生效原則為 $effectivePolicy（CurrentUser=$cuPolicy／LocalMachine=$lmPolicy），會擋住腳本執行" -FixHint "請執行「Set-ExecutionPolicy -Scope CurrentUser RemoteSigned」後重跑 preflight.ps1"
+    } else {
+        Add-Result -Name "ExecutionPolicy 可執行腳本" -Pass $true -Detail "生效原則為 $effectivePolicy（CurrentUser=$cuPolicy／LocalMachine=$lmPolicy）" -FixHint ""
+    }
+} catch {
+    Add-Result -Name "ExecutionPolicy 可執行腳本" -Pass $false -Detail "檢查失敗：$($_.Exception.Message)" -FixHint "請執行「Set-ExecutionPolicy -Scope CurrentUser RemoteSigned」後重跑 preflight.ps1"
+}
+
+# 7. 工作區可寫入（FAIL 級）
+try {
+    $workshopRoot = Split-Path $PSScriptRoot -Parent
+    $probeFile = Join-Path $workshopRoot (".preflight_write_test_" + [guid]::NewGuid().ToString('N') + ".tmp")
+    New-Item -Path $probeFile -ItemType File -ErrorAction Stop | Out-Null
+    Remove-Item -Path $probeFile -Force -ErrorAction Stop
+    Add-Result -Name "工作區可寫入" -Pass $true -Detail "工作坊根目錄可建立／刪除暫存檔" -FixHint ""
+} catch {
+    Add-Result -Name "工作區可寫入" -Pass $false -Detail "無法在工作坊根目錄寫入：$($_.Exception.Message)" -FixHint "請把工作坊資料夾放到你有寫入權限的位置（避開唯讀磁碟或受控資料夾），或改用有權限的帳號執行"
+}
+
+# 8. npm registry 連線（WARN 級）
+try {
+    $null = Invoke-WebRequest -Uri "https://registry.npmjs.org" -Method Head -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+    Add-Result -Name "npm registry 連線" -Pass $true -Detail "可連上 registry.npmjs.org" -FixHint ""
+} catch {
+    Add-Result -Name "npm registry 連線" -Pass $true -Warn $true -Detail "無法連上 registry.npmjs.org（離線或防火牆）；離線教室請確認已預裝依賴（兩個專案的 node_modules 皆已就緒）" -FixHint ""
+}
+
+# 9. Playwright Chromium 已快取（WARN 級）
+try {
+    $pwCacheDir = Join-Path $env:LOCALAPPDATA "ms-playwright"
+    $chromiumDirs = @()
+    if (Test-Path $pwCacheDir) {
+        $chromiumDirs = @(Get-ChildItem -Path $pwCacheDir -Directory -Filter "chromium*" -ErrorAction SilentlyContinue)
+    }
+    if ($chromiumDirs.Count -gt 0) {
+        Add-Result -Name "Playwright Chromium 已快取" -Pass $true -Detail "已找到 $($chromiumDirs.Count) 個 chromium 快取目錄（step4 E2E 可直接跑）" -FixHint ""
+    } else {
+        Add-Result -Name "Playwright Chromium 已快取" -Pass $true -Warn $true -Detail "未找到 Chromium 快取；step4 首跑會自動下載約 150MB，離線教室請課前先跑一次 run-e2e.ps1" -FixHint ""
+    }
+} catch {
+    Add-Result -Name "Playwright Chromium 已快取" -Pass $true -Warn $true -Detail "無法檢查 Chromium 快取；step4 首跑會自動下載約 150MB，離線教室請課前先跑一次 run-e2e.ps1" -FixHint ""
+}
+
+# 10. AI Agent CLI（WARN 級）
+try {
+    $agentCandidates = @('claude', 'codex', 'cursor')
+    $foundAgents = @()
+    foreach ($agent in $agentCandidates) {
+        if (Get-Command $agent -ErrorAction SilentlyContinue) {
+            $foundAgents += $agent
+        }
+    }
+    if ($foundAgents.Count -gt 0) {
+        Add-Result -Name "AI Agent CLI" -Pass $true -Detail "偵測到：$($foundAgents -join '、')" -FixHint ""
+    } else {
+        Add-Result -Name "AI Agent CLI" -Pass $true -Warn $true -Detail "未偵測到常見 AI Agent CLI（claude／codex／cursor）；若用 IDE 內建 Agent（如 Cursor／Copilot）可忽略" -FixHint ""
+    }
+} catch {
+    Add-Result -Name "AI Agent CLI" -Pass $true -Warn $true -Detail "無法偵測 AI Agent CLI；若用 IDE 內建 Agent（如 Cursor／Copilot）可忽略" -FixHint ""
+}
+
 # 輸出清單
 foreach ($r in $results) {
     if ($r.Warn) {
@@ -124,3 +192,5 @@ if ($failCount -eq 0) {
     Write-Host "有 $failCount 項檢查未通過，請依上方修復提示處理後重新執行 preflight.ps1。" -ForegroundColor Red
     exit 1
 }
+
+# 註：帳號額度／登入狀態無法自動檢查，開課前請講師人工確認（見 instructor/GUIDE.md）

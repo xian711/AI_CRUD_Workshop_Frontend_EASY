@@ -15,12 +15,14 @@
 ```powershell
 # 在工作坊根目錄執行：複製範本成你的工作專案
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
-# 把題目文件放進專案（AI 才讀得到）
-Copy-Item step3_new_module\PRD-中心裝備物資.md, step3_new_module\SCOPE-課堂範圍決策.md step3_new_module\my-equipment-app\
+# 只把 PRD 放進專案（AI 才讀得到需求）
+Copy-Item step3_new_module\PRD-中心裝備物資.md step3_new_module\my-equipment-app\
 cd step3_new_module\my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
 ```
+
+> **範圍答案（SCOPE）由講師在你完成六題釐清後發放，先別偷看。** 這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。
 
 > `sample-app` 根目錄已自帶 harness 四件（`CLAUDE.md`、`CODE-RULES-ui-本專案.md`、`design-system-summary.md`、`使用說明-複製範本開發新模組.md`）。複製走範本，harness 就跟著走——AI 一進來就讀得到全套規則。
 
@@ -83,7 +85,9 @@ AI：逐任務開發，遵守 harness 規則，每完成一個任務回報一行
 
 因為 PRD 有太多「做不做都行」的岔路。AI 先用選擇題把岔路攤開來，你拍板，範圍才會小而完整。這跟 spec-kit 的 clarify 是同一個道理：**先問對問題，再寫對程式。**
 
-實際會問哪些題？完整六題與參考答案見 [`SCOPE-課堂範圍決策.md`](SCOPE-課堂範圍決策.md)，這裡摘要：
+> **別把「AI 有先問選擇題」當成 harness 的效果。** AI 先問選擇題＝起手 prompt 的 workflow 指令被遵守（我們在 prompt 裡明寫「先用選擇題問我」）。harness（規則＋範本）的效果體現在**生成的程式碼品質**——色碼走 token、命名一致、驗證到位、不硬編碼——對比 step1 的 A/B 就看得到。兩者是不同層次的東西，別混為一談。
+
+實際會問哪些題？完整六題與參考答案見 [`SCOPE-課堂範圍決策.md`（講師版）](../instructor/SCOPE-課堂範圍決策.md)（講師在你答完六題後才發放），這裡摘要：
 
 | # | AI 會問 | 課堂拍板 |
 |---|---|---|
@@ -108,7 +112,7 @@ AI 逐任務做完後，換你上場驗收。
 
 1. 確認 dev server 有跑（port 3100）。
 2. 打開 <http://localhost:3100/equipment/crud>。
-3. 拿 [`SCOPE-課堂範圍決策.md`](SCOPE-課堂範圍決策.md) 的欄位規格與列表功能表逐項對照。
+3. 拿 [`SCOPE-課堂範圍決策.md`（講師版）](../instructor/SCOPE-課堂範圍決策.md) 的欄位規格與列表功能表逐項對照。
 
 **至少要能重現這幾件事：**
 

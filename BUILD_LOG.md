@@ -42,6 +42,25 @@ Codex 唯讀掃全庫，**17 條發現（P1×9、P2×8、P0×0）**，判定「�
 - step3 參考解的釐清選擇題對話（step3_clarify.png）為示意重演圖，題目與裁決內容取自真實的 SCOPE 決策。
 - 尚未經真人講師 120 分鐘 dry run（開課前建議做一次）。
 
+## R2：教師／學生雙角色審查（2026-07-12，外部獨立實跑）
+
+使用者派出的獨立審查以講師＋學員雙視角實跑全課程，出具 [COURSE_REVIEW_TEACHER_STUDENT.md](COURSE_REVIEW_TEACHER_STUDENT.md)：**P1×8、P2×8、P0×0，判「有條件可試教」**。全數採納修正（三個 agent 平行執行）：
+
+| 主題 | 修正 |
+|------|------|
+| 學員路徑被答案污染（P1-3） | 新建 `instructor/`：SCOPE 答案移出學員路徑、3.0 只複製 PRD、講師答完六題才發放 |
+| LOOP 沒有紅（P1-6） | 新建 `step4_loop_e2e/lab-red-to-green/`：注入真實 bug（拿掉分類必填）→ E4 紅 → 判因 → 修 → 綠，全循環實測通過 |
+| preflight 蓋不住真阻斷（P1-2） | 擴成 10 項：加 ExecutionPolicy、工作區可寫、npm registry、chromium 快取、AI Agent CLI（FAIL/WARN 分級） |
+| 講師配套缺席（P2-8/P1-1） | `instructor/GUIDE.md`（120 分時間軸＋故障分流）＋`apply-solution-checkpoint.ps1`（78 分鐘落後即套參考解，已實測） |
+| 評量缺席（P2-1） | `step5_wrapup/RUBRIC.md`：100 分六面向、70 及格、三項不得為零＋學員提交格式 |
+| 名實不符 | 「E2E 視覺審查」→「E2E 功能驗證＋失敗截圖診斷」；「三件套」統一「前端 harness 四件」；效益絕對句改目標句；prompt 遵循≠harness 生效已區分 |
+| 程式（P2-7） | `todayString` 撞名改 `equipmentTodayString`，build 警告歸零 |
+| 其他 | 使用說明檔頭 Windows 對照表、AGENTS.md（Codex 相容）、Agent 相容表、時數 40/35 校正、step1 A/B 違規計分表、收工 grep allowlist、文件行數/條數同步 |
+
+修正後複驗：build 0 error 0 警告（相關項）、E2E 7/7 綠、lab 紅→綠循環完整、preflight 10 項全過 exit 0。
+
+**尚未完成（人的行動）**：至少 3 位目標學員的 120 分鐘 dry run（正式開課 Gate，見 instructor/GUIDE.md）。時間數據取得前，「120 分鐘完課」視為目標而非承諾。
+
 ## 用量
 
-Claude 子代理合計約 **1.12M tokens**（偵察 62k＋PRD 133k＋教材群 364k＋實作 164k＋e2e 104k＋手冊 74k＋修正 221k）＋總指揮約 150k；Codex 約 **129k**。
+建課輪：Claude 子代理合計約 **1.12M tokens**（偵察 62k＋PRD 133k＋教材群 364k＋實作 164k＋e2e 104k＋手冊 74k＋修正 221k）＋總指揮約 150k；Codex 約 **129k**。R2 修正輪：Claude 子代理約 **280k**＋總指揮約 40k。
