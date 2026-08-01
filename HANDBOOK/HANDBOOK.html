@@ -240,7 +240,7 @@
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
           <li>知道這門課要教什麼、怎麼進行。</li>
-          <li>確認機器準備好了（Node.js、pnpm、git、port 3100、磁碟空間）。</li>
+          <li>確認機器準備好了（10 項檢查：Node.js、pnpm、git、port 3100、磁碟空間、可執行腳本的環境、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI）。</li>
         </ol>
       </div>
 
@@ -256,10 +256,10 @@ cd step0_course_intro
       <pre><code># macOS／Linux（終端機）
 cd step0_course_intro
 bash preflight.sh</code></pre>
-      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若出現 <code>[FAIL]</code>，照腳本印出的修復提示處理後重跑一次。</p>
+      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——<code>[WARN]</code> 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取）。只有 <code>[FAIL]</code> 要照腳本印出的修復提示處理後重跑一次。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>腳本逐項印出 Node.js、pnpm、git、port 3100、磁碟空間的檢查結果，最後一行是「前置檢查全數通過，可以開課！」。</p>
+      <p>腳本逐項印出 10 項檢查結果（Node.js、pnpm、git、port 3100、磁碟空間、可執行腳本的環境、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI），每項前面標著 <code>[PASS]</code>／<code>[WARN]</code>／<code>[FAIL]</code>，最後一行是「前置檢查全數通過，可以開課！」（有警告時是「前置檢查全數通過（含 N 項警告），可以開課！」）。</p>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>

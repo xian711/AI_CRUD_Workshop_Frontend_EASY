@@ -85,7 +85,7 @@ cd step0_course_intro
 bash preflight.sh
 ```
 
-看到「前置檢查全數通過，可以開課！」再進入 step1。若有 `[FAIL]` 項目，照腳本印出的修復提示處理後重跑一次。
+看到「前置檢查全數通過，可以開課！」再進入 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——`[WARN]` 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取，step4 首跑會自動下載）。只有 `[FAIL]` 項目要照腳本印出的修復提示處理後重跑一次。
 
 > 兩個版本只有第 6 項不同：Windows 檢查 `ExecutionPolicy` 有沒有擋住腳本；macOS／Linux 改檢查 `curl` 是否可用（step4 的 `run-e2e.sh` 靠它確認 App 有沒有起來）。其餘 9 項完全相同。
 >
