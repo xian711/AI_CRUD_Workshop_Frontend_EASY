@@ -12,6 +12,8 @@
 
 動手之前，先把範本複製成你自己的工作專案，並確認 AI Agent 的工作目錄就是這個專案根目錄（不然 AI 讀不到題目文件與 harness）。
 
+**Windows（PowerShell）**
+
 ```powershell
 # 在工作坊根目錄執行：複製範本成你的工作專案
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
@@ -21,6 +23,21 @@ cd step3_new_module\my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
 ```
+
+**macOS／Linux（終端機）**
+
+```bash
+# 在工作坊根目錄執行：複製範本成你的工作專案
+cp -R step2_speedrun_kit/2.5_sample_app/sample-app step3_new_module/my-equipment-app
+# 只把 PRD 放進專案（AI 才讀得到需求）
+cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
+cd step3_new_module/my-equipment-app
+pnpm install
+# 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
+```
+
+> 複製 `sample-app` 時如果它已經跑過 `pnpm install`，`node_modules` 會一起被複製（檔案很多、會等一下）。
+> 想快一點，可以先刪掉來源的 `node_modules` 再複製，複製完在新專案跑 `pnpm install` 即可。
 
 > **範圍答案（SCOPE）由講師在你完成六題釐清後發放，先別偷看。** 這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。
 

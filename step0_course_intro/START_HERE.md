@@ -12,11 +12,26 @@
 
 **先備知識白話版**——你需要：
 
-- 會用終端機（PowerShell）打指令。
+- 會用終端機打指令（Windows 用 PowerShell；macOS／Linux 用內建終端機的 bash／zsh）。
 - 跑過 `npm`／`pnpm` 這類套件指令。
 - 看得懂 TypeScript 元件程式碼的大意（不用會寫，看懂在做什麼即可）。
 
 你**不需要**：Vue／Nuxt 經驗、提示詞（prompt）撰寫經驗。
+
+## 支援平台：Windows 與 macOS（Linux 亦可）
+
+這門課 **Windows 與 macOS 都能上**。教材附的每支腳本都有兩個版本，檢查項目、判定標準與 exit code 完全一致：
+
+| 用途 | Windows | macOS／Linux |
+|---|---|---|
+| 前置檢查 | `step0_course_intro\preflight.ps1` | `step0_course_intro/preflight.sh` |
+| E2E 一鍵跑 | `step4_loop_e2e\run-e2e.ps1` | `step4_loop_e2e/run-e2e.sh` |
+| 注入練習 bug | `lab-red-to-green\inject-bug.ps1` | `lab-red-to-green/inject-bug.sh` |
+| 還原練習 bug | `lab-red-to-green\restore.ps1` | `lab-red-to-green/restore.sh` |
+| 講師 checkpoint | `instructor\apply-solution-checkpoint.ps1` | `instructor/apply-solution-checkpoint.sh` |
+
+**macOS／Linux 一律用 `bash 腳本名.sh` 的方式執行**（例如 `bash preflight.sh`），這樣就不必先 `chmod +x`。
+`pnpm install`／`pnpm dev`／port 3100 這些跟平台無關，兩邊完全一樣。文件中的指令若分成兩塊，照你自己的平台那一塊做即可。
 
 ## 上完你能做到什麼
 
@@ -47,18 +62,32 @@
 
 以下四件事會吃掉不少等待時間，**課堂時間不含這些等待**，請在上課前一天先做完：
 
-1. 跑 `preflight.ps1`（見下一節），把 `[FAIL]` 項目全部處理掉。
+1. 跑前置檢查腳本（Windows `preflight.ps1`／macOS 與 Linux `preflight.sh`，見下一節），把 `[FAIL]` 項目全部處理掉。
 2. 兩個專案先各跑一次 `pnpm install`：`step2_speedrun_kit/2.5_sample_app/sample-app/` 與 `step3_new_module/solution-app/`。
-3. `step4_loop_e2e/run-e2e.ps1` 先跑一次（首跑會下載 Chromium 約 150MB；離線教室務必課前先跑）。
+3. `step4_loop_e2e/run-e2e.ps1`（macOS／Linux 用 `run-e2e.sh`）先跑一次（首跑會下載 Chromium 約 150MB；離線教室務必課前先跑）。
 4. 確認你的 AI Agent（Claude Code／Codex／Cursor 等）**已登入且有額度**——這項 preflight 無法自動檢查，要自己確認。
 
 ## 開始之前：先跑前置檢查
 
-本資料夾內的 `preflight.ps1` 會檢查你的機器有沒有準備好（Node.js、pnpm、git、port 3100、磁碟空間、ExecutionPolicy、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI）。開課前請先執行：
+本資料夾內的前置檢查腳本會跑 10 項檢查，確認你的機器準備好了（Node.js、pnpm、git、port 3100、磁碟空間、可執行腳本的環境、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI）。開課前請先執行：
+
+**Windows（PowerShell）**
 
 ```powershell
 cd step0_course_intro
 .\preflight.ps1
 ```
 
+**macOS／Linux（終端機）**
+
+```bash
+cd step0_course_intro
+bash preflight.sh
+```
+
 看到「前置檢查全數通過，可以開課！」再進入 step1。若有 `[FAIL]` 項目，照腳本印出的修復提示處理後重跑一次。
+
+> 兩個版本只有第 6 項不同：Windows 檢查 `ExecutionPolicy` 有沒有擋住腳本；macOS／Linux 改檢查 `curl` 是否可用（step4 的 `run-e2e.sh` 靠它確認 App 有沒有起來）。其餘 9 項完全相同。
+>
+> macOS 常見的 `[FAIL]` 修法：`brew install node pnpm`（Node／pnpm）、`xcode-select --install`（git）、
+> `lsof -nP -iTCP:3100 -sTCP:LISTEN` 找出占用 3100 的 PID 再 `kill <PID>`。

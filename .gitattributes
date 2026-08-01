@@ -1,0 +1,5 @@
+# 跨平台換行保護：
+# .sh 一律 LF（CRLF 會讓 macOS／Linux 的 bash 直接報錯）
+# .ps1 一律 CRLF（Windows PowerShell 5.1 相容）
+*.sh text eol=lf
+*.ps1 text eol=crlf

@@ -13,7 +13,7 @@ L0–L3 分級定義見 `HARNESS.md`；本檔只列各級執行規則。
 - 以專案啟動指令背景啟動（指令與埠號來源見 `harness/CODE-RULES-api.md`）；**埠號從啟動輸出或設定檔抓，不寫死**。
 - 只打 TC 對應案例：happy path ＋ 1–2 個錯誤案例（400 / 403），不全打。
 - **貼真實回應，不得捏造**；跑不起來（缺 DB、缺連線字串）就誠實標 blocker 或 `[待實機]`（鐵律 2）。
-- PowerShell 的 `curl` 是 `Invoke-WebRequest` 別名，參數不相容：**一律明寫 `curl.exe`**。
+- **Windows**：PowerShell 的 `curl` 是 `Invoke-WebRequest` 別名，參數不相容，**一律明寫 `curl.exe`**。**macOS／Linux**：`curl` 就是真的 curl，照標準參數寫即可（別寫成 `curl.exe`）。
 - token / 密碼用 `{{占位符}}`，不進交付檔與版控。
 - 同步維護 `.http` 測試檔（樣式見 `templates/api-tests-sample.http`，工程師可在 IDE 直接執行）。
 - 測完停掉 server、清殘留 process。
@@ -27,7 +27,7 @@ L0–L3 分級定義見 `HARNESS.md`；本檔只列各級執行規則。
 - 測「失敗路徑」時，斷言「無 console error」要排除刻意觸發的錯誤（如 mock 回 500）。
 - 測試資料用有意義的資料（真實格式的姓名、電話、地名），不用 test123。
 - CRUD 驗證順序：`R → C → R → U → R → D → R`，每次寫入後都重查確認。
-- Windows 上跑 Python 腳本且輸出含中文時，先設 `PYTHONIOENCODING=utf-8`。
+- Windows 上跑 Python 腳本且輸出含中文時，先設 `PYTHONIOENCODING=utf-8`（macOS／Linux 預設 UTF-8 locale，通常不需要；若 `locale` 顯示為 `C`／`POSIX` 才要設）。
 - 驗證腳本放 scratchpad，不進專案目錄。
 - 收尾：停掉 dev server、清殘留 process。
 - 全部案例通過才算驗收通過；回報 PASS / FAIL 統計。

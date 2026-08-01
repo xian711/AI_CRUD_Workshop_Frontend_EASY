@@ -4,6 +4,8 @@
 
 ## 快速開始（學員）
 
+**Windows（PowerShell）**
+
 ```powershell
 # 1. 前置檢查（Node、pnpm、git、port 3100、磁碟）
 cd step0_course_intro
@@ -11,6 +13,19 @@ cd step0_course_intro
 
 # 2. 全數 PASS 後，打開 START_HERE.md 開始上課
 ```
+
+**macOS／Linux（終端機 bash／zsh）**
+
+```bash
+# 1. 前置檢查（Node、pnpm、git、port 3100、磁碟）
+cd step0_course_intro
+bash preflight.sh
+
+# 2. 全數 PASS 後，打開 START_HERE.md 開始上課
+```
+
+> **兩個平台都能上這門課。** 所有腳本都備了兩套：Windows 用 `.ps1`、macOS／Linux 用同名的 `.sh`，
+> 檢查項目、判定標準與 exit code 完全一致。文件裡的指令一律標明平台，照你自己的那一版做即可。
 
 照 `step0 → step1 → step2 → step3 → step4 → step5` 順序走，每個資料夾都有 README 帶路，**不要跳步**。
 想看圖文版完整流程：[HANDBOOK/HANDBOOK.md](HANDBOOK/HANDBOOK.md)（或用瀏覽器開 `HANDBOOK/HANDBOOK.html`）。
@@ -35,7 +50,7 @@ cd step0_course_intro
 | 範本正本（人員 CRUD） | `step2_speedrun_kit/2.5_sample_app/sample-app/` | `pnpm install` → `pnpm dev` → http://localhost:3100/template/crud |
 | 參考解（含裝備物資模組） | `step3_new_module/solution-app/` | 同上 → http://localhost:3100/equipment/crud |
 
-兩個都用 port 3100，**一次只跑一個**。E2E 驗證：`step4_loop_e2e/run-e2e.ps1`（需 solution-app 跑著）。
+兩個都用 port 3100，**一次只跑一個**。E2E 驗證：`step4_loop_e2e/run-e2e.ps1`（macOS／Linux 用 `run-e2e.sh`，需 solution-app 跑著）。
 
 ## 這門課的題目是真的
 

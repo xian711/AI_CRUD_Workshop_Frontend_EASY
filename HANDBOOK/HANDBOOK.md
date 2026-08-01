@@ -19,6 +19,8 @@
 
 **這門課給誰**：會寫程式、但還沒用過 AI harness 開發的工程師。不要求會 Vue／Nuxt，看得懂前端程式碼會更順。不需要提示詞經驗，課程會示範怎麼下指令。
 
+**支援平台：Windows 與 macOS（Linux 亦可）。** 教材每支腳本都備了兩版——Windows 用 `.ps1`、macOS／Linux 用同名 `.sh`，檢查項目、判定標準與 exit code 完全一致。本手冊的指令一律分成兩塊列出，照你自己的平台那一塊做即可；`pnpm install`／`pnpm dev`／port 3100 這些跟平台無關。macOS／Linux 一律用 `bash 腳本名.sh` 執行，就不必先 `chmod +x`。
+
 ---
 
 ## Step 0｜課程說明與前置檢查
@@ -35,8 +37,15 @@
 3. 開課前先跑前置檢查：
 
    ```powershell
+   # Windows（PowerShell）
    cd step0_course_intro
    .\preflight.ps1
+   ```
+
+   ```bash
+   # macOS／Linux（終端機）
+   cd step0_course_intro
+   bash preflight.sh
    ```
 
 4. 看到「前置檢查全數通過，可以開課！」再進 step1。若出現 `[FAIL]`，照腳本印出的修復提示處理後重跑一次。
@@ -190,11 +199,21 @@ harness 就是你交給 AI 的一套「規矩」：**專案規則（CODE-RULES�
 動手之前，先把範本複製成自己的工作專案，並確認 AI Agent 的工作目錄就是這個專案根目錄（不然 AI 讀不到題目文件與 harness）。
 
 ```powershell
-# 在工作坊根目錄執行：複製範本成你的工作專案
+# Windows（PowerShell）｜在工作坊根目錄執行：複製範本成你的工作專案
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
 # 只把 PRD 放進專案（AI 才讀得到需求）
 Copy-Item step3_new_module\PRD-中心裝備物資.md step3_new_module\my-equipment-app\
 cd step3_new_module\my-equipment-app
+pnpm install
+# 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
+```
+
+```bash
+# macOS／Linux（終端機）｜在工作坊根目錄執行：複製範本成你的工作專案
+cp -R step2_speedrun_kit/2.5_sample_app/sample-app step3_new_module/my-equipment-app
+# 只把 PRD 放進專案（AI 才讀得到需求）
+cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
+cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
 ```
@@ -319,21 +338,28 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
 
 1. 先確認 solution-app 在跑（另一個視窗別關）：
 
-   ```powershell
+   ```bash
    cd ../step3_new_module/solution-app
-   pnpm dev          # http://localhost:3100
+   pnpm dev          # http://localhost:3100（兩個平台指令相同）
    ```
 
 2. 再跑 E2E：
 
    ```powershell
+   # Windows（PowerShell）
    cd step4_loop_e2e
    powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
    ```
 
+   ```bash
+   # macOS／Linux（終端機）
+   cd step4_loop_e2e
+   bash run-e2e.sh
+   ```
+
    腳本會：確認 3100 有回應且是本 App → 裝相依（已裝就跳過）→ 跑 7 條測試 → 印 PASS/FAIL 總結（exit 0＝全綠、1＝有紅）。
 
-3. 要啟動 LOOP，一段話就夠（可直接貼）：
+3. 要啟動 LOOP，一段話就夠（可直接貼；macOS／Linux 把腳本名改成 `run-e2e.sh`）：
 
    ```
    跑 step4_loop_e2e/run-e2e.ps1。
@@ -346,6 +372,7 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
 4. 動手經歷一次「紅 → 判因 → 修 → 綠」（LOOP 真正的重點，不是只看一次綠）：
 
    ```powershell
+   # Windows（PowerShell）
    cd lab-red-to-green
    powershell -ExecutionPolicy Bypass -File .\inject-bug.ps1   # 讓 E4 變紅
    cd ..
@@ -356,9 +383,21 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
    powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1      # 再跑一次，確認回到 7/7 綠
    ```
 
+   ```bash
+   # macOS／Linux（終端機）
+   cd lab-red-to-green
+   bash inject-bug.sh    # 讓 E4 變紅
+   cd ..
+   bash run-e2e.sh       # 看失敗訊息，判斷是 App bug 還是測試 bug
+   cd lab-red-to-green
+   bash restore.sh       # 修回（或自己把驗證規則加回去）
+   cd ..
+   bash run-e2e.sh       # 再跑一次，確認回到 7/7 綠
+   ```
+
 ### 👀 你應該看到
 
-`run-e2e.ps1` 印出 7 條測試全數 `ok`，最後 `7 passed`、`EXITCODE=0`。
+E2E 腳本（`run-e2e.ps1`／`run-e2e.sh`）印出 7 條測試全數 `ok`，最後 `7 passed`、`EXITCODE=0`。
 
 ![E2E 七條全綠終端輸出](images/step4_e2e_green.png)
 
@@ -374,7 +413,7 @@ PRD 有太多「做不做都行」的岔路。讓 AI 先用選擇題把岔路攤
 | E6 | `/template/crud` 正常載入 | Regression（沒改壞範本） |
 | E7 | 編輯品項：改數量與存放地點，儲存後新值生效 | Update |
 
-跑 `inject-bug.ps1` 後再跑一次 `run-e2e.ps1`，會看到 **E4 變紅**（等不到「請選擇分類」錯誤訊息）；跑 `restore.ps1`（或自己修回驗證規則）後再跑一次，7 條會**全部變回綠**。
+跑 `inject-bug`（`.ps1`／`.sh`）後再跑一次 E2E，會看到 **E4 變紅**（等不到「請選擇分類」錯誤訊息）；跑 `restore`（`.ps1`／`.sh`，或自己修回驗證規則）後再跑一次，7 條會**全部變回綠**。
 
 ### 💡 為什麼
 
@@ -420,7 +459,7 @@ harness 方法**不綁框架**：不是 Nuxt 也適用，四件內容換成你�
 
 全部打勾，代表你真的走完了：
 
-- [ ] 前置檢查 `preflight.ps1` 全數通過
+- [ ] 前置檢查（`preflight.ps1`／`preflight.sh`）全數通過
 - [ ] 並排看過 no-harness 與 with-harness 兩頁，說得出至少三個差別
 - [ ] 範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現
 - [ ] 看過 Design System 與前端 harness 四件，知道顏色／間距走 token
@@ -428,7 +467,7 @@ harness 方法**不綁框架**：不是 Nuxt 也適用，四件內容換成你�
 - [ ] 貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）
 - [ ] 六題範圍逐題拍板，確認任務清單後才說「開工」
 - [ ] 裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現
-- [ ] `run-e2e.ps1` 跑出 7 條全綠、exit 0
+- [ ] E2E 腳本（`run-e2e.ps1`／`run-e2e.sh`）跑出 7 條全綠、exit 0
 - [ ] 完成一次紅→判因→修→綠（留下四項證據）
 - [ ] 說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則
 

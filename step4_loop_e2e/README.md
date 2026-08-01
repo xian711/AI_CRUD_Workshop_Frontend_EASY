@@ -11,7 +11,7 @@
 
 | 沒有 LOOP（人在迴圈裡） | 有 LOOP（AI 在迴圈裡） |
 |--------------------------|--------------------------|
-| AI 改一版 → 人手動開瀏覽器點一點 → 回報哪裡壞 → AI 再改 | AI 改一版 → 自己跑 `run-e2e.ps1` → 看到紅 → 自己修 → 再跑 → 綠了才停 |
+| AI 改一版 → 人手動開瀏覽器點一點 → 回報哪裡壞 → AI 再改 | AI 改一版 → 自己跑 E2E 腳本 → 看到紅 → 自己修 → 再跑 → 綠了才停 |
 | 人是瓶頸，改 5 次就累了 | 人只看最後結果，AI 跑幾輪都不喊累 |
 
 **關鍵前提：要先有「可自動執行的驗證」。** 沒有這個，LOOP 就退化成 AI 自說自話。
@@ -25,7 +25,7 @@ E2E（端到端測試）就是這裡的驗證——它真的開瀏覽器、真�
 
 ## 二、怎麼下 LOOP prompt
 
-驗證備妥後，一段話就能啟動 LOOP。可直接貼：
+驗證備妥後，一段話就能啟動 LOOP。可直接貼（Windows 用 `run-e2e.ps1`，macOS／Linux 把腳本名改成 `run-e2e.sh`）：
 
 ```
 跑 step4_loop_e2e/run-e2e.ps1。
@@ -94,7 +94,7 @@ Playwright 設 `screenshot: 'only-on-failure'`——測試紅了會自動存一�
 逐條給出「可被推翻的具體理由」，能重現就附步驟。找不到問題也要說明你怎麼確認的。
 ```
 
-第二個 AI 挑出的問題，交回原 AI 修 → 再跑 `run-e2e.ps1` → 再審。這就是「對抗式 LOOP」。
+第二個 AI 挑出的問題，交回原 AI 修 → 再跑一次 E2E 腳本 → 再審。這就是「對抗式 LOOP」。
 
 ---
 
@@ -125,13 +125,23 @@ pnpm dev          # http://localhost:3100
 
 再跑 E2E：
 
-```
+**Windows（PowerShell）**
+
+```powershell
 cd step4_loop_e2e
 powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
 ```
 
-`run-e2e.ps1` 會：先確認 3100 有回應且是本 App → e2e 資料夾裝相依（已裝就跳過）→
+**macOS／Linux（終端機）**
+
+```bash
+cd step4_loop_e2e
+bash run-e2e.sh
+```
+
+腳本會：先確認 3100 有回應且是本 App → e2e 資料夾裝相依（已裝就跳過）→
 跑 7 條測試 → 印 PASS/FAIL 總結，exit code 對應（0＝全綠、1＝有紅）。
+兩個版本的判定標準一致：**恰好 7 條 passed，且無 failed／skipped／flaky，才算過。**
 
 ---
 

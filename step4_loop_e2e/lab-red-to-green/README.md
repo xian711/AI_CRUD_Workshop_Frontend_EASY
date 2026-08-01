@@ -7,9 +7,14 @@
 
 ---
 
+> **平台對照**：以下每個步驟都給兩套指令。Windows 用 `.ps1`、macOS／Linux 用同名 `.sh`
+> （`inject-bug.sh`／`restore.sh`／`run-e2e.sh`），行為、備份位置與 exit code 完全一致。
+
+---
+
 ## 這個 bug 是什麼
 
-`inject-bug.ps1` 會把明細頁 `[id].vue` 裡「**分類（categoryKey）必填**」的驗證規則拿掉。
+`inject-bug.ps1`（macOS／Linux 是 `inject-bug.sh`）會把明細頁 `[id].vue` 裡「**分類（categoryKey）必填**」的驗證規則拿掉。
 
 - 改之前：新增品項時什麼都不填就按「儲存」，會看到欄位錯誤「請選擇分類」。
 - 改之後：那個「請選擇分類」錯誤**不再出現**——App 的驗證行為被改壞了。
@@ -23,12 +28,21 @@
 
 確認 solution-app dev server 開著（另一個視窗，別關）：
 
-```
+**Windows（PowerShell）**
+
+```powershell
 cd ..\..\step3_new_module\solution-app
 pnpm dev          # http://localhost:3100
 ```
 
-以下指令都在**本資料夾**（`step4_loop_e2e\lab-red-to-green\`）或它的上一層 `step4_loop_e2e\` 執行。
+**macOS／Linux（終端機）**
+
+```bash
+cd ../../step3_new_module/solution-app
+pnpm dev          # http://localhost:3100
+```
+
+以下指令都在**本資料夾**（`step4_loop_e2e/lab-red-to-green/`）或它的上一層 `step4_loop_e2e/` 執行。
 
 ---
 
@@ -36,31 +50,52 @@ pnpm dev          # http://localhost:3100
 
 ### ① 先跑基準，確認 7/7 綠
 
-```
+```powershell
+# Windows（PowerShell）
 cd ..
 powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
+```
+
+```bash
+# macOS／Linux（終端機）
+cd ..
+bash run-e2e.sh
 ```
 
 看到「E2E 全綠：7 條 passed」再往下。這是你的**基準線**——待會出問題才知道是這一步引入的。
 
 ### ② 注入 bug
 
-```
+```powershell
+# Windows（PowerShell）
 cd lab-red-to-green
 powershell -ExecutionPolicy Bypass -File .\inject-bug.ps1
 ```
 
-它會先把原檔備份到 `.lab-backup\`，再拿掉那條必填規則。
+```bash
+# macOS／Linux（終端機）
+cd lab-red-to-green
+bash inject-bug.sh
+```
+
+它會先把原檔備份到 `.lab-backup/`，再拿掉那條必填規則。
 
 ### ③ 再跑一次 E2E，看到 E4 紅
 
-```
+```powershell
+# Windows（PowerShell）
 cd ..
 powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
 ```
 
+```bash
+# macOS／Linux（終端機）
+cd ..
+bash run-e2e.sh
+```
+
 這次會 **FAIL**，E4 那條紅。**把紅色輸出留下來**（這是證據一）。
-失敗訊息大意是：等不到 `#categoryKey-error` 出現「請選擇分類」。（Playwright 也會在 `e2e\test-results\` 下存一張失敗當下的截圖。）
+失敗訊息大意是：等不到 `#categoryKey-error` 出現「請選擇分類」。（Playwright 也會在 `e2e/test-results/` 下存一張失敗當下的截圖。）
 
 ### ④ 先判因（別急著修！）
 
@@ -78,28 +113,42 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
 
 - **基本**：跑還原腳本，一鍵修回。
 
-  ```
+  ```powershell
+  # Windows（PowerShell）
   cd lab-red-to-green
   powershell -ExecutionPolicy Bypass -File .\restore.ps1
   ```
 
+  ```bash
+  # macOS／Linux（終端機）
+  cd lab-red-to-green
+  bash restore.sh
+  ```
+
 - **進階**：自己動手把驗證規則加回去。打開
-  `..\..\step3_new_module\solution-app\pages\equipment\crud\[id].vue`，
+  `../../step3_new_module/solution-app/pages/equipment/crud/[id].vue`，
   找到 `rulesFor()` 裡的 `categoryKey`，把它改回：
 
   ```ts
   categoryKey: [{ required: true, message: '請選擇分類' }],
   ```
 
-  （改完別忘了本資料夾還留著 `.lab-backup\`，可自行刪掉或之後跑 `restore.ps1` 清掉。）
+  （改完別忘了本資料夾還留著 `.lab-backup/`，可自行刪掉或之後跑還原腳本清掉。）
 
 把你**用哪種方式修的**寫下來（這是證據三）。
 
 ### ⑥ 再跑 E2E，回到 7/7 綠
 
-```
+```powershell
+# Windows（PowerShell）
 cd ..
 powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
+```
+
+```bash
+# macOS／Linux（終端機）
+cd ..
+bash run-e2e.sh
 ```
 
 看到「E2E 全綠：7 條 passed」就完成一圈了。**把綠色輸出留下來**（這是證據四）。
@@ -123,7 +172,7 @@ LOOP 很會「為了讓燈變綠」而鬼打牆，愈修愈亂。給自己一條
 
 > **同一個問題連續修兩次還沒好，就停下來，回去看根因判斷是不是錯了。**
 
-在這個練習裡，如果你走「進階」自己改、改兩次還是紅，別再瞎試——直接跑 `restore.ps1` 回到乾淨狀態，
+在這個練習裡，如果你走「進階」自己改、改兩次還是紅，別再瞎試——直接跑還原腳本（`restore.ps1`／`restore.sh`）回到乾淨狀態，
 重看一次第 ④ 步，多半是規則字串貼錯或改錯地方。
 
 ---
@@ -132,11 +181,12 @@ LOOP 很會「為了讓燈變綠」而鬼打牆，愈修愈亂。給自己一條
 
 真正的 LOOP 高手不只會修紅，還會**補上原本沒驗到的洞**。
 
-試著在 `..\e2e\tests\equipment.spec.ts` 加第 8 條測試，驗**「單位」欄位的必填**：
+試著在 `../e2e/tests/equipment.spec.ts` 加第 8 條測試，驗**「單位」欄位的必填**：
 在新增頁只留「單位」空著、其餘填好，按儲存，斷言出現「請輸入單位」錯誤且停在表單頁。
 
 提示：照 E4 的寫法改——`rulesFor()` 裡 `unit` 的錯誤訊息是「請輸入單位」。
-加完把 `run-e2e.ps1` 裡的 `$Expected = 7` 改成 `8`，再跑一次，確認 8 條全綠。
+加完把腳本裡的預期條數改成 `8`（Windows 改 `run-e2e.ps1` 的 `$Expected = 7`；macOS／Linux 改 `run-e2e.sh` 的 `EXPECTED=7`），
+再跑一次，確認 8 條全綠。
 （這步是選配；若你改了測試數，記得練習結束後自行決定要不要留。）
 
 ---
@@ -145,8 +195,14 @@ LOOP 很會「為了讓燈變綠」而鬼打牆，愈修愈亂。給自己一條
 
 收工前，solution-app 這個檔要回到原狀（除了課程本身的 R1/R2 修正）：
 
-```
-git -C ..\..\step3_new_module\solution-app status --short pages/equipment/crud/[id].vue
+```powershell
+# Windows（PowerShell）
+git -C ..\..\step3_new_module\solution-app status --short "pages/equipment/crud/[id].vue"
 ```
 
-沒有輸出＝乾淨。若還有 diff，跑一次 `restore.ps1` 或 `git checkout` 即可。
+```bash
+# macOS／Linux（終端機）：路徑含中括號，記得加引號避免被 shell 當萬用字元
+git -C ../../step3_new_module/solution-app status --short 'pages/equipment/crud/[id].vue'
+```
+
+沒有輸出＝乾淨。若還有 diff，跑一次還原腳本（`restore.ps1`／`restore.sh`）或 `git checkout` 即可。
