@@ -68,7 +68,7 @@ if [ -d "$E2E_DIR/node_modules" ] && [ -x "$E2E_DIR/node_modules/.bin/playwright
 else
     echo "${C_CYAN}安裝 e2e 相依（npm ci）...${C_RESET}"
     if ! ( cd "$E2E_DIR" && npm ci ); then
-        echo "${C_RED}FAIL：npm ci 失敗（$E2E_DIR）${C_RESET}"
+        echo "${C_RED}FAIL：npm ci 失敗（${E2E_DIR}）${C_RESET}"
         exit 1
     fi
 fi
@@ -106,7 +106,7 @@ reason=''
 if [ "$no_tests" -eq 1 ]; then
     reason='找不到任何測試。'
 elif [ "$test_exit" -ne 0 ]; then
-    reason="測試程序 exit code = $test_exit。"
+    reason="測試程序 exit code = ${test_exit}。"
 elif [ -z "$passed" ]; then
     reason='exit 0 但抓不到 Playwright 總結行（無法確認全綠）。'
 elif [ "$failed" -ne 0 ]; then

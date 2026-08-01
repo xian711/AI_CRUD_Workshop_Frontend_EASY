@@ -46,7 +46,7 @@ if has_cmd node; then
     if [ -n "$node_major" ] && [ "$node_major" -ge 20 ] 2>/dev/null; then
         add_result "Node.js >= 20" 1 "偵測到 $node_raw" "" 0
     else
-        add_result "Node.js >= 20" 0 "偵測到 $node_raw（版本過舊）" \
+        add_result "Node.js >= 20" 0 "偵測到 ${node_raw}（版本過舊）" \
             "請安裝 Node.js 20 以上版本：https://nodejs.org/（或用 Homebrew：brew install node）" 0
     fi
 else
@@ -151,14 +151,14 @@ if [ "${chromium_count:-0}" -gt 0 ] 2>/dev/null; then
     add_result "Playwright Chromium 已快取" 1 "已找到 $chromium_count 個 chromium 快取目錄（step4 E2E 可直接跑）" "" 0
 else
     add_result "Playwright Chromium 已快取" 1 \
-        "未找到 Chromium 快取（$pw_cache）；step4 首跑會自動下載約 150MB，離線教室請課前先跑一次 run-e2e.sh" "" 1
+        "未找到 Chromium 快取（${pw_cache}）；step4 首跑會自動下載約 150MB，離線教室請課前先跑一次 run-e2e.sh" "" 1
 fi
 
 # ── 10. AI Agent CLI（WARN 級）──
 found_agents=""
 for agent in claude codex cursor; do
     if has_cmd "$agent"; then
-        if [ -z "$found_agents" ]; then found_agents="$agent"; else found_agents="$found_agents、$agent"; fi
+        if [ -z "$found_agents" ]; then found_agents="$agent"; else found_agents="${found_agents}、${agent}"; fi
     fi
 done
 if [ -n "$found_agents" ]; then
