@@ -1,9 +1,9 @@
 # SPEC — 人員 CRUD（教學示範）
 
-> 用途：以 AI Harness 樣板格式，把本專案「CRUD 標準範本」的人員 CRUD 填成一份**完整示範 SPEC**（教學用「填好的考卷」，非最小雛形）。對應 harness 樣板：`../2.2_harness/aspnet-api-ai-harness-v5/harness/SPEC.md`。
+> 用途：把「CRUD 標準範本」的人員 CRUD 填成一份**完整示範規格**（教學用「填好的考卷」，非最小雛形）。回公司要交規格文件時，可以照這份的章節骨架寫。
 > 本檔已**併入原 `SRS-CRUD標準範本-v1.0`**（目的與定位、示範實體、Use Cases、FR-T／BR-T／NFR-T、範圍外、驗收清單），
 > 所以規格只需要看這一份；**設計與實作細節**見同資料夾 `SDD-CRUD標準範本-v1.1.md`，架構圖見 `DIAGRAMS.html`。
-> 說明：本專案目前**無後端**，故 Mode 選 **UI**（前端雛形，資料綁 mock）。純 UI 雛形依 harness 只需填 Feature 與 CRUD UI Spec 兩節；此處為教學完整性補齊 FR/BR/圖/Mock/Done，並在 API 相關節標交接記號。
+> 說明：本專案目前**無後端**，故 Mode 選 **UI**（前端雛形，資料綁 mock）。純 UI 雛形其實只需填 Feature 與 CRUD UI Spec 兩節；此處為教學完整性補齊 FR/BR/圖/Mock/Done，並在 API 相關節標交接記號。
 
 Mode: `UI`（雛形：資料綁 mock，API 串接點標 `// TODO: DEV 串接`）
 
@@ -180,7 +180,7 @@ Response envelope、驗證錯誤碼、權限中介層 → `[SD 待定]`（後端
 
 ## Mock Data Required
 
-一律標示為測試資料（Harness 誠實原則），已於 `useTemplateMembers.ts` 檔頭註明「虛構測試資料」。24 筆字面量（非 hash 產生器），涵蓋：
+一律標示為測試資料（誠實原則：不拿假資料冒充真實資料），已於 `useTemplateMembers.ts` 檔頭註明「虛構測試資料」。24 筆字面量（非 hash 產生器），涵蓋：
 
 - normal：全部 6 編組、4 職務（主任/副主任各 1 隸屬協作中心）。
 - boundary：至少 3 筆「停用」、至少 8 筆含 1~3 個資格；updatedAt 分佈 2026-05~2026-07 供排序示範；分頁預設 10 筆恰 3 頁。
@@ -207,7 +207,7 @@ Frontend: `Vue 3 + Nuxt 3`（Nuxt UI v2 + Tailwind + Design Token 三層架構�
 
 Existing CRUD example（路徑相對 `sample-app/`）：`pages/template/crud/`（`index.vue` 列表、`[id].vue` 檢視/編輯/新增三合一）；資料層 `composables/useTemplateMembers.ts`、列表狀態工廠 `composables/useTemplateListPage.ts`；util `utils/templateValidation.ts`、`utils/templateCsv.ts`；元件 `components/template/TemplateFormField.vue`、`TemplateStatusBadge.vue`。
 
-Design System summary: `sample-app/design-system-summary.md`（token 實檔與完整手冊見 `../2.3_design_system/`）。
+Design System summary: `sample-app/design-system-summary.md`（token 實檔與完整手冊見 `../2.2_design_system/`）。
 
 Page sections:
 
@@ -257,7 +257,7 @@ Permissions:
 
 ## Done Criteria
 
-完工三關見 `../2.2_harness/aspnet-api-ai-harness-v5/HARNESS.md`；本 UI 雛形之 CRUD Mode 條款按實況調整：
+本 UI 雛形的完工條件如下（依實況調整）：
 
 - 驗收清單逐條成立（UC-T-01~06 全流程可操作、每個 FR／BR 逐條檢核、桌機 1280px 與手機 390px 視覺檢查、URL 帶條件重整後狀態一致、`sample-app/CLAUDE.md` 禁止事項清單逐條比對）。
 - CRUD UI Spec 完整、Fields 已 mapping Design System 元件。

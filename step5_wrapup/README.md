@@ -36,4 +36,4 @@
 
 ## 下一步：後端課預告
 
-前端這一套「範本 ＋ harness ＋ AI」的方法，後端一樣適用。下一門課會用同一套流程，搭配 `aspnet-api-ai-harness-v5` 做一個 .NET API CRUD 模組，從資料庫 schema 到 API 端點全部走同樣的「PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證」流程。
+前端這一套「範本 ＋ harness ＋ AI」的方法，後端一樣適用。下一門課會用同一套流程，做一個 .NET API CRUD 模組，從資料庫 schema 到 API 端點全部走同樣的「PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證」流程。

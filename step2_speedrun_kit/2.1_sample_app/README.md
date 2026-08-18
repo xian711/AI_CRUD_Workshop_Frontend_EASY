@@ -40,6 +40,6 @@ pnpm dev          # 啟動 dev server
 | `SDD-CRUD標準範本-v1.1.md` | **設計文件**：檔案結構與行數預算、資料層／列表工廠／驗證引擎／CSV 的實作規格、Clean Code 對照表 | 想知道「這個檔為什麼這樣寫」 |
 | `DIAGRAMS.html` | **7 張 UML 圖**（循序／狀態／ER…） | 想快速看架構全貌——用**瀏覽器打開** |
 
-> harness 四件（`CLAUDE.md`、`CODE-RULES-ui-本專案.md`、`design-system-summary.md`、`使用說明-複製範本開發新模組.md`）就在 `sample-app/` 專案根目錄，複製範本時一起帶著走；它們是什麼、怎麼運作見 `../2.2_harness/README.md`。
+> harness 四件（`CLAUDE.md`、`CODE-RULES-ui-本專案.md`、`design-system-summary.md`、`使用說明-複製範本開發新模組.md`）就在 `sample-app/` 專案根目錄，複製範本時一起帶著走；它們是什麼、怎麼運作見 `../README.md` 的「harness 四件：給 AI 的規矩」一節。
 
 > 種子資料為虛構測試資料（24 筆），非真實個資。改接後端只需把 `useTemplateMembers.ts` 內部實作換成 `useFetch`，頁面一行都不用動。

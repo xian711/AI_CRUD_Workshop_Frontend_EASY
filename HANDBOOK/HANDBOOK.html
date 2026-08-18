@@ -368,14 +368,13 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
       </div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>材料收在 <code>step2_speedrun_kit/</code> 的<strong>三個資料夾</strong>裡。照 ①→⑤ 走，<strong>每一步都會點名你此刻要打開哪一份</strong>；沒被點到的文件都是「回公司想查再翻」，現在不必讀。</p>
+      <p>材料收在 <code>step2_speedrun_kit/</code> 的<strong>兩個資料夾</strong>裡。照 ①→⑤ 走，<strong>每一步都會點名你此刻要打開哪一份</strong>；沒被點到的文件都是「回公司想查再翻」，現在不必讀。</p>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>資料夾</th><th>是什麼</th><th>哪一步會用到</th></tr></thead>
+        <thead><tr><th>資料夾</th><th>是什麼</th><th>哪些步驟會用到</th></tr></thead>
         <tbody>
-          <tr><td><code>2.1_sample_app</code></td><td>範本正本（可跑的人員 CRUD）＋規格文件＋UML 圖</td><td>① ② ③ ④</td></tr>
-          <tr><td><code>2.2_harness</code></td><td>「給 AI 的規矩」導讀（四件實檔在範本專案根目錄）＋課後後端參考包</td><td>④</td></tr>
-          <tr><td><code>2.3_design_system</code></td><td>Design System：token 實檔、色票與間距手冊、元件目錄</td><td>⑤</td></tr>
+          <tr><td><code>2.1_sample_app</code></td><td>範本正本（可跑的人員 CRUD）＋規格文件＋UML 圖；harness 四件的實檔也在裡面</td><td>① ② ③ ④</td></tr>
+          <tr><td><code>2.2_design_system</code></td><td>Design System：token 實檔、色票與間距手冊、元件目錄</td><td>⑤</td></tr>
         </tbody>
       </table>
       </div>
@@ -394,11 +393,11 @@ pnpm dev          # 啟動 dev server</code></pre>
       <p>打開 <code>2.1_sample_app/README.md</code>，對照裡面的「<strong>8 個核心檔（複製改名 vs 直接共用）</strong>」表看一遍。判斷準則只有一句：<strong>跟「這個實體長什麼樣子」有關的 → 複製改名；通用機制 → 直接共用。</strong>這張表就是 step3 你要叫 AI 照著做的事。</p>
 
       <h3>④ 認識規矩：harness 四件</h3>
-      <p>打開 <code>2.1_sample_app/sample-app/CLAUDE.md</code>（<strong>專案憲法，AI 每次對話自動讀</strong>）掃一遍，知道它幫你擋掉什麼。四件各自負責什麼、不同 AI Agent 怎麼載入，看 <code>2.2_harness/README.md</code>——那份還有一張<strong>「樣板 ↔ 本專案」對照表</strong>：課後附錄的 harness 參考包是<strong>空白樣板</strong>（規格是空的、token 前綴全寫 <code>TODO</code>、前端規則填的還是別的技術棧），範本專案裡這四份就是<strong>同一份文件填好之後的樣子</strong>。兩邊互相對應但刻意不相同——<strong>回公司要做的，就是拿那份空白樣板填成你們自己的規矩</strong>。</p>
+      <p>打開 <code>2.1_sample_app/sample-app/CLAUDE.md</code>（<strong>專案憲法，AI 每次對話自動讀</strong>）掃一遍，知道它幫你擋掉什麼。四件各自負責什麼、不同 AI Agent 怎麼載入，看 <code>step2_speedrun_kit/README.md</code> 的「<strong>harness 四件：給 AI 的規矩</strong>」一節。</p>
       <blockquote><strong>四件的實檔都在 <code>2.1_sample_app/sample-app/</code> 專案根目錄</strong>（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code>），step3 複製範本時會一起帶著走。教材刻意不放第二份副本——同名兩份你會改到不生效的那一個。</blockquote>
 
       <h3>⑤ 認識 token：Design System</h3>
-      <p>用瀏覽器打開 <code>2.3_design_system/DESIGN_SYSTEM.html</code> 看色票與間距，知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
+      <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距，知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
 
       <blockquote><strong>這三份想查才翻，現在別花時間讀：</strong><code>2.1_sample_app/SPEC-範例-人員CRUD.md</code>（需求規格：Use Cases、FR／BR／NFR、驗收清單）、<code>2.1_sample_app/SDD-CRUD標準範本-v1.1.md</code>（設計：檔案結構、行數預算、各檔實作規格）、<code>2.1_sample_app/DIAGRAMS.html</code>（7 張 UML 圖，用瀏覽器開）。它們是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</blockquote>
 
@@ -817,7 +816,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        harness 方法<strong>不綁框架</strong>：不是 Nuxt 也適用，四件內容換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，搭 <code>aspnet-api-ai-harness-v5</code> 做一個 .NET API CRUD 模組。
+        harness 方法<strong>不綁框架</strong>：不是 Nuxt 也適用，四件內容換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，做一個 .NET API CRUD 模組。
       </div>
     </div>
   </section>
