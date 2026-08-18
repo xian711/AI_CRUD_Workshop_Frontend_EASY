@@ -126,7 +126,7 @@
   .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0;}
   .fig-grid figure{margin:0;}
 
-  .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:16px 0;}
+  .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:16px 0;white-space:pre;}
   .flow b{color:#ffb3b8;}
 
   /* ── checklist ── */
@@ -246,8 +246,8 @@
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <ol>
-        <li>讀一遍 <code>START_HERE.md</code>，確認上完課要帶走三件能力：看得出有無 harness 的差別、能用 AI 生成新模組、能設計並執行一輪 LOOP 驗證。</li>
-        <li>每個 step 都有自己的資料夾與 <code>README.md</code>，照 step0 → step5 順序走。</li>
+        <li>上完課要帶走三件能力：看得出有無 harness 的差別、能用 AI 生成新模組、能設計並執行一輪 LOOP 驗證。</li>
+        <li><strong>整堂課只看這一份手冊</strong>，照 step0 → step5 順序走；各 step 資料夾放的是工作材料（範本、PRD、腳本），手冊會指示何時用哪個。</li>
         <li>開課前先跑前置檢查：</li>
       </ol>
       <pre><code># Windows（PowerShell）
@@ -422,7 +422,7 @@ pnpm dev          # 啟動 dev server</code></pre>
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <p>要長出的新模組是<strong>中心裝備物資</strong>（跑在 <code>/equipment/crud</code>），用的是跟 step2 同一套範本＋harness。</p>
 
-      <h3>⓪ 準備工作區（3.0）</h3>
+      <h3>⓪ 準備工作區</h3>
       <p>動手之前，先把範本複製成自己的工作專案，並確認 AI Agent 的工作目錄就是這個專案根目錄（不然 AI 讀不到題目文件與 harness）。</p>
       <pre><code># Windows（PowerShell）｜在工作坊根目錄執行：複製範本成你的工作專案
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
@@ -438,14 +438,31 @@ cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
-      <blockquote><strong>範圍答案由講師在你完成六題釐清後發放</strong>（<code>instructor/SCOPE-課堂範圍決策.md</code>），先別偷看。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。</blockquote>
+      <blockquote><strong>範圍答案由講師在你完成三題拍板後發放</strong>（<code>instructor/SCOPE-課堂範圍決策.md</code>），先別偷看。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。</blockquote>
       <blockquote>harness 四件（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。</blockquote>
 
-      <h3>① 讀 PRD（3.1）</h3>
-      <p>打開 <code>PRD-中心裝備物資.md</code>。這份 PRD 是從真實災防平台現有頁面<strong>逆向整理</strong>出來的，記的是「現況」不是「理想」——連缺口都照實記（例如白紙黑字寫「品項沒有刪除功能」）。標「原始碼未見／TODO」的地方＝待你決策。26 欄＋借用歸還＋維保提醒，兩小時做不完，很正常。</p>
+      <h3>① 讀 PRD</h3>
+      <p>打開 <code>PRD-中心裝備物資.md</code>。題目取材自真實災防平台的頁面（原系統 26 欄＋借用歸還＋維保提醒，兩小時絕對做不完），已先濃縮成<strong>一堂課做得完的課堂版（12 欄）</strong>——但刻意留了<strong>三個決策點</strong>（刪除補不補、匯出做不做、編碼規則簡不簡化）給你拍板，連「原系統沒有刪除功能」這種真實缺口都照實保留。</p>
 
-      <h3>② 貼起手 prompt，讓 AI 先問問題（3.2）</h3>
-      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。從 <code>PROMPTS.md</code> 複製【起手 prompt】整段貼上——這段同時交代「先讀 CLAUDE.md → CODE-RULES → 使用說明 → PRD、先別寫程式、要用選擇題問範圍」。</p>
+      <h3>② 貼起手 prompt，讓 AI 先問問題</h3>
+      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。整段複製貼上：</p>
+      <pre><code>你是本專案的前端工程師。我們要用現成的 CRUD 標準範本，開發新模組「中心裝備物資」。
+
+請先「依序」讀完專案根目錄的四份文件，讀完再動作：
+1. CLAUDE.md（專案憲法）
+2. CODE-RULES-ui-本專案.md（前端鐵律：色碼、命名、行數、驗證）
+3. 使用說明-複製範本開發新模組.md（複製範本的標準流程與八檔心法）
+4. PRD-中心裝備物資.md（課堂版需求：12 欄，內含第 5 節「三個待決策點」）
+
+讀完後「先不要寫任何程式」。針對 PRD 第 5 節的三個待決策點（D1 刪除、D2 匯出、D3 編碼規則），
+用「選擇題」逐題問我：每題 2 到 4 個選項，標出你建議的選項並附一句理由。
+
+我逐題拍板後，你再輸出任務清單（T1、T2… 約 8 個，每個小到可單獨驗收），
+停下來等我確認，我說「開工」你才開始。
+
+開發時全程遵守 harness 規則：禁止硬編碼色碼與 px、禁止 console.log、
+日期欄用原生 date input、下拉用「全部」哨兵、單檔行數控制在規範內。
+每完成一個任務回報「一行」進度，不要把程式碼整段倒出來。</code></pre>
       <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 列任務 → 你確認 → AI 逐項做並回報。</strong></p>
       <div class="flow">你：貼<b>【起手 prompt】</b>
    ▼
@@ -462,26 +479,26 @@ AI：輸出<b>「任務清單」</b>（8-10 個），停下等你確認
 AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <h3>③ 一題一題拍板</h3>
-      <p>AI 會問六題，逐題拍板（可直接採納建議選項）：</p>
+      <p>AI 會問三題（對應 PRD 第 5 節的三個決策點），逐題拍板（可直接採納建議選項）：</p>
       <div class="table-scroll">
       <table>
         <thead><tr><th>#</th><th>AI 會問</th><th>課堂拍板</th></tr></thead>
         <tbody>
-          <tr><td>Q1</td><td>欄位做多少？</td><td>核心 <strong>12 欄</strong>（不是全部 26 欄）</td></tr>
-          <tr><td>Q2</td><td>PRD 沒有刪除功能，怎麼辦？</td><td><strong>補上硬刪除＋確認彈窗</strong>（CRUD 要有 D）</td></tr>
-          <tr><td>Q3</td><td>借用／歸還、維保、照片、匯入 Excel？</td><td><strong>全部範圍外</strong></td></tr>
-          <tr><td>Q4</td><td>匯出？</td><td><strong>CSV 匯出</strong>（範本現成工具，成本趨近零）</td></tr>
-          <tr><td>Q5</td><td>編碼規則？</td><td><strong>簡化版</strong>（不含機關前綴、不做同碼累加數量）</td></tr>
-          <tr><td>Q6</td><td>存放地點？</td><td><strong>單一文字欄位</strong>（不做級聯地址）</td></tr>
+          <tr><td>D1</td><td>原系統沒有刪除功能，補嗎？</td><td><strong>補硬刪除＋確認彈窗</strong>（CRUD 要有 D）</td></tr>
+          <tr><td>D2</td><td>匯出是 TODO 空實作，做不做？</td><td><strong>做 CSV 匯出</strong>（範本現成工具，成本趨近零）</td></tr>
+          <tr><td>D3</td><td>編碼規則？</td><td><strong>簡化版</strong>（不含機關前綴、不做同碼累加數量）</td></tr>
         </tbody>
       </table>
       </div>
-      <blockquote>六題不用背。重點是理解：<strong>每題都是在「完整 PRD」和「兩小時課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼 <code>PROMPTS.md</code> 的【釐清階段】救援 prompt 打斷它。</blockquote>
+      <blockquote>三題不用背。重點是理解：<strong>每題都是在「真實系統」和「兩小時課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼這段救援 prompt 打斷它：</blockquote>
+      <pre><code>停，先不要寫程式、不要建任何檔案。
+請先針對 PRD 第 5 節的三個待決策點，用選擇題逐題問我（每題 2-4 個選項＋你的建議）。
+我拍板後你再列任務清單，等我確認才開工。</code></pre>
 
       <h3>④ 確認任務清單、說「開工」</h3>
-      <p>AI 會產出 8-10 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除、T7 CSV、T8 SRS/SDD、T9 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
+      <p>AI 會產出約 8 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除＋CSV、T7 SRS/SDD、T8 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
 
-      <h3>⑤ 驗收與修正（3.3）</h3>
+      <h3>⑤ 驗收與修正</h3>
       <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿講師發放的 <code>SCOPE-課堂範圍決策.md</code>（<code>instructor/SCOPE-課堂範圍決策.md</code>）欄位規格逐項對照。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
@@ -539,60 +556,130 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <div class="goal">
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
-          <li>理解 LOOP 工程：<strong>先給 AI 一個會給出紅/綠的自動驗證，再叫它自己修到綠。</strong></li>
-          <li>跑一次 7 條 E2E 測試，看到全綠。</li>
-          <li>記住兩條關鍵規則：兩次停損、修測試不修 App。</li>
+          <li>說得出 LOOP 是什麼、優點與限制是什麼。</li>
+          <li>貼<strong>一個 prompt</strong>，讓 AI 把<strong>你自己在 step3 生成的模組</strong>修到 E2E 全綠。</li>
+          <li>驗收 AI 交回的報告，記住兩條鐵律：兩次停損、不准作弊。</li>
         </ol>
       </div>
 
+      <div class="block-title"><span class="ico">📖</span>LOOP 是什麼</div>
+      <p>一句話：<strong>先給 AI 一個「可自動執行、會給出綠/紅」的驗證，再叫它自己修到綠。</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>沒有 LOOP（人在迴圈裡）</th><th>有 LOOP（AI 在迴圈裡）</th></tr></thead>
+        <tbody>
+          <tr><td>AI 改一版 → 人手動開瀏覽器點一點 → 回報哪裡壞 → AI 再改</td><td>AI 改一版 → 自己跑 E2E → 看到紅 → 自己修 → 再跑 → 綠了才停</td></tr>
+          <tr><td>人是瓶頸，改 5 次就累了</td><td>人只看最後結果，AI 跑幾輪都不喊累</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>關鍵前提：要先有可自動執行的驗證</strong>（本課是 7 條 Playwright E2E，exit 0＝全綠、1＝有紅）。沒有這個，LOOP 就退化成 AI 自說自話。</p>
+      <p><strong>流程圖（一圈 LOOP 怎麼轉）：</strong></p>
+      <div class="flow"> 你：貼 LOOP prompt（只貼這一次）
+          │
+          ▼
+ ┌── AI 跑驗證 run-e2e ──► 全綠？ ──是──► AI 交報告 ──► <b>你驗收</b>
+ │        ▲                 │
+ │        │                否（有紅）
+ │        │                 ▼
+ │        │           AI 判因（App 不符規格？環境？測試本身？）
+ │        │                 │
+ │        │                 ▼
+ │        └────────── AI 修正，再跑
+ │                          │
+ └──────────────────────────┘
+             │
+             │ 同一問題連修 2 次仍紅
+             ▼
+      <b>停損：AI 停下來回報，換人判斷</b></div>
+      <p><strong>架構圖（誰呼叫誰）：</strong></p>
+      <div class="flow">┌────────────── <b>人（你）</b>──────────────┐
+│      出 1 個 prompt ＋ 驗收報告      │
+└──────────────────┬──────────────────┘
+                   ▼
+┌────────────── <b>AI Agent</b> ─────────────┐    ┌── <b>第二個 AI（選配）</b>──┐
+│   跑驗證 → 判因 → 修 App → 寫報告    │◄───│ 對抗審查：抓假綠、    │
+└──────────────────┬──────────────────┘    │ 鬆斷言、猜的 selector │
+                   ▼ 呼叫                   └──────────────────────┘
+┌──────────── <b>驗證 harness</b> ───────────┐
+│ run-e2e 腳本（紅綠燈，exit 0/1）     │
+│  └─ Playwright 7 條測試              │
+│      └─ Chromium 真瀏覽器            │
+└──────────────────┬──────────────────┘
+                   ▼ 實際點擊、斷言
+┌────────────── <b>受測 App</b> ─────────────┐
+│  你的 my-equipment-app（port 3100）  │
+└─────────────────────────────────────┘</div>
+      <p><strong>優點與限制：</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>優點</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td>省人機來回</td><td>人只出一個 prompt＋一次驗收，中間 N 輪紅綠都是 AI 自己跑</td></tr>
+          <tr><td>不喊累、可重複</td><td>跑 10 輪成本幾乎等於 1 輪；每輪判定標準完全一致</td></tr>
+          <tr><td>品質由驗證把關</td><td>過不過由紅綠燈說了算，不是 AI 的自我感覺</td></tr>
+          <tr><td>結果可追溯</td><td>每輪紅了什麼、修了什麼都留在報告裡</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>限制／風險</th><th>對策（本課做法）</th></tr></thead>
+        <tbody>
+          <tr><td>AI 會作弊（放寬斷言、跳測試）</td><td>prompt 鐵律禁止動測試；驗收時 <code>git diff</code> 抽查 e2e 資料夾</td></tr>
+          <tr><td>AI 會鬼打牆（愈修愈亂）</td><td>兩次停損：同一問題連修 2 次仍紅就停下回報</td></tr>
+          <tr><td>驗證寫得爛＝假綠也全過</td><td>換第二個 AI 對抗審查測試本身</td></tr>
+          <tr><td>沒有自動驗證的東西不適用</td><td>先寫驗證再開 LOOP；驗不了的（如視覺美感）回歸人工審</td></tr>
+        </tbody>
+      </table>
+      </div>
+
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <ol>
-        <li>先確認 solution-app 在跑（另一個視窗別關）：</li>
-      </ol>
-      <pre><code>cd ../step3_new_module/solution-app
-pnpm dev          # http://localhost:3100（兩個平台指令相同）</code></pre>
-      <ol start="2">
-        <li>再跑 E2E：</li>
-      </ol>
-      <pre><code># Windows（PowerShell）
-cd step4_loop_e2e
-powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
-      <pre><code># macOS／Linux（終端機）
-cd step4_loop_e2e
-bash run-e2e.sh</code></pre>
-      <p>腳本會：確認 3100 有回應且是本 App → 裝相依（已裝就跳過）→ 跑 7 條測試 → 印 PASS/FAIL 總結（exit 0＝全綠、1＝有紅）。</p>
-      <ol start="3">
-        <li>要啟動 LOOP，一段話就夠（可直接貼；macOS／Linux 把腳本名改成 <code>run-e2e.sh</code>）：</li>
-      </ol>
-      <pre><code>跑 step4_loop_e2e/run-e2e.ps1。
-若有紅字，找出原因、修正後再跑一次，直到 7 條全綠。
-規則：同一個問題連續修兩次還沒好就停下來回報（不要無限撞牆）。
-只准修測試，不准為了過測試去改 solution-app 的程式；
-若判斷是 App 真的有 bug，記下來回報，但不要動 App。</code></pre>
-      <ol start="4">
-        <li>動手經歷一次「紅 → 判因 → 修 → 綠」（LOOP 真正的重點，不是只看一次綠）：</li>
-      </ol>
-      <pre><code># Windows（PowerShell）
-cd lab-red-to-green
-powershell -ExecutionPolicy Bypass -File .\inject-bug.ps1   # 讓 E4 變紅
-cd ..
-powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1      # 看失敗訊息，判斷是 App bug 還是測試 bug
-cd lab-red-to-green
-powershell -ExecutionPolicy Bypass -File .\restore.ps1      # 修回（或自己把驗證規則加回去）
-cd ..
-powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1      # 再跑一次，確認回到 7/7 綠</code></pre>
-      <pre><code># macOS／Linux（終端機）
-cd lab-red-to-green
-bash inject-bug.sh    # 讓 E4 變紅
-cd ..
-bash run-e2e.sh       # 看失敗訊息，判斷是 App bug 還是測試 bug
-cd lab-red-to-green
-bash restore.sh       # 修回（或自己把驗證規則加回去）
-cd ..
-bash run-e2e.sh       # 再跑一次，確認回到 7/7 綠</code></pre>
+      <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong> 紅燈不用刻意製造——你在 step3 用自己的 AI 模型生成的 <code>my-equipment-app</code>，本來就會跟驗收規格有落差，一跑 E2E 自然就紅；<strong>這 7 條測試就是可執行的驗收規格</strong>。</p>
+      <p>在工作坊根目錄開 AI Agent，整段複製貼上：</p>
+      <pre><code>你是 LOOP 工程師，接下來自己跑完，中途不要問我。
+受測 App：step3_new_module/my-equipment-app（我用 AI 生成的裝備物資模組）。
+驗證指令（紅綠燈）：Windows 跑 powershell -ExecutionPolicy Bypass -File step4_loop_e2e/run-e2e.ps1；
+macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有紅。
+
+依序完成：
+1. 確認 http://localhost:3100 跑的是受測 App；沒開就自己在背景啟動
+   （cd step3_new_module/my-equipment-app 後 pnpm dev），等可連線再繼續；
+   若 3100 被別的程式佔用，停下回報，等我處理。
+2. 跑驗證。紅了就逐條判因，分三類處理：
+   a. App 不符驗收規格（最常見）→ 修 my-equipment-app，遵守它根目錄的 harness 規則。
+   b. 環境問題（server 沒起、相依沒裝）→ 修環境。
+   c. 測試本身的問題 → 停下回報理由，等我裁決，不准自己改測試。
+3. 修完再跑，直到 7 條全綠。
+
+鐵律：
+- 同一個問題連續修兩次還沒好，停下來回報，不要無限撞牆。
+- 不准為了讓燈變綠去放寬測試斷言、跳過測試、或改測試預期條數。
+
+完成後交報告：
+- 每一輪：紅了哪幾條、一句話根因、修了哪個檔。
+- 最後：全綠總結行（7 passed）。</code></pre>
+      <blockquote><strong>一次就全綠？</strong>恭喜，代表你的模組已通過驗收規格，報告只有一輪、直接收工。這也是正常結果——LOOP 的價值在「有紅時不用人跳進去」，不在硬要看到紅。</blockquote>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>E2E 腳本（<code>run-e2e.ps1</code>／<code>run-e2e.sh</code>）印出 7 條測試全數 <code>ok</code>，最後 <code>7 passed</code>、<code>EXITCODE=0</code>。</p>
+      <p>AI 交回一份報告，照這張表核：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>檢查點</th><th>怎麼核</th></tr></thead>
+        <tbody>
+          <tr><td>每輪紀錄完整</td><td>紅了哪幾條、根因、修了哪個檔，一輪一列</td></tr>
+          <tr><td>根因說得通</td><td>「App 不符規格」就該修 App；說「測試有問題」的要有你的裁決紀錄</td></tr>
+          <tr><td>測試沒被動過</td><td>在 <code>step4_loop_e2e/</code> 跑 <code>git diff e2e/</code>，應該是空的</td></tr>
+          <tr><td>最終真的綠</td><td>報告附 <code>7 passed</code>、exit 0 的總結行</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>進階（選配）：對抗審查。</strong>開第二個 AI（例如本機 Codex），貼這段，它挑出的問題交回原 AI 修 → 再跑 → 再審：</p>
+      <pre><code>你的任務是「盡力推翻」step4_loop_e2e/e2e 這套 E2E 測試，不是誇獎它：
+1. 有沒有「假綠」——斷言太鬆、選到隱藏節點、等到的是別的元素？
+2. selector 是不是猜的？有沒有靠位置索引（nth）這種一改版就碎的寫法？
+3. 測試之間會不會互相污染（前一條的資料影響後一條）？
+逐條給「可被推翻的具體理由」，能重現就附步驟；找不到問題也要說明你怎麼確認的。</code></pre>
       <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>E2E 腳本實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0（截圖為 Windows 版 run-e2e.ps1；macOS 的 run-e2e.sh 輸出與判定相同）。</figcaption></figure>
       <div class="table-scroll">
       <table>
@@ -608,11 +695,9 @@ bash run-e2e.sh       # 再跑一次，確認回到 7/7 綠</code></pre>
         </tbody>
       </table>
       </div>
-      <p>跑 <code>inject-bug</code>（<code>.ps1</code>／<code>.sh</code>）後再跑一次 E2E，會看到 <strong>E4 變紅</strong>（等不到「請選擇分類」錯誤訊息）；跑 <code>restore</code>（<code>.ps1</code>／<code>.sh</code>，或自己修回驗證規則）後再跑一次，7 條會<strong>全部變回綠</strong>。</p>
-
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>兩次停損規則</strong>：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。<strong>修測試不修 App</strong>：LOOP 很會「為了讓燈變綠」而作弊（放寬斷言、改壞 App 邏輯），用這條把它框住。另外，寫測試的 AI 不適合審自己（它傾向相信自己寫對了），收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。<strong>LOOP 的核心是經歷紅到綠，不是看到綠</strong>——只跑出一次全綠只證明現在沒壞，真正學到的是變紅之後怎麼判因、怎麼修。
+        <strong>LOOP 的價值就是省掉人機來回</strong>——人只出一個 prompt＋一次驗收，中間幾輪紅綠都是 AI 自己跑；如果還要人一個一個指令下，那就不是 LOOP，是人肉迴圈。紅燈也不必刻意製造：不同 AI 模型生成的結果本來就會跟規格有落差，LOOP 的日常用途正是<strong>把「生成結果」拉齊到「驗收規格」</strong>。但放手讓 AI 跑，就要用鐵律框住它：<strong>兩次停損</strong>（同一個坑修兩次沒好＝方向錯了，該讓人看）、<strong>不准作弊</strong>（LOOP 很會「為了讓燈變綠」放寬斷言、跳過測試）。另外，寫測試（或修 App）的 AI 不適合審自己，收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。你驗收的是報告和紅綠證據，不是一句「做完了」。
       </div>
       <blockquote>這 7 條測試是<strong>功能驗證＋失敗截圖診斷</strong>（失敗時自動存一張截圖，給人也給 AI 判讀用），不是 pixel 比對的視覺回歸。<strong>真正的視覺審查＝人逐張看截圖</strong>（本手冊 16 張就是這樣審的），不是靠自動化斷言能取代的。</blockquote>
       <blockquote><strong>建置紀律補充：</strong>這套測試第一次跑就全綠，靠的是「先 probe 探 DOM、再寫 selector」——探路的成本，遠低於用死站點瞎猜 selector 反覆跑紅的成本。細節見 <code>EVIDENCE-建置實錄.md</code>。</blockquote>
@@ -675,13 +760,13 @@ bash run-e2e.sh       # 再跑一次，確認回到 7/7 綠</code></pre>
         <li>並排看過 no-harness 與 with-harness 兩頁，說得出至少三個差別</li>
         <li>範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現</li>
         <li>看過 Design System 與前端 harness 四件，知道顏色／間距走 token</li>
-        <li>讀懂 PRD，理解「PRD 給全貌，不是這堂課的範圍」</li>
+        <li>讀懂課堂版 PRD，知道三個決策點是拿「真實系統」換「兩小時課堂」的取捨</li>
         <li>貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）</li>
-        <li>六題範圍逐題拍板，確認任務清單後才說「開工」</li>
+        <li>三個決策點逐題拍板，確認任務清單後才說「開工」</li>
         <li>裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現</li>
-        <li>E2E 腳本（<code>run-e2e.ps1</code>／<code>run-e2e.sh</code>）跑出 7 條全綠、exit 0</li>
-        <li>完成一次紅→判因→修→綠（留下四項證據）</li>
-        <li>說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則</li>
+        <li>貼一個 LOOP prompt，AI 把你的 my-equipment-app 修到 E2E 7 條全綠</li>
+        <li>驗收 AI 的報告（每輪紅了什麼／根因／修了哪個檔＋全綠總結行）＋ <code>git diff e2e/</code> 抽查測試沒被動</li>
+        <li>說得出 LOOP 是什麼、一個優點一個限制，以及「兩次停損」「不准作弊」兩條鐵律</li>
       </ul>
 
       <h3>回去怎麼用（三步驟速記）</h3>

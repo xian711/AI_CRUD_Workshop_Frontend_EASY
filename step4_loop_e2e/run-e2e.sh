@@ -4,14 +4,14 @@
 # 裝備物資模組 E2E 一鍵跑（EASY 版｜macOS／Linux）
 #
 # 與 Windows 的 run-e2e.ps1 行為一致：
-#   1. 確認 solution-app 在 http://localhost:3100 有回應（且是本 App，非別的程式佔埠）。
+#   1. 確認受測 App（你的 my-equipment-app 或參考解 solution-app）在 http://localhost:3100 有回應（且是本課範本 App，非別的程式佔埠）。
 #   2. e2e 資料夾裝相依（node_modules 與 playwright 皆就緒才跳過 npm ci）＋確保 chromium 已裝。
 #   3. 跑 Playwright 7 條測試，解析輸出印 PASS/FAIL 總結，exit code 對應。
 #
 # 在 step4_loop_e2e 目錄執行：
 #   bash run-e2e.sh
 # 先另開一個視窗啟動 App：
-#   cd ../step3_new_module/solution-app && pnpm dev      # http://localhost:3100
+#   cd ../step3_new_module/my-equipment-app && pnpm dev   # 或 solution-app；http://localhost:3100
 #
 # Exit code：0 = 全綠；1 = 任一 FAIL、找不到測試或非預期錯誤。
 #
@@ -20,7 +20,7 @@ set -u
 
 PORT=3100
 EXPECTED=7                        # EASY 版 baseline：恰好 7 條全綠才算過
-APP_MARKER='disaster-color-mode'  # solution-app 的 colorMode.storageKey 前綴，用來確認 3100 是本 App
+APP_MARKER='disaster-color-mode'  # 本課範本 App 的 colorMode.storageKey 前綴，用來確認 3100 是本課的 App
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$SCRIPT_DIR/e2e"
@@ -50,17 +50,17 @@ if [ "$http_code" -ge 200 ] 2>/dev/null && [ "$http_code" -lt 500 ] 2>/dev/null;
 fi
 
 if [ "$alive" -ne 1 ]; then
-    echo "${C_RED}FAIL：solution-app 沒在 $PORT 埠回應。${C_RESET}"
-    echo "${C_YELLOW}請先啟動 solution-app：cd ../step3_new_module/solution-app && pnpm dev${C_RESET}"
+    echo "${C_RED}FAIL：受測 App 沒在 $PORT 埠回應。${C_RESET}"
+    echo "${C_YELLOW}請先啟動受測 App：cd ../step3_new_module/my-equipment-app && pnpm dev（或 solution-app）${C_RESET}"
     exit 1
 fi
 
 if ! grep -qF "$APP_MARKER" "$TMP_BODY" 2>/dev/null; then
     echo "${C_RED}FAIL：$PORT 埠有回應，但不是本 App（可能被別的程式佔用）。${C_RESET}"
-    echo "${C_YELLOW}請關掉佔用的程式，改在 3100 啟動 solution-app。${C_RESET}"
+    echo "${C_YELLOW}請關掉佔用的程式，改在 3100 啟動受測 App。${C_RESET}"
     exit 1
 fi
-echo "${C_GREEN}PASS：solution-app 在 $PORT 埠、確認為本 App。${C_RESET}"
+echo "${C_GREEN}PASS：受測 App 在 $PORT 埠、確認為本課的 App。${C_RESET}"
 
 # ── 2. 相依：node_modules 存在「且」playwright CLI 也在，才跳過 npm ci（半套安裝一律重裝）──
 if [ -d "$E2E_DIR/node_modules" ] && [ -x "$E2E_DIR/node_modules/.bin/playwright" ]; then

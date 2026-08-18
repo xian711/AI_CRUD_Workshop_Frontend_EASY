@@ -78,5 +78,5 @@ export type EquipmentItemInput = Omit<EquipmentItem, 'id' | 'code'>
 ## 5. 待辦（正式環境）
 
 - 後端 API contract 由 SD 定案後，把 `useEquipmentItems` 內部 mock 換 `useFetch`（端點 `/api/equipment/items`）。
-- 刪除改軟刪除（狀態報廢）之取捨（SCOPE Q2 正式環境建議）。
+- 刪除改軟刪除（狀態報廢）之取捨（SCOPE D1 正式環境建議）。
 - 機關前綴、權限（`useAuth`）。
