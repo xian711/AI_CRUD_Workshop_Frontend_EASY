@@ -4,7 +4,7 @@
 |------|------|
 | 文件版本 | v1.1（依 SD Reviewer 對抗式審查修訂，修訂紀錄見第 12 章） |
 | 日期 | 2026-07-10 |
-| 依據 | `doc/crud-template/SRS-CRUD標準範本-v1.0.md` |
+| 依據 | 同資料夾 `SPEC-範例-人員CRUD.md`（需求規格，已併入原 SRS-CRUD標準範本 v1.0）|
 | 範圍 | 前端 + UIUX（Nuxt 3 + Nuxt UI v2 + Design Token 三層架構） |
 
 ---
@@ -332,7 +332,7 @@ interface Props { status: TemplateMemberStatus }
 
 ## 11. 驗收與審查
 
-- 實作完成後依 SRS 第 8 章清單自檢。
+- 實作完成後依 `SPEC-範例-人員CRUD.md` 的「Done Criteria → 驗收清單」自檢。
 - 程式碼審查維度：(a) SDD 符合度逐條、(b) CLAUDE.md 禁止事項、(c) Clean Code 對照表落實、(d) TypeScript 無 any 滲漏、(e) 響應式正確性（computed vs method、深拷貝時機）。
 - E2E 視覺審查：桌機 1280×800 與手機 390×844 各截列表/檢視/表單/錯誤態/刪除確認。
 
@@ -362,7 +362,7 @@ interface Props { status: TemplateMemberStatus }
 
 | # | 勘誤 |
 |---|------|
-| 1 | §6.2-4 手機卡片補列「資格、更新日期、檢視鈕」——原清單與 SRS NFR-T-01（資訊等價）衝突，裁定以 SRS 為準 |
+| 1 | §6.2-4 手機卡片補列「資格、更新日期、檢視鈕」——原清單與 NFR-T-01（資訊等價）衝突，裁定以需求規格為準 |
 | 2 | §3 補充：debounce 排程必須於 scope dispose 時清理，且寫回 URL 前須確認仍在原路由（防跨頁污染——雙 reviewer 審查發現） |
 | 3 | §2.3 `today()` 一律使用**本地時區**組 YYYY-MM-DD，不得用 `toISOString()`（UTC 於台灣時區 00:00–08:00 會差一天） |
 

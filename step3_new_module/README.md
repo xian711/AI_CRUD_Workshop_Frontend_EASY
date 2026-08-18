@@ -15,7 +15,7 @@
 
 ```powershell
 # 在工作坊根目錄執行
-Copy-Item -Recurse step2_speedrun_kit\2.5_sample_app\sample-app step3_new_module\my-equipment-app
+Copy-Item -Recurse step2_speedrun_kit\2.1_sample_app\sample-app step3_new_module\my-equipment-app
 Copy-Item step3_new_module\PRD-中心裝備物資.md step3_new_module\my-equipment-app\
 cd step3_new_module\my-equipment-app
 pnpm install
@@ -26,7 +26,7 @@ pnpm install
 
 ```bash
 # 在工作坊根目錄執行
-cp -R step2_speedrun_kit/2.5_sample_app/sample-app step3_new_module/my-equipment-app
+cp -R step2_speedrun_kit/2.1_sample_app/sample-app step3_new_module/my-equipment-app
 cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install
