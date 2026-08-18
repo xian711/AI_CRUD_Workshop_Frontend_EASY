@@ -1,8 +1,8 @@
 # Design System Summary（防災協作平台）
 
-> 用途：供 AI Harness CRUD / UI Mode 產出時對照的 Design System 摘要（元件對照、token 層級、慣例）。對應 harness 樣板：`modules/crud-ui/design-system-summary.md`。
-> **完整版**見 `design-system-kit/docs/design-system-手冊.md` 與 `元件目錄.md`；本檔只留摘要，勿反覆貼完整設計文件（Harness token budget 精神）。
-> 數值以 `design-system-kit/tokens/design-token.css` + `comp-tokens.css` 實檔為準。
+> 用途：供 AI Harness CRUD / UI Mode 產出時對照的 Design System 摘要（元件對照、token 層級、慣例）。對應 harness 樣板：工作坊 `step2_speedrun_kit/2.2_harness/aspnet-api-ai-harness-v5/modules/crud-ui/design-system-summary.md`（那份整頁是 `TODO` 空欄，本檔是**填好**的版本）。
+> **完整版**見工作坊 `step2_speedrun_kit/2.3_design_system/docs/`（`design-system-手冊.md`、`元件目錄.md`）；本檔只留摘要，勿反覆貼完整設計文件（Harness token budget 精神）。
+> 數值以本專案實際載入的 `assets/css/design-token.css` + `comp-tokens.css` 為準（工作坊展示正本見 `step2_speedrun_kit/2.3_design_system/tokens/`，內容相同）。
 
 ## Token 層級（三層，引用只能由下往上）
 
@@ -68,5 +68,5 @@
 
 ## Token Check（產出後必跑）
 
-依 `design-system-kit`（等同 harness `modules/crud-ui/design-token-rules.md`）：搜 R001 硬編碼色值、R002 引用 REF、R003 硬編碼間距/裸數字 utility、R004 `!important`、W001 缺 focus-visible。
+依 token 三層規則（對應 harness 樣板 `modules/crud-ui/design-token-rules.md`）：搜 R001 硬編碼色值、R002 引用 REF、R003 硬編碼間距/裸數字 utility、R004 `!important`、W001 缺 focus-visible。
 ⚠️ 既有 `comp-tokens.css` 有已知自我違規（見手冊第 9 章 #4：部分 COMP 硬編碼 / 跨層引用 REF），跑檢查時屬既有技術債，非本次新增產出的違規，應排除誤報。

@@ -12,7 +12,7 @@
 ## 內容物導覽
 
 ```
-design-system-kit/
+2.3_design_system/                  ← 回公司整包帶走時可自行改名（原名 design-system-kit）
 ├─ README.md                      ← 你正在讀這份：安裝與導覽
 ├─ tokens/
 │   ├─ design-token.css           ← REF + SYS 層 token（原始色票 + 語意別名 + 字型 @font-face）

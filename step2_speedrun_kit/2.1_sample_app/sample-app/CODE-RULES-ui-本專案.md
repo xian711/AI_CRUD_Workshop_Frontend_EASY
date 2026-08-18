@@ -1,7 +1,7 @@
 # CODE-RULES-ui（防災協作平台前端程式規範）
 
-> 用途：本專案前端的實際程式規則，供 AI Harness CRUD / UI Mode 改碼前對照。**取代** harness 樣板內取自 TIPC EOC_TV（Vite/Pinia/axios）的預設值。對應 harness 樣板：`harness/CODE-RULES-ui.md`。
-> 提煉自 `frontend/CLAUDE.md` + `SDD-CRUD標準範本-v1.1.md` UIUX 規範 + Clean Code 對照表。純後端工作不必讀本檔。
+> 用途：本專案前端的實際程式規則，供 AI Harness CRUD / UI Mode 改碼前對照。**取代** harness 樣板內取自 TIPC EOC_TV（Vite/Pinia/axios）的預設值。對應 harness 樣板：工作坊 `step2_speedrun_kit/2.2_harness/aspnet-api-ai-harness-v5/harness/CODE-RULES-ui.md`（那份是**空白預設**，本檔是**本專案填好並取代**的版本）。
+> 提煉自同資料夾 `CLAUDE.md` ＋ 工作坊 `step2_speedrun_kit/2.1_sample_app/SDD-CRUD標準範本-v1.1.md` 的 UIUX 規範與 Clean Code 對照表。純後端工作不必讀本檔。
 
 | 項目 | 規範 |
 |---|---|

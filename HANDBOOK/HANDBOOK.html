@@ -394,7 +394,7 @@ pnpm dev          # 啟動 dev server</code></pre>
       <p>打開 <code>2.1_sample_app/README.md</code>，對照裡面的「<strong>8 個核心檔（複製改名 vs 直接共用）</strong>」表看一遍。判斷準則只有一句：<strong>跟「這個實體長什麼樣子」有關的 → 複製改名；通用機制 → 直接共用。</strong>這張表就是 step3 你要叫 AI 照著做的事。</p>
 
       <h3>④ 認識規矩：harness 四件</h3>
-      <p>打開 <code>2.1_sample_app/sample-app/CLAUDE.md</code>（<strong>專案憲法，AI 每次對話自動讀</strong>）掃一遍，知道它幫你擋掉什麼。四件各自負責什麼、不同 AI Agent 怎麼載入，看 <code>2.2_harness/README.md</code>。</p>
+      <p>打開 <code>2.1_sample_app/sample-app/CLAUDE.md</code>（<strong>專案憲法，AI 每次對話自動讀</strong>）掃一遍，知道它幫你擋掉什麼。四件各自負責什麼、不同 AI Agent 怎麼載入，看 <code>2.2_harness/README.md</code>——那份還有一張<strong>「樣板 ↔ 本專案」對照表</strong>：課後附錄的 harness 參考包是<strong>空白樣板</strong>（規格是空的、token 前綴全寫 <code>TODO</code>、前端規則填的還是別的技術棧），範本專案裡這四份就是<strong>同一份文件填好之後的樣子</strong>。兩邊互相對應但刻意不相同——<strong>回公司要做的，就是拿那份空白樣板填成你們自己的規矩</strong>。</p>
       <blockquote><strong>四件的實檔都在 <code>2.1_sample_app/sample-app/</code> 專案根目錄</strong>（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code>），step3 複製範本時會一起帶著走。教材刻意不放第二份副本——同名兩份你會改到不生效的那一個。</blockquote>
 
       <h3>⑤ 認識 token：Design System</h3>
