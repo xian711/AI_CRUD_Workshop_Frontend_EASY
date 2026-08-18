@@ -42,8 +42,11 @@ bash apply-solution-checkpoint.sh --target ../step3_new_module/my-equipment-app
 
 ## 三、故障分流表
 
+> **通則：任何腳本／指令紅字，一律先請學員把「整段輸出」貼給自己的 AI Agent 排除**（HANDBOOK 的 step0、step2、step4 各有現成 prompt），同一個錯誤 AI 修兩次還沒好，講師才接手。這樣講師不會被 20 台機器的環境問題塞死，學員也真的練到「把錯誤丟給 AI」這件事。下表是講師接手後的處置。
+
 | 狀況 | 現場處置 |
 |---|---|
+| 學員 preflight 出現 `[FAIL]` | 依上面通則先讓學員自己用 AI 修（step0 有現成 prompt）。講師接手時先問一句「裝完有沒有重開終端機」——**最常見的是裝好 Node／pnpm 但舊視窗抓不到 PATH 的假紅燈**。`[WARN]` 一律不擋開課。 |
 | 網路斷 | 走離線路線：課前已裝依賴＋Chromium，全程不連網也能跑；生成改用 checkpoint。 |
 | Agent 額度用盡 | 停止讓該生等生成，直接套 checkpoint 進到驗收／LOOP，課後再自行補生成練習。 |
 | port 3100 被占 | Windows：`Get-NetTCPConnection -LocalPort 3100` 找 PID → `Stop-Process -Id <PID>`。macOS／Linux：`lsof -nP -iTCP:3100 -sTCP:LISTEN` 找 PID → `kill <PID>`。再重啟 dev。 |

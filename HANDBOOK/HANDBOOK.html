@@ -241,6 +241,7 @@
         <ol>
           <li>知道這門課要教什麼、怎麼進行。</li>
           <li>確認機器準備好了（10 項檢查：Node.js、pnpm、git、port 3100、磁碟空間、可執行腳本的環境、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI）。</li>
+          <li>紅燈（<code>[FAIL]</code>）時，知道怎麼讓 AI 幫你把環境修好，而不是卡在那裡等人。</li>
         </ol>
       </div>
 
@@ -256,14 +257,37 @@ cd step0_course_intro
       <pre><code># macOS／Linux（終端機）
 cd step0_course_intro
 bash preflight.sh</code></pre>
-      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——<code>[WARN]</code> 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取）。只有 <code>[FAIL]</code> 要照腳本印出的修復提示處理後重跑一次。</p>
+      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——<code>[WARN]</code> 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取）。只有 <code>[FAIL]</code> 一定要處理掉，做法看下面「看到 [FAIL] 紅燈怎麼辦」。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <p>腳本逐項印出 10 項檢查結果（Node.js、pnpm、git、port 3100、磁碟空間、可執行腳本的環境、工作區可寫入、npm 連線、Playwright Chromium 快取、AI Agent CLI），每項前面標著 <code>[PASS]</code>／<code>[WARN]</code>／<code>[FAIL]</code>，最後一行是「前置檢查全數通過，可以開課！」（有警告時是「前置檢查全數通過（含 N 項警告），可以開課！」）。</p>
 
+      <div class="block-title"><span class="ico">🚑</span>看到 [FAIL] 紅燈怎麼辦</div>
+      <p>紅燈不用舉手乾等，也不用自己上網亂查——<strong>這堂課的第一個練習就是：把問題交給 AI 排除</strong>。照「先照提示做 → 交給 AI → 兩次不好就找講師」三步走：</p>
+      <ol>
+        <li><strong>先照腳本印的修復提示做一次。</strong>每個 <code>[FAIL]</code> 下一行都會印「修復提示：…」（例如「請執行『npm install -g pnpm』安裝 pnpm」）。照做完之後<strong>關掉終端機、重開一個新的</strong>再跑一次 preflight——剛裝好的 Node／pnpm／git 在舊視窗裡抓不到，這是最常見的假紅燈。</li>
+        <li><strong>還是紅燈，就把整份輸出貼給你的 AI Agent。</strong>在工作坊資料夾下開 Agent（Claude Code／Codex／Cursor 這類 CLI，或 IDE 內建的 Agent 對話框都可以），連 <code>[PASS]</code> 的行一起貼給它——它要看到完整環境才判斷得準。可以直接複製這段 prompt：</li>
+      </ol>
+      <pre><code>我在跑工作坊的環境前置檢查（Windows 是 step0_course_intro\preflight.ps1，
+macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出如下：
+
+（把整份 preflight 輸出貼在這裡，PASS 的行也一起貼）
+
+我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
+1. 逐項說明每個 FAIL 的真正原因，不要只重複腳本印的修復提示。
+2. 給我可以直接複製執行的指令，一行一行，每行附一句話說明在做什麼。
+3. 指令跑完後帶我重跑一次 preflight，確認紅燈都變綠。
+
+限制：只處理我這台電腦的環境設定，不要改工作坊裡的任何程式碼或腳本；
+需要系統管理員權限的步驟，請先講清楚風險再叫我執行。</code></pre>
+      <ol start="3">
+        <li><strong>同一項讓 AI 修兩次還是紅，就舉手找講師。</strong>這就是 step4 會用到的<strong>兩次停損</strong>鐵律——同一個坑修兩次沒好，代表方向錯了，該換人看，別在原地繞。環境卡關而已，講師手上有離線包和參考解，一定跟得上進度。</li>
+      </ol>
+      <blockquote>這步還有個附帶好處：<strong>它順便幫你驗證了 AI Agent 真的能用</strong>（登入了、有額度、看得懂你貼的東西）。第 10 項「AI Agent CLI」只偵測得到指令存不存在，測不出帳號狀態；拿一個真實問題請它幫忙一次，才算真的確認完成。</blockquote>
+
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        這堂課全程動手做，環境沒備好會卡在半路。前置檢查一次把常見坑（沒裝 pnpm、3100 埠被占用）攔在開課前，省得上課才發現跑不起來。
+        這堂課全程動手做，環境沒備好會卡在半路。前置檢查一次把常見坑（沒裝 pnpm、3100 埠被占用）攔在開課前，省得上課才發現跑不起來。而紅燈時「把完整錯誤訊息貼給 AI，要它講原因＋給可複製的指令」，正是後面 step3～step4 一直在用的同一套心法——從修環境開始練最沒有風險。
       </div>
     </div>
   </section>
@@ -370,6 +394,20 @@ pnpm dev          # 啟動 dev server</code></pre>
         <li>認識規矩：讀 <code>2.3_harness/CLAUDE.md</code>（專案憲法，AI 每次對話自動讀）與 <code>2.4_design_system</code>。</li>
       </ol>
 
+      <div class="block-title"><span class="ico">🚑</span>裝不起來／跑不起來怎麼辦</div>
+      <p><code>pnpm install</code> 或 <code>pnpm dev</code> 噴一大串紅字，處置跟 step0 同一套：<strong>先看訊息有沒有明講原因</strong>（最常見是 port 3100 被別的程式占用、或公司網路擋住 npm），還是不行就<strong>把終端機從你打的指令那一行開始整段複製，貼給 AI Agent</strong>——只貼最後一行紅字它判不準。可以用這個 prompt：</p>
+      <pre><code>我在跑工作坊的範本專案，指令失敗了。我打的指令和完整輸出如下：
+
+（從你輸入指令那一行開始整段貼上，不要只貼最後一行紅字）
+
+我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
+1. 先告訴我這是什麼問題（網路擋住？埠被占用？Node 版本不符？相依裝壞了？）。
+2. 給我可以直接複製執行的指令，一行一行，每行附一句話說明在做什麼。
+3. 跑完帶我確認 http://localhost:3100/template/crud 真的打得開。
+
+限制：不要改範本專案裡的程式碼，我這一步只是要把現成範本原封不動跑起來。</code></pre>
+      <blockquote>同樣是<strong>兩次停損</strong>：同一個錯誤 AI 修兩次還是不行，就舉手找講師——講師手上有預先打包好的 <code>node_modules</code> 離線包，不會讓你卡在安裝這一關。</blockquote>
+
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <div class="fig-grid">
         <figure><img src="images/step2_template_list.png" alt="範本人員 CRUD 列表頁"><figcaption>範本列表頁：表格＋篩選＋分頁＋匯出 CSV。</figcaption></figure>
@@ -438,6 +476,7 @@ cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
+      <blockquote>這裡的 <code>pnpm install</code> 失敗的話，處置跟 step2 的「裝不起來／跑不起來怎麼辦」完全一樣：整段輸出貼給 AI Agent 要它講原因＋給指令，同一個錯誤修兩次沒好就舉手找講師。</blockquote>
       <blockquote><strong>範圍答案由講師在你完成三題拍板後發放</strong>（<code>instructor/SCOPE-課堂範圍決策.md</code>），先別偷看。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。</blockquote>
       <blockquote>harness 四件（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。</blockquote>
 
@@ -660,6 +699,34 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
 - 每一輪：紅了哪幾條、一句話根因、修了哪個檔。
 - 最後：全綠總結行（7 passed）。</code></pre>
       <blockquote><strong>一次就全綠？</strong>恭喜，代表你的模組已通過驗收規格，報告只有一輪、直接收工。這也是正常結果——LOOP 的價值在「有紅時不用人跳進去」，不在硬要看到紅。</blockquote>
+
+      <div class="block-title"><span class="ico">🚑</span>LOOP 卡住怎麼辦</div>
+      <p>先分清楚兩種紅，處置完全不同：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>你看到的狀況</th><th>這是什麼</th><th>你要做的</th></tr></thead>
+        <tbody>
+          <tr><td>E1～E7 有幾條 fail</td><td><strong>正常</strong>，這就是 LOOP 存在的目的</td><td>別插手，讓 AI 自己修 → 再跑</td></tr>
+          <tr><td>腳本根本沒開始跑測試就掛了（Playwright 瀏覽器下載失敗、連不上 3100、PowerShell 擋住執行）</td><td>環境問題，不是 LOOP 的活</td><td>整段輸出貼給 AI 排除，同 step0 那一套</td></tr>
+          <tr><td>AI 自己停下來回報（觸發兩次停損）</td><td>制度設計如此，代表該人介入了</td><td>看它的根因說法：該修 App 就叫它修；它說「測試有問題」要你點頭才准動</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>後兩種都可以直接把完整輸出交給 AI，用這個 prompt：</p>
+      <pre><code>我在跑工作坊 step4 的 E2E 驗證腳本，它「還沒開始跑測試就失敗了」
+（Windows 是 step4_loop_e2e/run-e2e.ps1，macOS 是 step4_loop_e2e/run-e2e.sh）。
+完整輸出如下：
+
+（從你輸入指令那一行開始整段貼上）
+
+我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
+1. 判斷這是環境問題還是測試問題，講清楚你的判斷依據。
+2. 若是環境問題（Playwright 瀏覽器沒下載、受測 App 沒啟動、3100 被占用、執行政策擋住），
+   給我可以直接複製執行的指令修掉它，一行一行，每行附一句在做什麼。
+3. 修好後帶我重跑一次腳本。
+
+鐵律：不准修改 step4_loop_e2e/e2e 底下的任何測試檔，也不准放寬斷言或跳過測試——那是作弊。
+測試若真有問題，只准告訴我理由，由我裁決。</code></pre>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <p>AI 交回一份報告，照這張表核：</p>
