@@ -14,7 +14,6 @@
 | `HANDBOOK/` | **學員唯一要讀的手冊**（HTML，含 16 張實拍截圖與所有可複製的 prompt） |
 | `step0`～`step4` 各資料夾 | 上課的工作材料（前置檢查、A/B demo、範本、PRD、E2E 腳本）——HANDBOOK 會指示何時用哪個。step5 是課程總結，沒有工作材料，全在 HANDBOOK 裡 |
 | `step6_survey/` | **課後驗收題**：一個人做一個課程回饋問卷並發布上線。題目、PRD、起手 prompt、發布步驟都在它的 `README.md`；`solution/` 是參考解，卡住再開 |
-| `課程系列-精簡與銜接指引.md` | 給後端課與測試課維護者：怎麼精簡、怎麼接住前端留的接縫 |
 | `instructor/` | 講師專用（時間軸、SCOPE 答案、checkpoint 腳本），學員勿先看 |
 
 教材由 Claude（Fable 5）多代理協作產出、Codex（GPT-5.6）對抗審查、E2E 實跑驗證全綠後發佈。
