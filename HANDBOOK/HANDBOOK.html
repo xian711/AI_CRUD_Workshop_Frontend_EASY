@@ -392,9 +392,32 @@ pnpm dev          # 啟動 dev server</code></pre>
       <h3>③ 看懂範本結構：8 個核心檔</h3>
       <p>打開 <code>2.1_sample_app/README.md</code>，對照裡面的「<strong>8 個核心檔（複製改名 vs 直接共用）</strong>」表看一遍。判斷準則只有一句：<strong>跟「這個實體長什麼樣子」有關的 → 複製改名；通用機制 → 直接共用。</strong>這張表就是 step3 你要叫 AI 照著做的事。</p>
 
-      <h3>④ 認識規矩：harness 四件</h3>
-      <p>打開 <code>2.1_sample_app/sample-app/CLAUDE.md</code>（<strong>專案憲法，AI 每次對話自動讀</strong>）掃一遍，知道它幫你擋掉什麼。四件各自負責什麼、不同 AI Agent 怎麼載入，看 <code>step2_speedrun_kit/README.md</code> 的「<strong>harness 四件：給 AI 的規矩</strong>」一節。</p>
-      <blockquote><strong>四件的實檔都在 <code>2.1_sample_app/sample-app/</code> 專案根目錄</strong>（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code>），step3 複製範本時會一起帶著走。教材刻意不放第二份副本——同名兩份你會改到不生效的那一個。</blockquote>
+      <h3>④ 認識規矩：規矩放在哪、誰會去讀</h3>
+      <p><strong>你不需要讀懂裡面的每一條規則</strong>——那是寫給 AI 讀的。就像滷茶葉蛋不必知道滷包裡有幾味藥材，但你得知道<strong>滷包放在哪、什麼時候丟下去、換鍋子的時候要不要一起帶走</strong>。這一步只要弄懂三件事。</p>
+      <div class="flow">2.1_sample_app/sample-app/          ← 這一鍋就是範本專案
+
+  <b>【滷包】給 AI 的規矩 — 4 份，你不用讀</b>
+  ├─ CLAUDE.md                       專案憲法：技術棧鎖定、鐵律精華
+  ├─ CODE-RULES-ui-本專案.md          前端規則細則：樣式／驗證／行數預算
+  ├─ design-system-summary.md        視覺 token 摘要：顏色與間距怎麼用
+  └─ 使用說明-複製範本開發新模組.md     操作手冊：哪些複製、哪些共用
+     （旁邊還有 AGENTS.md，是給部分 Agent 的入口便條，內容只寫「去讀 CLAUDE.md」）
+
+  <b>【鍋子】範本程式 — ③ 對照過的 8 核心檔就在這裡</b>
+  ├─ pages/         列表頁、明細頁
+  ├─ components/    欄位元件、狀態徽章、共用 App* 元件
+  ├─ composables/   資料層、列表狀態工廠
+  └─ utils/         驗證引擎、CSV 匯出
+
+  <b>【不用管】設定檔</b>
+  └─ package.json　nuxt.config.ts　tsconfig.json　app.config.ts …</div>
+      <p><strong>鍋具怎麼用？答案是你幾乎什麼都不用做：</strong></p>
+      <ol>
+        <li><strong>滷包不用你端上桌。</strong><strong>不管你用哪一個 AI，規矩都會被讀到</strong>——有些 Agent 一開對話就自動讀根目錄的規則檔；不會自動讀的，step3 的起手 prompt 第一句就是「先依序讀完這四份文件再動作」。<strong>你不需要做任何設定</strong>。（哪個 Agent 屬於哪一種，見 <code>step2_speedrun_kit/README.md</code> 的對照表。）</li>
+        <li><strong>滷包跟著鍋子走。</strong>step3 你會把整個 <code>sample-app</code> 複製成 <code>my-equipment-app</code>，這四份會一起被複製過去。新模組不必重新設定，直接繼承同一套規矩。</li>
+        <li><strong>要改口味就改滷包本身。</strong>全教材只有這一份實檔，沒有第二份副本，改完立刻對 AI 生效。</li>
+      </ol>
+      <blockquote><strong>想看一眼滷包裡有什麼？（選配）</strong>打開 <code>CLAUDE.md</code> 掃 30 秒就好——它只有 48 行，你會看到「鎖定技術棧不准換套件、禁止硬編碼顏色、危險操作要二次確認」這類鐵律。四份的完整分工與不同 AI Agent 的載入方式，見 <code>step2_speedrun_kit/README.md</code> 的「harness 四件：給 AI 的規矩」一節。</blockquote>
 
       <h3>⑤ 認識 token：Design System</h3>
       <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距，知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
