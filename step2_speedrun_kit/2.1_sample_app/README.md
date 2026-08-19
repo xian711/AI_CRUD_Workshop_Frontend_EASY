@@ -16,7 +16,12 @@ pnpm dev          # 啟動 dev server
 
 ## 8 個核心檔（複製改名 vs 直接共用）
 
-決策準則：**與「這個實體長什麼樣子」有關 → 複製改名；通用機制 → 直接共用。**
+決策準則有兩條，先看第一條，不確定再看第二條：
+
+1. **與「這個實體長什麼樣子」有關 → 複製改名；通用機制 → 直接共用。**
+2. **內容看起來通用，但需要「模組故障隔離」或「命名空間隔離」的小元件 → 還是複製。**
+   例外就是下表的 `TemplateFormField.vue` 與 `TemplateStatusBadge.vue`：它們內容其實通用，仍刻意複製，
+   代價是多兩個小檔（各 &lt; 45 行），換來「A 模組改壞不連累 B 模組」。只看第 1 條的話，這兩個一定會判成共用。
 
 | # | 檔案 | 角色 | 動作 |
 |---|---|---|:---:|
@@ -28,6 +33,10 @@ pnpm dev          # 啟動 dev server
 | 6 | `composables/useTemplateListPage.ts` | 列表狀態工廠（篩選＋分頁＋URL 同步，吃泛型） | 直接共用 |
 | 7 | `utils/templateValidation.ts` | 純函式驗證引擎（與實體無關） | 直接共用 |
 | 8 | `utils/templateCsv.ts` | 純函式 CSV 匯出（與實體無關） | 直接共用 |
+
+> **同一張表，兩種角色兩種讀法：**開發／PM 用它檢查「AI 有沒有複製錯、有沒有偷改共用件」；
+> QA 用它劃**回歸測試的爆炸半徑**——動到「複製改名」那 5 個檔，只要重測該模組；
+> 動到「直接共用」那 3 個檔（以及所有 `App*.vue`），**所有用到範本的模組都要重測**。
 
 > 補充共用檔：`composables/useTableSort.ts`（排序）、`utils/taiwanAddress.ts`（縣市鄉鎮）、所有 `components/App*.vue`（Pagination／ConfirmModal／SortHeader／TableFooter／SafeTeleport／AddressPicker…）皆直接共用，不複製。
 > 兩個 `Template*` 元件內容其實通用，仍刻意複製隔離命名空間——代價是多兩個小檔（各 < 45 行），換來「A 模組改壞不連累 B 模組」。

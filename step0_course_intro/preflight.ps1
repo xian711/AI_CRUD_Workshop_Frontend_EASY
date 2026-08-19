@@ -4,6 +4,11 @@
   PowerShell 5.1 相容（不使用 && / || 等 PS7+ 語法）
 #>
 
+# 輸出編碼：Windows 預設 CP950 主控台會把繁體中文印成亂碼，先切 UTF-8
+# （與 step4_loop_e2e/run-e2e.ps1 的作法一致）
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 $results = @()
 
 function Add-Result {

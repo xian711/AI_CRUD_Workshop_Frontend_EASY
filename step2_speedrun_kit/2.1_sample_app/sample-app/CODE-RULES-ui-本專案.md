@@ -12,7 +12,7 @@
 | 匯入慣例 | `utils/` 下函式**顯式 import**（`import { exportCsv } from '~/utils/templateCsv'`）；`composables/`、`components/` 走 Nuxt auto-import。實作前先 grep 確認名稱無衝突 |
 | 資料層 | composable module-level `ref` 單例 + `ensureSeeded()`（一次性深拷貝種子）；CRUD 函式**全非同步回 Promise**，預留 `useFetch('/api/...')` 接縫；`getById` 回**深拷貝**防表單改到 store。本範本**無 Pinia**（前端記憶體單例即可）|
 | 跨檔匯入 | 一律 `~/` alias（`~/utils/…`、`~/composables/…`）|
-| 樣式 | 依 design token 三層（COMP→SYS→REF）與同資料夾 `design-system-summary.md`（token 實檔見工作坊 `step2_speedrun_kit/2.2_design_system/`）；**禁止**硬編碼 hex/px、禁止引用 REF、禁止 `<style scoped>` 蓋 Nuxt UI（改 `app.config.ts` 的 `ui`）、禁止 `!important` |
+| 樣式 | 依 design token 三層（COMP→SYS→REF）與同資料夾 `design-system-summary.md`（token 實檔見工作坊 `step2_speedrun_kit/2.2_design_system/`）；**禁止**硬編碼 hex/px<br>（講清楚免得誤會：禁的是**寫死在 CSS 裡的數值**，例如 `color: #C8232C`、`margin: 12px`；Tailwind 的間距類別如 `px-3`、`gap-md`、`p-lg` 是 **token 化的工具類別，可以用**——名字裡有 px 兩個字不代表它是硬編碼）、禁止引用 REF、禁止 `<style scoped>` 蓋 Nuxt UI（改 `app.config.ts` 的 `ui`）、禁止 `!important` |
 | Token 別名 | 用 Tailwind 別名等同語意引用：`bg-primary`、`text-on-surface`、`border-outline-variant`、`p-lg`、`gap-md`、`rounded-lg`。有 COMP token 者用 `[var(--ui-comp-*)]` |
 | 表單互動 | 依 design-system-summary 之 Form/Table Rules：Label 在上、必填 `*`、欄位級錯誤紅字、危險操作二次確認且確認鈕寫明動作、送出防重複、分頁 props 給預設值、`focus-visible` 不可拿掉 |
 | 主要動作 | 一律 `Teleport to="#breadcrumb-actions"`（返回/次要用 `-left`），內容區不重複渲染；動作列按鈕統一 `size="md"` |
