@@ -304,80 +304,64 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
           <li>用「同一句需求、只差有沒有附規矩」的兩個產出，親眼看出差別。</li>
-          <li>知道差別從哪來：規則（CODE-RULES）、範本、系統文件。</li>
+          <li>知道差別<strong>不在美醜</strong>，在「每個決定有沒有出處」。</li>
+          <li>知道 harness 管得住什麼、管不住什麼。</li>
         </ol>
       </div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES）＋設計系統（色票、間距）＋標準範本</strong>。沒有它，AI 每次都在隨興發揮；有了它，產出從「路人硬湊」變成「像老手照團隊規矩寫的程式」。</p>
+      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES）＋設計系統（色票、間距）＋標準範本</strong>。沒有它，AI 每次都會自己決定；有了它，AI 照你們的決定做。<strong>注意：現在的 AI 不給規矩也寫得出漂亮頁面</strong>——所以這一步不是在比誰好看。</p>
       <ol>
         <li>打開 <code>demo/PROMPT.md</code>，確認兩版給 AI 的需求<strong>是同一句</strong>，只差有沒有附規矩。</li>
         <li>雙擊 <code>demo/no-harness.html</code>（沒 harness 版）。</li>
         <li>雙擊 <code>demo/with-harness.html</code>（有 harness 版）。</li>
-        <li>兩個視窗並排逐項對照。兩版都真的能新增／刪除，功能一模一樣，差的是「品質」。</li>
+        <li>兩個視窗並排對照下面三項。兩版都真的能新增／刪除，功能一模一樣；<strong>差的是「這個決定是誰做的」</strong>。</li>
       </ol>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>左邊沒 harness＝藍色陽春頁，顏色亂配、中英夾雜、沒有驗證；右邊有 harness＝品牌紅 <code>#C8232C</code> 完整頁，必填標紅星、空白擋下、刪除跳二次確認。</p>
+      <p><strong>你會發現兩版都很好看，而且功能一模一樣。</strong>這就是這一步最重要的體會——<strong>先別急著比美醜，左邊那版甚至可能比右邊更討喜</strong>（它自己配了色、加了圖示）。重點在別的地方：<strong>右邊每一個決定都有出處，左邊全是 AI 自己決定的。</strong>教材附的這兩張就是拿 <code>demo/PROMPT.md</code> 實跑出來的；你自己去跑，畫面不會一樣，但下面三項的落差不會變。</p>
       <div class="fig-grid">
         <figure>
-          <img src="images/step1_no_harness.png" alt="沒 harness：藍色陽春頁">
-          <figcaption>沒 harness：藍色系、硬編碼色碼、中英夾雜、按刪除直接刪。</figcaption>
+          <img src="images/step1_no_harness.png" alt="沒 harness：好看但全是 AI 自己決定">
+          <figcaption>沒 harness：<strong>一點都不醜</strong>。但主色是它自己挑的警示橘，品牌紅一次沒出現；必填沒標星號；血型多一個「不明」。</figcaption>
         </figure>
         <figure>
           <img src="images/step1_with_harness.png" alt="有 harness：品牌紅完整驗證頁">
-          <figcaption>有 harness：品牌紅、全繁中、必填加紅星、電話驗證、刪除跳確認框。</figcaption>
+          <figcaption>有 harness：品牌紅 <code>#C8232C</code>、必填標紅星、血型固定四選一、電話只收 09 開頭 10 碼——<strong>每個決定都查得到出處</strong>。</figcaption>
         </figure>
       </div>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>對應規則</th></tr></thead>
+        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>為什麼這項要緊</th></tr></thead>
         <tbody>
-          <tr><td>顏色來源</td><td><code>#0000ff</code> 硬編碼散落</td><td>全走 <code>:root</code> 語意變數</td><td>禁止硬編碼 hex/px</td></tr>
-          <tr><td>品牌一致性</td><td>藍色系，跟品牌無關</td><td>品牌紅 <code>#C8232C</code> 系</td><td>依功能類別選色</td></tr>
-          <tr><td>用字語言</td><td><code>Add</code>／<code>刪除</code> 夾雜</td><td>全繁中、中英加半形空格</td><td>一致語言</td></tr>
-          <tr><td>輸入驗證</td><td>空白也能新增</td><td>空白擋下、<code>PHONE_PATTERN</code></td><td>純函式驗證＋具名常數</td></tr>
-          <tr><td>刪除操作</td><td>按下去直接刪</td><td>二次確認，鈕寫明動作</td><td>危險操作二次確認</td></tr>
-          <tr><td>手機適配</td><td>窄螢幕表格擠爆</td><td><code>@media</code> 手機也能操作</td><td>響應式</td></tr>
-          <tr><td>必填標示</td><td>沒有任何必填提示</td><td>Label 在上、必填加紅色 <code>*</code></td><td>表單互動：Label 在上、必填 <code>*</code></td></tr>
-          <tr><td>錯誤呈現</td><td>無；頂多 <code>alert("新增 OK!")</code></td><td>紅字錯誤顯示在<strong>該欄位下方</strong></td><td>表單互動：欄位級錯誤紅字</td></tr>
-          <tr><td>血型輸入</td><td>自由文字框，可打任何字</td><td>下拉選單固定 A／B／AB／O</td><td>驗證：enum 值嚴格依清單</td></tr>
-          <tr><td>送出防呆</td><td>可連點，重複新增</td><td>送出當下 <code>disabled</code></td><td>表單互動：送出防重複</td></tr>
-          <tr><td>間距與字級</td><td>隨意 <code>padding:5px</code>、<code>3px</code></td><td>統一走 4／8／16／24 變數</td><td>樣式：禁止硬編碼 px</td></tr>
-          <tr><td>程式品質</td><td>全域 <code>var</code>、inline <code>onclick</code>、魔術數字</td><td>具名常數、事件委派、無死碼</td><td>無 magic literal、無 <code>console.log</code></td></tr>
+          <tr>
+            <td><strong>顏色從哪來</strong></td>
+            <td>AI <strong>自己發明一套 token</strong>：<code>--brand: #e8590c</code>、<code>--danger</code>…命名是它自己取的，色票是它自己挑的，<strong>你們的品牌色一次都沒出現</strong>（而且它自己那套還漏了 4 個裸色碼在外面）</td>
+            <td>用<strong>你們給的</strong> token 命名與色票：<code>--ui-sys-color-primary: #C8232C</code>，全檔 11 個色碼一個不多一個不少</td>
+            <td>它做的其實是「對的實務」——但那是<strong>它的</strong>一套。兩套 token 合不起來，<strong>擺在你們現有系統旁邊就是兩個產品</strong></td>
+          </tr>
+          <tr>
+            <td><strong>業務規則從哪來</strong></td>
+            <td>AI 自己發明一套：電話用通用格式（連 <code>(02) 1234-5678</code> 都收）、血型自己多加一個選項</td>
+            <td>照規則寫成具名常數：<code>PHONE_PATTERN</code> 只收台灣手機 09 開頭 10 碼、血型固定四選一</td>
+            <td>顏色錯了看得出來，<strong>驗證規則錯了要等資料髒掉才發現</strong></td>
+          </tr>
+          <tr>
+            <td><strong>多出來的東西</strong></td>
+            <td colspan="2" style="text-align:center"><strong>兩版都會自己多做</strong>（例如自己加 localStorage 存檔、加額外欄位、加你沒要的功能）</td>
+            <td>harness 管得住「<strong>怎麼寫</strong>」，管不住「<strong>做多少</strong>」——範圍要靠 PRD 和決策點管，那是 step3 的事</td>
+          </tr>
         </tbody>
       </table>
       </div>
+      <blockquote><strong>這張表是實測出來的，不是想像的。</strong>我們用 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次（Claude Sonnet）。沒 harness 那版<strong>一點都不醜</strong>：它自己選了警示橘、做了響應式、還多做了刪除確認與防注入，甚至<strong>自己建了一套 design token</strong>（<code>--brand</code>、<code>--danger</code>…）——它知道該用 token，只是用的是它自己的那套。但品牌紅 0 次、電話收 6～15 碼的通用格式（<code>(02) 1234-5678</code> 也算合法）、血型多一個「不明」。<strong>而兩版都自己加了 localStorage</strong>，有 harness 那版還多加了空清單提示、Esc 關閉、焦點歸還。</blockquote>
+      <blockquote><strong>所以 harness 的價值不是「讓 AI 寫得好看」，是「讓 AI 寫得跟你們一樣」。</strong>現在的 AI 不給規矩也能生出漂亮頁面——問題從來不是醜，是<strong>每次都長得不一樣、而且會自己發明規則</strong>。</blockquote>
 
       <blockquote><strong>先誠實講清楚：</strong><code>demo/</code> 那兩份 HTML 是我們用 <code>demo/PROMPT.md</code> 裡固定的兩版 prompt 各跑一次、挑出來當教材的<strong>策展成品</strong>，不是每次都會一模一樣重現的實驗。所以別把它們當「鐵證」——要信，就自己拿去實測一遍。</blockquote>
 
-      <div class="block-title"><span class="ico">🧪</span>拿去實測：A/B 違規計分表</div>
-      <p>打開 <code>demo/PROMPT.md</code>，把<strong>版本 A（沒 harness）</strong>貼給你自己的 AI 跑一次、<strong>版本 B（有 harness）</strong>也貼給它跑一次，各產出一個 HTML，然後照下表逐項打分：<strong>這一版有違規記 1、合規記 0</strong>，最後加總比較。</p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>#</th><th>可勾稽分項（0＝合規／1＝違規）</th><th>你的 A 版<br>沒 harness</th><th>你的 B 版<br>有 harness</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>出現硬編碼色碼（<code>#xxxxxx</code>／<code>blue</code>，非走語意變數）</td><td></td><td></td></tr>
-          <tr><td>2</td><td>中英夾雜（<code>Add</code>／<code>Name</code>／<code>Volunteer</code> 這類混用）</td><td></td><td></td></tr>
-          <tr><td>3</td><td>必填欄位沒有標示（無紅色 <code>*</code>／無必填提示）</td><td></td><td></td></tr>
-          <tr><td>4</td><td>空白或亂填也能送出（沒有輸入驗證）</td><td></td><td></td></tr>
-          <tr><td>5</td><td>電話沒有格式驗證（非 09 開頭 10 碼也收）</td><td></td><td></td></tr>
-          <tr><td>6</td><td>血型是自由文字框（不是固定選項下拉）</td><td></td><td></td></tr>
-          <tr><td>7</td><td>刪除沒有二次確認（按了直接刪）</td><td></td><td></td></tr>
-          <tr><td>8</td><td>送出鈕可連點重複新增（無防呆）</td><td></td><td></td></tr>
-          <tr><td>9</td><td>錯誤訊息沒有顯示在該欄位下方（用 alert 或沒有）</td><td></td><td></td></tr>
-          <tr><td>10</td><td>間距／字級忽大忽小（散落魔術數字 px）</td><td></td><td></td></tr>
-          <tr><td>11</td><td>手機窄螢幕不可用（表格擠爆、沒 viewport／media query）</td><td></td><td></td></tr>
-          <tr><td>12</td><td>程式品質差（全域 <code>var</code>／inline <code>onclick</code>／<code>console.log</code>／死碼）</td><td></td><td></td></tr>
-          <tr><td>—</td><td><strong>違規分數合計（越低越好）</strong></td><td></td><td></td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p><strong>怎麼判讀：</strong>正常情況下 A 版違規分數會明顯高於 B 版。<strong>比的是「違規數的落差」</strong>，不是要求你重現我們這兩份的逐字內容。若你的 A 版剛好也守了幾條，那很好——代表你的 AI 底子不錯；但只要需求換難一點、規則換多一點，沒 harness 的那版就會開始崩，這正是 harness 要解決的事。</p>
-
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。一句話結論：<strong>同一句需求，差的不是 AI 智商，是你給不給規矩。</strong>
+        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。AI 越強，這件事越重要——因為它自己決定的東西會越來越合理、越來越好看，<strong>你越不容易發現它其實沒照你們的規矩走</strong>。一句話結論：<strong>同一句需求，差的不是 AI 的能力，是你有沒有把決定權拿回來。</strong>
       </div>
     </div>
   </section>
@@ -947,7 +931,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       <p>全部打勾，代表你真的走完了：</p>
       <ul class="checklist">
         <li>前置檢查（<code>preflight.ps1</code>／<code>preflight.sh</code>）全數通過</li>
-        <li>並排看過 no-harness 與 with-harness 兩頁，說得出至少三個差別</li>
+        <li>並排看過 no-harness 與 with-harness 兩頁，說得出「顏色從哪來、業務規則從哪來」的差別，以及 harness 管不到「做多少」</li>
         <li>範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現</li>
         <li>看過 Design System 與前端 harness 四件，知道顏色／間距走 token</li>
         <li>讀懂課堂版 PRD，知道三個決策點是拿「真實系統」換「兩小時課堂」的取捨</li>

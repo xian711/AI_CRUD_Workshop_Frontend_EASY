@@ -1,77 +1,312 @@
-<!DOCTYPE html>
-<html>
-<head>
 <meta charset="UTF-8">
-<title>Volunteer List</title>
+<title>防災志工名單</title>
 <style>
-  body { font-family: Arial; margin: 20px; }
-  h1 { color: #0000ff; }
-  table { border: 1px solid gray; }
-  th { background-color: lightblue; padding: 5px; }
-  td { border: 1px solid #cccccc; padding: 5px; }
-  .addbtn { background-color: blue; color: white; padding: 6px; }
-  input { margin: 3px; }
+  :root {
+    --brand: #e8590c;
+    --brand-dark: #c2410c;
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #26221f;
+    --muted: #756f68;
+    --border: #e5e0da;
+    --danger: #d1453b;
+    --danger-dark: #b0362d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  header .icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 14px;
+    color: var(--brand-dark);
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 0.9fr auto;
+    gap: 10px;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    form { grid-template-columns: 1fr; }
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  input, select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(232,89,12,0.15);
+  }
+  .err {
+    font-size: 11px;
+    color: var(--danger);
+    min-height: 14px;
+    margin-top: 3px;
+  }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-add {
+    background: var(--brand);
+    color: #fff;
+    padding: 9px 18px;
+    height: 38px;
+    align-self: end;
+    white-space: nowrap;
+  }
+  .btn-add:hover { background: var(--brand-dark); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  tbody td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody tr:hover { background: #fbf7f2; }
+  .blood-badge {
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fde8e6;
+    color: var(--danger-dark);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .btn-del {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+  }
+  .btn-del:hover { background: var(--danger); color: #fff; }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px 10px;
+    font-size: 13px;
+  }
+  .count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .count b { color: var(--brand-dark); }
 </style>
-</head>
-<body>
 
-<h1>防災 Volunteer 名單</h1>
+<div class="wrap">
+  <header>
+    <div class="icon">🚨</div>
+    <div>
+      <h1>防災志工名單</h1>
+      <div class="sub">新增 / 刪除志工資料（姓名、電話、血型）</div>
+    </div>
+  </header>
 
-<div>
-  姓名: <input type="text" id="name">
-  電話: <input type="text" id="phone">
-  血型: <input type="text" id="blood" placeholder="A/B/AB/O">
-  <button class="addbtn" onclick="add()">Add</button>
+  <div class="card">
+    <h2>新增志工</h2>
+    <form id="volForm" novalidate>
+      <div class="field">
+        <label for="name">姓名</label>
+        <input id="name" name="name" type="text" placeholder="例如：王小明" maxlength="30">
+        <div class="err" id="nameErr"></div>
+      </div>
+      <div class="field">
+        <label for="phone">電話</label>
+        <input id="phone" name="phone" type="text" placeholder="例如：0912345678" maxlength="15">
+        <div class="err" id="phoneErr"></div>
+      </div>
+      <div class="field">
+        <label for="blood">血型</label>
+        <select id="blood" name="blood">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="AB">AB</option>
+          <option value="O">O</option>
+          <option value="不明">不明</option>
+        </select>
+        <div class="err"></div>
+      </div>
+      <button type="submit" class="btn-add">＋ 新增志工</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>志工名單</h2>
+    <div class="count">目前共 <b id="countNum">0</b> 位志工</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th>姓名</th>
+          <th>電話</th>
+          <th>血型</th>
+          <th style="width:70px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg">目前沒有志工資料，請在上方新增。</div>
+  </div>
 </div>
 
-<br>
-
-<table id="tb">
-  <tr>
-    <th>Name</th>
-    <th>Phone</th>
-    <th>血型</th>
-    <th>操作</th>
-  </tr>
-</table>
-
 <script>
-  var list = [
-    { name: "王小明", phone: "0912345678", blood: "O" },
-    { name: "陳美麗", phone: "0987654321", blood: "A" }
-  ];
+  const STORAGE_KEY = 'disaster_volunteers_v1';
+  const form = document.getElementById('volForm');
+  const nameInput = document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
+  const bloodInput = document.getElementById('blood');
+  const nameErr = document.getElementById('nameErr');
+  const phoneErr = document.getElementById('phoneErr');
+  const tbody = document.getElementById('tbody');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const countNum = document.getElementById('countNum');
 
-  function render() {
-    var t = document.getElementById("tb");
-    t.innerHTML = "<tr><th>Name</th><th>Phone</th><th>血型</th><th>操作</th></tr>";
-    for (var i = 0; i < list.length; i++) {
-      var row = t.insertRow(-1);
-      row.insertCell(0).innerHTML = list[i].name;
-      row.insertCell(1).innerHTML = list[i].phone;
-      row.insertCell(2).innerHTML = list[i].blood;
-      row.insertCell(3).innerHTML = "<button style='color:red' onclick='del(" + i + ")'>刪除</button>";
+  function loadVolunteers() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
     }
   }
 
-  function add() {
-    var name = document.getElementById("name").value;
-    var phone = document.getElementById("phone").value;
-    var blood = document.getElementById("blood").value;
-    list.push({ name: name, phone: phone, blood: blood });
-    alert("新增 OK!");
-    document.getElementById("name").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("blood").value = "";
-    render();
+  function saveVolunteers(list) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) { /* 儲存失敗就忽略，資料仍留在畫面上 */ }
   }
 
-  function del(i) {
-    list.splice(i, 1);
-    render();
+  let volunteers = loadVolunteers();
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
+
+  function render() {
+    tbody.innerHTML = '';
+    countNum.textContent = volunteers.length;
+    emptyMsg.style.display = volunteers.length === 0 ? 'block' : 'none';
+
+    volunteers.forEach((v, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + (idx + 1) + '</td>' +
+        '<td>' + escapeHtml(v.name) + '</td>' +
+        '<td>' + escapeHtml(v.phone) + '</td>' +
+        '<td><span class="blood-badge">' + escapeHtml(v.blood) + '</span></td>' +
+        '<td><button class="btn-del" data-id="' + v.id + '">刪除</button></td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  tbody.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-del');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const target = volunteers.find(v => String(v.id) === id);
+    if (target && !confirm('確定要刪除「' + target.name + '」嗎？')) return;
+    volunteers = volunteers.filter(v => String(v.id) !== id);
+    saveVolunteers(volunteers);
+    render();
+  });
+
+  function validate() {
+    let ok = true;
+    nameErr.textContent = '';
+    phoneErr.textContent = '';
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    if (!name) {
+      nameErr.textContent = '請輸入姓名';
+      ok = false;
+    }
+
+    if (!phone) {
+      phoneErr.textContent = '請輸入電話';
+      ok = false;
+    } else if (!/^[0-9+\-\s()]{6,15}$/.test(phone)) {
+      phoneErr.textContent = '電話格式看起來不太對';
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validate()) return;
+
+    volunteers.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      name: nameInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      blood: bloodInput.value
+    });
+    saveVolunteers(volunteers);
+    render();
+
+    form.reset();
+    nameInput.focus();
+  });
 
   render();
 </script>
-
-</body>
-</html>

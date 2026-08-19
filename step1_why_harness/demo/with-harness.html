@@ -1,434 +1,751 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>防災志工名單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     Design Token（取自 CODE-RULES-ui-本專案 / design-token.css）
-     禁止硬編碼 hex/px，一律引用以下語意變數
-     ============================================================ */
   :root {
-    /* 品牌色 —— 防災紅 */
-    --ui-sys-color-primary:            #C8232C;
-    --ui-sys-color-primary-hover:      #A01D24;
-    --ui-sys-color-primary-container:  #FFF0F0;
-    --ui-sys-color-on-primary:         #FFFFFF;
-    --ui-sys-color-on-primary-container:#6B0C10;
-    /* 表面 / 文字 */
-    --ui-sys-color-surface:            #FFFFFF;
-    --ui-sys-color-surface-page:       #F5F6F8;
-    --ui-sys-color-surface-variant:    #FAFAFA;
-    --ui-sys-color-on-surface:         #0A0A0A;
+    /* ===== 品牌色彩 design token（語意變數） ===== */
+    --ui-sys-color-primary: #C8232C;
+    --ui-sys-color-primary-hover: #A01D24;
+    --ui-sys-color-primary-container: #FFF0F0;
+    --ui-sys-color-on-primary: #FFFFFF;
+    --ui-sys-color-error: #FB2C36;
+    --ui-sys-color-error-container: #FEF2F2;
+    --ui-sys-color-on-surface: #0A0A0A;
     --ui-sys-color-on-surface-variant: #404040;
-    --ui-sys-color-outline:            #737373;
-    --ui-sys-color-outline-variant:    #E5E5E5;
-    /* 語意色 */
-    --ui-sys-color-error:              #FB2C36;
-    --ui-sys-color-error-container:    #FEF2F2;
-    --ui-sys-color-success:            #00C16A;
-    --ui-sys-color-success-container:  #EFFDF5;
-    /* 間距 */
-    --sp-xs: 4px;
-    --sp-sm: 8px;
-    --sp-md: 16px;
-    --sp-lg: 24px;
-    --sp-xl: 40px;
-    /* 圓角 */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 16px;
-    /* 字級 */
-    --fs-title: 24px;
-    --fs-label: 14px;
-    --fs-body:  16px;
-    --fs-helper: 12px;
-    /* 陰影 */
-    --elevation-card: 0 4px 8px rgba(0, 0, 0, 0.08);
-    --elevation-modal: 0 20px 60px rgba(0, 0, 0, 0.18);
+    --ui-sys-color-outline-variant: #E5E5E5;
+    --ui-sys-color-surface: #FFFFFF;
+    --ui-sys-color-surface-page: #F5F6F8;
+    --ui-sys-color-success: #00C16A;
+
+    /* ===== 陰影（由語意色彩混合而成，不使用硬編碼色碼） ===== */
+    --ui-sys-shadow-color: color-mix(in srgb, var(--ui-sys-color-on-surface) 12%, transparent);
+    --ui-sys-shadow-sm: 0 1px 3px var(--ui-sys-shadow-color);
+    --ui-sys-shadow-md: 0 4px 16px var(--ui-sys-shadow-color);
+
+    /* ===== 間距 token：4 / 8 / 16 / 24 / 40 ===== */
+    --ui-sys-space-1: 4px;
+    --ui-sys-space-2: 8px;
+    --ui-sys-space-4: 16px;
+    --ui-sys-space-6: 24px;
+    --ui-sys-space-10: 40px;
+
+    /* ===== 圓角 token：4 / 8 / 16 ===== */
+    --ui-sys-radius-sm: 4px;
+    --ui-sys-radius-md: 8px;
+    --ui-sys-radius-lg: 16px;
+
+    /* ===== 邊框寬度 token ===== */
+    --ui-sys-border-width: 1px;
+    --ui-sys-border-width-thick: 2px;
+
+    /* ===== 字級 token ===== */
+    --ui-sys-font-size-xs: 12px;
+    --ui-sys-font-size-sm: 14px;
+    --ui-sys-font-size-base: 16px;
+    --ui-sys-font-size-lg: 20px;
+    --ui-sys-font-size-xl: 28px;
+
+    /* ===== 字重 token ===== */
+    --ui-sys-font-weight-regular: 400;
+    --ui-sys-font-weight-medium: 500;
+    --ui-sys-font-weight-bold: 700;
+    --ui-sys-font-weight-black: 900;
+
+    /* ===== 字型 ===== */
+    --ui-sys-font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
 
   body {
-    margin: 0;
-    padding: var(--sp-lg);
-    font-family: "Noto Sans TC", system-ui, sans-serif;
-    font-size: var(--fs-body);
+    font-family: var(--ui-sys-font-family);
+    font-size: var(--ui-sys-font-size-base);
+    font-weight: var(--ui-sys-font-weight-regular);
     color: var(--ui-sys-color-on-surface);
-    background: var(--ui-sys-color-surface-page);
+    background-color: var(--ui-sys-color-surface-page);
     line-height: 1.6;
   }
 
-  .page { max-width: 720px; margin: 0 auto; }
+  .sr-only {
+    position: absolute;
+    width: var(--ui-sys-space-1);
+    height: var(--ui-sys-space-1);
+    padding: 0;
+    margin: calc(var(--ui-sys-space-1) * -1);
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
-  h1 {
-    font-size: var(--fs-title);
-    font-weight: 700;
-    margin: 0 0 var(--sp-lg);
-    padding-bottom: var(--sp-sm);
-    border-bottom: 2px solid var(--ui-sys-color-primary);
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--ui-sys-space-6) var(--ui-sys-space-4) var(--ui-sys-space-10);
+  }
+
+  .page-header {
+    margin-bottom: var(--ui-sys-space-6);
+  }
+
+  .page-header h1 {
+    margin: 0 0 var(--ui-sys-space-1);
+    font-size: var(--ui-sys-font-size-xl);
+    font-weight: var(--ui-sys-font-weight-black);
+    color: var(--ui-sys-color-primary);
+  }
+
+  .page-subtitle {
+    margin: 0;
+    color: var(--ui-sys-color-on-surface-variant);
+    font-size: var(--ui-sys-font-size-sm);
   }
 
   .card {
-    background: var(--ui-sys-color-surface);
-    border: 1px solid var(--ui-sys-color-outline-variant);
-    border-radius: var(--radius-lg);
-    padding: var(--sp-lg);
-    box-shadow: var(--elevation-card);
-    margin-bottom: var(--sp-lg);
+    background-color: var(--ui-sys-color-surface);
+    border: var(--ui-sys-border-width) solid var(--ui-sys-color-outline-variant);
+    border-radius: var(--ui-sys-radius-lg);
+    box-shadow: var(--ui-sys-shadow-sm);
+    padding: var(--ui-sys-space-6);
+    margin-bottom: var(--ui-sys-space-6);
   }
 
-  /* 表單 —— Label 在上、必填標星、欄位級錯誤 */
+  .card-title {
+    margin: 0 0 var(--ui-sys-space-4);
+    font-size: var(--ui-sys-font-size-lg);
+    font-weight: var(--ui-sys-font-weight-bold);
+  }
+
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--sp-md);
-    align-items: start;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--ui-sys-space-4);
   }
 
-  .field { display: flex; flex-direction: column; gap: var(--sp-xs); }
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
 
   .field label {
-    font-size: var(--fs-label);
-    font-weight: 500;
-    color: var(--ui-sys-color-on-surface-variant);
-  }
-
-  .required { color: var(--ui-sys-color-primary); margin-left: 2px; }
-
-  .field input,
-  .field select {
-    font: inherit;
-    font-size: var(--fs-body);
-    padding: var(--sp-sm) var(--sp-md);
-    border: 1px solid var(--ui-sys-color-outline-variant);
-    border-radius: var(--radius-md);
-    background: var(--ui-sys-color-surface-variant);
+    margin-bottom: var(--ui-sys-space-1);
+    font-size: var(--ui-sys-font-size-sm);
+    font-weight: var(--ui-sys-font-weight-medium);
     color: var(--ui-sys-color-on-surface);
   }
 
-  .field input:focus,
-  .field select:focus {
-    outline: none;
-    background: var(--ui-sys-color-surface);
-    border-color: var(--ui-sys-color-primary);
-    box-shadow: 0 0 0 3px var(--ui-sys-color-primary-container);
-  }
-
-  .field.has-error input,
-  .field.has-error select {
-    border-color: var(--ui-sys-color-error);
-    background: var(--ui-sys-color-error-container);
-  }
-
-  .error-text {
-    font-size: var(--fs-helper);
+  .required-mark {
     color: var(--ui-sys-color-error);
-    min-height: 1em;
   }
 
-  .actions { margin-top: var(--sp-md); }
+  .field input,
+  .field select {
+    font-family: inherit;
+    font-size: var(--ui-sys-font-size-base);
+    color: var(--ui-sys-color-on-surface);
+    background-color: var(--ui-sys-color-surface);
+    border: var(--ui-sys-border-width) solid var(--ui-sys-color-outline-variant);
+    border-radius: var(--ui-sys-radius-sm);
+    padding: var(--ui-sys-space-2);
+    min-height: 44px;
+  }
 
-  /* 按鈕 */
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .btn:focus-visible {
+    outline: var(--ui-sys-border-width-thick) solid var(--ui-sys-color-primary);
+    outline-offset: var(--ui-sys-space-1);
+  }
+
+  .field input.input-invalid,
+  .field select.input-invalid {
+    border-color: var(--ui-sys-color-error);
+    background-color: var(--ui-sys-color-error-container);
+  }
+
+  .field-error {
+    margin: var(--ui-sys-space-1) 0 0;
+    min-height: 1.4em;
+    font-size: var(--ui-sys-font-size-xs);
+    font-weight: var(--ui-sys-font-weight-medium);
+    color: var(--ui-sys-color-error);
+  }
+
+  .form-actions {
+    margin-top: var(--ui-sys-space-4);
+    display: flex;
+    justify-content: flex-end;
+  }
+
   .btn {
-    font: inherit;
-    font-weight: 600;
-    padding: var(--sp-sm) var(--sp-lg);
-    border-radius: var(--radius-md);
-    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: var(--ui-sys-font-size-base);
+    font-weight: var(--ui-sys-font-weight-bold);
+    border-radius: var(--ui-sys-radius-sm);
+    border: var(--ui-sys-border-width) solid transparent;
+    padding: var(--ui-sys-space-2) var(--ui-sys-space-4);
+    min-height: 44px;
     cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  }
+
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
   }
 
   .btn-primary {
-    background: var(--ui-sys-color-primary);
+    background-color: var(--ui-sys-color-primary);
     color: var(--ui-sys-color-on-primary);
   }
-  .btn-primary:hover { background: var(--ui-sys-color-primary-hover); }
-  .btn-primary:disabled { opacity: 0.6; cursor: default; }
 
-  .btn-danger {
-    background: transparent;
-    color: var(--ui-sys-color-error);
-    border-color: var(--ui-sys-color-error);
-    padding: var(--sp-xs) var(--sp-md);
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--ui-sys-color-primary-hover);
   }
-  .btn-danger:hover { background: var(--ui-sys-color-error-container); }
 
-  .btn-ghost {
-    background: transparent;
+  .btn-secondary {
+    background-color: var(--ui-sys-color-surface);
     color: var(--ui-sys-color-on-surface-variant);
     border-color: var(--ui-sys-color-outline-variant);
   }
-  .btn-ghost:hover { background: var(--ui-sys-color-surface-variant); }
 
-  /* 表格 */
-  table { width: 100%; border-collapse: collapse; }
-  th, td {
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--ui-sys-color-surface-page);
+  }
+
+  .btn-danger {
+    background-color: var(--ui-sys-color-error);
+    color: var(--ui-sys-color-on-primary);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .btn-danger-outline {
+    background-color: transparent;
+    color: var(--ui-sys-color-error);
+    border-color: var(--ui-sys-color-error);
+  }
+
+  .btn-danger-outline:hover:not(:disabled) {
+    background-color: var(--ui-sys-color-error-container);
+  }
+
+  .btn-sm {
+    padding: var(--ui-sys-space-1) var(--ui-sys-space-2);
+    min-height: 36px;
+    font-size: var(--ui-sys-font-size-sm);
+  }
+
+  .list-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--ui-sys-space-2);
+    margin-bottom: var(--ui-sys-space-4);
+    flex-wrap: wrap;
+  }
+
+  .list-card-header .card-title {
+    margin: 0;
+  }
+
+  .volunteer-count {
+    font-size: var(--ui-sys-font-size-sm);
+    color: var(--ui-sys-color-on-surface-variant);
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .volunteer-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .volunteer-table th,
+  .volunteer-table td {
     text-align: left;
-    padding: var(--sp-sm) var(--sp-md);
-    border-bottom: 1px solid var(--ui-sys-color-outline-variant);
+    padding: var(--ui-sys-space-2) var(--ui-sys-space-2);
+    border-bottom: var(--ui-sys-border-width) solid var(--ui-sys-color-outline-variant);
   }
-  th {
-    font-size: var(--fs-label);
-    font-weight: 600;
+
+  .volunteer-table th {
+    font-size: var(--ui-sys-font-size-sm);
+    font-weight: var(--ui-sys-font-weight-bold);
     color: var(--ui-sys-color-on-surface-variant);
-    background: var(--ui-sys-color-surface-variant);
   }
-  .empty {
+
+  .empty-state {
     text-align: center;
-    color: var(--ui-sys-color-outline);
-    padding: var(--sp-xl) var(--sp-md);
-  }
-  .count {
-    font-size: var(--fs-label);
+    padding: var(--ui-sys-space-6) var(--ui-sys-space-4);
     color: var(--ui-sys-color-on-surface-variant);
-    margin-bottom: var(--sp-sm);
+    font-size: var(--ui-sys-font-size-sm);
   }
 
-  /* 血型徽章 */
-  .badge {
-    display: inline-block;
-    padding: 2px var(--sp-sm);
-    border-radius: var(--radius-sm);
-    background: var(--ui-sys-color-primary-container);
-    color: var(--ui-sys-color-on-primary-container);
-    font-size: var(--fs-label);
-    font-weight: 600;
-  }
-
-  /* 二次確認對話框 */
-  .overlay {
-    position: fixed; inset: 0;
-    background: rgba(0, 0, 0, 0.48);
-    display: none;
+  /* ===== 刪除確認 modal ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: color-mix(in srgb, var(--ui-sys-color-on-surface) 45%, transparent);
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--sp-md);
+    padding: var(--ui-sys-space-4);
+    z-index: 100;
   }
-  .overlay.open { display: flex; }
-  .dialog {
-    background: var(--ui-sys-color-surface);
-    border-radius: var(--radius-lg);
-    padding: var(--sp-lg);
-    max-width: 400px;
-    width: 100%;
-    box-shadow: var(--elevation-modal);
-  }
-  .dialog h2 { font-size: 20px; margin: 0 0 var(--sp-sm); }
-  .dialog p { margin: 0 0 var(--sp-lg); color: var(--ui-sys-color-on-surface-variant); }
-  .dialog-actions { display: flex; justify-content: flex-end; gap: var(--sp-sm); }
 
-  /* 手機 */
-  @media (max-width: 520px) {
-    body { padding: var(--sp-md); }
-    .form-grid { grid-template-columns: 1fr; }
-    th:nth-child(2), td:nth-child(2) { display: none; } /* 窄螢幕先收起電話欄 */
+  .modal-overlay[hidden] {
+    display: none;
+  }
+
+  .modal {
+    background-color: var(--ui-sys-color-surface);
+    border-radius: var(--ui-sys-radius-lg);
+    box-shadow: var(--ui-sys-shadow-md);
+    padding: var(--ui-sys-space-6);
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .modal h2 {
+    margin: 0 0 var(--ui-sys-space-2);
+    font-size: var(--ui-sys-font-size-lg);
+    color: var(--ui-sys-color-error);
+  }
+
+  .modal p {
+    margin: 0 0 var(--ui-sys-space-4);
+    color: var(--ui-sys-color-on-surface-variant);
+    font-size: var(--ui-sys-font-size-sm);
+  }
+
+  .modal p span {
+    font-weight: var(--ui-sys-font-weight-bold);
+    color: var(--ui-sys-color-on-surface);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--ui-sys-space-2);
+  }
+
+  /* ===== 手機寬度：表單改單欄、表格改卡片式 ===== */
+  @media (max-width: 640px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+      justify-content: stretch;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+
+    .volunteer-table thead {
+      display: none;
+    }
+
+    .volunteer-table,
+    .volunteer-table tbody,
+    .volunteer-table tr,
+    .volunteer-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .volunteer-table tr {
+      border: var(--ui-sys-border-width) solid var(--ui-sys-color-outline-variant);
+      border-radius: var(--ui-sys-radius-md);
+      margin-bottom: var(--ui-sys-space-4);
+      padding: var(--ui-sys-space-2) var(--ui-sys-space-4);
+    }
+
+    .volunteer-table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ui-sys-space-2);
+      border-bottom: none;
+      padding: var(--ui-sys-space-1) 0;
+    }
+
+    .volunteer-table td::before {
+      content: attr(data-label);
+      font-weight: var(--ui-sys-font-weight-bold);
+      color: var(--ui-sys-color-on-surface-variant);
+      font-size: var(--ui-sys-font-size-xs);
+    }
   }
 </style>
 </head>
 <body>
-<div class="page">
-  <h1>防災志工名單</h1>
+  <div class="page">
+    <header class="page-header">
+      <h1>防災志工名單</h1>
+      <p class="page-subtitle">管理防災志工的姓名、電話與血型資料，資料會保留在本機瀏覽器中。</p>
+    </header>
 
-  <!-- 新增表單 -->
-  <div class="card">
-    <form id="volunteer-form" novalidate>
-      <div class="form-grid">
-        <div class="field" id="field-name">
-          <label for="input-name">姓名<span class="required">*</span></label>
-          <input id="input-name" type="text" autocomplete="off" placeholder="請輸入姓名">
-          <span class="error-text" id="error-name"></span>
+    <section class="card form-card" aria-labelledby="form-title">
+      <h2 id="form-title" class="card-title">新增志工</h2>
+      <form id="volunteer-form" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="name-input">姓名 <span class="required-mark" aria-hidden="true">*</span></label>
+            <input type="text" id="name-input" name="name" autocomplete="off" aria-required="true" aria-describedby="name-error">
+            <p class="field-error" id="name-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="phone-input">電話 <span class="required-mark" aria-hidden="true">*</span></label>
+            <input type="tel" id="phone-input" name="phone" autocomplete="off" placeholder="0912345678" aria-required="true" aria-describedby="phone-error">
+            <p class="field-error" id="phone-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="blood-type-select">血型 <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="blood-type-select" name="bloodType" aria-required="true" aria-describedby="blood-type-error">
+              <option value="" disabled selected>請選擇血型</option>
+            </select>
+            <p class="field-error" id="blood-type-error" role="alert"></p>
+          </div>
         </div>
-        <div class="field" id="field-phone">
-          <label for="input-phone">電話<span class="required">*</span></label>
-          <input id="input-phone" type="tel" autocomplete="off" placeholder="09 開頭共 10 碼">
-          <span class="error-text" id="error-phone"></span>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <span class="btn-label">新增志工</span>
+          </button>
         </div>
-        <div class="field" id="field-blood">
-          <label for="input-blood">血型<span class="required">*</span></label>
-          <select id="input-blood">
-            <option value="">請選擇</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="AB">AB</option>
-            <option value="O">O</option>
-          </select>
-          <span class="error-text" id="error-blood"></span>
-        </div>
+      </form>
+    </section>
+
+    <section class="card list-card" aria-labelledby="list-title">
+      <div class="list-card-header">
+        <h2 id="list-title" class="card-title">志工清單</h2>
+        <span class="volunteer-count" id="volunteer-count" aria-live="polite">共 0 位志工</span>
       </div>
-      <div class="actions">
-        <button type="submit" class="btn btn-primary" id="submit-btn">新增志工</button>
+      <div class="table-wrapper">
+        <table class="volunteer-table" id="volunteer-table" hidden>
+          <thead>
+            <tr>
+              <th scope="col">姓名</th>
+              <th scope="col">電話</th>
+              <th scope="col">血型</th>
+              <th scope="col"><span class="sr-only">操作</span></th>
+            </tr>
+          </thead>
+          <tbody id="volunteer-tbody"></tbody>
+        </table>
       </div>
-    </form>
+      <p class="empty-state" id="empty-state">目前尚無志工資料，請使用上方表單新增。</p>
+    </section>
   </div>
 
-  <!-- 名單 -->
-  <div class="card">
-    <div class="count" id="count-text"></div>
-    <table>
-      <thead>
-        <tr>
-          <th>姓名</th>
-          <th>電話</th>
-          <th>血型</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- 刪除二次確認 -->
-<div class="overlay" id="confirm-overlay">
-  <div class="dialog" role="alertdialog" aria-modal="true">
-    <h2>刪除志工</h2>
-    <p id="confirm-message"></p>
-    <div class="dialog-actions">
-      <button type="button" class="btn btn-ghost" id="cancel-delete">取消</button>
-      <button type="button" class="btn btn-danger" id="confirm-delete">確認刪除</button>
+  <div class="modal-overlay" id="delete-modal-overlay" hidden>
+    <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-desc">
+      <h2 id="delete-modal-title">確認刪除志工</h2>
+      <p id="delete-modal-desc">確定要刪除「<span id="delete-modal-name"></span>」的資料嗎？此操作無法復原。</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancel-delete-btn">取消</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">確認刪除</button>
+      </div>
     </div>
   </div>
-</div>
 
 <script>
-  "use strict";
+  (function () {
+    'use strict';
 
-  // 具名常數 —— 台灣手機格式（09 開頭共 10 碼）
-  const PHONE_PATTERN = /^09\d{8}$/;
-  const BLOOD_TYPES = ["A", "B", "AB", "O"];
+    /* ===== 具名常數（避免魔術數字 / 散落字串） ===== */
+    var PHONE_PATTERN = /^09\d{8}$/;
+    var BLOOD_TYPES = ['A', 'B', 'AB', 'O'];
+    var STORAGE_KEY = 'disaster-volunteer-roster-v1';
+    var SUBMIT_PROCESSING_DELAY_MS = 400;
 
-  // 記憶體資料層（種子資料）
-  let volunteers = [
-    { name: "王小明", phone: "0912345678", blood: "O" },
-    { name: "陳美麗", phone: "0987654321", blood: "A" }
-  ];
-
-  let pendingDeleteIndex = null;
-
-  // DOM 參照
-  const form = document.getElementById("volunteer-form");
-  const submitBtn = document.getElementById("submit-btn");
-  const tableBody = document.getElementById("table-body");
-  const countText = document.getElementById("count-text");
-  const overlay = document.getElementById("confirm-overlay");
-  const confirmMessage = document.getElementById("confirm-message");
-
-  const fields = {
-    name: { input: document.getElementById("input-name"), wrap: document.getElementById("field-name"), error: document.getElementById("error-name") },
-    phone: { input: document.getElementById("input-phone"), wrap: document.getElementById("field-phone"), error: document.getElementById("error-phone") },
-    blood: { input: document.getElementById("input-blood"), wrap: document.getElementById("field-blood"), error: document.getElementById("error-blood") }
-  };
-
-  // 純函式驗證：回傳各欄位錯誤訊息（無錯則為空字串）
-  function validate(form) {
-    const errors = { name: "", phone: "", blood: "" };
-    if (!form.name) {
-      errors.name = "請輸入姓名";
-    }
-    if (!form.phone) {
-      errors.phone = "請輸入電話";
-    } else if (!PHONE_PATTERN.test(form.phone)) {
-      errors.phone = "電話格式錯誤（09 開頭共 10 碼）";
-    }
-    if (!BLOOD_TYPES.includes(form.blood)) {
-      errors.blood = "請選擇血型";
-    }
-    return errors;
-  }
-
-  function showErrors(errors) {
-    Object.keys(fields).forEach(function (key) {
-      const message = errors[key];
-      fields[key].error.textContent = message;
-      fields[key].wrap.classList.toggle("has-error", Boolean(message));
-    });
-  }
-
-  function hasError(errors) {
-    return Object.keys(errors).some(function (key) { return errors[key]; });
-  }
-
-  function renderTable() {
-    countText.textContent = "目前共 " + volunteers.length + " 位志工";
-    if (volunteers.length === 0) {
-      tableBody.innerHTML = '<tr><td class="empty" colspan="4">尚無志工資料</td></tr>';
-      return;
-    }
-    tableBody.innerHTML = volunteers.map(function (v, index) {
-      return "<tr>" +
-        "<td>" + escapeHtml(v.name) + "</td>" +
-        "<td>" + escapeHtml(v.phone) + "</td>" +
-        '<td><span class="badge">' + escapeHtml(v.blood) + "</span></td>" +
-        '<td><button type="button" class="btn btn-danger" data-index="' + index + '">刪除</button></td>' +
-        "</tr>";
-    }).join("");
-  }
-
-  // 防止使用者輸入內容破壞表格結構
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    const draft = {
-      name: fields.name.input.value.trim(),
-      phone: fields.phone.input.value.trim(),
-      blood: fields.blood.input.value
+    var FIELD_ERROR_MESSAGES = {
+      nameRequired: '請輸入姓名',
+      phoneRequired: '請輸入電話',
+      phoneInvalid: '電話格式錯誤，請輸入 09 開頭的 10 碼手機號碼',
+      bloodTypeRequired: '請選擇血型'
     };
-    const errors = validate(draft);
-    showErrors(errors);
-    if (hasError(errors)) {
-      return;
+
+    var FIELD_CONFIG = {
+      name: { inputId: 'name-input', errorId: 'name-error' },
+      phone: { inputId: 'phone-input', errorId: 'phone-error' },
+      bloodType: { inputId: 'blood-type-select', errorId: 'blood-type-error' }
+    };
+
+    /* ===== 狀態 ===== */
+    var volunteers = loadVolunteers();
+    var volunteerIdCounter = 0;
+    var isSubmitting = false;
+    var pendingDeleteVolunteer = null;
+    var lastFocusedElement = null;
+
+    /* ===== DOM 參照 ===== */
+    var form = document.getElementById('volunteer-form');
+    var nameInput = document.getElementById('name-input');
+    var phoneInput = document.getElementById('phone-input');
+    var bloodTypeSelect = document.getElementById('blood-type-select');
+    var submitBtn = document.getElementById('submit-btn');
+    var submitBtnLabel = submitBtn.querySelector('.btn-label');
+    var volunteerTable = document.getElementById('volunteer-table');
+    var volunteerTbody = document.getElementById('volunteer-tbody');
+    var emptyState = document.getElementById('empty-state');
+    var volunteerCountLabel = document.getElementById('volunteer-count');
+    var deleteModalOverlay = document.getElementById('delete-modal-overlay');
+    var deleteModalName = document.getElementById('delete-modal-name');
+    var cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    var confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+    /* ===== 初始化 ===== */
+    populateBloodTypeOptions();
+    renderVolunteerList();
+
+    form.addEventListener('submit', handleFormSubmit);
+    nameInput.addEventListener('input', function () { clearFieldError('name'); });
+    phoneInput.addEventListener('input', function () { clearFieldError('phone'); });
+    bloodTypeSelect.addEventListener('change', function () { clearFieldError('bloodType'); });
+    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+    confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
+    deleteModalOverlay.addEventListener('click', function (event) {
+      if (event.target === deleteModalOverlay) {
+        closeDeleteModal();
+      }
+    });
+
+    /* ===== 血型下拉選單（由 BLOOD_TYPES 常數產生，避免重複硬編碼） ===== */
+    function populateBloodTypeOptions() {
+      BLOOD_TYPES.forEach(function (type) {
+        var option = document.createElement('option');
+        option.value = type;
+        option.textContent = type + ' 型';
+        bloodTypeSelect.appendChild(option);
+      });
     }
-    submitBtn.disabled = true; // 送出防重複
-    volunteers.push(draft);
-    form.reset();
-    renderTable();
-    submitBtn.disabled = false;
-  }
 
-  function openConfirm(index) {
-    pendingDeleteIndex = index;
-    confirmMessage.textContent = "確定要刪除「" + volunteers[index].name + "」嗎？此動作無法復原。";
-    overlay.classList.add("open");
-  }
+    /* ===== 表單送出 ===== */
+    function handleFormSubmit(event) {
+      event.preventDefault();
 
-  function closeConfirm() {
-    pendingDeleteIndex = null;
-    overlay.classList.remove("open");
-  }
+      if (isSubmitting) {
+        return;
+      }
 
-  function confirmDelete() {
-    if (pendingDeleteIndex !== null) {
-      volunteers.splice(pendingDeleteIndex, 1);
-      renderTable();
+      clearAllFieldErrors();
+
+      var name = nameInput.value;
+      var phone = phoneInput.value;
+      var bloodType = bloodTypeSelect.value;
+
+      var errors = validateVolunteerInput(name, phone, bloodType);
+      var errorKeys = Object.keys(errors);
+
+      if (errorKeys.length > 0) {
+        errorKeys.forEach(function (key) {
+          showFieldError(key, errors[key]);
+        });
+        document.getElementById(FIELD_CONFIG[errorKeys[0]].inputId).focus();
+        return;
+      }
+
+      setSubmitProcessing(true);
+
+      window.setTimeout(function () {
+        volunteers.push({
+          id: createVolunteerId(),
+          name: name.trim(),
+          phone: phone.trim(),
+          bloodType: bloodType
+        });
+        saveVolunteers();
+        renderVolunteerList();
+        form.reset();
+        setSubmitProcessing(false);
+        nameInput.focus();
+      }, SUBMIT_PROCESSING_DELAY_MS);
     }
-    closeConfirm();
-  }
 
-  // 事件綁定
-  form.addEventListener("submit", handleSubmit);
-  tableBody.addEventListener("click", function (event) {
-    const button = event.target.closest("button[data-index]");
-    if (button) {
-      openConfirm(Number(button.dataset.index));
-    }
-  });
-  document.getElementById("cancel-delete").addEventListener("click", closeConfirm);
-  document.getElementById("confirm-delete").addEventListener("click", confirmDelete);
-  overlay.addEventListener("click", function (event) {
-    if (event.target === overlay) {
-      closeConfirm();
-    }
-  });
+    function validateVolunteerInput(name, phone, bloodType) {
+      var errors = {};
 
-  renderTable();
+      if (name.trim().length === 0) {
+        errors.name = FIELD_ERROR_MESSAGES.nameRequired;
+      }
+
+      if (phone.trim().length === 0) {
+        errors.phone = FIELD_ERROR_MESSAGES.phoneRequired;
+      } else if (!PHONE_PATTERN.test(phone.trim())) {
+        errors.phone = FIELD_ERROR_MESSAGES.phoneInvalid;
+      }
+
+      if (BLOOD_TYPES.indexOf(bloodType) === -1) {
+        errors.bloodType = FIELD_ERROR_MESSAGES.bloodTypeRequired;
+      }
+
+      return errors;
+    }
+
+    function showFieldError(fieldKey, message) {
+      var config = FIELD_CONFIG[fieldKey];
+      var inputEl = document.getElementById(config.inputId);
+      var errorEl = document.getElementById(config.errorId);
+      errorEl.textContent = message;
+      inputEl.setAttribute('aria-invalid', 'true');
+      inputEl.classList.add('input-invalid');
+    }
+
+    function clearFieldError(fieldKey) {
+      var config = FIELD_CONFIG[fieldKey];
+      var inputEl = document.getElementById(config.inputId);
+      var errorEl = document.getElementById(config.errorId);
+      errorEl.textContent = '';
+      inputEl.removeAttribute('aria-invalid');
+      inputEl.classList.remove('input-invalid');
+    }
+
+    function clearAllFieldErrors() {
+      Object.keys(FIELD_CONFIG).forEach(clearFieldError);
+    }
+
+    /* ===== 送出鈕防重複點擊 ===== */
+    function setSubmitProcessing(processing) {
+      isSubmitting = processing;
+      submitBtn.disabled = processing;
+      submitBtnLabel.textContent = processing ? '新增中…' : '新增志工';
+    }
+
+    /* ===== 志工清單渲染 ===== */
+    function renderVolunteerList() {
+      volunteerTbody.innerHTML = '';
+
+      if (volunteers.length === 0) {
+        volunteerTable.hidden = true;
+        emptyState.hidden = false;
+      } else {
+        volunteerTable.hidden = false;
+        emptyState.hidden = true;
+        volunteers.forEach(function (volunteer) {
+          volunteerTbody.appendChild(createVolunteerRow(volunteer));
+        });
+      }
+
+      volunteerCountLabel.textContent = '共 ' + volunteers.length + ' 位志工';
+    }
+
+    function createVolunteerRow(volunteer) {
+      var row = document.createElement('tr');
+
+      var nameCell = document.createElement('td');
+      nameCell.setAttribute('data-label', '姓名');
+      nameCell.textContent = volunteer.name;
+
+      var phoneCell = document.createElement('td');
+      phoneCell.setAttribute('data-label', '電話');
+      phoneCell.textContent = volunteer.phone;
+
+      var bloodTypeCell = document.createElement('td');
+      bloodTypeCell.setAttribute('data-label', '血型');
+      bloodTypeCell.textContent = volunteer.bloodType + ' 型';
+
+      var actionCell = document.createElement('td');
+      actionCell.setAttribute('data-label', '操作');
+      var deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'btn btn-danger-outline btn-sm';
+      deleteBtn.textContent = '刪除';
+      deleteBtn.addEventListener('click', function () {
+        openDeleteModal(volunteer);
+      });
+      actionCell.appendChild(deleteBtn);
+
+      row.appendChild(nameCell);
+      row.appendChild(phoneCell);
+      row.appendChild(bloodTypeCell);
+      row.appendChild(actionCell);
+
+      return row;
+    }
+
+    /* ===== 刪除二次確認 modal ===== */
+    function openDeleteModal(volunteer) {
+      pendingDeleteVolunteer = volunteer;
+      lastFocusedElement = document.activeElement;
+      deleteModalName.textContent = volunteer.name;
+      deleteModalOverlay.hidden = false;
+      cancelDeleteBtn.focus();
+      document.addEventListener('keydown', handleModalKeydown);
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteVolunteer = null;
+      deleteModalOverlay.hidden = true;
+      document.removeEventListener('keydown', handleModalKeydown);
+      if (lastFocusedElement) {
+        lastFocusedElement.focus();
+      }
+    }
+
+    function handleModalKeydown(event) {
+      if (event.key === 'Escape') {
+        closeDeleteModal();
+      }
+    }
+
+    function handleConfirmDelete() {
+      if (!pendingDeleteVolunteer) {
+        return;
+      }
+      volunteers = volunteers.filter(function (volunteer) {
+        return volunteer.id !== pendingDeleteVolunteer.id;
+      });
+      saveVolunteers();
+      renderVolunteerList();
+      closeDeleteModal();
+    }
+
+    /* ===== id 產生與本機儲存 ===== */
+    function createVolunteerId() {
+      volunteerIdCounter += 1;
+      return 'v-' + Date.now() + '-' + volunteerIdCounter;
+    }
+
+    function loadVolunteers() {
+      try {
+        var raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return [];
+        }
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveVolunteers() {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(volunteers));
+      } catch (error) {
+        /* 本機儲存不可用（例如隱私瀏覽模式）時，僅停用持久化，不影響本次操作 */
+      }
+    }
+  })();
 </script>
 </body>
 </html>
