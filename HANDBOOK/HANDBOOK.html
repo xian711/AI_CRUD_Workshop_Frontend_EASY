@@ -584,7 +584,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <p>AI 會產出約 8 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除＋CSV、T7 SRS/SDD、T8 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
 
       <h3>⑤ 驗收與修正</h3>
-      <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿講師發放的 <code>SCOPE-課堂範圍決策.md</code>（<code>instructor/SCOPE-課堂範圍決策.md</code>）欄位規格逐項對照。</p>
+      <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿 <code>step3_new_module/PRD-中心裝備物資.md</code> 第 2 節的 12 欄規格逐項對照——每一欄檢查四件事：label 文字、必不必填、用哪種元件、驗證規則。</p>
 
       <div class="block-title"><span class="ico">📦</span>產出物：8 檔改名對照</div>
       <p>AI 做完後，用這張表核對它有沒有照「複製 vs 共用」的心法做。<strong>判斷準則就一句：跟實體長相有關的 → 複製改名；通用機制 → 直接共用。</strong>這正是 step2 ③ 那張 8 核心檔表實際套用的樣子。</p>
