@@ -109,6 +109,26 @@ pnpm dev
 
 開 <http://localhost:3100/survey> 逐項核：
 
+> **懶得一項一項點？有一鍵驗收腳本。**
+> 在 `step6_survey` 目錄執行（App 要先 `pnpm dev` 起來）：
+>
+> ```powershell
+> # Windows
+> powershell -ExecutionPolicy Bypass -File .\run-survey-e2e.ps1
+> ```
+>
+> ```bash
+> # macOS／Linux
+> bash run-survey-e2e.sh
+> ```
+>
+> 它會用真瀏覽器把 **S1～S9** 跑一遍（就是下面清單的第 1～9 項），再幫你做 **S10** 的硬編碼色碼掃描，
+> 最後印一張總結表。**第 11 項它刻意不幫你做**——那一項的重點就是「你要親眼看到」。
+>
+> 腳本是**通用寫法**：你的 8 題用什麼元件、按鈕寫什麼字、`localStorage` 的 key 叫什麼，它都不管。
+> 只要你照 PRD 做，它就過得了。跑不動的步驟它會直說，不會假裝通過。
+> 埠不是 3100 的話：`$env:PORT = '3200'`（Windows）／`PORT=3200 bash run-survey-e2e.sh`（Mac）。
+
 | # | 驗收點 | 期望 |
 |---|---|---|
 | 1 | 必填留空按送出 | 欄位**下方**出現紅字，畫面聚焦第一個錯誤欄，不是只跳 toast |
@@ -141,7 +161,26 @@ pnpm dev
 
 ### ④ 發布到 GitHub Pages
 
-**先產生靜態檔：**
+> **有一鍵發布腳本，而且預設是「演練模式」——不會真的推出去。**
+> 在你的問卷專案資料夾（`my-survey-app`）裡執行：
+>
+> ```powershell
+> # Windows｜演練：只建置＋檢查，什麼都不推
+> powershell -ExecutionPolicy Bypass -File ..\deploy-gh-pages.ps1 -RepoName my-survey-app
+> ```
+>
+> ```bash
+> # macOS／Linux｜演練
+> bash ../deploy-gh-pages.sh --repo-name my-survey-app
+> ```
+>
+> 它會幫你做四件事再停下來：① 確認你在對的資料夾 ② 設好 baseURL 建置並檢查資源前綴與 `.nojekyll`
+> ③ **掃一遍產出有沒有像帳密、金鑰、手機號、身分證號、內網位址的東西** ④ 印出「會推什麼、推到哪」。
+>
+> 確認都沒問題，再加 `-RepoUrl ... -Push`（Mac：`--repo-url ... --push`）才會真的推。
+> **推之前請先讀完下面那四點手動檢查**——腳本擋得住技術性的錯，擋不住「這份資料本來就不該公開」。
+
+**先產生靜態檔（想自己一步一步做的話）：**
 
 ```powershell
 # Windows｜把 你的帳號 與 repo 名稱 換成你自己的

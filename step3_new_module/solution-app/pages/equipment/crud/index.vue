@@ -17,7 +17,7 @@
     <!-- 篩選卡：關鍵字（名稱＋編碼）／分類／狀態 -->
     <CardOutlined>
       <div class="flex items-end gap-sm gap-y-md flex-wrap">
-        <div class="space-y-1">
+        <div class="space-y-1" data-testid="equipment-keyword">
           <div class="text-label-small text-on-surface-variant">關鍵字</div>
           <UInput
             v-model="filters.q"
@@ -43,7 +43,7 @@
 
     <!-- 工具列：結果筆數 + 匯出 -->
     <div class="flex items-center justify-between gap-sm flex-wrap">
-      <p class="text-body-medium text-on-surface-variant">共 {{ filteredRows.length }} 筆</p>
+      <p class="text-body-medium text-on-surface-variant" data-testid="equipment-total">共 {{ filteredRows.length }} 筆</p>
       <UButton color="secondary" variant="ghost" size="md" icon="i-heroicons-arrow-down-tray" @click="handleExport">
         匯出 CSV
       </UButton>
@@ -76,13 +76,13 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-outline-variant">
-          <tr v-for="(row, index) in pagedRows" :key="row.id" :class="rowClass(index)" @click="goView(row)">
+          <tr v-for="(row, index) in pagedRows" :key="row.id" :class="rowClass(index)" data-testid="equipment-row" @click="goView(row)">
             <td class="px-3 py-2.5">
               <UBadge color="secondary" variant="soft" size="xs">{{ categoryLabelOf(row.categoryKey) }}</UBadge>
             </td>
             <td class="px-3 py-2.5">
               <div class="font-emphasis text-on-surface">{{ row.name }}</div>
-              <div class="font-mono text-label-small text-on-surface-variant">{{ row.code }}</div>
+              <div class="font-mono text-label-small text-on-surface-variant" data-testid="equipment-code">{{ row.code }}</div>
             </td>
             <td class="px-3 py-2.5 text-on-surface-variant">{{ row.spec1 }}</td>
             <td class="px-3 py-2.5 text-right font-mono text-on-surface">{{ row.qty }} {{ row.unit }}</td>

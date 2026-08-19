@@ -357,6 +357,7 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
       <blockquote><strong>這張表是實測出來的，不是想像的。</strong>我們用 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次（Claude Sonnet）。沒 harness 那版<strong>一點都不醜</strong>：它自己選了警示橘、做了響應式、還多做了刪除確認與防注入，甚至<strong>自己建了一套 design token</strong>（<code>--brand</code>、<code>--danger</code>…）——它知道該用 token，只是用的是它自己的那套。但品牌紅 0 次、電話收 6～15 碼的通用格式（<code>(02) 1234-5678</code> 也算合法）、血型多一個「不明」。<strong>而兩版都自己加了 localStorage</strong>，有 harness 那版還多加了空清單提示、Esc 關閉、焦點歸還。</blockquote>
       <blockquote><strong>所以 harness 的價值不是「讓 AI 寫得好看」，是「讓 AI 寫得跟你們一樣」。</strong>現在的 AI 不給規矩也能生出漂亮頁面——問題從來不是醜，是<strong>每次都長得不一樣、而且會自己發明規則</strong>。</blockquote>
 
+      <blockquote><strong>打不開瀏覽器？（或你叫 AI Agent 幫你讀教材）</strong>看 <code>step1_why_harness/demo/DIFF_SUMMARY.md</code>——純文字版的差異摘要，把「顏色從哪來／業務規則從哪來／多出來的東西」三項整理成表，還附一張可以直接寫成測試案例的「QA 驗收特徵快速清單」。<strong>但它取代不了看畫面</strong>：好不好看、順不順手，文字寫不出來。</blockquote>
       <blockquote><strong>先誠實講清楚：</strong><code>demo/</code> 那兩份 HTML 是我們用 <code>demo/PROMPT.md</code> 裡固定的兩版 prompt 各跑一次、挑出來當教材的<strong>策展成品</strong>，不是每次都會一模一樣重現的實驗。所以別把它們當「鐵證」——要信，就自己拿去實測一遍。</blockquote>
 
       <div class="why">
@@ -437,7 +438,7 @@ pnpm dev          # 啟動 dev server</code></pre>
       <blockquote><strong>想看一眼滷包裡有什麼？（選配）</strong>打開 <code>CLAUDE.md</code> 掃 30 秒就好——它只有 48 行，你會看到「鎖定技術棧不准換套件、禁止硬編碼顏色、危險操作要二次確認」這類鐵律。四份的完整分工與不同 AI Agent 的載入方式，見 <code>step2_speedrun_kit/README.md</code> 的「harness 四件：給 AI 的規矩」一節。</blockquote>
 
       <h3>⑤ 認識 token：Design System</h3>
-      <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距，知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
+      <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距（開不了瀏覽器就改看同資料夾的 <code>TOKENS_SUMMARY.md</code>，純文字版，順帶解釋了「token 檔裡明明有 <code>#C8232C</code>、<code>24px</code>，為什麼不算硬編碼」），知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
 
       <blockquote><strong>這三份想查才翻，現在別花時間讀：</strong><code>2.1_sample_app/SPEC-範例-人員CRUD.md</code>（需求規格：Use Cases、FR／BR／NFR、驗收清單）、<code>2.1_sample_app/SDD-CRUD標準範本-v1.1.md</code>（設計：檔案結構、行數預算、各檔實作規格）、<code>2.1_sample_app/DIAGRAMS.html</code>（7 張 UML 圖，用瀏覽器開）。它們是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</blockquote>
 
@@ -589,6 +590,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <h3>④ 確認任務清單、說「開工」</h3>
       <p>AI 會產出約 8 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除＋CSV、T7 SRS/SDD、T8 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
+      <blockquote><strong>T7 的 SRS／SDD 不要用「有兩個檔就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-SDD-最小樣板.md</code>——那份把最低門檻定死成四段：SRS 要有<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>；SDD 要有<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>。缺一段就退回去補。裡面也用白話解釋了 SRS／SDD 這兩個縮寫對不寫程式的人到底是什麼、你只要親自核哪幾段。</blockquote>
 
       <h3>⑤ 驗收與修正</h3>
       <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿 <code>step3_new_module/PRD-中心裝備物資.md</code> 第 2 節的 12 欄規格逐項對照——每一欄檢查四件事：label 文字、必不必填、用哪種元件、驗證規則。</p>
@@ -827,6 +829,29 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
 2. selector 是不是猜的？有沒有靠位置索引（nth）這種一改版就碎的寫法？
 3. 測試之間會不會互相污染（前一條的資料影響後一條）？
 逐條給「可被推翻的具體理由」，能重現就附步驟；找不到問題也要說明你怎麼確認的。</code></pre>
+      <blockquote><strong>為什麼「立場」要寫進 prompt 裡：同一個 AI，換個立場，產出完全不同等級。</strong><br>
+      試教時我們拿<strong>同一個 AI</strong>做了兩件事。第一次在 step1，我要它「逐條勾稽手冊寫的事實對不對」——
+      它把「沒 harness 版漏了 4 個裸色碼」標成「✅ 成立」，<strong>但它自己貼的證據寫的是 5 處</strong>。
+      它順著教材的敘述走了。第二次在 step4，我要它「<strong>盡力推翻</strong>這套測試，不是誇獎它」——
+      同一個 AI 挖出了三個教材作者自己都沒發現的假綠。<br>
+      結論很簡單：<strong>「幫我檢查一下」得到的是附和，「盡力推翻它」得到的才是審查。</strong>
+      找 AI 當審查員時，立場要寫死在 prompt 裡，不能靠它自己選。</blockquote>
+      <div class="block-title"><span class="ico">📓</span>試教實錄：兩個真的發生過的狀況</div>
+      <blockquote><strong>案例 A｜兩位學員都守規矩，卻走出完全相反的結局。</strong><br>
+      同一段 LOOP prompt、同一套測試，兩位學員都判定「有幾條在驗 PRD 沒寫的東西」。然後——<br>
+      <strong>學員 A：停下來回報。</strong> 3 passed / 4 failed、exit 1。沒有作弊、沒有鬼打牆，但交不出綠燈。<br>
+      <strong>學員 B：照著改。</strong> 跑了 8 輪、7 passed 全綠。測試一個字都沒動，
+      但把原本符合 PRD 的實作改成了參考解的樣子（他自己說這叫 <em>overfitting to tests</em>——<strong>為了過測而向測試過擬合</strong>）。<br>
+      <strong>兩個人都沒違反那兩條鐵律。</strong>問題出在鐵律沒涵蓋這個岔路——所以我們補了第三條：
+      <strong>每次修改都要指出它對應 PRD 的哪一條或你拍板的哪一個決策；找不到出處的照樣可以改，但要標成「規格外調整」。</strong><br>
+      學員 A 事後補的那句話值得抄下來：「不作弊、也沒鬼打牆，AI 仍可能因為測試藏了需求，而把一個符合 PRD 的設計改壞。」</blockquote>
+      <blockquote><strong>案例 B｜三道檢查全部放行，架構還是退化了。</strong><br>
+      學員 B 為了讓燈變綠，在中間幾輪把列表頁的 <code>useTemplateListPage</code>（step2 教「直接共用、禁複製、禁自己再寫一套」的那一個）
+      拿掉，改成自己用 <code>ref</code>／<code>computed</code> 重寫一套篩選＋分頁＋URL 同步。結果是：<br>
+      共用檔本身沒被改（雜湊比對相同）→ <strong>過</strong>；測試沒被動 → <strong>過</strong>；7 條全綠 → <strong>過</strong>。
+      <strong>三道檢查全部放行，但 step2 教的心法已經破功，而且沒有任何一關抓得到。</strong><br>
+      這就是上面那張表為什麼多了「共用件還在用嗎」那一列。
+      <strong>驗收要驗的不只是「燈亮不亮」，還有「它是怎麼亮的」。</strong></blockquote>
       <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>E2E 腳本實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0（截圖為 Windows 版 run-e2e.ps1；macOS 的 run-e2e.sh 輸出與判定相同）。</figcaption></figure>
       <div class="table-scroll">
       <table>

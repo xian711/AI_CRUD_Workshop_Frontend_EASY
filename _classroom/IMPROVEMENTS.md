@@ -207,3 +207,244 @@
 | `2.2_design_system/DESIGN_SYSTEM.html` 與 `step1/demo/` 補純文字摘要／`DIFF_SUMMARY.md` | 兩位皆提 | 是新增檔案而非修補，且要重新設計內容深度。已記入 COURSE_REPORT 的「下一版建議」。 |
 | PRD 補電話正則、排序 tie-breaker、數量上限等邊界規格 | QA step3 | 補了會讓課堂版 PRD 變厚，與「濃縮成一堂課做得完」的設計意圖衝突。建議改成獨立的「正式上線前要補的規格」附錄，已記入 COURSE_REPORT。 |
 | SRS／SDD 的最小樣板 | PM step3 | 需要教材作者決定要求到什麼程度（PM 交了、QA 沒交，而手冊 ④ 只說「順序合理就回開工」，等於把 T7 的存廢交給運氣）。已記入 COURSE_REPORT。 |
+
+---
+---
+
+# v2 改版紀錄
+
+> 依 `COURSE_REPORT.md` 第八節（8.1 必做 3 項 ＋ 8.2 值得做 5 項）與總管補充 2 項實作。
+> 基準：`master @ 1c57456`（v1 的「試教實錄與 20 項教材優化」）。
+> **E2E 改完已實跑驗證：`run-e2e.ps1` 對 solution-app → 7 passed / 0 failed / 0 skipped、exit 0。**
+
+## v2 一覽
+
+| # | 對應 | 檔案 | 類型 |
+|:-:|---|---|---|
+| v2-1 | 8.1-1 (A輔) | `step3_new_module/PRD-中心裝備物資.md` | 補規格（種子 fixture ＋ testid 掛載點） |
+| v2-2 | 8.1-1 (B主) | `step4_loop_e2e/e2e/tests/equipment.spec.ts` | 重寫 selector 與斷言 |
+| v2-3 | 8.1-1（D 條允許） | `solution-app/pages/equipment/crud/index.vue` | 加 4 個 `data-testid` |
+| v2-4 | 8.1-2 | 同 v2-2 | 補 E1／E4／E6 三個假綠 |
+| v2-5 | 8.1-3 | `run-e2e.ps1`／`run-e2e.sh`／`tests.sha256`／`instructor/update-e2e-hash.*` | 測試檔 SHA-256 防竄改 |
+| v2-6 | 8.2-4 | `nuxt.config.ts` ×2、`playwright.config.ts`、`run-e2e.*` | 埠改讀環境變數 |
+| v2-7 | 8.2-5 | `step1_why_harness/demo/DIFF_SUMMARY.md`、`2.2_design_system/TOKENS_SUMMARY.md` | 新增純文字摘要 |
+| v2-8 | 8.2-6 | `step3_new_module/SRS-SDD-最小樣板.md` | 新增最小樣板 |
+| v2-9 | 8.2-7 | `step6_survey/run-survey-e2e.*`、`step6_survey/e2e/` | 新增一鍵驗收 |
+| v2-10 | 8.2-8 | `step6_survey/deploy-gh-pages.*` | 新增一鍵發布（預設演練，不推） |
+| v2-11 | 總管補充 9 | `HANDBOOK/HANDBOOK.html` step4 | 補兩個試教實錄案例 |
+| v2-12 | 總管補充 10（＝8.3-15） | `HANDBOOK/HANDBOOK.html` step4 | 補「立場決定審查品質」 |
+| v2-13 | 配套 | `HANDBOOK.html`、`step6_survey/README.md` | 把新檔案接進動線 |
+
+---
+
+## v2-1　PRD 補「種子資料約定」與「E2E 掛載點」（8.1-1 A輔）
+
+**改了什麼**：`PRD-中心裝備物資.md` 新增 **2.1 節**，兩張表：
+
+- **2.1.1 種子資料（fixture）五條約定**：24 筆、10 分類全涵蓋、三種狀態都出現、至少一個品名重複 2 筆以上、編碼不重複。並附參考解的實際分佈（ICT 5／POWER 3／OFFICE 3／PPE 3／…，「筆記型電腦」與「發電機」各 2 筆），但明講**不必逐字相同**。
+- **2.1.2 四個 `data-testid` 掛載點**：`equipment-keyword`／`equipment-total`／`equipment-row`／`equipment-code`，各自寫明「為什麼這個非用 testid 不可」，並註明沒掛也有語意退路。
+
+同時改了兩處舊文字：
+
+- **D3 那格**：拿掉 v1 加的「本課基準格式是 `PW-GEN-003`」，改成「**格式由你定**，只要能即時算出來、且不重複」。因為 v2 的 E3 已經不驗格式了，繼續寫基準格式等於又把答案塞回去。
+- **第 6 節前的引言**：改成「PRD 規定功能與資料＋2.1 節的約定，**UI 用字你自己決定**，E2E v2 已改模糊比對」。
+
+**為什麼**：試教時兩位學員都做出符合 PRD 的模組卻被 E2E 判紅，根因是**規格藏在測試裡**。這一節把它搬到明面上。
+
+**對應回饋**：step3 講師觀察 2；step4 PM (c)、(e)2／(e)3；QA (a)、(j)3。
+
+## v2-2　E2E 全面改寫：語意化 selector、動態筆數、模糊比對（8.1-1 B主）
+
+**改了什麼**（`equipment.spec.ts`，+207 −90 行）：
+
+| 原本（v1） | 現在（v2） |
+|---|---|
+| `getByPlaceholder('項目名稱／編碼')` | `[data-testid="equipment-keyword"] input`，`.or()` 退回「頁面第一個 textbox」 |
+| `getByText('共 24 筆', { exact: true })` | 讀 `[data-testid="equipment-total"]`，退路 `/共\s*\d+\s*筆/`，**解析出數字當基準** |
+| `td.nth(1).locator('div').last()` | `[data-testid="equipment-code"]`，退路才是「該格最後一行」 |
+| `getByRole('button', { name: '新增品項' })` | `{ name: /新增/ }` |
+| `getByText('已新增品項')` | `getByText(/已新增｜新增成功/)`（正則模糊比對） |
+| `dialog.getByText('刪除品項')` | `expect(dialog).toContainText(/刪除/)` |
+| `getByText('已儲存變更')` | `getByText(/已儲存｜儲存成功/)` |
+| `toHaveValue('PW-GEN-003')` | 只驗「非空、無空白、≥3 字、`/^[A-Za-z0-9][A-Za-z0-9._-]*$/`」**＋搜尋該編碼恰好 1 筆（證明不重複）** |
+| E2 寫死 24→2→24 | **先讀總筆數當基準**；用第一列編碼搜 → 恰 1 筆；轉小寫再搜 → 仍 1 筆（驗不分大小寫）；用品名搜 → `1 ≤ 命中 < 總數`；清除 → 回到基準 |
+| E7 `new RegExp('77\s')` | 讀整列文字，`toContain('77')` ＋ `toContain(地點)`，**不綁欄位在第幾格** |
+| E7 `toHaveURL(/\?.*mode=edit/)` | 只要求「進到這一筆的表單頁」，不綁 `?mode=edit` 這種路由實作 |
+
+檔頭註解也重寫了，把 v2 的三條原則寫死在裡面（語意優先／數字動態／真沒語意才用 testid，而且 testid 要寫進 PRD）。
+
+**為什麼**：QA 的對抗審查與 PM 的逐條盤點列出 9～11 條「測試在驗 PRD 沒寫的東西」。v2 把它們一條一條拆掉。
+
+**驗證**：對 solution-app 實跑 **7 passed**。
+
+## v2-3　solution-app 加 4 個 `data-testid`（動用 D 條的唯一一次）
+
+**改了什麼**：`pages/equipment/crud/index.vue` 加 4 個屬性，共 4 行、無邏輯變動：
+
+| 屬性 | 掛在哪 |
+|---|---|
+| `data-testid="equipment-keyword"` | 關鍵字輸入框外框 |
+| `data-testid="equipment-total"` | 顯示「共 N 筆」的元素 |
+| `data-testid="equipment-row"` | 表格資料列 `<tr>` |
+| `data-testid="equipment-code"` | 列內的品項編碼 |
+
+**為什麼**：這 4 個位置真的沒有語意可用（頁面有多個輸入框、「共 N 筆」是自訂文案、手機卡片與表格列並存、編碼跟品名同一格）。
+
+**為什麼不算走回頭路**：因為它們**同步寫進 PRD 2.1.2**，變成講明的約定；而且測試對每一個都留了語意退路，沒掛也不會直接死當。
+
+**這是 V2_MISSION D 條允許的唯一一次 App 變更，範圍就這 4 行。** 其餘 App 程式碼、參考解邏輯、範本一律沒動。
+
+## v2-4　補掉三個假綠（8.1-2）
+
+| 條目 | v1 的漏洞（QA 對抗審查抓到的） | v2 怎麼補 |
+|---|---|---|
+| **E1** | 只驗「共 24 筆」與有 table——**分頁整個失效、24 筆全倒進表格也會綠** | 加 `expect(rows).toHaveCount(min(總筆數, 20))`，明確驗「第一頁恰好一頁份」 |
+| **E4** | PRD 有 6 個必填，**只斷言了分類 1 個**——其餘漏寫驗證照樣綠 | 逐欄斷言 `categoryKey`／`name`／`unit`／`spec1` 四個欄位各自容器內都有非空錯誤訊息；另兩個必填（`qty`、`status`）因為有合法預設值不會觸發紅字，**改成明確驗預設值**（`qty` 為 0、`status` 顯示「正常」），不再默認 |
+| **E6** | 「回歸測試」只看 `/template/crud` 有沒有一張表和「共 N 筆」——**人員表單整個壞死也會綠** | 加「**真的點進第一列的檢視頁**」：斷言 URL 進到 `/template/crud/<id>`，且檢視頁渲染出該列的內容 |
+
+## v2-5　run-e2e 內建測試檔 SHA-256 防竄改（8.1-3）
+
+**新增與改動**：
+
+| 檔案 | 做什麼 |
+|---|---|
+| `step4_loop_e2e/tests.sha256` | 基準清單，保護 `e2e/tests/equipment.spec.ts` 與 `e2e/playwright.config.ts` |
+| `run-e2e.ps1`／`run-e2e.sh` | **步驟 0**：跑測試前先比對雜湊，不符就拒絕執行並印出「哪個檔被改了」 |
+| `instructor/update-e2e-hash.ps1`／`.sh` | 講師正當改測試後，用來重算基準 |
+
+**幾個刻意的設計**：
+
+1. **連 `playwright.config.ts` 一起保護**。改 `retries`、加 `grep`、動 `testIgnore` 一樣能讓燈變綠，只保護測試本體擋不住。
+2. **雜湊前先去掉 CR**，所以 CRLF／LF 差異不影響——Windows 與 macOS 算出同一個值（已實測兩邊一致）。
+3. **重算腳本放在 `instructor/`，不放在 `step4_loop_e2e/` 旁邊。** 它是解鎖用的鑰匙，不該跟學員每天要跑的腳本擺在一起。
+4. **完全不依賴 git。** 這正是試教時 `git diff e2e/` 失效的原因（學員拿到的是資料夾副本，兩位都實測到 `Not a git repository`）。
+
+**驗證**：故意在測試檔尾端加一行 → `run-e2e.ps1` 印出「FAIL：E2E 測試檔與基準不符，拒絕執行 ／ e2e/tests/equipment.spec.ts（內容被改過）」並停在步驟 0；還原後雜湊回到基準值。
+
+**對應回饋**：step4 PM (b)、(e)5；QA (d)、(j)1。
+
+## v2-6　埠改讀環境變數（8.2-4）
+
+**改了什麼**：
+
+| 檔案 | 改法 |
+|---|---|
+| `2.1_sample_app/sample-app/nuxt.config.ts` | `port: Number(process.env.PORT) \|\| 3100` |
+| `solution-app/nuxt.config.ts` | 同上 |
+| `e2e/playwright.config.ts` | `BASE_URL` 整段覆寫，或只給 `PORT`；預設 `http://localhost:3100` |
+| `run-e2e.ps1`／`run-e2e.sh` | 讀同一組變數；站點檢查與錯誤訊息全部改用 `$BaseUrl`，不再寫死 3100 |
+
+**預設值一個都沒變**，教材通篇寫的 3100 照樣成立。
+
+**驗證**：`PORT=3277` 跑 run-e2e → 它去檢查 `http://localhost:3277`（證明有讀到）；`PORT=3277 pnpm dev` 啟動 sample-app → 實際起在 3277 且 `/template/crud` 回 200。
+
+**對應回饋**：step2 QA (f)；試教時兩位共用一台機器必須錯開埠，就是這個問題的現場版。
+
+## v2-7　兩份純文字摘要（8.2-5）
+
+| 新檔 | 內容 |
+|---|---|
+| `step1_why_harness/demo/DIFF_SUMMARY.md` | 三列對照（顏色從哪來／業務規則從哪來／多出來的東西）逐項列出實際數字與行為、規模對照、**10 條可直接寫成測試案例的 QA 驗收特徵清單**，最後明講「這份沒辦法告訴你哪一版好看」 |
+| `2.2_design_system/TOKENS_SUMMARY.md` | 三句話版本、token 三層、顏色／間距／圓角／字級四張表、**「token 檔裡的 `#C8232C` 為什麼不算硬編碼」**、以及「這一節你只要帶走什麼」三問 |
+
+**為什麼**：「HTML 在終端機讀不動」是兩位學員在 step0／step1／step2 **連續抱怨三次**的問題，各自估教學效果掉 70～80%。
+
+兩份都在開頭寫明「**取代不了看畫面**」，避免變成偷懶的藉口。
+
+**對應回饋**：step1 QA (c)3、(e)3；step2 PM (a) 第 8 條、QA (b)。
+
+## v2-8　SRS／SDD 最小樣板（8.2-6）
+
+**新檔** `step3_new_module/SRS-SDD-最小樣板.md`：先用白話解釋 SRS／SDD 對不寫程式的人是什麼、PM 只要親自核哪幾段；再把最低門檻定死成 **SRS 四段**（已拍板決策／需求追溯／範圍外／待定與風險）與 **SDD 四段**（檔案責任／資料模型／關鍵決策實作／harness 證據）。
+
+「檔案責任」那一段特別要求寫「共用件**有沒有真的在用**」——這是 step4 架構退化那一條的預防。
+
+**為什麼**：手冊只說「AI 會交出 SRS／SDD」，沒說要看什麼。試教時 PM 交了、QA 沒交，而**任務清單是 AI 自己列的、沒有檢查點**，等於把 T7 的存廢交給運氣。
+
+**對應回饋**：step3 PM (a)4、(e)5；講師觀察 6。
+
+## v2-9　step6 一鍵驗收（8.2-7）
+
+**新增**：`step6_survey/run-survey-e2e.ps1`／`.sh` ＋ `step6_survey/e2e/`（獨立 Playwright 專案，9 條 S1~S9）。
+
+跑 README「③ 驗收」那張清單：S1 必填驗證與聚焦、S2 正常送出、S3 防連點、S4 持久化、S5 管理頁看得到、S6 空狀態、S7 CSV（檔名含日期＋BOM＋中文）、S8 二次確認且確認鈕寫明動作、S9 手機 390 無橫向捲軸且能送出。
+
+**S10（硬編碼色碼）由腳本自己做靜態掃描**，而且只掃「你新增的檔」、不掃 token 正本——就是 v1 第 16 項那個「351 行」陷阱的自動化版本。**第 11 項（無痕視窗）刻意不自動化**，那一項的重點就是要人親眼看到。
+
+**最難的地方是「問卷是學員自己設計的」**，所以整份用通用寫法：
+
+- 表單自動填寫：掃文字框／多行文字／radio／原生 select，再把「點開才有選項」的按鈕逐顆試（Nuxt UI 的 `USelectMenu` 渲染出來只是普通 `<button>`，沒有 `role=combobox`）。
+- 筆數：掃 `localStorage` 每一把 key，取「能 parse 成 JSON 陣列」中最長的那個——不管學員把 key 取成什麼名字。
+- 文字：一律模糊比對（成功／已送出／感謝）。
+
+**驗證**：拿**試教時學員實際做出來的問卷 App** 當受測目標（用 `PORT=3200` 起，順便再驗一次 v2-6），`run-survey-e2e.ps1` 跑出 **9 passed ＋ S10 通過（掃了 4 個新增檔、0 處硬編碼），總結「驗收全過」**。
+
+過程中修掉兩個真實問題：SPA 還沒渲染完就 `count()`／`innerText()`（`count()` 不會自動等待）、以及下拉不是 `role=combobox` 而是普通按鈕。**這兩個坑正好證明「沒實跑過的驗收腳本不能發」。**
+
+## v2-10　step6 一鍵發布（8.2-8，只寫腳本、不實際發布）
+
+**新增**：`step6_survey/deploy-gh-pages.ps1`／`.sh`。
+
+**預設是演練模式（dry run），什麼都不推。** 流程：① 確認在對的資料夾（有 `nuxt.config.ts` 與 `pages/survey`）② 設 `NUXT_APP_BASE_URL=/<RepoName>/` 建置，並檢查 `index.html` 的資源真的帶上前綴、`.nojekyll` 在（不在就自動補）③ **敏感資料掃描**（帳密／金鑰欄位、台灣手機號、身分證字號、內網位址），掃到就擋下來，要 `-IgnoreSecretScan` 才放行 ④ 印出「來源、目標 repo、目標分支、發布後網址、檔案數」就停。
+
+加 `-Push` ＋ `-RepoUrl` 才會在 `.output/public` 建拋棄式 repo 推上去，並在結尾印出 Pages 設定與**下架／刪 repo 的方法**。
+
+**我沒有執行過任何推送動作，也沒有建立任何 GitHub repo**——腳本只做到語法檢查與程式碼審閱。
+
+**為什麼要做成演練優先**：兩位學員的紙上檢查列出 6+3 個「一步做錯就公開出去」的地雷，其中「沒有撤回說明」與「Pages 免費版強制 public」是教材完全沒提的。
+
+**對應回饋**：step6 PM (e)1～6、(g)6；QA (g)。
+
+## v2-11　HANDBOOK step4 補兩個試教實錄案例（總管補充 9）
+
+**改了什麼**：step4「你應該看到」那張表後面，新增「📓 試教實錄：兩個真的發生過的狀況」兩個框（學員匿名寫 A／B）：
+
+- **案例 A｜兩位學員都守規矩，卻走出完全相反的結局。** 學員 A 停損回報（3 passed / 4 failed，交不出綠燈）；學員 B 照改跑 8 輪全綠，測試一字未動，但把符合 PRD 的實作改成參考解的樣子（overfitting to tests）。**兩人都沒違反那兩條鐵律**——所以補了第三條（每次修改要指出對應 PRD 哪一條或哪個拍板，找不到出處的標成「規格外調整」）。附上學員 A 那句「不作弊、也沒鬼打牆，AI 仍可能因為測試藏了需求，而把一個符合 PRD 的設計改壞」。
+- **案例 B｜三道檢查全部放行，架構還是退化了。** 學員 B 把 `useTemplateListPage` 拆掉自己重寫；共用檔雜湊相同 → 過、測試沒被動 → 過、7 條全綠 → 過，**心法卻已破功**。這就是驗收表為什麼多了「共用件還在用嗎」那一列。
+
+> 註：第三條鐵律與「共用件還在用嗎」檢查點本身在 v1（第 7、9 項）就加進 LOOP prompt 與驗收表了；v2 補的是**它們為什麼存在的實錄**。
+
+## v2-12　HANDBOOK step4 補「立場決定審查品質」（總管補充 10 ＝ 8.3-15）
+
+**改了什麼**：對抗審查那段的 prompt 後面新增一則引言，附上同一個 AI 的兩次實證：step1 要它「逐條勾稽」→ 它把「漏了 4 個裸色碼」標成「成立」，**但自己貼的證據寫的是 5 處**（順著教材走）；step4 要它「**盡力推翻**」→ 同一個 AI 挖出三個教材作者自己都沒發現的假綠。
+
+結論一句話：**「幫我檢查一下」得到的是附和，「盡力推翻它」得到的才是審查——立場要寫死在 prompt 裡，不能靠 AI 自己選。**
+
+## v2-13　把新檔案接進動線（配套）
+
+沒有入口的檔案等於不存在，所以在四個地方加了指路：
+
+| 位置 | 加了什麼 |
+|---|---|
+| HANDBOOK step1「你應該看到」 | 打不開瀏覽器就看 `DIFF_SUMMARY.md`，並註明取代不了看畫面 |
+| HANDBOOK step2 ⑤ | 開不了瀏覽器就看 `TOKENS_SUMMARY.md`，順帶點出「token 檔裡有 hex 為什麼不算硬編碼」 |
+| HANDBOOK step3 ④ | T7 不要用「有兩個檔就打勾」驗收，打開 `SRS-SDD-最小樣板.md` 對四段 |
+| `step6_survey/README.md` ③④ | 一鍵驗收腳本（含換埠寫法）、一鍵發布腳本（強調預設演練、推之前先讀那四點手動檢查） |
+
+---
+
+## v2 驗證總表
+
+| 驗證項目 | 結果 |
+|---|---|
+| **step4 E2E 對 solution-app 實跑** | **7 passed / 0 failed / 0 skipped，「E2E 全綠」，exit 0** |
+| 雜湊防竄改（正向） | 未竄改時印「PASS：測試檔與基準相符」，照常往下跑 |
+| 雜湊防竄改（負向） | 偷加一行 → 停在步驟 0，印出被改的檔名，拒絕執行 |
+| 雜湊跨平台一致 | PowerShell 版與 `sha256sum` 版對同兩個檔算出完全相同的值 |
+| `PORT` 覆寫（測試端） | `PORT=3277` → run-e2e 去檢查 `http://localhost:3277` |
+| `PORT` 覆寫（App 端） | `PORT=3277 pnpm dev` → sample-app 起在 3277，`/template/crud` 回 200 |
+| step6 一鍵驗收實跑 | 對學員實作的問卷 App：**9 passed ＋ S10 通過 →「驗收全過」** |
+| 所有 `.ps1` 語法 | 5 支全部通過 `PSParser::Tokenize` |
+| 所有 `.sh` 語法 | 4 支全部通過 `bash -n` |
+| `preflight.ps1` 實跑 | 10 項全 PASS、中文正常 |
+| `HANDBOOK.html` 標籤配對 | 0 個未閉合、0 個錯配 |
+| 有沒有動到不該動的 | 只有 solution-app 的 4 行 `data-testid`（D 條明文允許）。範本 App 邏輯、參考解邏輯、其他頁面一律沒動 |
+
+## v2 仍然沒做的（留給下一版）
+
+| 項目 | 為什麼還是不做 |
+|---|---|
+| 真的發布到 GitHub Pages | 需要真人帳號授權。腳本寫好了、演練驗過了，但**推送這一步必須由帳號持有人自己按**。 |
+| `templateCsv.ts` 加 CSV 公式注入防護 | 動的是「直接共用」的共用工具，會影響所有模組與既有測試，超出這一輪範圍。QA 的建議已記在 COURSE_REPORT 8.3-12。 |
+| `package.json` 預裝 `vue-tsc`、`gh-pages` 套件 | 違反 `CLAUDE.md` 的「不准擅自加套件」。`gh-pages` 的功能已改用純腳本達成（v2-10），不必加相依。 |
+| PRD 補電話分機／排序 tie-breaker／數量上限等邊界規格 | 會讓課堂版 PRD 變厚，與「一堂課做得完」衝突。建議另開「正式上線前要補的規格」附錄，見 COURSE_REPORT 8.3-12。 |

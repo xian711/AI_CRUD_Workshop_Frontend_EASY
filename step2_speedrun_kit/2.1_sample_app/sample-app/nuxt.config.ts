@@ -13,8 +13,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
 
+  // 埠不再寫死：預設 3100（教材通篇都用這個），需要時用環境變數 PORT 覆寫，
+  // 例如同一台機器要同時開兩個專案：PORT=3200 pnpm dev
   devServer: {
-    port: 3100,
+    port: Number(process.env.PORT) || 3100,
   },
 
   // 雙模式資料層開關（composables/useTemplateMembers.ts 讀取）：

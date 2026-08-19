@@ -1,0 +1,13 @@
+{
+  "name": "easy-survey-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI CRUD 工作坊 EASY 版｜課後驗收題（課程回饋問卷）的一鍵驗收 E2E。獨立 Playwright 專案，網址由 PORT / BASE_URL 決定。",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
