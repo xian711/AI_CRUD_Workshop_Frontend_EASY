@@ -339,9 +339,41 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
           <tr><td>輸入驗證</td><td>空白也能新增</td><td>空白擋下、<code>PHONE_PATTERN</code></td><td>純函式驗證＋具名常數</td></tr>
           <tr><td>刪除操作</td><td>按下去直接刪</td><td>二次確認，鈕寫明動作</td><td>危險操作二次確認</td></tr>
           <tr><td>手機適配</td><td>窄螢幕表格擠爆</td><td><code>@media</code> 手機也能操作</td><td>響應式</td></tr>
+          <tr><td>必填標示</td><td>沒有任何必填提示</td><td>Label 在上、必填加紅色 <code>*</code></td><td>表單互動：Label 在上、必填 <code>*</code></td></tr>
+          <tr><td>錯誤呈現</td><td>無；頂多 <code>alert("新增 OK!")</code></td><td>紅字錯誤顯示在<strong>該欄位下方</strong></td><td>表單互動：欄位級錯誤紅字</td></tr>
+          <tr><td>血型輸入</td><td>自由文字框，可打任何字</td><td>下拉選單固定 A／B／AB／O</td><td>驗證：enum 值嚴格依清單</td></tr>
+          <tr><td>送出防呆</td><td>可連點，重複新增</td><td>送出當下 <code>disabled</code></td><td>表單互動：送出防重複</td></tr>
+          <tr><td>間距與字級</td><td>隨意 <code>padding:5px</code>、<code>3px</code></td><td>統一走 4／8／16／24 變數</td><td>樣式：禁止硬編碼 px</td></tr>
+          <tr><td>程式品質</td><td>全域 <code>var</code>、inline <code>onclick</code>、魔術數字</td><td>具名常數、事件委派、無死碼</td><td>無 magic literal、無 <code>console.log</code></td></tr>
         </tbody>
       </table>
       </div>
+
+      <blockquote><strong>先誠實講清楚：</strong><code>demo/</code> 那兩份 HTML 是我們用 <code>demo/PROMPT.md</code> 裡固定的兩版 prompt 各跑一次、挑出來當教材的<strong>策展成品</strong>，不是每次都會一模一樣重現的實驗。所以別把它們當「鐵證」——要信，就自己拿去實測一遍。</blockquote>
+
+      <div class="block-title"><span class="ico">🧪</span>拿去實測：A/B 違規計分表</div>
+      <p>打開 <code>demo/PROMPT.md</code>，把<strong>版本 A（沒 harness）</strong>貼給你自己的 AI 跑一次、<strong>版本 B（有 harness）</strong>也貼給它跑一次，各產出一個 HTML，然後照下表逐項打分：<strong>這一版有違規記 1、合規記 0</strong>，最後加總比較。</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>可勾稽分項（0＝合規／1＝違規）</th><th>你的 A 版<br>沒 harness</th><th>你的 B 版<br>有 harness</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>出現硬編碼色碼（<code>#xxxxxx</code>／<code>blue</code>，非走語意變數）</td><td></td><td></td></tr>
+          <tr><td>2</td><td>中英夾雜（<code>Add</code>／<code>Name</code>／<code>Volunteer</code> 這類混用）</td><td></td><td></td></tr>
+          <tr><td>3</td><td>必填欄位沒有標示（無紅色 <code>*</code>／無必填提示）</td><td></td><td></td></tr>
+          <tr><td>4</td><td>空白或亂填也能送出（沒有輸入驗證）</td><td></td><td></td></tr>
+          <tr><td>5</td><td>電話沒有格式驗證（非 09 開頭 10 碼也收）</td><td></td><td></td></tr>
+          <tr><td>6</td><td>血型是自由文字框（不是固定選項下拉）</td><td></td><td></td></tr>
+          <tr><td>7</td><td>刪除沒有二次確認（按了直接刪）</td><td></td><td></td></tr>
+          <tr><td>8</td><td>送出鈕可連點重複新增（無防呆）</td><td></td><td></td></tr>
+          <tr><td>9</td><td>錯誤訊息沒有顯示在該欄位下方（用 alert 或沒有）</td><td></td><td></td></tr>
+          <tr><td>10</td><td>間距／字級忽大忽小（散落魔術數字 px）</td><td></td><td></td></tr>
+          <tr><td>11</td><td>手機窄螢幕不可用（表格擠爆、沒 viewport／media query）</td><td></td><td></td></tr>
+          <tr><td>12</td><td>程式品質差（全域 <code>var</code>／inline <code>onclick</code>／<code>console.log</code>／死碼）</td><td></td><td></td></tr>
+          <tr><td>—</td><td><strong>違規分數合計（越低越好）</strong></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>怎麼判讀：</strong>正常情況下 A 版違規分數會明顯高於 B 版。<strong>比的是「違規數的落差」</strong>，不是要求你重現我們這兩份的逐字內容。若你的 A 版剛好也守了幾條，那很好——代表你的 AI 底子不錯；但只要需求換難一點、規則換多一點，沒 harness 的那版就會開始崩，這正是 harness 要解決的事。</p>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
@@ -507,7 +539,7 @@ cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
       <blockquote>這裡的 <code>pnpm install</code> 失敗的話，處置跟 step2 的「裝不起來／跑不起來怎麼辦」完全一樣：整段輸出貼給 AI Agent 要它講原因＋給指令，同一個錯誤修兩次沒好就舉手找講師。</blockquote>
-      <blockquote><strong>範圍答案由講師在你完成三題拍板後發放</strong>（<code>instructor/SCOPE-課堂範圍決策.md</code>），先別偷看。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。</blockquote>
+      <blockquote><strong>下面 ③ 會直接給你三題的「課堂拍板」結果</strong>，那是為了讓全班進度一致、兩小時走得完，你可以直接採納。<strong>但完整的裁決理由與被放棄的替代方案</strong>（例如 D1 為什麼正式環境該用軟刪除）在講師版 <code>instructor/SCOPE-課堂範圍決策.md</code>，<strong>等你自己拍完板，講師才會發</strong>。這一步真正要練的不是「猜中答案」，是<strong>親自跟 AI 把岔路攤開、由你決定砍什麼留什麼</strong>——先看完整理由等於直接抄，那段練習就沒了。</blockquote>
       <blockquote>harness 四件（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。</blockquote>
 
       <h3>① 讀 PRD</h3>
@@ -569,6 +601,25 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <h3>⑤ 驗收與修正</h3>
       <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿講師發放的 <code>SCOPE-課堂範圍決策.md</code>（<code>instructor/SCOPE-課堂範圍決策.md</code>）欄位規格逐項對照。</p>
+
+      <div class="block-title"><span class="ico">📦</span>產出物：8 檔改名對照</div>
+      <p>AI 做完後，用這張表核對它有沒有照「複製 vs 共用」的心法做。<strong>判斷準則就一句：跟實體長相有關的 → 複製改名；通用機制 → 直接共用。</strong>這正是 step2 ③ 那張 8 核心檔表實際套用的樣子。</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>範本檔</th><th>新模組檔</th><th>處置</th></tr></thead>
+        <tbody>
+          <tr><td><code>pages/template/crud/index.vue</code></td><td><code>pages/equipment/crud/index.vue</code></td><td>複製改名</td></tr>
+          <tr><td><code>pages/template/crud/[id].vue</code></td><td><code>pages/equipment/crud/[id].vue</code></td><td>複製改名</td></tr>
+          <tr><td><code>composables/useTemplateMembers.ts</code></td><td><code>composables/useEquipmentItems.ts</code></td><td>複製改名</td></tr>
+          <tr><td><code>components/template/TemplateFormField.vue</code></td><td><code>components/equipment/EquipmentFormField.vue</code></td><td>複製改名</td></tr>
+          <tr><td><code>components/template/TemplateStatusBadge.vue</code></td><td><code>components/equipment/EquipmentStatusBadge.vue</code></td><td>複製改名</td></tr>
+          <tr><td><code>composables/useTemplateListPage.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
+          <tr><td><code>utils/templateValidation.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
+          <tr><td><code>utils/templateCsv.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>AI 另外會交出 SRS／SDD（對照你的拍板有沒有漏）和 24 筆 mock 種子。<strong>種子的欄位名就是未來接後端 API 的介面</strong>，驗收時順手看一眼命名合不合理。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <figure><img src="images/step3_clarify.png" alt="AI 先出釐清選擇題"><figcaption>AI 不急著寫程式，而是把岔路攤成選擇題、每題附建議——這代表 harness 在運作。</figcaption></figure>
@@ -832,10 +883,52 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       </div>
       <p><strong>回去怎麼用（三步驟）：</strong></p>
       <ol>
-        <li><strong>把前端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明（後端另有 harness 參考可比照）複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
+        <li><strong>把前端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code> 複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
         <li><strong>把既有標準頁面整理成範本</strong>——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。</li>
         <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
       </ol>
+
+      <div class="block-title"><span class="ico">📋</span>評量：怎麼算學會了</div>
+      <p>滿分 100，<strong>70 分及格</strong>。這張表不是為了打分數，是為了證明三個學習目標真的達成，而不只是「App 跑起來了」。</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>面向</th><th>分數</th><th>合格證據</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>環境與範本操作</td><td>10</td><td>preflight exit 0、dev server 啟動、人員範本基本 CRUD 可操作</td></tr>
+          <tr><td>2</td><td>Harness A/B 解釋</td><td>15</td><td>對 step1 的 A/B，至少指出 <strong>5 個</strong>規則與產出結果的因果（色碼、命名、驗證、危險操作、token）</td></tr>
+          <tr><td>3</td><td>需求裁切 <span class="badge-warn">不得為零</span></td><td>20</td><td>三個決策點的裁決<strong>及每題合理理由</strong>，能說明「為何砍、為何留」</td></tr>
+          <tr><td>4</td><td>任務／SRS／實作可追溯</td><td>15</td><td>任務清單可逐項驗收，範圍無偷加、無漏做，SRS 對得上決策</td></tr>
+          <tr><td>5</td><td>CRUD 與響應式人工驗收 <span class="badge-warn">不得為零</span></td><td>25</td><td>C／R／U／D、validation、filter／搜尋、CSV，桌機＋手機皆可操作</td></tr>
+          <tr><td>6</td><td>LOOP 證據與根因判讀 <span class="badge-warn">不得為零</span></td><td>15</td><td>用一個 prompt 讓 AI 把自己的模組修到 E2E 全綠；報告完整（每輪紅／根因／修檔），能分辨 App bug 與測試 bug</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <blockquote><strong>及格門檻是兩道，不是一道。</strong>總分要 ≥ 70；而且<strong>面向 3、5、6 任一項掛零就不通過</strong>，總分再高也一樣。理由：這三項正好對應本課三個學習目標——先決策、能生成、會驗收與修。缺任一項，等於核心沒學到。</blockquote>
+      <p><strong>要交的四份東西：</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>項目</th><th>內容</th><th>對應面向</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>三題裁決＋理由</td><td>三個決策點各一個裁決＋一句理由</td><td>3</td></tr>
+          <tr><td>2</td><td>驗收紀錄</td><td>桌機、手機<strong>各一張截圖</strong>（共 2 張），標出驗收點</td><td>5</td></tr>
+          <tr><td>3</td><td>LOOP 報告</td><td>最終全綠輸出＋（若有紅）每輪的紅清單、一句話根因、修了哪個檔；附 <code>git diff e2e/</code> 為空的抽查結果</td><td>6</td></tr>
+          <tr><td>4</td><td>Exit ticket</td><td>一句話：帶回公司要先導入哪一項</td><td>—</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="block-title"><span class="ico">❓</span>常見問題</div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>問題</th><th>回答</th></tr></thead>
+        <tbody>
+          <tr><td>我們不是用 Nuxt，怎麼辦？</td><td>harness 方法不綁框架。四件換成你們的技術棧規則即可；範本拆分（複製區 vs 共用區）的心法在任何前端框架都適用。</td></tr>
+          <tr><td>我們沒有 Design System，怎麼辦？</td><td>不用一次到位。先從<strong>色票</strong>（品牌色、錯誤色、中性色）與<strong>間距常數</strong>（例如 4／8／16／24／40）開始定案，寫進 CODE-RULES，AI 就不會再亂配色、亂用魔術數字。元件規範可以之後再補。</td></tr>
+          <tr><td>AI 生成的程式碼看起來很像，但細節怪怪的？</td><td>正常現象，AI 生成永遠需要人工檢視。回頭檢查是不是 harness 規則沒寫清楚，或範本的「複製 vs 共用」邊界沒交代好；把發現的問題補進 CODE-RULES，下次就不會再錯。</td></tr>
+          <tr><td>LOOP 會不會讓 AI 跑到失控？</td><td>每輪 LOOP 都要有明確的「驗」的標準（測試、E2E 檢查清單、視覺審查）。<strong>沒有客觀驗收標準就不要放給 AI 自己跑。</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>

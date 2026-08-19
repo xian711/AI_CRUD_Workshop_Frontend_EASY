@@ -12,7 +12,7 @@
 | 資料夾 | 是什麼 |
 |--------|--------|
 | `HANDBOOK/` | **學員唯一要讀的手冊**（HTML，含 16 張實拍截圖與所有可複製的 prompt） |
-| `step0`～`step5` 各資料夾 | 上課的工作材料（前置檢查、範本、PRD、E2E 腳本、評量表）——HANDBOOK 會指示何時用哪個 |
+| `step0`～`step4` 各資料夾 | 上課的工作材料（前置檢查、A/B demo、範本、PRD、E2E 腳本）——HANDBOOK 會指示何時用哪個。step5 是課程總結，沒有工作材料，全在 HANDBOOK 裡 |
 | `instructor/` | 講師專用（時間軸、SCOPE 答案、checkpoint 腳本），學員勿先看 |
 
 教材由 Claude（Fable 5）多代理協作產出、Codex（GPT-5.6）對抗審查、E2E 實跑驗證全綠後發佈。
