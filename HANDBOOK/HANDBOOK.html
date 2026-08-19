@@ -872,6 +872,26 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
       </ol>
 
+
+      <div class="block-title"><span class="ico">🎓</span>課後驗收題：做一個能上線的問卷</div>
+      <p>這門課最後留一題給你自己做——<strong>沒有講師帶、沒有人幫你出決策、沒有人幫你看紅燈</strong>。做完你會有一個真的網址，可以傳給同事看。</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>你要做的</th><th>用到這門課的哪一段</th></tr></thead>
+        <tbody>
+          <tr><td>複製範本，分清楚哪些複製改名、哪些直接共用</td><td>step2 的 8 核心檔心法</td></tr>
+          <tr><td>一頁 PRD ＋ 一個 prompt，生出完整模組</td><td>step3 的生成流程</td></tr>
+          <tr><td>照 10 項清單逐條驗收、用修正心法收斂</td><td>step3 的驗收與修正</td></tr>
+          <tr><td>產出守住色票、驗證、危險操作規則</td><td>step1 的三項對照</td></tr>
+          <tr><td>發布到 GitHub Pages，拿到真的網址</td><td>這一題新加的</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>題目、需求 PRD、可直接複製的起手 prompt、驗收清單、發布步驟，全都在 <code>step6_survey/README.md</code>。預估 40～60 分鐘。</p>
+      <blockquote><strong>問卷刻意沒有後端。</strong>資料先存在瀏覽器裡，程式碼留一行 <code>// TODO: DEV 串接 POST /api/survey</code>。
+      <strong>下一門後端課要做的，就是把那一行換成真的 API——而且頁面一行都不用改。</strong>這不是巧合，是 step2 的資料層從一開始就設計成非同步的原因。
+      <code>step6_survey/solution/</code> 有參考解，<strong>卡兩次以上再開</strong>。</blockquote>
+
       <div class="block-title"><span class="ico">📋</span>評量：怎麼算學會了</div>
       <p>滿分 100，<strong>70 分及格</strong>。這張表不是為了打分數，是為了證明三個學習目標真的達成，而不只是「App 跑起來了」。</p>
       <div class="table-scroll">
