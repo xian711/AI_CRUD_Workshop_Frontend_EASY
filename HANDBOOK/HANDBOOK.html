@@ -54,7 +54,7 @@
     color:#fff;border-radius:20px;padding:38px 34px;box-shadow:var(--shadow);
   }
   .hero-card .eyebrow{opacity:.9;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
-  .hero-card h1{margin:10px 0 14px;font-size:30px;line-height:1.3;font-weight:800;}
+  .hero-card h1{margin:0;font-size:30px;line-height:1.3;font-weight:800;}
   .hero-card p{margin:0;font-size:16px;opacity:.96;max-width:60ch;}
   .hero-meta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
   .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 13px;font-size:13px;font-weight:600;}
@@ -195,24 +195,13 @@
 
 <div class="hero">
   <div class="hero-card">
-    <div class="eyebrow">Step-by-Step 學習手冊</div>
-    <h1>用「範本 + harness + AI」<br>把全新 CRUD 模組壓進一小時</h1>
-    <p>這份手冊帶你把整堂課從頭走一遍。每一步都有「要做到什麼、怎麼做、會看到什麼、為什麼」——課後照著走，也能自己重現。課程目標：讓新 CRUD 模組的骨架在一小時內長出來（實測數據隨試教梯次更新）。</p>
-    <div class="hero-meta">
-      <span class="chip">⏱ 約 120 分鐘</span>
-      <span class="chip">🛠 全程動手做</span>
-      <span class="chip">🧭 step0 → step5</span>
-      <span class="chip">💻 Windows ＋ macOS</span>
-    </div>
+    <h1>用「範本 + harness + AI」<br>讓新 CRUD 模組的骨架快速交付</h1>
   </div>
 </div>
 
 <main>
 
   <div class="outline">
-    <h2>課程大綱</h2>
-    <p>照順序走、不要跳步——後面會用到前面的產出。這門課給<strong>會寫程式、但還沒用過 AI harness 開發</strong>的工程師；不要求會 Vue／Nuxt，不需要提示詞經驗。</p>
-    <p><strong>支援平台：Windows 與 macOS（Linux 亦可）。</strong> 教材每支腳本都備了兩版——Windows 用 <code>.ps1</code>、macOS／Linux 用同名 <code>.sh</code>，檢查項目、判定標準與 exit code 完全一致。本手冊的指令一律分成兩塊列出，照你自己的平台那一塊做即可；<code>pnpm install</code>／<code>pnpm dev</code>／port 3100 這些跟平台無關。macOS／Linux 一律用 <code>bash 腳本名.sh</code> 執行，就不必先 <code>chmod +x</code>。</p>
     <div class="table-scroll">
     <table>
       <thead><tr><th>Step</th><th>這一章在做什麼</th><th>時間</th></tr></thead>
@@ -245,50 +234,23 @@
         </ol>
       </div>
 
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <ol>
-        <li>上完課要帶走三件能力：看得出有無 harness 的差別、能用 AI 生成新模組、能設計並執行一輪 LOOP 驗證。</li>
-        <li><strong>整堂課只看這一份手冊</strong>，照 step0 → step5 順序走；各 step 資料夾放的是工作材料（範本、PRD、腳本），手冊會指示何時用哪個。</li>
-        <li>開課前先跑前置檢查：</li>
-      </ol>
-      <pre><code># Windows（PowerShell）
-cd step0_course_intro
+      <p>先把教材整包抓下來，再跑前置檢查：</p>
+      <pre><code># Windows（PowerShell）｜先切到你要放教材的資料夾，例如 cd D:\
+git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
+cd AI_CRUD_Workshop_Frontend_EASY\step0_course_intro
 .\preflight.ps1</code></pre>
-      <pre><code># macOS／Linux（終端機）
-cd step0_course_intro
+      <pre><code># macOS／Linux（終端機）｜先切到你要放教材的資料夾，例如 cd ~/
+git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
+cd AI_CRUD_Workshop_Frontend_EASY/step0_course_intro
 bash preflight.sh</code></pre>
       <p>看到「前置檢查全數通過，可以開課！」再進 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——<code>[WARN]</code> 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取）。只有 <code>[FAIL]</code> 一定要處理掉，做法看下面「看到 [FAIL] 紅燈怎麼辦」。</p>
 
-      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>腳本逐項印出 10 項檢查結果，項目名稱與下面這張表逐字相同（方便你一項一項打勾）：<strong>1.</strong> Node.js &gt;= 20、<strong>2.</strong> pnpm 已安裝、<strong>3.</strong> git 已安裝、<strong>4.</strong> port 3100 未被占用、<strong>5.</strong> 磁碟剩餘空間 &gt;= 2GB、<strong>6.</strong> ExecutionPolicy 可執行腳本、<strong>7.</strong> 工作區可寫入、<strong>8.</strong> npm registry 連線、<strong>9.</strong> Playwright Chromium 已快取、<strong>10.</strong> AI Agent CLI。每項前面標著 <code>[PASS]</code>／<code>[WARN]</code>／<code>[FAIL]</code>，最後一行是「前置檢查全數通過，可以開課！」（有警告時是「前置檢查全數通過（含 N 項警告），可以開課！」）。</p>
-
       <div class="block-title"><span class="ico">🚑</span>看到 [FAIL] 紅燈怎麼辦</div>
-      <p>紅燈不用舉手乾等，也不用自己上網亂查——<strong>這堂課的第一個練習就是：把問題交給 AI 排除</strong>。照「先照提示做 → 交給 AI → 兩次不好就找講師」三步走：</p>
-      <ol>
-        <li><strong>先照腳本印的修復提示做一次。</strong>每個 <code>[FAIL]</code> 下一行都會印「修復提示：…」（例如「請執行『npm install -g pnpm』安裝 pnpm」）。照做完之後<strong>關掉終端機、重開一個新的</strong>再跑一次 preflight——剛裝好的 Node／pnpm／git 在舊視窗裡抓不到，這是最常見的假紅燈。</li>
-        <li><strong>還是紅燈，就把整份輸出貼給你的 AI Agent。</strong>在工作坊資料夾下開 Agent（Claude Code／Codex／Cursor 這類 CLI，或 IDE 內建的 Agent 對話框都可以），連 <code>[PASS]</code> 的行一起貼給它——它要看到完整環境才判斷得準。可以直接複製這段 prompt：</li>
-      </ol>
-      <pre><code>我在跑工作坊的環境前置檢查（Windows 是 step0_course_intro\preflight.ps1，
-macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出如下：
+      <p>三步走：<strong>照腳本印的「修復提示」做一次 → 關掉終端機重開一個再跑 preflight</strong>（剛裝好的 Node／pnpm／git 在舊視窗抓不到，這是最常見的假紅燈）<strong>→ 還是紅，把整份輸出貼給 AI Agent</strong>（連 <code>[PASS]</code> 的行一起貼）：</p>
+      <pre><code>這是工作坊環境前置檢查（step0_course_intro\preflight.ps1）的完整輸出，我用 Windows 11。
+請說明每個 [FAIL] 的原因、給我可複製的修復指令，修完帶我重跑一次；不要改工作坊裡的任何檔案。
 
-（把整份 preflight 輸出貼在這裡，PASS 的行也一起貼）
-
-我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
-1. 逐項說明每個 FAIL 的真正原因，不要只重複腳本印的修復提示。
-2. 給我可以直接複製執行的指令，一行一行，每行附一句話說明在做什麼。
-3. 指令跑完後帶我重跑一次 preflight，確認紅燈都變綠。
-
-限制：只處理我這台電腦的環境設定，不要改工作坊裡的任何程式碼或腳本；
-需要系統管理員權限的步驟，請先講清楚風險再叫我執行。</code></pre>
-      <ol start="3">
-        <li><strong>同一項讓 AI 修兩次還是紅，就舉手找講師。</strong>這就是 step4 會用到的<strong>兩次停損</strong>鐵律——同一個坑修兩次沒好，代表方向錯了，該換人看，別在原地繞。環境卡關而已，講師手上有離線包和參考解，一定跟得上進度。</li>
-      </ol>
-      <blockquote>這步還有個附帶好處：<strong>它順便幫你驗證了 AI Agent 真的能用</strong>（登入了、有額度、看得懂你貼的東西）。第 10 項「AI Agent CLI」只偵測得到指令存不存在，測不出帳號狀態；拿一個真實問題請它幫忙一次，才算真的確認完成。</blockquote>
-
-      <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        這堂課全程動手做，環境沒備好會卡在半路。前置檢查一次把常見坑（沒裝 pnpm、3100 埠被占用）攔在開課前，省得上課才發現跑不起來。而紅燈時「把完整錯誤訊息貼給 AI，要它講原因＋給可複製的指令」，正是後面 step3～step4 一直在用的同一套心法——從修環境開始練最沒有風險。
-      </div>
+（把整份 preflight 輸出貼在這裡）</code></pre>
     </div>
   </section>
 
@@ -309,17 +271,9 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
         </ol>
       </div>
 
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <div class="block-title"><span class="ico">👀</span>兩版差在哪</div>
       <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES）＋設計系統（色票、間距）＋標準範本</strong>。沒有它，AI 每次都會自己決定；有了它，AI 照你們的決定做。<strong>注意：現在的 AI 不給規矩也寫得出漂亮頁面</strong>——所以這一步不是在比誰好看。</p>
-      <ol>
-        <li>打開 <code>demo/PROMPT.md</code>，確認兩版給 AI 的需求<strong>是同一句</strong>，只差有沒有附規矩。</li>
-        <li>雙擊 <code>demo/no-harness.html</code>（沒 harness 版）。</li>
-        <li>雙擊 <code>demo/with-harness.html</code>（有 harness 版）。</li>
-        <li>兩個視窗並排對照下面三項。兩版都真的能新增／刪除，<strong>核心功能相同</strong>；但欄位選項與驗證規則其實已經不一樣了（血型幾個選項、電話收不收 <code>(02) 1234-5678</code>），<strong>而這正是「這個決定是誰做的」的結果</strong>。</li>
-      </ol>
-
-      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p><strong>你會發現兩版都很好看，新增與刪除也都能用。</strong>這就是這一步最重要的體會——<strong>先別急著比美醜，左邊那版甚至可能比右邊更討喜</strong>（它自己配了色、加了圖示）。重點在別的地方：<strong>右邊每一個決定都有出處，左邊全是 AI 自己決定的。</strong>教材附的這兩張就是拿 <code>demo/PROMPT.md</code> 實跑出來的；你自己去跑，畫面不會一樣，但下面三項的落差不會變。</p>
+      <p>下面兩張圖，是拿<strong>同一句需求</strong>、只差有沒有附規矩，各跑一次的產出。<strong>兩版都很好看，新增與刪除也都能用</strong>——這就是最重要的體會：<strong>左邊那版甚至可能比右邊更討喜</strong>（它自己配了色、加了圖示）。重點在別的地方：<strong>右邊每一個決定都有出處，左邊全是 AI 自己決定的。</strong>兩版核心功能相同，但欄位選項與驗證規則已經不一樣了（血型幾個選項、電話收不收 <code>(02) 1234-5678</code>），<strong>而這正是「這個決定是誰做的」的結果</strong>。</p>
       <div class="fig-grid">
         <figure>
           <img src="images/step1_no_harness.png" alt="沒 harness：好看但全是 AI 自己決定">
@@ -355,9 +309,7 @@ macOS 是 step0_course_intro/preflight.sh），有幾項 [FAIL]。完整輸出�
       </table>
       </div>
       <blockquote><strong>這張表是實測出來的，不是想像的。</strong>我們用 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次（Claude Sonnet）。沒 harness 那版<strong>一點都不醜</strong>：它自己選了警示橘、做了響應式、還多做了刪除確認與防注入，甚至<strong>自己建了一套 design token</strong>（<code>--brand</code>、<code>--danger</code>…）——它知道該用 token，只是用的是它自己的那套。但品牌紅 0 次、電話收 6～15 碼的通用格式（<code>(02) 1234-5678</code> 也算合法）、血型多一個「不明」。<strong>而兩版都自己加了 localStorage</strong>，有 harness 那版還多加了空清單提示、Esc 關閉、焦點歸還。</blockquote>
-      <blockquote><strong>所以 harness 的價值不是「讓 AI 寫得好看」，是「讓 AI 寫得跟你們一樣」。</strong>現在的 AI 不給規矩也能生出漂亮頁面——問題從來不是醜，是<strong>每次都長得不一樣、而且會自己發明規則</strong>。</blockquote>
 
-      <blockquote><strong>打不開瀏覽器？（或你叫 AI Agent 幫你讀教材）</strong>看 <code>step1_why_harness/demo/DIFF_SUMMARY.md</code>——純文字版的差異摘要，把「顏色從哪來／業務規則從哪來／多出來的東西」三項整理成表，還附一張可以直接寫成測試案例的「QA 驗收特徵快速清單」。<strong>但它取代不了看畫面</strong>：好不好看、順不順手，文字寫不出來。</blockquote>
       <blockquote><strong>先誠實講清楚：</strong><code>demo/</code> 那兩份 HTML 是我們用 <code>demo/PROMPT.md</code> 裡固定的兩版 prompt 各跑一次、挑出來當教材的<strong>策展成品</strong>，不是每次都會一模一樣重現的實驗。所以別把它們當「鐵證」——要信，就自己拿去實測一遍。</blockquote>
 
       <div class="why">
@@ -444,16 +396,10 @@ pnpm dev          # 啟動 dev server</code></pre>
 
       <div class="block-title"><span class="ico">🚑</span>裝不起來／跑不起來怎麼辦</div>
       <p><code>pnpm install</code> 或 <code>pnpm dev</code> 噴一大串紅字，處置跟 step0 同一套：<strong>先看訊息有沒有明講原因</strong>（最常見是 port 3100 被別的程式占用、或公司網路擋住 npm），還是不行就<strong>把終端機從你打的指令那一行開始整段複製，貼給 AI Agent</strong>——只貼最後一行紅字它判不準。可以用這個 prompt：</p>
-      <pre><code>我在跑工作坊的範本專案，指令失敗了。我打的指令和完整輸出如下：
+      <pre><code>工作坊範本專案的 pnpm 指令失敗了，完整輸出如下，我用 Windows 11。
+請說明原因、給我可複製的修復指令，修完確認 http://localhost:3100/template/crud 打得開；不要改專案裡的程式碼。
 
-（從你輸入指令那一行開始整段貼上，不要只貼最後一行紅字）
-
-我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
-1. 先告訴我這是什麼問題（網路擋住？埠被占用？Node 版本不符？相依裝壞了？）。
-2. 給我可以直接複製執行的指令，一行一行，每行附一句話說明在做什麼。
-3. 跑完帶我確認 http://localhost:3100/template/crud 真的打得開。
-
-限制：不要改範本專案裡的程式碼，我這一步只是要把現成範本原封不動跑起來。</code></pre>
+（從你輸入指令那一行開始整段貼上）</code></pre>
       <blockquote>同樣是<strong>兩次停損</strong>：同一個錯誤 AI 修兩次還是不行，就舉手找講師——講師手上有預先打包好的 <code>node_modules</code> 離線包，不會讓你卡在安裝這一關。</blockquote>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
@@ -529,33 +475,24 @@ cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
-      <blockquote>這裡的 <code>pnpm install</code> 失敗的話，處置跟 step2 的「裝不起來／跑不起來怎麼辦」完全一樣：整段輸出貼給 AI Agent 要它講原因＋給指令，同一個錯誤修兩次沒好就舉手找講師。</blockquote>
       <blockquote><strong>🚑 一開頁就 500、錯誤訊息寫 <code>useColorMode is not defined</code>？</strong>不是你的程式壞了，是舊的建置快取被複製過來了。關掉 dev server，把<strong>你這個工作專案</strong>（<code>my-equipment-app</code>）裡的 <code>.nuxt</code> 和 <code>.output</code> 兩個資料夾刪掉，再 <code>pnpm dev</code> 就好——它們是產物，砍了會自動重生。<strong>注意：刪的是你的工作專案，不要去刪 <code>2.1_sample_app/sample-app</code> 的。</strong>（上面的複製指令已經排除這兩個資料夾，正常不會遇到；這裡留著是為了萬一。）</blockquote>
       <blockquote><strong>下面 ③ 會直接給你三題的「課堂拍板」結果</strong>，那是為了讓全班進度一致、兩小時走得完，你可以直接採納。<strong>但完整的裁決理由與被放棄的替代方案</strong>（例如 D1 為什麼正式環境該用軟刪除）在講師版 <code>instructor/SCOPE-課堂範圍決策.md</code>，<strong>等你自己拍完板，講師才會發</strong>。這一步真正要練的不是「猜中答案」，是<strong>親自跟 AI 把岔路攤開、由你決定砍什麼留什麼</strong>——先看完整理由等於直接抄，那段練習就沒了。</blockquote>
-      <blockquote>harness 四件（<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、使用說明）已內建在專案根目錄，複製走範本就跟著走——AI 一進來就讀得到全套規則。</blockquote>
 
       <h3>① 讀 PRD</h3>
       <p>打開 <code>PRD-中心裝備物資.md</code>。題目取材自真實災防平台的頁面（原系統 26 欄＋借用歸還＋維保提醒，兩小時絕對做不完），已先濃縮成<strong>一堂課做得完的課堂版（12 欄）</strong>——但刻意留了<strong>三個決策點</strong>（刪除補不補、匯出做不做、編碼規則簡不簡化）給你拍板，連「原系統沒有刪除功能」這種真實缺口都照實保留。</p>
 
       <h3>② 貼起手 prompt，讓 AI 先問問題</h3>
       <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。整段複製貼上：</p>
-      <pre><code>你是本專案的前端工程師。我們要用現成的 CRUD 標準範本，開發新模組「中心裝備物資」。
+      <pre><code>你是本專案的前端工程師，我們要用現成的 CRUD 標準範本開發新模組「中心裝備物資」。
 
-請先「依序」讀完專案根目錄的四份文件，讀完再動作：
-1. CLAUDE.md（專案憲法）
-2. CODE-RULES-ui-本專案.md（前端鐵律：色碼、命名、行數、驗證）
-3. 使用說明-複製範本開發新模組.md（複製範本的標準流程與八檔心法）
-4. PRD-中心裝備物資.md（課堂版需求：12 欄，內含第 5 節「三個待決策點」）
+先依序讀完專案根目錄這四份，讀完再動作：CLAUDE.md、CODE-RULES-ui-本專案.md、
+使用說明-複製範本開發新模組.md、PRD-中心裝備物資.md。
 
-讀完後「先不要寫任何程式」。針對 PRD 第 5 節的三個待決策點（D1 刪除、D2 匯出、D3 編碼規則），
-用「選擇題」逐題問我：每題 2 到 4 個選項，標出你建議的選項並附一句理由。
+讀完先不要寫程式。針對 PRD 第 5 節的三個待決策點（D1 刪除、D2 匯出、D3 編碼規則），
+用選擇題逐題問我：每題 2 到 4 個選項，標出你建議哪個並附一句理由。
 
-我逐題拍板後，你再輸出任務清單（T1、T2… 約 8 個，每個小到可單獨驗收），
-停下來等我確認，我說「開工」你才開始。
-
-開發時全程遵守 harness 規則：禁止硬編碼色碼與 px、禁止 console.log、
-日期欄用原生 date input、下拉用「全部」哨兵、單檔行數控制在規範內。
-每完成一個任務回報「一行」進度，不要把程式碼整段倒出來。</code></pre>
+我逐題拍板後，你再列任務清單（約 8 個，每個小到可單獨驗收），停下等我說「開工」。
+開工後全程遵守剛剛讀的那四份規則，每完成一個任務回報一行進度，不要把程式碼整段倒出來。</code></pre>
       <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 列任務 → 你確認 → AI 逐項做並回報。</strong></p>
       <div class="flow">你：貼<b>【起手 prompt】</b>
    ▼
@@ -752,32 +689,22 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <blockquote><strong>先把話講清楚，免得你被紅燈嚇到：這 7 條只驗 PRD 承諾過的事。</strong><br>第一版的測試是拿參考解 <code>solution-app</code> 探過 DOM 才寫出來的，結果把「參考解剛好長那樣」的細節（搜尋框的 placeholder 文字、成功 toast 的用字、確認框標題、品項編碼的確切格式、種子裡剛好幾台發電機）都寫死成斷言——照 PRD 做出功能正確的模組，照樣被判紅。<strong>那是測試的錯，不是學員的錯，現在已經全部拿掉了。</strong><br>現在這 7 條驗的是：<strong>PRD 第 2.1 節的種子約定（24 筆）、第 4 節的功能（每頁 20 筆、關鍵字過濾、必填不離頁、刪除二次確認、編輯生效）、第 6 節的驗收條件，以及範本沒被改壞。</strong><br><strong>UI 用字由你決定</strong>——按鈕寫「新增品項」還是「新增裝備物資」、成功要不要跳 toast、編碼是 <code>PW-GEN-003</code> 還是 <code>PW-003</code>，測試都不管（編碼只驗「即時算得出來」與「不重複」，那才是 PRD D3 承諾的兩件事）。<br>所以紅燈時的第一個問題還是那個：<strong>紅的是「功能沒做到」（修 App），還是「測試在驗 PRD 沒寫的東西」（停下來寫進報告）？</strong>後者現在應該很少見了；真的遇到，那是教材的缺陷，請回報。</blockquote>
       <p>在工作坊根目錄開 AI Agent，整段複製貼上：</p>
       <pre><code>你是 LOOP 工程師，接下來自己跑完，中途不要問我。
-受測 App：step3_new_module/my-equipment-app（我用 AI 生成的裝備物資模組）。
-驗證指令（紅綠燈）：Windows 跑 powershell -ExecutionPolicy Bypass -File step4_loop_e2e/run-e2e.ps1；
+受測 App：step3_new_module/my-equipment-app。
+紅綠燈指令：Windows 跑 powershell -ExecutionPolicy Bypass -File step4_loop_e2e/run-e2e.ps1，
 macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有紅。
 
-依序完成：
-1. 確認 http://localhost:3100 跑的是受測 App；沒開就自己在背景啟動
-   （cd step3_new_module/my-equipment-app 後 pnpm dev），等可連線再繼續；
-   若 3100 被別的程式佔用，停下回報，等我處理。
-2. 跑驗證。紅了就逐條判因，分三類處理：
-   a. App 不符驗收規格（最常見）→ 修 my-equipment-app，遵守它根目錄的 harness 規則。
-   b. 環境問題（server 沒起、相依沒裝）→ 修環境。
-   c. 測試本身的問題 → 停下回報理由，等我裁決，不准自己改測試。
-3. 修完再跑，直到 7 條全綠。
+先確認 http://localhost:3100 跑的是受測 App（沒開就自己在背景啟動；3100 被別的程式佔用就停下回報），
+再跑驗證、逐條判因、修完重跑，直到 7 條全綠。
 
 鐵律：
 - 同一個問題連續修兩次還沒好，停下來回報，不要無限撞牆。
-- 不准為了讓燈變綠去放寬測試斷言、跳過測試、或改測試預期條數。
-- 每一次修改都要指出它對應「PRD 的哪一條」或「我拍板的哪一個決策」。
-  找不到出處的（例如測試要的只是某句文案或某個 HTML id），照樣可以改，但要在報告裡另外標成
-  「規格外調整」，並寫一句它跟 PRD 的差異在哪。
-- 不准為了過測就把「直接共用」的零件（useTemplateListPage / templateValidation / templateCsv /
-  App*.vue）拆掉自己重寫一套。共用件用不動時，停下來回報，不要繞過它。
+- 不准放寬斷言、跳過測試、改測試預期條數；測試本身有問題就停下回報，等我裁決。
+- 每次修改都要指出它對應 PRD 的哪一條或我拍板的哪一個決策；找不到出處的照樣可以改，
+  但要在報告裡標成「規格外調整」，並寫一句它跟 PRD 的差異在哪。
+- 不准為了過測把「直接共用」的零件（useTemplateListPage / templateValidation /
+  templateCsv / App*.vue）拆掉重寫一套；用不動就停下回報。
 
-完成後交報告：
-- 每一輪：紅了哪幾條、一句話根因、修了哪個檔。
-- 最後：全綠總結行（7 passed）。</code></pre>
+報告：每一輪紅了哪幾條、一句話根因、修了哪個檔；最後附全綠總結行（7 passed）。</code></pre>
       <blockquote><strong>一次就全綠？</strong>恭喜，代表你的模組已通過驗收規格，報告只有一輪、直接收工。這也是正常結果——LOOP 的價值在「有紅時不用人跳進去」，不在硬要看到紅。</blockquote>
 
       <div class="block-title"><span class="ico">🚑</span>LOOP 卡住怎麼辦</div>
@@ -794,20 +721,11 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       </table>
       </div>
       <p>後兩種都可以直接把完整輸出交給 AI，用這個 prompt：</p>
-      <pre><code>我在跑工作坊 step4 的 E2E 驗證腳本，它「還沒開始跑測試就失敗了」
-（Windows 是 step4_loop_e2e/run-e2e.ps1，macOS 是 step4_loop_e2e/run-e2e.sh）。
-完整輸出如下：
+      <pre><code>工作坊 step4 的 E2E 腳本還沒開始跑測試就失敗了，完整輸出如下，我用 Windows 11。
+請判斷是環境問題還是測試問題、給我可複製的修復指令，修完帶我重跑一次。
+不准改 step4_loop_e2e/e2e 底下的測試檔，也不准放寬斷言或跳過測試；測試真有問題只准告訴我理由，由我裁決。
 
-（從你輸入指令那一行開始整段貼上）
-
-我的作業系統是：Windows 11（Mac 的人改寫 macOS 14）。請你：
-1. 判斷這是環境問題還是測試問題，講清楚你的判斷依據。
-2. 若是環境問題（Playwright 瀏覽器沒下載、受測 App 沒啟動、3100 被占用、執行政策擋住），
-   給我可以直接複製執行的指令修掉它，一行一行，每行附一句在做什麼。
-3. 修好後帶我重跑一次腳本。
-
-鐵律：不准修改 step4_loop_e2e/e2e 底下的任何測試檔，也不准放寬斷言或跳過測試——那是作弊。
-測試若真有問題，只准告訴我理由，由我裁決。</code></pre>
+（從你輸入指令那一行開始整段貼上）</code></pre>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <p>AI 交回一份報告，照這張表核：</p>
@@ -824,11 +742,10 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       </table>
       </div>
       <p><strong>對抗審查（強烈建議做，別當選配）。</strong>試教時這一步挖出了三個教材自己沒發現的「假綠」：E1 沒驗第一頁是不是只有 20 筆、E4 六個必填只驗了一個、E6 的「回歸測試」只看有沒有一張表格。開第二個 AI（例如本機 Codex），貼這段，它挑出的問題交回原 AI 修 → 再跑 → 再審：</p>
-      <pre><code>你的任務是「盡力推翻」step4_loop_e2e/e2e 這套 E2E 測試，不是誇獎它：
-1. 有沒有「假綠」——斷言太鬆、選到隱藏節點、等到的是別的元素？
-2. selector 是不是猜的？有沒有靠位置索引（nth）這種一改版就碎的寫法？
-3. 測試之間會不會互相污染（前一條的資料影響後一條）？
-逐條給「可被推翻的具體理由」，能重現就附步驟；找不到問題也要說明你怎麼確認的。</code></pre>
+      <pre><code>你的任務是「盡力推翻」step4_loop_e2e/e2e 這套 E2E 測試，不是誇獎它。專找三種問題：
+假綠（斷言太鬆、選到隱藏節點、等到的是別的元素）、猜的 selector（靠 nth 這種一改版就碎的寫法）、
+測試互相污染（前一條的資料影響後一條）。
+逐條給可被推翻的具體理由，能重現就附步驟；找不到問題也要說明你怎麼確認的。</code></pre>
       <blockquote><strong>為什麼「立場」要寫進 prompt 裡：同一個 AI，換個立場，產出完全不同等級。</strong><br>
       試教時我們拿<strong>同一個 AI</strong>做了兩件事。第一次在 step1，我要它「逐條勾稽手冊寫的事實對不對」——
       它把「沒 harness 版漏了 4 個裸色碼」標成「✅ 成立」，<strong>但它自己貼的證據寫的是 5 處</strong>。
@@ -866,10 +783,6 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
           <tr><td>E7</td><td>編輯品項：改數量與存放地點，儲存後新值生效</td><td>Update</td></tr>
         </tbody>
       </table>
-      </div>
-      <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>LOOP 的價值就是省掉人機來回</strong>——人只出一個 prompt＋一次驗收，中間幾輪紅綠都是 AI 自己跑；如果還要人一個一個指令下，那就不是 LOOP，是人肉迴圈。紅燈也不必刻意製造：不同 AI 模型生成的結果本來就會跟規格有落差，LOOP 的日常用途正是<strong>把「生成結果」拉齊到「驗收規格」</strong>。但放手讓 AI 跑，就要用鐵律框住它：<strong>兩次停損</strong>（同一個坑修兩次沒好＝方向錯了，該讓人看）、<strong>不准作弊</strong>（LOOP 很會「為了讓燈變綠」放寬斷言、跳過測試）。另外，寫測試（或修 App）的 AI 不適合審自己，收尾要換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場做對抗審查，找出假綠、猜的 selector、測試互相污染等問題，交回原 AI 修 → 再跑 → 再審，形成「對抗式 LOOP」。你驗收的是報告和紅綠證據，不是一句「做完了」。
       </div>
       <blockquote>這 7 條測試是<strong>功能驗證＋失敗截圖診斷</strong>（失敗時自動存一張截圖，給人也給 AI 判讀用），不是 pixel 比對的視覺回歸。<strong>真正的視覺審查＝人逐張看截圖</strong>（本手冊 16 張就是這樣審的），不是靠自動化斷言能取代的。</blockquote>
       <blockquote><strong>建置紀律補充：</strong>這套測試第一次跑就全綠，靠的是「先 probe 探 DOM、再寫 selector」——探路的成本，遠低於用死站點瞎猜 selector 反覆跑紅的成本。細節見 <code>EVIDENCE-建置實錄.md</code>。</blockquote>
@@ -991,7 +904,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       <p>全部打勾，代表你真的走完了：</p>
       <ul class="checklist">
         <li>前置檢查（<code>preflight.ps1</code>／<code>preflight.sh</code>）全數通過</li>
-        <li>並排看過 no-harness 與 with-harness 兩頁，說得出「顏色從哪來、業務規則從哪來」的差別，以及 harness 管不到「做多少」</li>
+        <li>說得出兩版「顏色從哪來、業務規則從哪來」的差別，以及 harness 管不到「做多少」</li>
         <li>範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現</li>
         <li>看過 Design System 與前端 harness 四件，知道顏色／間距走 token</li>
         <li>讀懂課堂版 PRD，知道三個決策點是拿「真實系統」換「兩小時課堂」的取捨</li>
@@ -1004,12 +917,6 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         <li>說得出 LOOP 是什麼、一個優點一個限制，以及「兩次停損」「不准作弊」兩條鐵律</li>
       </ul>
 
-      <h3>回去怎麼用（三步驟速記）</h3>
-      <ol>
-        <li><strong>帶四件</strong>：CLAUDE.md ＋ CODE-RULES ＋ design-system-summary ＋ 使用說明，複製進你的專案、改成公司規則。</li>
-        <li><strong>整範本</strong>：挑最成熟的 CRUD 頁，拆「複製區 vs 共用區」。</li>
-        <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。</li>
-      </ol>
     </div>
   </section>
 
