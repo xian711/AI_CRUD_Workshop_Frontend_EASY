@@ -124,11 +124,63 @@
     box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);
   }
   figcaption{margin-top:9px;font-size:13.5px;color:var(--ink-soft);text-align:center;font-style:italic;}
+  figure.overview{margin:0 0 26px;}
   .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0;}
   .fig-grid figure{margin:0;}
 
   .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:16px 0;white-space:pre;}
   .flow b{color:#ffb3b8;}
+
+  /* ── 圖解區塊 ── */
+  .dg{margin:18px 0;}
+  .dg-title{font-size:14px;font-weight:700;color:var(--brand-dark);margin:0 0 10px;}
+  .dg-note{font-size:13px;color:var(--ink-soft);margin:8px 0 0;}
+
+  .shift{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;}
+  .shift-box{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--card);}
+  .shift-box h4{margin:0 0 8px;font-size:14.5px;}
+  .shift-box.old h4{color:var(--ink-soft);}
+  .shift-box.new{border-color:var(--brand);box-shadow:var(--shadow);}
+  .shift-box.new h4{color:var(--brand-dark);}
+  .shift-box p{margin:0;font-size:14px;color:var(--ink-soft);}
+  .shift-arrow{align-self:center;color:var(--brand);font-size:24px;font-weight:800;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .chips span{background:var(--brand-soft);color:var(--brand-dark);border-radius:6px;padding:3px 9px;font-size:12.5px;font-weight:600;}
+
+  .bilingual{display:grid;gap:10px;}
+  .bl-row{display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:center;
+    border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--card);}
+  .bl-tag{font-family:"Cascadia Code",Consolas,monospace;font-weight:700;font-size:15px;
+    text-align:center;border-radius:8px;padding:9px 4px;}
+  .bl-row.human .bl-tag{background:var(--brand-soft);color:var(--brand-dark);}
+  .bl-row.ai .bl-tag{background:#1e1f26;color:#d7d7dd;}
+  .bl-row b{display:block;font-size:14.5px;margin-bottom:2px;}
+  .bl-row p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+
+  .steps4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .steps4 .s{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--card);}
+  .steps4 .n{font-size:26px;font-weight:800;color:var(--brand);line-height:1;}
+  .steps4 b{display:block;margin:6px 0 4px;font-size:14.5px;}
+  .steps4 p{margin:0;font-size:13px;color:var(--ink-soft);}
+
+  .curve{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px 8px;}
+  .curve svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;margin:0 0 4px 6px;}
+  .legend i{display:inline-block;width:22px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px;}
+  .curve-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+  .curve-notes div{font-size:13px;color:var(--ink-soft);border-left:3px solid var(--line);padding-left:10px;}
+  .curve-notes div:first-child,.curve-notes div:last-child{border-left-color:#5A7A9E;}
+  .curve-notes div:nth-child(2){border-left-color:var(--brand);}
+  .curve-notes b{color:var(--ink);}
+
+  @media (max-width:760px){
+    .shift{grid-template-columns:1fr;}
+    .shift-arrow{justify-self:center;transform:rotate(90deg);}
+    .steps4{grid-template-columns:1fr 1fr;}
+    .bl-row{grid-template-columns:1fr;}
+    .bl-tag{max-width:104px;}
+    .curve-notes{grid-template-columns:1fr;}
+  }
 
   /* ── checklist ── */
   .checklist{list-style:none;padding:0;margin:14px 0;}
@@ -202,17 +254,22 @@
 
 <main>
 
+  <figure class="overview">
+    <img src="images/overview_metaphor.jpg" alt="用滷味比喻整套方法：harness 是滷包、範本是配方、SDD 是料理紀錄、知識累積是老滷汁">
+    <figcaption>一張圖看完整套方法：<strong>harness 是滷包</strong>（給 AI 的規矩）、<strong>範本是配方</strong>（AI 照著填的骨架）、<strong>SDD 是料理紀錄</strong>（改程式時文件同步更新）、<strong>知識累積是老滷汁</strong>（越熬越香）。</figcaption>
+  </figure>
+
   <div class="outline">
     <div class="table-scroll">
     <table>
-      <thead><tr><th>Step</th><th>這一章在做什麼</th><th>時間</th></tr></thead>
+      <thead><tr><th>Step</th><th>這一章在做什麼</th></tr></thead>
       <tbody>
-        <tr><td><b>step0</b></td><td>課程說明、前置檢查</td><td>10 分</td></tr>
-        <tr><td><b>step1</b></td><td>為什麼要 harness（有／沒有 harness 產出對比）</td><td>15 分</td></tr>
-        <tr><td><b>step2</b></td><td>CRUD 快速完工秘笈（跑範本 → 玩一輪 → 8 核心檔 → harness 四件 → Design System）</td><td>40 分</td></tr>
-        <tr><td><b>step3</b></td><td>複製範本開發新模組（PRD → AI 生成 → 反覆修正）<span class="star">重頭戲</span></td><td>35 分</td></tr>
-        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 功能驗證＋失敗截圖診斷 ＋ 雙 AI 對抗審查</td><td>15 分</td></tr>
-        <tr><td><b>step5</b></td><td>課程總結、回去怎麼用</td><td>5 分</td></tr>
+        <tr><td><b>step0</b></td><td>課程說明、前置檢查</td></tr>
+        <tr><td><b>step1</b></td><td>為什麼要 harness（有／沒有 harness 產出對比）</td></tr>
+        <tr><td><b>step2</b></td><td>CRUD 快速完工秘笈（跑範本 → 玩一輪 → 8 核心檔 → harness 四件 → Design System）</td></tr>
+        <tr><td><b>step3</b></td><td>複製範本開發新模組（PRD → AI 生成 → 反覆修正）<span class="star">重頭戲</span></td></tr>
+        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 功能驗證＋失敗截圖診斷 ＋ 雙 AI 對抗審查</td></tr>
+        <tr><td><b>step5</b></td><td>課程總結、回去怎麼用</td></tr>
       </tbody>
     </table>
     </div>
@@ -223,7 +280,6 @@
     <div class="step-head">
       <div class="step-num">0</div>
       <h2>課程說明與前置檢查</h2>
-      <span class="t">10 分</span>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -235,6 +291,16 @@
         </ol>
       </div>
 
+      <div class="dg">
+        <div class="dg-title">開課前的四步</div>
+        <div class="steps4">
+          <div class="s"><div class="n">01</div><b>抓教材</b><p>用 <code>git clone</code> 把整包下載下來。</p></div>
+          <div class="s"><div class="n">02</div><b>開終端機</b><p>在教材資料夾開一個終端機視窗。</p></div>
+          <div class="s"><div class="n">03</div><b>環境檢查</b><p>跑 preflight，看 10 項是不是都亮綠燈。</p></div>
+          <div class="s"><div class="n">04</div><b>開始上課</b><p>回來打開這份手冊，從 step1 往下走。</p></div>
+        </div>
+        <p class="dg-note">不熟終端機也沒關係：把 AI 當助教，直接跟它說「幫我打開這個資料夾並執行這支腳本」。</p>
+      </div>
       <p>先把教材整包抓下來，再跑前置檢查：</p>
       <pre><code># Windows（PowerShell）｜先切到你要放教材的資料夾，例如 cd D:\
 git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
@@ -260,7 +326,6 @@ bash preflight.sh</code></pre>
     <div class="step-head">
       <div class="step-num">1</div>
       <h2>為什麼要有 harness？</h2>
-      <span class="t">15 分</span>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -329,7 +394,6 @@ bash preflight.sh</code></pre>
     <div class="step-head">
       <div class="step-num">2</div>
       <h2>CRUD 快速完工秘笈</h2>
-      <span class="t">40 分</span>
     </div>
     <div class="step-body">
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
@@ -359,6 +423,20 @@ pnpm dev          # 啟動 dev server</code></pre>
 
       <h3>④ 認識規矩：規矩放在哪、誰會去讀</h3>
       <p><strong>你不需要讀懂裡面的每一條規則</strong>——那是寫給 AI 讀的。就像滷茶葉蛋不必知道滷包裡有幾味藥材，但你得知道<strong>滷包放在哪、什麼時候丟下去、換鍋子的時候要不要一起帶走</strong>。這一步只要弄懂三件事。</p>
+      <div class="dg">
+        <div class="dg-title">同一個專案，兩種讀者，兩種格式</div>
+        <div class="bilingual">
+          <div class="bl-row human">
+            <div class="bl-tag">.html</div>
+            <div><b>給人看的</b><p>排版好、看得舒服。像你正在讀的這份手冊，還有色票手冊 <code>DESIGN_SYSTEM.html</code>。</p></div>
+          </div>
+          <div class="bl-row ai">
+            <div class="bl-tag">.md</div>
+            <div><b>給 AI 看的</b><p>結構嚴謹、字少。AI 讀起來準，也比較省錢。harness 四件全是這種，例如 <code>CLAUDE.md</code>。</p></div>
+          </div>
+        </div>
+        <p class="dg-note">所以「不用讀懂每一條規則」是真的——那幾份 <code>.md</code> 的讀者本來就不是你。</p>
+      </div>
       <blockquote><strong>「不用讀」講得更精準一點：</strong>不用<em>逐條讀懂</em>，不等於四份都不看。人至少要<strong>掃過 <code>CLAUDE.md</code></strong>（48 行，知道底線在哪）；<strong>開新模組前要讀 <code>使用說明-複製範本開發新模組.md</code></strong>（那份本來就是寫給人看的）；另外兩份由 AI 改碼時查、由人做 code review 時對照。<br>另外提醒：這個比喻只管「滷包放哪、要不要帶走」。<strong>它不負責回答「滷包裡的規矩對不對」</strong>——業務規則寫錯（例如「不能匯出個資」寫反了），AI 會照著做，錯得更快更整齊。規矩的內容要有人負責、有版本、有人審。</blockquote>
       <div class="flow">2.1_sample_app/sample-app/          ← 這一鍋就是範本專案
 
@@ -369,7 +447,7 @@ pnpm dev          # 啟動 dev server</code></pre>
   └─ 使用說明-複製範本開發新模組.md     操作手冊：哪些複製、哪些共用
      （旁邊還有 AGENTS.md，是給部分 Agent 的入口便條，內容只寫「去讀 CLAUDE.md」）
 
-  <b>【鍋子】範本程式 — ③ 對照過的 8 核心檔就在這裡</b>
+  <b>【配方】範本程式 — AI 照著填的骨架，③ 對照過的 8 核心檔就在這裡</b>
   ├─ pages/         列表頁、明細頁
   ├─ components/    欄位元件、狀態徽章、共用 App* 元件
   ├─ composables/   資料層、列表狀態工廠
@@ -434,10 +512,23 @@ pnpm dev          # 啟動 dev server</code></pre>
     <div class="step-head">
       <div class="step-num">3</div>
       <h2>複製範本開發新模組<span class="star">重頭戲</span></h2>
-      <span class="t">35 分</span>
     </div>
     <div class="step-body">
-      <blockquote><strong>這一步你不寫程式，你當的是「提需求、做決策、驗成果」的人。</strong> 寫程式的粗活是 AI 的事。</blockquote>
+      <div class="dg">
+        <div class="dg-title">典範轉移：你不再是執行者，你是 AI 的主管</div>
+        <div class="shift">
+          <div class="shift-box old">
+            <h4>以前：你是執行者</h4>
+            <p>一個人面對整個系統，力氣全花在敲程式碼上。</p>
+          </div>
+          <div class="shift-arrow">➜</div>
+          <div class="shift-box new">
+            <h4>這一步：你是指揮官</h4>
+            <p>你只做三件事：<strong>提需求、做決策、驗收成果</strong>。粗活交給 AI：</p>
+            <div class="chips"><span>生成程式碼</span><span>修到測試全綠</span><span>寫 SRS／SDD</span></div>
+          </div>
+        </div>
+      </div>
       <div class="goal">
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
@@ -474,7 +565,7 @@ pnpm install
       <blockquote><strong>🚑 一開頁就 500、錯誤訊息寫 <code>useColorMode is not defined</code>？</strong>不是你的程式壞了，是舊的建置快取被複製過來了。關掉 dev server，把<strong>你這個工作專案</strong>（<code>my-equipment-app</code>）裡的 <code>.nuxt</code> 和 <code>.output</code> 兩個資料夾刪掉，再 <code>pnpm dev</code> 就好——它們是產物，砍了會自動重生。<strong>注意：刪的是你的工作專案，不要去刪 <code>2.1_sample_app/sample-app</code> 的。</strong>（上面的複製指令已經排除這兩個資料夾，正常不會遇到；這裡留著是為了萬一。）</blockquote>
 
       <h3>① 讀 PRD</h3>
-      <p>打開 <code>PRD-中心裝備物資.md</code>。題目取材自真實災防平台的頁面（原系統 26 欄＋借用歸還＋維保提醒，兩小時絕對做不完），已先濃縮成<strong>一堂課做得完的課堂版（12 欄）</strong>——但刻意留了<strong>三個決策點</strong>（刪除補不補、匯出做不做、編碼規則簡不簡化）給你拍板，連「原系統沒有刪除功能」這種真實缺口都照實保留。</p>
+      <p>打開 <code>PRD-中心裝備物資.md</code>。題目取材自真實災防平台的頁面（原系統 26 欄＋借用歸還＋維保提醒，課堂上絕對做不完），已先濃縮成<strong>一堂課做得完的課堂版（12 欄）</strong>——但刻意留了<strong>三個決策點</strong>（刪除補不補、匯出做不做、編碼規則簡不簡化）給你拍板，連「原系統沒有刪除功能」這種真實缺口都照實保留。</p>
 
       <h3>② 貼起手 prompt，讓 AI 先問問題</h3>
       <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。整段複製貼上：</p>
@@ -515,7 +606,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
         </tbody>
       </table>
       </div>
-      <blockquote>三題不用背。重點是理解：<strong>每題都是在「真實系統」和「兩小時課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼這段救援 prompt 打斷它：</blockquote>
+      <blockquote>三題不用背。重點是理解：<strong>每題都是在「真實系統」和「課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼這段救援 prompt 打斷它：</blockquote>
       <pre><code>停，先不要寫程式、不要建任何檔案。
 請先針對 PRD 第 5 節的三個待決策點，用選擇題逐題問我（每題 2-4 個選項＋你的建議）。
 我拍板後你再列任務清單，等我確認才開工。</code></pre>
@@ -547,7 +638,6 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <p>AI 另外會交出 SRS／SDD（對照你的拍板有沒有漏）和 24 筆 mock 種子。<strong>種子的欄位名就是未來接後端 API 的介面</strong>，驗收時順手看一眼命名合不合理。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <figure><img src="images/step3_clarify.png" alt="AI 先出釐清選擇題"><figcaption>AI 不急著寫程式，而是把岔路攤成選擇題、每題附建議——這代表 harness 在運作。</figcaption></figure>
       <figure><img src="images/step3_equipment_list.png" alt="裝備物資列表頁"><figcaption>裝備物資列表：24 筆種子、每頁 20 筆、「分類→項目」升冪，狀態標籤綠／黃／紅。</figcaption></figure>
       <div class="fig-grid">
         <figure><img src="images/step3_equipment_form.png" alt="新增表單含連動下拉與編碼預覽"><figcaption>新增表單：選定分類＋項目後，標題即時顯示自動編碼。</figcaption></figure>
@@ -595,7 +685,6 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
     <div class="step-head">
       <div class="step-num">4</div>
       <h2>LOOP 工程 × E2E 驗證</h2>
-      <span class="t">15 分</span>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -762,7 +851,6 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
     <div class="step-head">
       <div class="step-num">5</div>
       <h2>課程總結與回去怎麼用</h2>
-      <span class="t">5 分</span>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -786,6 +874,41 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         </tbody>
       </table>
       </div>
+      <div class="dg">
+        <div class="dg-title">你的心力該花在哪：兩端高、中間低</div>
+        <div class="curve">
+          <div class="legend">
+            <span><i style="background:var(--brand)"></i>AI 出的力</span>
+            <span><i style="background:#5A7A9E"></i>你的價值</span>
+          </div>
+          <svg viewBox="0 0 720 300" role="img" aria-label="價值曲線：人的價值集中在需求分析與測試驗收兩端，中間的實作由 AI 接手">
+            <g stroke="var(--line)" stroke-width="1">
+              <line x1="220" y1="30" x2="220" y2="250"/>
+              <line x1="380" y1="30" x2="380" y2="250"/>
+              <line x1="540" y1="30" x2="540" y2="250"/>
+            </g>
+            <line x1="60" y1="250" x2="700" y2="250" stroke="var(--ink-soft)" stroke-width="1.5"/>
+            <line x1="60" y1="30"  x2="60"  y2="250" stroke="var(--ink-soft)" stroke-width="1.5"/>
+            <text transform="translate(24,190) rotate(-90)" fill="var(--ink-soft)" font-size="13">投入心力與價值</text>
+            <path d="M60,236 C150,230 240,80 390,60 C470,50 540,70 700,128"
+                  fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M60,52 C150,90 250,205 380,212 C480,218 590,140 700,48"
+                  fill="none" stroke="#5A7A9E" stroke-width="3" stroke-linecap="round"/>
+            <g fill="var(--ink-soft)" font-size="13" text-anchor="middle">
+              <text x="140" y="274">需求分析</text>
+              <text x="300" y="274">前端實作</text>
+              <text x="460" y="274">後端實作</text>
+              <text x="620" y="274">測試與驗收</text>
+            </g>
+          </svg>
+          <div class="curve-notes">
+            <div><b>頭：講清楚要什麼</b><br>三個決策點誰來拍板，AI 替不了你。</div>
+            <div><b>中間：交給 AI</b><br>複製改名、寫欄位、修到全綠，都是它的活。</div>
+            <div><b>尾：由你驗收</b><br>燈亮了不等於做對，證據要你自己看。</div>
+          </div>
+        </div>
+      </div>
+
       <p><strong>回去怎麼用（三步驟）：</strong></p>
       <ol>
         <li><strong>把前端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code> 複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
@@ -815,7 +938,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         <li>說得出兩版「顏色從哪來、業務規則從哪來」的差別，以及 harness 管不到「做多少」</li>
         <li>範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現</li>
         <li>看過 Design System 與前端 harness 四件，知道顏色／間距走 token</li>
-        <li>讀懂課堂版 PRD，知道三個決策點是拿「真實系統」換「兩小時課堂」的取捨</li>
+        <li>讀懂課堂版 PRD，知道三個決策點是拿「真實系統」換「課堂」的取捨</li>
         <li>貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）</li>
         <li>三個決策點逐題拍板，確認任務清單後才說「開工」</li>
         <li>裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現</li>
