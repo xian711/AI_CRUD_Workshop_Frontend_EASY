@@ -84,8 +84,10 @@ try {
             $trimmed = $line.Trim()
             if ($trimmed -eq '' -or $trimmed.StartsWith('#')) { continue }
             # 格式必須是「64 位小寫十六進位 + 空白 + 路徑」，不合就 FAIL（不再默默跳過）
-            if ($trimmed -notmatch '^([0-9a-fA-F]{64})\s+(\S.*)$') {
-                $problems += "基準檔第 $lineNo 行格式不合（應為 64 位 hex ＋ 空白 ＋ 路徑）：$trimmed"
+            # 收尾錨點 ＋ 路徑不得含空白＝「恰好兩欄」。
+            # 少了這個，「<正確 hash>  e2e/tests/equipment.spec.ts EXTRA」這種行會被當成合法格式。
+            if ($trimmed -notmatch '^([0-9a-fA-F]{64})\s+(\S+)$') {
+                $problems += "基準檔第 $lineNo 行格式不合（應恰為「64 位 hex ＋ 空白 ＋ 路徑」兩欄）：$trimmed"
                 continue
             }
             $expectedHash = $Matches[1].ToLower()

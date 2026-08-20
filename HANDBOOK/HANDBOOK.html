@@ -860,7 +860,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
           <tr><td>E1</td><td><code>/equipment/crud</code> 看得到表格、種子 24 筆、<strong>第一頁恰好 20 列</strong></td><td>Read</td></tr>
           <tr><td>E2</td><td>用編碼搜尋剩 1 筆、大小寫不影響、用品名搜尋會縮小、清除後回到原本筆數</td><td>Filter</td></tr>
           <tr><td>E3</td><td>new → 選分類→項目→編碼「即時算出且不重複」（格式不限）→ 儲存 → 筆數 +1</td><td>Create</td></tr>
-          <tr><td>E4</td><td>空表單儲存 → 四個必填各自紅字、不離頁；再清空／填負數，逐欄確認六個必填都有守門</td><td>Validation</td></tr>
+          <tr><td>E4</td><td>空表單儲存 → 四個必填各自紅字、不離頁；再清空／填負數，逐欄驗到 <strong>5 個必填</strong>；狀態沒有清空入口，改驗「選項只有三個合法值、沒有清除鈕」（進不了空值）</td><td>Validation</td></tr>
           <tr><td>E5</td><td>刪除 → 確認框 → 取消不變、確認 -1</td><td>Delete</td></tr>
           <tr><td>E6</td><td><code>/template/crud</code> 正常載入，而且點得進人員檢視頁看到資料</td><td>Regression（沒改壞範本）</td></tr>
           <tr><td>E7</td><td>編輯品項：改數量與存放地點，儲存後新值生效</td><td>Update</td></tr>

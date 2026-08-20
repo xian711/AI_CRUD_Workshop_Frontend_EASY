@@ -83,9 +83,14 @@ else
         line_no=$((line_no + 1))
         trimmed="$(printf '%s' "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
         case "$trimmed" in ''|'#'*) continue ;; esac
-        # 格式必須是「64 位十六進位 + 空白 + 路徑」，不合就 FAIL（不再默默跳過）
-        if ! printf '%s' "$trimmed" | grep -qE '^[0-9a-fA-F]{64}[[:space:]]+[^[:space:]]'; then
-            add_problem "基準檔第 ${line_no} 行格式不合（應為 64 位 hex ＋ 空白 ＋ 路徑）：$trimmed"
+        # 格式必須「恰好」是「64 位十六進位 + 空白 + 路徑」兩欄，不合就 FAIL（不再默默跳過）。
+        # 注意兩件事，缺一就會留破口：
+        #   1. regex 一定要收尾錨點 $——只錨開頭的話，
+        #      「<正確 hash>  e2e/tests/equipment.spec.ts EXTRA」會通過，多出來的 EXTRA 被靜靜丟掉。
+        #   2. 再用 awk NF == 2 確認真的只有兩欄（受保護的兩個路徑本來就不含空白）。
+        if ! printf '%s' "$trimmed" | grep -qE '^[0-9a-fA-F]{64}[[:space:]]+[^[:space:]]+$' \
+           || [ "$(printf '%s\n' "$trimmed" | awk '{print NF}')" != "2" ]; then
+            add_problem "基準檔第 ${line_no} 行格式不合（應恰為「64 位 hex ＋ 空白 ＋ 路徑」兩欄）：$trimmed"
             continue
         fi
         expected_hash="$(printf '%s' "$trimmed" | awk '{print tolower($1)}')"

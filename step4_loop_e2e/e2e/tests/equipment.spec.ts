@@ -195,7 +195,13 @@ test('E3 新增品項：連動下拉、編碼即時產生且不重複、儲存�
 
 // ── E4 表單驗證 ─────────────────────────────────────────────
 // 觀念：Validation（欄位級驗證，錯誤不離頁）。
-test('E4 表單驗證：PRD 六個必填欄位逐欄把關，錯誤不離頁', async ({ page }) => {
+// PRD 第 2 節共有六個必填欄位，但它們的「驗法」分成兩種，這件事必須講清楚：
+//   A. 五個欄位（分類／項目／單位／規格說明／數量）使用者進得了不合法狀態
+//      → 用「弄成不合法 → 看得到欄位級錯誤訊息」來驗。
+//   B. 狀態（status）使用者進不了空值：單選下拉、預設就有值、沒有清除鈕、選項全是合法值
+//      → 沒有「錯誤訊息」可驗，改用 invariant-by-construction：驗「不可能變成不合法」這件事本身。
+// 所以測試名稱寫「五欄驗錯 ＋ 狀態進不了空值」，不寫「六欄都經錯誤訊息驗證」——後者是不實陳述。
+test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁', async ({ page }) => {
   const save = () => page.getByRole('button', { name: /儲存/ }).click()
   const qtyInput = page.locator('[data-field="qty"] input')
 
@@ -220,7 +226,7 @@ test('E4 表單驗證：PRD 六個必填欄位逐欄把關，錯誤不離頁', a
   await expect(page.getByText(/請修正\s*\d+\s*個欄位/), 'PRD 4 節：驗證失敗要有 toast').toBeVisible()
   await expect(page, 'PRD 4 節：驗證失敗不離頁').toHaveURL(/\/equipment\/crud\/new/)
 
-  // ── (2) 把每一個必填欄位「弄成不合法」再存一次，逐欄確認真的有守門 ──────
+  // ── (2) 把「進得了不合法狀態」的欄位一一弄壞再存，逐欄確認真的有守門 ──────
   // 為什麼要做這一段：只靠 (1) 的空表單，證明的是「初始狀態會報錯」，
   // 不能證明「使用者清掉之後也會被擋」，更完全驗不到有預設值的 qty。
 
@@ -248,6 +254,27 @@ test('E4 表單驗證：PRD 六個必填欄位逐欄把關，錯誤不離頁', a
   await save()
   await expect(fieldError(page, 'qty'), 'PRD 2 節：數量 ≥ 0，負數應被擋下').toBeVisible()
   await expect(fieldError(page, 'qty')).toHaveText(/數量/)
+
+  // ── (3) 狀態：沒有「弄成不合法」這條路，改驗 invariant ─────────────────
+  // 誠實說清楚這一條跟上面五欄不同：
+  // 狀態是單選下拉、預設就有合法值、UI 上沒有清除鈕、選項全是合法值，
+  // 使用者根本走不到「空值」，所以不會有錯誤訊息可以驗。
+  // 這時候正確的驗法不是硬湊一條 fieldError，而是驗「不可能變成不合法」這件事本身：
+  //   3-1 只有一顆觸發鈕，沒有清除／叉叉
+  //   3-2 選項全集恰好是 PRD 的三個合法值，沒有空白哨兵
+  //   3-3 再點一次目前選中的那個，也不會被取消成空值
+  // 若哪天 UI 改成可以清空（多了清除鈕或空白選項），3-1／3-2 就會紅——
+  // 那時候就該回來改成「清空 → 斷言 fieldError(page, 'status')」。
+  const statusHost = page.locator('[data-field="status"]')
+  await expect(statusHost.locator('button'), '狀態欄不該有清除鈕（有的話就進得了空值）').toHaveCount(1)
+
+  await statusHost.locator('button').first().click()
+  const statusOptions = page.getByRole('option')
+  await expect(statusOptions, 'PRD 2／3 節：狀態選項恰為三個').toHaveCount(3)
+  await expect(statusOptions, '選項全集必須都是合法值，不得有空白哨兵').toHaveText([/正常/, /維修中/, /已報廢/])
+
+  await statusOptions.first().click()
+  await expect(statusHost, '再點一次已選中的選項，不該被取消成空值').toContainText(/正常/)
 
   // 全程都沒有離開新增頁
   await expect(page).toHaveURL(/\/equipment\/crud\/new/)
