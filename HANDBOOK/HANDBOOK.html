@@ -70,6 +70,7 @@
   th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
   th{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;white-space:nowrap;}
   tr:last-child td{border-bottom:none;}
+  td.grp{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;font-size:13.5px;}
   td code,p code,li code{background:#f0edec;color:var(--brand-dark);padding:1.5px 6px;border-radius:5px;font-size:.9em;font-family:"Cascadia Code",Consolas,monospace;}
 
   /* ── step cards ── */
@@ -286,31 +287,34 @@ bash preflight.sh</code></pre>
       </div>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>為什麼這項要緊</th></tr></thead>
+        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th></tr></thead>
         <tbody>
-          <tr>
-            <td><strong>顏色從哪來</strong></td>
-            <td>AI <strong>自己發明一套 token</strong>：<code>--brand: #e8590c</code>、<code>--danger</code>…命名是它自己取的，色票是它自己挑的，<strong>你們的品牌色一次都沒出現</strong>（而且它自己那套 token 沒收乾淨——<code>:root</code> 之外還散著 <strong>5 處裸色碼</strong>，共 3 個不重複色值：<code>#fff</code>、<code>#fbf7f2</code>、<code>#fde8e6</code>）</td>
-            <td>用<strong>你們給的</strong> token 命名與色票：<code>--ui-sys-color-primary: #C8232C</code>，全檔用滿 <strong>11 個不重複色值</strong>（<code>:root</code> 共 12 行宣告，其中 <code>on-primary</code> 與 <code>surface</code> 都是 <code>#FFFFFF</code>），<code>:root</code> 之外 <strong>0 處</strong>硬編碼</td>
-            <td>它做的其實是「對的實務」——但那是<strong>它的</strong>一套。兩套 token 合不起來，<strong>擺在你們現有系統旁邊就是兩個產品</strong></td>
-          </tr>
-          <tr>
-            <td><strong>業務規則從哪來</strong></td>
-            <td>AI 自己發明一套：電話用通用格式（連 <code>(02) 1234-5678</code> 都收）、血型自己多加一個選項</td>
-            <td>照規則寫成具名常數：<code>PHONE_PATTERN</code> 只收台灣手機 09 開頭 10 碼、血型固定四選一</td>
-            <td>顏色錯了看得出來，<strong>驗證規則錯了要等資料髒掉才發現</strong></td>
-          </tr>
-          <tr>
-            <td><strong>多出來的東西</strong></td>
-            <td colspan="2" style="text-align:center"><strong>兩版都會自己多做</strong>（例如自己加 localStorage 存檔、加額外欄位、加你沒要的功能）</td>
-            <td>harness 管得住「<strong>怎麼寫</strong>」，管不住「<strong>做多少</strong>」——範圍要靠 PRD 和決策點管，那是 step3 的事</td>
-          </tr>
+          <tr><td class="grp" colspan="3">顏色｜它自己那套是對的實務，但合不進你們的系統</td></tr>
+          <tr><td>主色</td><td><code>#e8590c</code> 警示橘，自己挑的</td><td><code>#C8232C</code> 品牌紅，規則指定</td></tr>
+          <tr><td>token 命名</td><td><code>--brand</code>、<code>--danger</code>，自己發明一套</td><td><code>--ui-sys-color-primary</code>，照給定的規則</td></tr>
+          <tr><td>品牌紅出現次數</td><td><strong>0 次</strong></td><td>有</td></tr>
+          <tr><td><code>:root</code> 外的裸色碼</td><td><strong>5 處</strong></td><td><strong>0 處</strong></td></tr>
+          <tr><td class="grp" colspan="3">業務規則｜顏色錯了看得出來，驗證規則錯了要等資料髒掉才發現</td></tr>
+          <tr><td>電話驗證</td><td>6～15 個字元通吃</td><td>只收 09 開頭 10 碼</td></tr>
+          <tr><td>輸入 <code>(02) 1234-5678</code></td><td>會過</td><td>被擋</td></tr>
+          <tr><td>血型選項</td><td>5 個，多一個「不明」</td><td>4 個，寫成具名常數</td></tr>
+          <tr><td>必填星號</td><td>沒有</td><td>每個必填欄都有</td></tr>
+          <tr><td>欄位級錯誤訊息</td><td>沒有</td><td>每欄一個，含 <code>aria-describedby</code></td></tr>
+          <tr><td class="grp" colspan="3">多做的｜兩邊都自己加東西——harness 管得住「怎麼寫」，管不住「做多少」</td></tr>
+          <tr><td>localStorage 存檔</td><td>自己加了</td><td>自己加了</td></tr>
+          <tr><td>刪除確認</td><td>瀏覽器原生 <code>confirm()</code></td><td>自製彈窗</td></tr>
+          <tr><td>空清單提示</td><td>無</td><td>有</td></tr>
+          <tr><td>Esc 關閉、焦點歸還</td><td>無</td><td>有</td></tr>
+          <tr><td><code>aria-live</code> 播報</td><td>無</td><td>有</td></tr>
+          <tr><td>表格欄位</td><td>多一個流水號欄</td><td>照需求</td></tr>
+          <tr><td class="grp" colspan="3">規模｜行數多一倍不是囉嗦，是多做了無障礙與欄位級錯誤</td></tr>
+          <tr><td>檔案行數</td><td>312 行</td><td>751 行</td></tr>
+          <tr><td>id 命名</td><td><code>volForm</code>、<code>blood</code></td><td><code>volunteer-form</code>、<code>blood-type-select</code></td></tr>
+          <tr><td><code>&lt;th&gt;</code> 有沒有 <code>scope</code></td><td>沒有</td><td>有</td></tr>
         </tbody>
       </table>
       </div>
-      <blockquote><strong>這張表是實測出來的，不是想像的。</strong>我們用 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次（Claude Sonnet）。沒 harness 那版<strong>一點都不醜</strong>：它自己選了警示橘、做了響應式、還多做了刪除確認與防注入，甚至<strong>自己建了一套 design token</strong>（<code>--brand</code>、<code>--danger</code>…）——它知道該用 token，只是用的是它自己的那套。但品牌紅 0 次、電話收 6～15 碼的通用格式（<code>(02) 1234-5678</code> 也算合法）、血型多一個「不明」。<strong>而兩版都自己加了 localStorage</strong>，有 harness 那版還多加了空清單提示、Esc 關閉、焦點歸還。</blockquote>
 
-      <blockquote><strong>先誠實講清楚：</strong><code>demo/</code> 那兩份 HTML 是我們用 <code>demo/PROMPT.md</code> 裡固定的兩版 prompt 各跑一次、挑出來當教材的<strong>策展成品</strong>，不是每次都會一模一樣重現的實驗。所以別把它們當「鐵證」——要信，就自己拿去實測一遍。</blockquote>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
@@ -476,7 +480,6 @@ cd step3_new_module/my-equipment-app
 pnpm install
 # 在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）</code></pre>
       <blockquote><strong>🚑 一開頁就 500、錯誤訊息寫 <code>useColorMode is not defined</code>？</strong>不是你的程式壞了，是舊的建置快取被複製過來了。關掉 dev server，把<strong>你這個工作專案</strong>（<code>my-equipment-app</code>）裡的 <code>.nuxt</code> 和 <code>.output</code> 兩個資料夾刪掉，再 <code>pnpm dev</code> 就好——它們是產物，砍了會自動重生。<strong>注意：刪的是你的工作專案，不要去刪 <code>2.1_sample_app/sample-app</code> 的。</strong>（上面的複製指令已經排除這兩個資料夾，正常不會遇到；這裡留著是為了萬一。）</blockquote>
-      <blockquote><strong>下面 ③ 會直接給你三題的「課堂拍板」結果</strong>，那是為了讓全班進度一致、兩小時走得完，你可以直接採納。<strong>但完整的裁決理由與被放棄的替代方案</strong>（例如 D1 為什麼正式環境該用軟刪除）在講師版 <code>instructor/SCOPE-課堂範圍決策.md</code>，<strong>等你自己拍完板，講師才會發</strong>。這一步真正要練的不是「猜中答案」，是<strong>親自跟 AI 把岔路攤開、由你決定砍什麼留什麼</strong>——先看完整理由等於直接抄，那段練習就沒了。</blockquote>
 
       <h3>① 讀 PRD</h3>
       <p>打開 <code>PRD-中心裝備物資.md</code>。題目取材自真實災防平台的頁面（原系統 26 欄＋借用歸還＋維保提醒，兩小時絕對做不完），已先濃縮成<strong>一堂課做得完的課堂版（12 欄）</strong>——但刻意留了<strong>三個決策點</strong>（刪除補不補、匯出做不做、編碼規則簡不簡化）給你拍板，連「原系統沒有刪除功能」這種真實缺口都照實保留。</p>
@@ -686,7 +689,6 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong> 紅燈不用刻意製造——你在 step3 用自己的 AI 模型生成的 <code>my-equipment-app</code>，本來就會跟驗收規格有落差，一跑 E2E 自然就紅；<strong>這 7 條測試就是可執行的驗收規格</strong>。</p>
-      <blockquote><strong>先把話講清楚，免得你被紅燈嚇到：這 7 條只驗 PRD 承諾過的事。</strong><br>第一版的測試是拿參考解 <code>solution-app</code> 探過 DOM 才寫出來的，結果把「參考解剛好長那樣」的細節（搜尋框的 placeholder 文字、成功 toast 的用字、確認框標題、品項編碼的確切格式、種子裡剛好幾台發電機）都寫死成斷言——照 PRD 做出功能正確的模組，照樣被判紅。<strong>那是測試的錯，不是學員的錯，現在已經全部拿掉了。</strong><br>現在這 7 條驗的是：<strong>PRD 第 2.1 節的種子約定（24 筆）、第 4 節的功能（每頁 20 筆、關鍵字過濾、必填不離頁、刪除二次確認、編輯生效）、第 6 節的驗收條件，以及範本沒被改壞。</strong><br><strong>UI 用字由你決定</strong>——按鈕寫「新增品項」還是「新增裝備物資」、成功要不要跳 toast、編碼是 <code>PW-GEN-003</code> 還是 <code>PW-003</code>，測試都不管（編碼只驗「即時算得出來」與「不重複」，那才是 PRD D3 承諾的兩件事）。<br>所以紅燈時的第一個問題還是那個：<strong>紅的是「功能沒做到」（修 App），還是「測試在驗 PRD 沒寫的東西」（停下來寫進報告）？</strong>後者現在應該很少見了；真的遇到，那是教材的缺陷，請回報。</blockquote>
       <p>在工作坊根目錄開 AI Agent，整段複製貼上：</p>
       <pre><code>你是 LOOP 工程師，接下來自己跑完，中途不要問我。
 受測 App：step3_new_module/my-equipment-app。
@@ -705,7 +707,6 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
   templateCsv / App*.vue）拆掉重寫一套；用不動就停下回報。
 
 報告：每一輪紅了哪幾條、一句話根因、修了哪個檔；最後附全綠總結行（7 passed）。</code></pre>
-      <blockquote><strong>一次就全綠？</strong>恭喜，代表你的模組已通過驗收規格，報告只有一輪、直接收工。這也是正常結果——LOOP 的價值在「有紅時不用人跳進去」，不在硬要看到紅。</blockquote>
 
       <div class="block-title"><span class="ico">🚑</span>LOOP 卡住怎麼辦</div>
       <p>先分清楚兩種紅，處置完全不同：</p>
@@ -741,34 +742,11 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         </tbody>
       </table>
       </div>
-      <p><strong>對抗審查（強烈建議做，別當選配）。</strong>試教時這一步挖出了三個教材自己沒發現的「假綠」：E1 沒驗第一頁是不是只有 20 筆、E4 六個必填只驗了一個、E6 的「回歸測試」只看有沒有一張表格。開第二個 AI（例如本機 Codex），貼這段，它挑出的問題交回原 AI 修 → 再跑 → 再審：</p>
+      <p><strong>對抗審查（強烈建議做，別當選配）。</strong>寫測試或修 App 的 AI 不適合審自己。開第二個 AI（例如本機 Codex），貼這段，它挑出的問題交回原 AI 修 → 再跑 → 再審：</p>
       <pre><code>你的任務是「盡力推翻」step4_loop_e2e/e2e 這套 E2E 測試，不是誇獎它。專找三種問題：
 假綠（斷言太鬆、選到隱藏節點、等到的是別的元素）、猜的 selector（靠 nth 這種一改版就碎的寫法）、
 測試互相污染（前一條的資料影響後一條）。
 逐條給可被推翻的具體理由，能重現就附步驟；找不到問題也要說明你怎麼確認的。</code></pre>
-      <blockquote><strong>為什麼「立場」要寫進 prompt 裡：同一個 AI，換個立場，產出完全不同等級。</strong><br>
-      試教時我們拿<strong>同一個 AI</strong>做了兩件事。第一次在 step1，我要它「逐條勾稽手冊寫的事實對不對」——
-      它把「沒 harness 版漏了 4 個裸色碼」標成「✅ 成立」，<strong>但它自己貼的證據寫的是 5 處</strong>。
-      它順著教材的敘述走了。第二次在 step4，我要它「<strong>盡力推翻</strong>這套測試，不是誇獎它」——
-      同一個 AI 挖出了三個教材作者自己都沒發現的假綠。<br>
-      結論很簡單：<strong>「幫我檢查一下」得到的是附和，「盡力推翻它」得到的才是審查。</strong>
-      找 AI 當審查員時，立場要寫死在 prompt 裡，不能靠它自己選。</blockquote>
-      <div class="block-title"><span class="ico">📓</span>試教實錄：兩個真的發生過的狀況</div>
-      <blockquote><strong>案例 A｜兩位學員都守規矩，卻走出完全相反的結局。</strong><br>
-      同一段 LOOP prompt、同一套測試，兩位學員都判定「有幾條在驗 PRD 沒寫的東西」。然後——<br>
-      <strong>學員 A：停下來回報。</strong> 3 passed / 4 failed、exit 1。沒有作弊、沒有鬼打牆，但交不出綠燈。<br>
-      <strong>學員 B：照著改。</strong> 跑了 8 輪、7 passed 全綠。測試一個字都沒動，
-      但把原本符合 PRD 的實作改成了參考解的樣子（他自己說這叫 <em>overfitting to tests</em>——<strong>為了過測而向測試過擬合</strong>）。<br>
-      <strong>兩個人都沒違反那兩條鐵律。</strong>問題出在鐵律沒涵蓋這個岔路——所以我們補了第三條：
-      <strong>每次修改都要指出它對應 PRD 的哪一條或你拍板的哪一個決策；找不到出處的照樣可以改，但要標成「規格外調整」。</strong><br>
-      學員 A 事後補的那句話值得抄下來：「不作弊、也沒鬼打牆，AI 仍可能因為測試藏了需求，而把一個符合 PRD 的設計改壞。」</blockquote>
-      <blockquote><strong>案例 B｜三道檢查全部放行，架構還是退化了。</strong><br>
-      學員 B 為了讓燈變綠，在中間幾輪把列表頁的 <code>useTemplateListPage</code>（step2 教「直接共用、禁複製、禁自己再寫一套」的那一個）
-      拿掉，改成自己用 <code>ref</code>／<code>computed</code> 重寫一套篩選＋分頁＋URL 同步。結果是：<br>
-      共用檔本身沒被改（雜湊比對相同）→ <strong>過</strong>；測試沒被動 → <strong>過</strong>；7 條全綠 → <strong>過</strong>。
-      <strong>三道檢查全部放行，但 step2 教的心法已經破功，而且沒有任何一關抓得到。</strong><br>
-      這就是上面那張表為什麼多了「共用件還在用嗎」那一列。
-      <strong>驗收要驗的不只是「燈亮不亮」，還有「它是怎麼亮的」。</strong></blockquote>
       <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>E2E 腳本實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0（截圖為 Windows 版 run-e2e.ps1；macOS 的 run-e2e.sh 輸出與判定相同）。</figcaption></figure>
       <div class="table-scroll">
       <table>
@@ -784,8 +762,6 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         </tbody>
       </table>
       </div>
-      <blockquote>這 7 條測試是<strong>功能驗證＋失敗截圖診斷</strong>（失敗時自動存一張截圖，給人也給 AI 判讀用），不是 pixel 比對的視覺回歸。<strong>真正的視覺審查＝人逐張看截圖</strong>（本手冊 16 張就是這樣審的），不是靠自動化斷言能取代的。</blockquote>
-      <blockquote><strong>建置紀律補充：</strong>這套測試第一次跑就全綠，靠的是「先 probe 探 DOM、再寫 selector」——探路的成本，遠低於用死站點瞎猜 selector 反覆跑紅的成本。細節見 <code>EVIDENCE-建置實錄.md</code>。</blockquote>
     </div>
   </section>
 
@@ -824,68 +800,8 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         <li><strong>把既有標準頁面整理成範本</strong>——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。</li>
         <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
       </ol>
+      <p>課後驗收題：一個人做一個問卷模組並發布上線，題目與步驟在 <code>step6_survey/README.md</code>。</p>
 
-
-      <div class="block-title"><span class="ico">🎓</span>課後驗收題：做一個能上線的問卷</div>
-      <p>這門課最後留一題給你自己做——<strong>沒有講師帶、沒有人幫你出決策、沒有人幫你看紅燈</strong>。做完你會有一個真的網址，可以傳給同事看。</p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>你要做的</th><th>用到這門課的哪一段</th></tr></thead>
-        <tbody>
-          <tr><td>複製範本，分清楚哪些複製改名、哪些直接共用</td><td>step2 的 8 核心檔心法</td></tr>
-          <tr><td>一頁 PRD ＋ 一個 prompt，生出完整模組</td><td>step3 的生成流程</td></tr>
-          <tr><td>照 10 項清單逐條驗收、用修正心法收斂</td><td>step3 的驗收與修正</td></tr>
-          <tr><td>產出守住色票、驗證、危險操作規則</td><td>step1 的三項對照</td></tr>
-          <tr><td>發布到 GitHub Pages，拿到真的網址</td><td>這一題新加的</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p>題目、需求 PRD、可直接複製的起手 prompt、驗收清單、發布步驟，全都在 <code>step6_survey/README.md</code>。預估 40～60 分鐘。</p>
-      <blockquote><strong>問卷刻意沒有後端。</strong>資料先存在瀏覽器裡，程式碼留一行 <code>// TODO: DEV 串接 POST /api/survey</code>。
-      <strong>下一門後端課要做的，就是把那一行換成真的 API——而且頁面一行都不用改。</strong>這不是巧合，是 step2 的資料層從一開始就設計成非同步的原因。
-      <code>step6_survey/solution/</code> 有參考解，<strong>卡兩次以上再開</strong>。</blockquote>
-
-      <div class="block-title"><span class="ico">📋</span>評量：怎麼算學會了</div>
-      <p>滿分 100，<strong>70 分及格</strong>。這張表不是為了打分數，是為了證明三個學習目標真的達成，而不只是「App 跑起來了」。</p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>#</th><th>面向</th><th>分數</th><th>合格證據</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>環境與範本操作</td><td>10</td><td>preflight exit 0、dev server 啟動、人員範本基本 CRUD 可操作</td></tr>
-          <tr><td>2</td><td>Harness A/B 解釋</td><td>15</td><td>對 step1 的 A/B，至少指出 <strong>5 個</strong>規則與產出結果的因果（色碼、命名、驗證、危險操作、token）</td></tr>
-          <tr><td>3</td><td>需求裁切 <span class="badge-warn">不得為零</span></td><td>20</td><td>三個決策點的裁決<strong>及每題合理理由</strong>，能說明「為何砍、為何留」</td></tr>
-          <tr><td>4</td><td>任務／SRS／實作可追溯</td><td>15</td><td>任務清單可逐項驗收，範圍無偷加、無漏做，SRS 對得上決策</td></tr>
-          <tr><td>5</td><td>CRUD 與響應式人工驗收 <span class="badge-warn">不得為零</span></td><td>25</td><td>C／R／U／D、validation、filter／搜尋、CSV，桌機＋手機皆可操作</td></tr>
-          <tr><td>6</td><td>LOOP 證據與根因判讀 <span class="badge-warn">不得為零</span></td><td>15</td><td>用一個 prompt 讓 AI 把自己的模組修到 E2E 全綠；報告完整（每輪紅／根因／修檔），能分辨 App bug 與測試 bug</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <blockquote><strong>及格門檻是兩道，不是一道。</strong>總分要 ≥ 70；而且<strong>面向 3、5、6 任一項掛零就不通過</strong>，總分再高也一樣。理由：這三項正好對應本課三個學習目標——先決策、能生成、會驗收與修。缺任一項，等於核心沒學到。</blockquote>
-      <p><strong>要交的四份東西：</strong></p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>#</th><th>項目</th><th>內容</th><th>對應面向</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>三題裁決＋理由</td><td>三個決策點各一個裁決＋一句理由</td><td>3</td></tr>
-          <tr><td>2</td><td>驗收紀錄</td><td>桌機、手機<strong>各一張截圖</strong>（共 2 張），標出驗收點</td><td>5</td></tr>
-          <tr><td>3</td><td>LOOP 報告</td><td>最終全綠輸出＋（若有紅）每輪的紅清單、一句話根因、修了哪個檔；附測試未被修改的抽查結果（<code>git diff e2e/</code> 為空，或檔案雜湊與原始相同）</td><td>6</td></tr>
-          <tr><td>4</td><td>Exit ticket</td><td>一句話：帶回公司要先導入哪一項</td><td>—</td></tr>
-        </tbody>
-      </table>
-      </div>
-
-      <div class="block-title"><span class="ico">❓</span>常見問題</div>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>問題</th><th>回答</th></tr></thead>
-        <tbody>
-          <tr><td>我們不是用 Nuxt，怎麼辦？</td><td>harness 方法不綁框架。四件換成你們的技術棧規則即可；範本拆分（複製區 vs 共用區）的心法在任何前端框架都適用。</td></tr>
-          <tr><td>我們沒有 Design System，怎麼辦？</td><td>不用一次到位。先從<strong>色票</strong>（品牌色、錯誤色、中性色）與<strong>間距常數</strong>（例如 4／8／16／24／40）開始定案，寫進 CODE-RULES，AI 就不會再亂配色、亂用魔術數字。元件規範可以之後再補。</td></tr>
-          <tr><td>AI 生成的程式碼看起來很像，但細節怪怪的？</td><td>正常現象，AI 生成永遠需要人工檢視。回頭檢查是不是 harness 規則沒寫清楚，或範本的「複製 vs 共用」邊界沒交代好；把發現的問題補進 CODE-RULES，下次就不會再錯。</td></tr>
-          <tr><td>LOOP 會不會讓 AI 跑到失控？</td><td>每輪 LOOP 都要有明確的「驗」的標準（測試、E2E 檢查清單、視覺審查）。<strong>沒有客觀驗收標準就不要放給 AI 自己跑。</strong></td></tr>
-        </tbody>
-      </table>
-      </div>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
