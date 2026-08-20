@@ -290,27 +290,28 @@ bash preflight.sh</code></pre>
         <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th></tr></thead>
         <tbody>
           <tr><td class="grp" colspan="3">顏色｜它自己那套是對的實務，但合不進你們的系統</td></tr>
-          <tr><td>主色</td><td><code>#e8590c</code> 警示橘，自己挑的</td><td><code>#C8232C</code> 品牌紅，規則指定</td></tr>
-          <tr><td>token 命名</td><td><code>--brand</code>、<code>--danger</code>，自己發明一套</td><td><code>--ui-sys-color-primary</code>，照給定的規則</td></tr>
-          <tr><td>品牌紅出現次數</td><td><strong>0 次</strong></td><td>有</td></tr>
-          <tr><td><code>:root</code> 外的裸色碼</td><td><strong>5 處</strong></td><td><strong>0 處</strong></td></tr>
+          <tr><td>主色</td><td>橘色 <code>#e8590c</code>，AI 自己挑的</td><td>紅色 <code>#C8232C</code>，規則指定的</td></tr>
+          <tr><td>色票名稱</td><td>自己發明一套</td><td>照你們給的那套</td></tr>
+          <tr><td>品牌紅有沒有用到</td><td><strong>一次都沒有</strong></td><td>有</td></tr>
+          <tr><td>沒走色票、直接寫死的顏色</td><td><strong>5 處</strong></td><td><strong>0 處</strong></td></tr>
           <tr><td class="grp" colspan="3">業務規則｜顏色錯了看得出來，驗證規則錯了要等資料髒掉才發現</td></tr>
-          <tr><td>電話驗證</td><td>6～15 個字元通吃</td><td>只收 09 開頭 10 碼</td></tr>
+          <tr><td>電話怎麼驗</td><td>6～15 個字，數字、括號、空白都收</td><td>只收 09 開頭的 10 碼</td></tr>
           <tr><td>輸入 <code>(02) 1234-5678</code></td><td>會過</td><td>被擋</td></tr>
-          <tr><td>血型選項</td><td>5 個，多一個「不明」</td><td>4 個，寫成具名常數</td></tr>
-          <tr><td>必填星號</td><td>沒有</td><td>每個必填欄都有</td></tr>
-          <tr><td>欄位級錯誤訊息</td><td>沒有</td><td>每欄一個，含 <code>aria-describedby</code></td></tr>
+          <tr><td>血型選項</td><td>5 個，多一個「不明」</td><td>4 個</td></tr>
+          <tr><td>必填星號</td><td>沒有</td><td>4 個必填欄都有</td></tr>
           <tr><td class="grp" colspan="3">多做的｜兩邊都自己加東西——harness 管得住「怎麼寫」，管不住「做多少」</td></tr>
-          <tr><td>localStorage 存檔</td><td>自己加了</td><td>自己加了</td></tr>
-          <tr><td>刪除確認</td><td>瀏覽器原生 <code>confirm()</code></td><td>自製彈窗</td></tr>
-          <tr><td>空清單提示</td><td>無</td><td>有</td></tr>
-          <tr><td>Esc 關閉、焦點歸還</td><td>無</td><td>有</td></tr>
-          <tr><td><code>aria-live</code> 播報</td><td>無</td><td>有</td></tr>
+          <tr><td>關掉再開，資料還在嗎</td><td>在（自己加的）</td><td>在（自己加的）</td></tr>
+          <tr><td>清單空的時候</td><td>有一句提示（自己加的）</td><td>有一句提示</td></tr>
+          <tr><td>刪除確認</td><td>瀏覽器內建的小視窗</td><td>頁面自己做的彈窗</td></tr>
           <tr><td>表格欄位</td><td>多一個流水號欄</td><td>照需求</td></tr>
-          <tr><td class="grp" colspan="3">規模｜行數多一倍不是囉嗦，是多做了無障礙與欄位級錯誤</td></tr>
+          <tr><td class="grp" colspan="3">報讀軟體用得了嗎｜看不見的人靠它把畫面唸出來。多出來的行數，一半花在這裡</td></tr>
+          <tr><td>哪一欄填錯，唸不唸得出來</td><td>唸不出來</td><td>4 個欄位都綁好了</td></tr>
+          <tr><td>畫面變動會不會自動唸</td><td>不會</td><td>會</td></tr>
+          <tr><td>表頭有沒有標明是欄標題</td><td>沒有</td><td>4 欄都有</td></tr>
+          <tr><td>彈窗的鍵盤操作</td><td>交給瀏覽器內建視窗</td><td>自己處理 Esc 關閉與游標歸位</td></tr>
+          <tr><td class="grp" colspan="3">規模｜行數多一倍不是囉嗦，是多做了上面那些</td></tr>
           <tr><td>檔案行數</td><td>312 行</td><td>751 行</td></tr>
-          <tr><td>id 命名</td><td><code>volForm</code>、<code>blood</code></td><td><code>volunteer-form</code>、<code>blood-type-select</code></td></tr>
-          <tr><td><code>&lt;th&gt;</code> 有沒有 <code>scope</code></td><td>沒有</td><td>有</td></tr>
+          <tr><td>程式裡的名字</td><td><code>volForm</code>、<code>blood</code>，隨手取</td><td><code>volunteer-form</code>、<code>blood-type-select</code>，完整</td></tr>
         </tbody>
       </table>
       </div>
@@ -331,15 +332,6 @@ bash preflight.sh</code></pre>
       <span class="t">40 分</span>
     </div>
     <div class="step-body">
-      <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
-        <ol>
-          <li>記住公式：<strong>範本給骨架、harness 給規矩、AI 出勞力。</strong></li>
-          <li>把現成範本當使用者操作一輪，建立心智模型。</li>
-          <li>認得前端 harness 四件、Design System、範本八個核心檔。</li>
-        </ol>
-      </div>
-
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <p>材料收在 <code>step2_speedrun_kit/</code> 的<strong>兩個資料夾</strong>裡。照 ①→⑤ 走，<strong>每一步都會點名你此刻要打開哪一份</strong>；沒被點到的文件都是「回公司想查再翻」，現在不必讀。</p>
       <div class="table-scroll">
