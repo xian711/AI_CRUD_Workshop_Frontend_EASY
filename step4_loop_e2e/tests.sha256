@@ -1,5 +1,7 @@
 # step4 E2E 受保護檔案的 SHA-256 基準（內容已去除 CR，換行風格不影響）
+# 用途：意外修改偵測——確認手上的測試與講師發出去的是同一份。
+# 它不是防蓄意作弊的機制：基準與測試在同一份可寫副本裡，一起改就繞得過。
 # 由 instructor/update-e2e-hash.ps1 或 instructor/update-e2e-hash.sh 產生。
 # 格式：<sha256>  <相對 step4_loop_e2e/ 的路徑>
-e80bff591a64ee67e07d9a46371008355decb56debb82e42d409d1c77ffc27b0  e2e/tests/equipment.spec.ts
+284136b234a0e6e240f186f3fab66903c1832616d9995f4b4a0518db4195232e  e2e/tests/equipment.spec.ts
 2e7d56a134f609a806d8ed5c0683ce03862bb49d2c9da71ca99ee5bf746a2b71  e2e/playwright.config.ts

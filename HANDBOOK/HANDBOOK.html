@@ -749,7 +749,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong> 紅燈不用刻意製造——你在 step3 用自己的 AI 模型生成的 <code>my-equipment-app</code>，本來就會跟驗收規格有落差，一跑 E2E 自然就紅；<strong>這 7 條測試就是可執行的驗收規格</strong>。</p>
-      <blockquote><strong>先把話講清楚，免得你被紅燈嚇到：這 7 條是拿參考解 <code>solution-app</code> 探過 DOM 才寫出來的</strong>（測試檔開頭第 4 行就這樣寫）。所以它驗的東西分兩種：<br><strong>(1) PRD 真的有寫的功能</strong>——24 筆、關鍵字過濾、必填不離頁、刪除二次確認、範本沒被改壞。這種紅了就是你的模組要修。<br><strong>(2) PRD 沒寫、只是參考解剛好長那樣的細節</strong>——搜尋框的 placeholder 文字、toast 的用字、確認框標題、品項編碼的確切格式（<code>PW-GEN-003</code>）、種子裡剛好 2 台發電機、錯誤訊息的 HTML id。這種紅了<strong>不是你做錯</strong>，是規格沒寫進 PRD。<br>兩種都可以修 App 讓它變綠（那不算作弊，測試一個字都沒動），但你要<strong>知道自己在修哪一種</strong>，並且寫進報告。特別是第 (2) 種跟你在 step3 的 D3 拍板衝突時——<strong>停下來、把衝突寫進報告，也算正確完成這一步</strong>，不會有 <code>7 passed</code>，但你交出了比綠燈更有價值的東西。</blockquote>
+      <blockquote><strong>先把話講清楚，免得你被紅燈嚇到：這 7 條只驗 PRD 承諾過的事。</strong><br>第一版的測試是拿參考解 <code>solution-app</code> 探過 DOM 才寫出來的，結果把「參考解剛好長那樣」的細節（搜尋框的 placeholder 文字、成功 toast 的用字、確認框標題、品項編碼的確切格式、種子裡剛好幾台發電機）都寫死成斷言——照 PRD 做出功能正確的模組，照樣被判紅。<strong>那是測試的錯，不是學員的錯，現在已經全部拿掉了。</strong><br>現在這 7 條驗的是：<strong>PRD 第 2.1 節的種子約定（24 筆）、第 4 節的功能（每頁 20 筆、關鍵字過濾、必填不離頁、刪除二次確認、編輯生效）、第 6 節的驗收條件，以及範本沒被改壞。</strong><br><strong>UI 用字由你決定</strong>——按鈕寫「新增品項」還是「新增裝備物資」、成功要不要跳 toast、編碼是 <code>PW-GEN-003</code> 還是 <code>PW-003</code>，測試都不管（編碼只驗「即時算得出來」與「不重複」，那才是 PRD D3 承諾的兩件事）。<br>所以紅燈時的第一個問題還是那個：<strong>紅的是「功能沒做到」（修 App），還是「測試在驗 PRD 沒寫的東西」（停下來寫進報告）？</strong>後者現在應該很少見了；真的遇到，那是教材的缺陷，請回報。</blockquote>
       <p>在工作坊根目錄開 AI Agent，整段複製貼上：</p>
       <pre><code>你是 LOOP 工程師，接下來自己跑完，中途不要問我。
 受測 App：step3_new_module/my-equipment-app（我用 AI 生成的裝備物資模組）。
@@ -857,12 +857,12 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
       <table>
         <thead><tr><th>編號</th><th>驗什麼</th><th>CRUD 觀念</th></tr></thead>
         <tbody>
-          <tr><td>E1</td><td><code>/equipment/crud</code> 看得到表格、「共 24 筆」</td><td>Read</td></tr>
-          <tr><td>E2</td><td>輸入「發電機」縮到 2 筆、清除後恢復 24 筆</td><td>Filter</td></tr>
-          <tr><td>E3</td><td>new → 選分類→項目→編碼自動預覽 <code>PW-GEN-003</code> → 儲存 → 共 25 筆</td><td>Create</td></tr>
-          <tr><td>E4</td><td>new 直接儲存 → 出現「請選擇分類」且停在表單頁</td><td>Validation</td></tr>
+          <tr><td>E1</td><td><code>/equipment/crud</code> 看得到表格、種子 24 筆、<strong>第一頁恰好 20 列</strong></td><td>Read</td></tr>
+          <tr><td>E2</td><td>用編碼搜尋剩 1 筆、大小寫不影響、用品名搜尋會縮小、清除後回到原本筆數</td><td>Filter</td></tr>
+          <tr><td>E3</td><td>new → 選分類→項目→編碼「即時算出且不重複」（格式不限）→ 儲存 → 筆數 +1</td><td>Create</td></tr>
+          <tr><td>E4</td><td>空表單儲存 → 四個必填各自紅字、不離頁；再清空／填負數，逐欄確認六個必填都有守門</td><td>Validation</td></tr>
           <tr><td>E5</td><td>刪除 → 確認框 → 取消不變、確認 -1</td><td>Delete</td></tr>
-          <tr><td>E6</td><td><code>/template/crud</code> 正常載入</td><td>Regression（沒改壞範本）</td></tr>
+          <tr><td>E6</td><td><code>/template/crud</code> 正常載入，而且點得進人員檢視頁看到資料</td><td>Regression（沒改壞範本）</td></tr>
           <tr><td>E7</td><td>編輯品項：改數量與存放地點，儲存後新值生效</td><td>Update</td></tr>
         </tbody>
       </table>

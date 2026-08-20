@@ -4,8 +4,13 @@
 # 裝備物資模組 E2E 一鍵跑（EASY 版｜macOS／Linux）
 #
 # 與 Windows 的 run-e2e.ps1 行為一致：
-#   0. 比對 E2E 測試檔的 SHA-256 與 tests.sha256 基準；被改過就直接拒絕執行
-#      （防「為了讓燈變綠去改測試」這種作弊；不依賴環境有沒有 git）。
+#   0. 【意外修改偵測】比對 E2E 測試檔的 SHA-256 與 tests.sha256 基準，不符就拒絕執行。
+#      這是 fail-closed：基準檔不見了、被清空、格式壞掉、少項、多項、重複、
+#      hash 不是 64 位十六進位——任何一種都判 FAIL，絕不因為「讀不到東西」就放行。
+#      老實說清楚它擋得住什麼：它擋得住「改了測試卻忘了同步基準」，
+#      也擋得住多數順手放寬斷言的情況；但它擋不住「有寫入權限、且刻意連基準一起重算」的人，
+#      因為腳本、測試、基準都在同一份學員可寫的副本裡。
+#      要真的防蓄意作弊，可信基準與評測器必須放在學員改不到的地方（講師端／CI）。
 #   1. 確認受測 App（你的 my-equipment-app 或參考解 solution-app）在受測網址有回應（且是本課範本 App，非別的程式佔埠）。
 #   2. e2e 資料夾裝相依（node_modules 與 playwright 皆就緒才跳過 npm ci）＋確保 chromium 已裝。
 #   3. 跑 Playwright 7 條測試，解析輸出印 PASS/FAIL 總結，exit code 對應。
@@ -20,7 +25,7 @@
 #   PORT=3200 bash run-e2e.sh
 #   BASE_URL=http://127.0.0.1:3200 bash run-e2e.sh
 #
-# Exit code：0 = 全綠；1 = 測試檔被動過、任一 FAIL、找不到測試或非預期錯誤。
+# Exit code：0 = 全綠；1 = 測試檔與基準不符、任一 FAIL、找不到測試或非預期錯誤。
 #
 
 set -u
@@ -32,8 +37,13 @@ EXPECTED=7                        # EASY 版 baseline：恰好 7 條全綠才算
 APP_MARKER='disaster-color-mode'  # 本課範本 App 的 colorMode.storageKey 前綴，用來確認受測網址跑的是本課的 App
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 E2E_DIR="$SCRIPT_DIR/e2e"
 HASH_MANIFEST="$SCRIPT_DIR/tests.sha256"
+# 基準檔必須「恰好」涵蓋這幾個檔：少一個、多一個、重複，都判 FAIL
+PROTECTED_FILES="e2e/tests/equipment.spec.ts e2e/playwright.config.ts"
+# 重算基準的講師工具（訊息一律印絕對路徑，免得從不同目錄執行時對不上）
+UPDATE_HASH_SH="$REPO_ROOT/instructor/update-e2e-hash.sh"
 
 if [ -t 1 ]; then
     C_RESET=$'\033[0m'; C_CYAN=$'\033[36m'; C_GREEN=$'\033[32m'
@@ -58,43 +68,73 @@ sha256_of() {
 
 echo "${C_CYAN}=== 裝備物資 E2E（EASY 版｜7 條）===${C_RESET}"
 
-# ── 0. 測試檔完整性 ──
-echo "${C_CYAN}檢查 E2E 測試檔有沒有被改過...${C_RESET}"
-if [ ! -f "$HASH_MANIFEST" ]; then
-    echo "${C_RED}FAIL：找不到雜湊基準檔 $HASH_MANIFEST。${C_RESET}"
-    echo "${C_YELLOW}請講師執行：bash ../instructor/update-e2e-hash.sh${C_RESET}"
-    exit 1
-fi
-tamper=''
-while IFS= read -r line || [ -n "$line" ]; do
-    case "$line" in ''|'#'*) continue ;; esac
-    expected_hash="$(printf '%s' "$line" | awk '{print $1}')"
-    rel="$(printf '%s' "$line" | awk '{print $2}')"
-    [ -z "$expected_hash" ] && continue
-    [ -z "$rel" ] && continue
-    full="$SCRIPT_DIR/$rel"
-    if [ ! -f "$full" ]; then
-        tamper="${tamper}
-  - ${rel}（檔案不見了）"
-        continue
-    fi
-    actual="$(sha256_of "$full")"
-    if [ "$actual" != "$expected_hash" ]; then
-        tamper="${tamper}
-  - ${rel}（內容被改過）"
-    fi
-done < "$HASH_MANIFEST"
+# ── 0. 意外修改偵測（fail-closed：任何一種「讀不出正確基準」的狀況都判 FAIL）──
+echo "${C_CYAN}檢查 E2E 測試檔與基準是否相符...${C_RESET}"
+problems=''
+add_problem() { problems="${problems}
+  - $1"; }
 
-if [ -n "$tamper" ]; then
-    echo "${C_RED}FAIL：E2E 測試檔與基準不符，拒絕執行。${C_RESET}"
-    echo "${C_RED}${tamper}${C_RESET}"
+if [ ! -f "$HASH_MANIFEST" ]; then
+    add_problem "找不到基準檔：$HASH_MANIFEST"
+else
+    seen_paths=''
+    line_no=0
+    while IFS= read -r line || [ -n "$line" ]; do
+        line_no=$((line_no + 1))
+        trimmed="$(printf '%s' "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        case "$trimmed" in ''|'#'*) continue ;; esac
+        # 格式必須是「64 位十六進位 + 空白 + 路徑」，不合就 FAIL（不再默默跳過）
+        if ! printf '%s' "$trimmed" | grep -qE '^[0-9a-fA-F]{64}[[:space:]]+[^[:space:]]'; then
+            add_problem "基準檔第 ${line_no} 行格式不合（應為 64 位 hex ＋ 空白 ＋ 路徑）：$trimmed"
+            continue
+        fi
+        expected_hash="$(printf '%s' "$trimmed" | awk '{print tolower($1)}')"
+        rel="$(printf '%s' "$trimmed" | awk '{print $2}' | tr '\\' '/')"
+        case " $seen_paths " in
+            *" $rel "*) add_problem "基準檔第 ${line_no} 行：$rel 重複列出"; continue ;;
+        esac
+        seen_paths="$seen_paths $rel"
+        case " $PROTECTED_FILES " in
+            *" $rel "*) ;;
+            *) add_problem "基準檔第 ${line_no} 行：$rel 不在受保護清單內（多出來的項目）"; continue ;;
+        esac
+        full="$SCRIPT_DIR/$rel"
+        if [ ! -f "$full" ]; then
+            add_problem "${rel}（檔案不見了）"
+            continue
+        fi
+        eval "hash_for_$(printf '%s' "$rel" | tr -c 'A-Za-z0-9' '_')=\$expected_hash"
+    done < "$HASH_MANIFEST"
+
+    # 少一項也不行——基準檔被清空或只留註解，會在這裡被抓到
+    for rel in $PROTECTED_FILES; do
+        case " $seen_paths " in
+            *" $rel "*) ;;
+            *) add_problem "基準檔缺少必要項目：$rel"; continue ;;
+        esac
+        full="$SCRIPT_DIR/$rel"
+        [ -f "$full" ] || continue    # 檔案不見了上面已記過
+        var="hash_for_$(printf '%s' "$rel" | tr -c 'A-Za-z0-9' '_')"
+        eval "expected=\${$var:-}"
+        [ -n "$expected" ] || continue
+        actual="$(sha256_of "$full")"
+        if [ "$actual" != "$expected" ]; then
+            add_problem "${rel}（內容與基準不符）"
+        fi
+    done
+fi
+
+if [ -n "$problems" ]; then
+    echo "${C_RED}FAIL：E2E 測試檔的完整性檢查沒過，拒絕執行。${C_RESET}"
+    echo "${C_RED}${problems}${C_RESET}"
     echo ""
-    echo "${C_YELLOW}這條防線是刻意的：LOOP 為了讓燈變綠，最常見的作弊就是放寬斷言或跳過測試。${C_RESET}"
-    echo "${C_YELLOW}要改 App 請隨意；測試不准動。若你認為測試本身真的有問題，停下來回報，由人裁決。${C_RESET}"
-    echo "${C_YELLOW}（講師確定要改測試的話，改完跑 bash ../instructor/update-e2e-hash.sh 重算基準。）${C_RESET}"
+    echo "${C_YELLOW}這一關在做的是「意外修改偵測」：確認你手上的測試，跟講師發出來的那一份是同一份。${C_RESET}"
+    echo "${C_YELLOW}要改 App 請隨意；測試不要動。若你認為測試本身真的有問題，停下來回報，由人裁決。${C_RESET}"
+    echo "${C_YELLOW}（講師確定要改測試的話，改完跑這一支重算基準：）${C_RESET}"
+    echo "${C_YELLOW}  bash \"$UPDATE_HASH_SH\"${C_RESET}"
     exit 1
 fi
-echo "${C_GREEN}PASS：測試檔與基準相符，沒有被動過。${C_RESET}"
+echo "${C_GREEN}PASS：測試檔與基準相符。${C_RESET}"
 
 # ── 1. 目標站點必須活著且是本 App ──
 echo "${C_CYAN}檢查 $BASE_URL ...${C_RESET}"
@@ -108,7 +148,9 @@ fi
 
 if [ "$alive" -ne 1 ]; then
     echo "${C_RED}FAIL：受測 App 沒在 $BASE_URL 回應。${C_RESET}"
-    echo "${C_YELLOW}請先啟動受測 App：cd ../step3_new_module/my-equipment-app && pnpm dev（或 solution-app）${C_RESET}"
+    echo "${C_YELLOW}請先啟動受測 App（絕對路徑，從哪個目錄執行都對得上）：${C_RESET}"
+    echo "${C_YELLOW}  cd \"$REPO_ROOT/step3_new_module/my-equipment-app\" && pnpm dev${C_RESET}"
+    echo "${C_YELLOW}  （還沒做 step3 的話，改用參考解 step3_new_module/solution-app）${C_RESET}"
     echo "${C_YELLOW}（若你把 App 開在別的埠，記得用 PORT=xxxx 或 BASE_URL=... 再跑這支腳本。）${C_RESET}"
     exit 1
 fi

@@ -3,8 +3,13 @@
     裝備物資模組 E2E 一鍵跑（EASY 版）。
 .DESCRIPTION
     步驟：
-      0. 比對 E2E 測試檔的 SHA-256 與 tests.sha256 基準；被改過就直接拒絕執行
-         （防「為了讓燈變綠去改測試」這種作弊；不依賴環境有沒有 git）。
+      0. 【意外修改偵測】比對 E2E 測試檔的 SHA-256 與 tests.sha256 基準，不符就拒絕執行。
+         這是 fail-closed：基準檔不見了、被清空、格式壞掉、少項、多項、重複、
+         hash 不是 64 位十六進位——任何一種都判 FAIL，絕不因為「讀不到東西」就放行。
+         老實說清楚它擋得住什麼：它擋得住「改了測試卻忘了同步基準」，
+         也擋得住多數順手放寬斷言的情況；但它擋不住「有寫入權限、且刻意連基準一起重算」的人，
+         因為腳本、測試、基準都在同一份學員可寫的副本裡。
+         要真的防蓄意作弊，可信基準與評測器必須放在學員改不到的地方（講師端／CI）。
       1. 確認受測 App（你的 my-equipment-app 或參考解 solution-app）在受測網址有回應
          （且是本課範本 App，非別的程式佔埠）。
       2. e2e 資料夾裝相依（node_modules 與 playwright 皆就緒才跳過 npm ci）＋確保 chromium 已裝。
@@ -20,7 +25,7 @@
       $env:PORT = '3200'                        # 只換埠
       $env:BASE_URL = 'http://127.0.0.1:3200'   # 或整段換掉網址
 
-    Exit code：0 = 全綠；1 = 測試檔被動過、任一 FAIL、找不到測試或非預期錯誤。
+    Exit code：0 = 全綠；1 = 測試檔與基準不符、任一 FAIL、找不到測試或非預期錯誤。
 #>
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -31,6 +36,10 @@ $Expected = 7                       # EASY 版 baseline：恰好 7 條全綠才�
 $AppMarker = 'disaster-color-mode'  # 本課範本 App 的 colorMode.storageKey 前綴，用來確認受測網址跑的是本課的 App
 $e2eDir = Join-Path $PSScriptRoot 'e2e'
 $HashManifest = Join-Path $PSScriptRoot 'tests.sha256'
+# 基準檔必須「恰好」涵蓋這幾個檔：少一個、多一個、重複，都判 FAIL
+$ProtectedFiles = @('e2e/tests/equipment.spec.ts', 'e2e/playwright.config.ts')
+# 重算基準的講師工具（訊息一律印絕對路徑，免得學員從不同目錄執行時對不上）
+$UpdateHashPs1 = Join-Path (Split-Path -Parent $PSScriptRoot) 'instructor\update-e2e-hash.ps1'
 
 # 以本地 EAP=Continue 跑原生指令（npm/npx），避免 PowerShell 5.1 把 stderr 文字誤判為終止錯誤。
 function Invoke-Native {
@@ -61,35 +70,56 @@ function Get-NormalizedSha256 {
 try {
     Write-Host '=== 裝備物資 E2E（EASY 版｜7 條）===' -ForegroundColor Cyan
 
-    # 0. 測試檔完整性
-    Write-Host '檢查 E2E 測試檔有沒有被改過...' -ForegroundColor Cyan
+    # 0. 意外修改偵測（fail-closed：任何一種「讀不出正確基準」的狀況都判 FAIL）
+    Write-Host '檢查 E2E 測試檔與基準是否相符...' -ForegroundColor Cyan
+    $problems = @()
+
     if (-not (Test-Path $HashManifest)) {
-        Write-Host "FAIL：找不到雜湊基準檔 $HashManifest。" -ForegroundColor Red
-        Write-Host '請講師執行：powershell -ExecutionPolicy Bypass -File ..\instructor\update-e2e-hash.ps1' -ForegroundColor Yellow
-        exit 1
+        $problems += "找不到基準檔：$HashManifest"
+    } else {
+        $seen = @{}
+        $lineNo = 0
+        foreach ($line in (Get-Content -LiteralPath $HashManifest)) {
+            $lineNo++
+            $trimmed = $line.Trim()
+            if ($trimmed -eq '' -or $trimmed.StartsWith('#')) { continue }
+            # 格式必須是「64 位小寫十六進位 + 空白 + 路徑」，不合就 FAIL（不再默默跳過）
+            if ($trimmed -notmatch '^([0-9a-fA-F]{64})\s+(\S.*)$') {
+                $problems += "基準檔第 $lineNo 行格式不合（應為 64 位 hex ＋ 空白 ＋ 路徑）：$trimmed"
+                continue
+            }
+            $expectedHash = $Matches[1].ToLower()
+            $rel = $Matches[2].Trim() -replace '\\', '/'
+            if ($seen.ContainsKey($rel)) { $problems += "基準檔第 $lineNo 行：$rel 重複列出"; continue }
+            $seen[$rel] = $expectedHash
+            if ($ProtectedFiles -notcontains $rel) {
+                $problems += "基準檔第 $lineNo 行：$rel 不在受保護清單內（多出來的項目）"
+            }
+        }
+        # 少一項也不行——基準檔被清空或只留註解，會在這裡被抓到
+        foreach ($rel in $ProtectedFiles) {
+            if (-not $seen.ContainsKey($rel)) { $problems += "基準檔缺少必要項目：$rel" }
+        }
+        # 逐檔比對
+        foreach ($rel in $ProtectedFiles) {
+            if (-not $seen.ContainsKey($rel)) { continue }
+            $full = Join-Path $PSScriptRoot ($rel -replace '/', '\')
+            if (-not (Test-Path $full)) { $problems += "$rel（檔案不見了）"; continue }
+            if ((Get-NormalizedSha256 -Path $full) -ne $seen[$rel]) { $problems += "$rel（內容與基準不符）" }
+        }
     }
-    $tamper = @()
-    foreach ($line in (Get-Content -LiteralPath $HashManifest)) {
-        $trimmed = $line.Trim()
-        if ($trimmed -eq '' -or $trimmed.StartsWith('#')) { continue }
-        $parts = $trimmed -split '\s+', 2
-        if ($parts.Count -ne 2) { continue }
-        $expectedHash = $parts[0].ToLower()
-        $rel = $parts[1].Trim()
-        $full = Join-Path $PSScriptRoot ($rel -replace '/', '\')
-        if (-not (Test-Path $full)) { $tamper += "$rel（檔案不見了）"; continue }
-        if ((Get-NormalizedSha256 -Path $full) -ne $expectedHash) { $tamper += "$rel（內容被改過）" }
-    }
-    if ($tamper.Count -gt 0) {
-        Write-Host 'FAIL：E2E 測試檔與基準不符，拒絕執行。' -ForegroundColor Red
-        foreach ($t in $tamper) { Write-Host "  - $t" -ForegroundColor Red }
+
+    if ($problems.Count -gt 0) {
+        Write-Host 'FAIL：E2E 測試檔的完整性檢查沒過，拒絕執行。' -ForegroundColor Red
+        foreach ($t in $problems) { Write-Host "  - $t" -ForegroundColor Red }
         Write-Host ''
-        Write-Host '這條防線是刻意的：LOOP 為了讓燈變綠，最常見的作弊就是放寬斷言或跳過測試。' -ForegroundColor Yellow
-        Write-Host '要改 App 請隨意；測試不准動。若你認為測試本身真的有問題，停下來回報，由人裁決。' -ForegroundColor Yellow
-        Write-Host '（講師確定要改測試的話，改完跑 instructor\update-e2e-hash.ps1 重算基準。）' -ForegroundColor Yellow
+        Write-Host '這一關在做的是「意外修改偵測」：確認你手上的測試，跟講師發出來的那一份是同一份。' -ForegroundColor Yellow
+        Write-Host '要改 App 請隨意；測試不要動。若你認為測試本身真的有問題，停下來回報，由人裁決。' -ForegroundColor Yellow
+        Write-Host '（講師確定要改測試的話，改完跑這一支重算基準：）' -ForegroundColor Yellow
+        Write-Host "  powershell -ExecutionPolicy Bypass -File `"$UpdateHashPs1`"" -ForegroundColor Yellow
         exit 1
     }
-    Write-Host 'PASS：測試檔與基準相符，沒有被動過。' -ForegroundColor Green
+    Write-Host 'PASS：測試檔與基準相符。' -ForegroundColor Green
 
     # 1. 目標站點必須活著且是本 App
     Write-Host "檢查 $BaseUrl ..." -ForegroundColor Cyan
@@ -102,7 +132,10 @@ try {
     } catch {}
     if (-not $alive) {
         Write-Host "FAIL：受測 App 沒在 $BaseUrl 回應。" -ForegroundColor Red
-        Write-Host '請先啟動受測 App：cd ../step3_new_module/my-equipment-app; pnpm dev（或 solution-app）' -ForegroundColor Yellow
+        $appDir = Join-Path (Split-Path -Parent $PSScriptRoot) 'step3_new_module\my-equipment-app'
+        Write-Host '請先啟動受測 App（絕對路徑，從哪個目錄執行都對得上）：' -ForegroundColor Yellow
+        Write-Host "  cd `"$appDir`" ; pnpm dev" -ForegroundColor Yellow
+        Write-Host '  （還沒做 step3 的話，改用參考解 step3_new_module\solution-app）' -ForegroundColor Yellow
         Write-Host '（若你把 App 開在別的埠，記得先設 $env:PORT 或 $env:BASE_URL 再跑這支腳本。）' -ForegroundColor Yellow
         exit 1
     }
