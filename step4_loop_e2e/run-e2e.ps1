@@ -39,7 +39,7 @@ $HashManifest = Join-Path $PSScriptRoot 'tests.sha256'
 # 基準檔必須「恰好」涵蓋這幾個檔：少一個、多一個、重複，都判 FAIL
 $ProtectedFiles = @('e2e/tests/equipment.spec.ts', 'e2e/playwright.config.ts')
 # 重算基準的講師工具（訊息一律印絕對路徑，免得學員從不同目錄執行時對不上）
-$UpdateHashPs1 = Join-Path (Split-Path -Parent $PSScriptRoot) 'instructor\update-e2e-hash.ps1'
+$UpdateHashPs1 = Join-Path $PSScriptRoot 'tools\update-e2e-hash.ps1'
 
 # 以本地 EAP=Continue 跑原生指令（npm/npx），避免 PowerShell 5.1 把 stderr 文字誤判為終止錯誤。
 function Invoke-Native {

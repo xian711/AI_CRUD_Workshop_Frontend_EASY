@@ -15,20 +15,18 @@
 # 所以只要你（講師）正當地改了測試檔或 playwright.config.ts，
 # 就要跑這一支把基準更新掉，否則學員會一律看到 FAIL。
 #
-# 這支刻意放在 instructor/ 而不是 step4_loop_e2e/ 旁邊——
-# 它是解鎖用的鑰匙，不該跟學員每天要跑的腳本擺在一起。
-# （這只是「不順手」，不是權限邊界。真正的邊界要靠把它移出學員可寫範圍。）
+# 它放在 tools/ 子資料夾，跟學員每天要跑的 run-e2e 分開——
+# 但這只是「不順手」，不是權限邊界。真正的邊界要靠把它移出學員可寫範圍。
 #
 # 雜湊前會先移除 CR（\r），所以 CRLF / LF 差異不會影響結果。
 #
-# 用法：bash instructor/update-e2e-hash.sh
+# 用法：bash step4_loop_e2e/tools/update-e2e-hash.sh
 #
 
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-LOOP_DIR="$REPO_ROOT/step4_loop_e2e"
+LOOP_DIR="$(dirname "$SCRIPT_DIR")"
 MANIFEST="$LOOP_DIR/tests.sha256"
 
 # 受保護的檔案（相對 step4_loop_e2e/）：測試本體 ＋ 會影響判定的設定
@@ -49,7 +47,7 @@ echo "=== 重算 step4 E2E 測試檔雜湊基準 ==="
     echo '# step4 E2E 受保護檔案的 SHA-256 基準（內容已去除 CR，換行風格不影響）'
     echo '# 用途：意外修改偵測——確認手上的測試與講師發出去的是同一份。'
     echo '# 它不是防蓄意作弊的機制：基準與測試在同一份可寫副本裡，一起改就繞得過。'
-    echo '# 由 instructor/update-e2e-hash.ps1 或 instructor/update-e2e-hash.sh 產生。'
+    echo '# 由 step4_loop_e2e/tools/update-e2e-hash.ps1 或同資料夾的 .sh 產生。'
     echo '# 格式：<sha256>  <相對 step4_loop_e2e/ 的路徑>'
 } > "$MANIFEST"
 

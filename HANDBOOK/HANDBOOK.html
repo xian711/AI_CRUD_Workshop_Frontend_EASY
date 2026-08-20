@@ -348,7 +348,7 @@ bash preflight.sh</code></pre>
       <pre><code>cd step2_speedrun_kit/2.1_sample_app/sample-app
 pnpm install      # 首次安裝依賴，順帶產生型別
 pnpm dev          # 啟動 dev server</code></pre>
-      <p>開瀏覽器到 <code>http://localhost:3100/template/crud</code>（開根網址會自動導向）。</p>
+      <p>開瀏覽器到 <code>http://localhost:3100/template/crud</code>（開根網址會自動導向）。<strong>網址裡的 <code>template</code> 就是這個範本模組在程式裡的名字</strong>——step3 你會把它整套複製改名成 <code>equipment</code>，網址也跟著變成 <code>/equipment/crud</code>。</p>
 
       <h3>② 當使用者玩一輪：CRUD 五個檢查點</h3>
       <p>逐一操作，確認每個都能重現（預期畫面見下面「你應該看到」）：<strong>新增一筆 → 進檢視頁編輯 → 刪除跳二次確認 → 關鍵字＋狀態篩選後複製網址開新分頁 → 匯出 CSV</strong>。</p>

@@ -43,7 +43,7 @@ HASH_MANIFEST="$SCRIPT_DIR/tests.sha256"
 # 基準檔必須「恰好」涵蓋這幾個檔：少一個、多一個、重複，都判 FAIL
 PROTECTED_FILES="e2e/tests/equipment.spec.ts e2e/playwright.config.ts"
 # 重算基準的講師工具（訊息一律印絕對路徑，免得從不同目錄執行時對不上）
-UPDATE_HASH_SH="$REPO_ROOT/instructor/update-e2e-hash.sh"
+UPDATE_HASH_SH="$SCRIPT_DIR/tools/update-e2e-hash.sh"
 
 if [ -t 1 ]; then
     C_RESET=$'\033[0m'; C_CYAN=$'\033[36m'; C_GREEN=$'\033[32m'
