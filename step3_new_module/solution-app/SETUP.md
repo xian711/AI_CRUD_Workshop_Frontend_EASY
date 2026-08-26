@@ -78,14 +78,4 @@ curl http://localhost:3100/api/template/members
 > create/update/remove 成功後以「後端回傳的實體」增量維護（不重新全量拉取）；`getById` 直打單筆。
 > 解包取 `response.data`；`success:false` 或 HTTP 錯誤一律拋繁中 `Error`，與 mock 拋錯行為一致，呼叫端不需改動。
 
-## 與主專案 frontend/ 的差異
-
-- **Port**：本包用 **3100**（`nuxt.config.ts` 的 `devServer.port`），避免與主專案 3000 埠衝突，可同時開兩個。
-- **依賴精簡**：只保留 `nuxt`、`@nuxt/ui`、`vue`、`@nuxtjs/tailwindcss`、`@iconify-json/heroicons`、`@iconify/utils`、`typescript`。移除 leaflet / echarts / v-calendar / xlsx / vuedraggable / turf / vue-leaflet 等與範本無關的套件。
-- **版本鎖定**：`nuxt` 鎖 `3.21.1`、`vite` 以 `pnpm.overrides` 鎖 `7.3.1`（與 frontend 相同的已驗證組合）。caret 會拉到 nuxt 3.21.8 + vite 7.3.6，其 `@nuxt/vite-builder` 在 `ssr:false` 下有 `No entry found in rollupOptions.input` 回歸。
-- **nuxt.config 精簡**：CSS 只載入 `design-token.css → comp-tokens.css`（移除 `map-icons.css`）；移除 `build.transpile`（echarts）與 `nitro.publicDir`（Cloudflare 部署）等無關設定。保留 tailwind theme.extend、字型 head、`ssr:false`、`colorMode: light`。
-- **workspace 隔離**：放了自己的 `pnpm-workspace.yaml`，讓 sample-app 自成 workspace root，`pnpm install` 不會併入外層。
-- **新增檔**：`pages/index.vue`（導向 `/template/crud`）、`layouts/default.vue`（re-export `template` layout）。
-- **未修剪任何共用元件**：依賴閉包內元件（AppBreadcrumb、AppAddressPicker 等）皆逐字照抄 frontend，無專案特定依賴需拿掉。註：`AppBreadcrumb` 的「所屬單位」下拉分支在本包永不渲染（template layout 恆提供麵包屑），為 inert 死碼，刻意保留以維持與 frontend 一致。
-
 > 種子資料為虛構測試資料（24 筆），非真實個資。資料層在 `composables/useTemplateMembers.ts`，改接後端只需把內部實作換成 `useFetch`。

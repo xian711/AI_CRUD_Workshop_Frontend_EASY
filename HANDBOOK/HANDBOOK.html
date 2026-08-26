@@ -208,7 +208,7 @@
         <tr><td><b>step1</b></td><td>為什麼要 harness（有／沒有 harness 產出對比）</td></tr>
         <tr><td><b>step2</b></td><td>CRUD 快速完工秘笈（跑範本 → 玩一輪 → 8 核心檔 → harness 四件 → Design System）</td></tr>
         <tr><td><b>step3</b></td><td>複製範本開發新模組（PRD → AI 生成 → 反覆修正）<span class="star">重頭戲</span></td></tr>
-        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 功能驗證＋失敗截圖診斷 ＋ 雙 AI 對抗審查</td></tr>
+        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 功能驗證<span class="note">（自動化瀏覽器測試）</span>＋失敗截圖診斷 ＋ 雙 AI 對抗審查</td></tr>
         <tr><td><b>step5</b></td><td>課程總結、回去怎麼用</td></tr>
       </tbody>
     </table>
@@ -348,7 +348,7 @@ bash preflight.sh</code></pre>
       <h3>① 安裝並啟動範本</h3>
       <pre><code>cd step2_speedrun_kit/2.1_sample_app/sample-app
 pnpm install      # 首次安裝依賴，順帶產生型別
-pnpm dev          # 啟動 dev server</code></pre>
+pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視窗要一直開著）</code></pre>
       <p>開瀏覽器到 <code>http://localhost:3100/template/crud</code>（開根網址會自動導向）。<strong>網址裡的 <code>template</code> 就是這個範本模組在程式裡的名字</strong>——step3 你會把它整套複製改名成 <code>equipment</code>，網址也跟著變成 <code>/equipment/crud</code>。</p>
 
       <h3>② 當使用者玩一輪：CRUD 五個檢查點</h3>
@@ -415,7 +415,7 @@ pnpm dev          # 啟動 dev server</code></pre>
       <table>
         <thead><tr><th>操作</th><th>你應該看到</th></tr></thead>
         <tbody>
-          <tr><td>新增人員 → 儲存</td><td>成功 toast，列表出現新增那筆</td></tr>
+          <tr><td>新增人員 → 儲存</td><td>成功 toast<span class="note">（畫面角落跳出來、幾秒後自己消失的小提示）</span>，列表出現新增那筆</td></tr>
           <tr><td>進檢視頁 → 編輯 → 儲存</td><td>值更新，回列表反映變更</td></tr>
           <tr><td>垃圾桶 → 二次確認</td><td>鈕寫「刪除人員」，按下才刪</td></tr>
           <tr><td>打「陳」＋狀態篩選 → 複製網址開新分頁</td><td>表格即時過濾，新分頁完整還原篩選與排序</td></tr>
@@ -524,7 +524,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <h3>④ 確認任務清單、說「開工」</h3>
       <p>AI 會產出約 8 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除＋CSV、T7 SRS/SDD、T8 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
-      <blockquote><strong>T7 的 SRS／SDD 不要用「有兩個檔就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-SDD-最小樣板.md</code>——那份把最低門檻定死成四段：SRS 要有<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>；SDD 要有<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>。缺一段就退回去補。裡面也用白話解釋了 SRS／SDD 這兩個縮寫對不寫程式的人到底是什麼、你只要親自核哪幾段。</blockquote>
+      <blockquote><strong>T7 的 SRS／SDD 不要用「有兩個檔就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-SDD-最小樣板.md</code>——那份把最低門檻定死成四段：SRS 要有<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>；SDD 要有<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>。缺一段就退回去補。裡面也用白話解釋了 SRS／SDD 這兩個縮寫對不寫程式的人到底是什麼、你只要親自核哪幾段。<br>想看<strong>填好的</strong>長什麼樣，<code>step3_new_module/docs/</code> 裡有參考解的 <code>SRS-裝備物資.md</code>、<code>SDD-裝備物資.md</code> 與任務清單 <code>TASKS.md</code>——一樣是<strong>先自己做，卡住再開</strong>。</blockquote>
 
       <h3>⑤ 驗收與修正</h3>
       <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿 <code>step3_new_module/PRD-中心裝備物資.md</code> 第 2 節的 12 欄規格逐項對照——每一欄檢查四件事：label 文字、必不必填、用哪種元件、驗證規則。</p>
@@ -618,7 +618,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
         </tbody>
       </table>
       </div>
-      <p><strong>關鍵前提：要先有可自動執行的驗證</strong>（本課是 7 條 Playwright E2E，exit 0＝全綠、1＝有紅）。沒有這個，LOOP 就退化成 AI 自說自話。</p>
+      <p><strong>關鍵前提：要先有可自動執行的驗證</strong>（本課是 7 條 Playwright <strong>E2E 測試</strong>——<strong>E2E 就是讓程式自動開一個真的瀏覽器，照使用者的操作順序點一遍，點完自己判定對不對</strong>；exit 0＝全綠、1＝有紅）。沒有這個，LOOP 就退化成 AI 自說自話。</p>
       <p><strong>流程圖（一圈 LOOP 怎麼轉）：</strong></p>
       <div class="flow"> 你：貼 LOOP prompt（只貼這一次）
           │
@@ -653,7 +653,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <table>
         <thead><tr><th>限制／風險</th><th>對策（本課做法）</th></tr></thead>
         <tbody>
-          <tr><td>AI 會作弊（放寬斷言、跳測試）</td><td>prompt 鐵律禁止動測試；驗收時 <code>git diff</code> 抽查 e2e 資料夾</td></tr>
+          <tr><td>AI 會作弊：把<strong>斷言</strong>放寬、或乾脆跳過測試<span class="note">（斷言＝測試裡「我期望看到什麼」的那一句；放寬就是把標準改鬆，讓不合格的也算過）</span></td><td>prompt 鐵律禁止動測試；驗收時 <code>git diff</code> 抽查 e2e 資料夾</td></tr>
           <tr><td>AI 會鬼打牆（愈修愈亂）</td><td>兩次停損：同一問題連修 2 次仍紅就停下回報</td></tr>
           <tr><td>驗證寫得爛＝假綠也全過</td><td>換第二個 AI 對抗審查測試本身</td></tr>
           <tr><td>沒有自動驗證的東西不適用</td><td>先寫驗證再開 LOOP；驗不了的（如視覺美感）回歸人工審</td></tr>
@@ -711,7 +711,7 @@ macOS/Linux 跑 bash step4_loop_e2e/run-e2e.sh。exit 0＝全綠、exit 1＝有�
         <tbody>
           <tr><td>每輪紀錄完整</td><td>紅了哪幾條、根因、修了哪個檔，一輪一列</td></tr>
           <tr><td>根因說得通</td><td>「App 不符規格」就該修 App；說「測試有問題」的要有你的裁決紀錄</td></tr>
-          <tr><td>測試沒被動過</td><td>在 <code>step4_loop_e2e/</code> 跑 <code>git diff e2e/</code>，應該是空的。<strong>如果你拿到的是資料夾／zip 副本（不是 git clone），這條會印 <code>Not a git repository</code>——那不是你做錯了。</strong>改用雜湊比對：<br><code>Get-FileHash e2e\tests\equipment.spec.ts</code>（Windows）／<code>shasum -a 256 e2e/tests/equipment.spec.ts</code>（Mac），跟講師發的原始雜湊對一次</td></tr>
+          <tr><td>測試沒被動過</td><td>在 <code>step4_loop_e2e/</code> 跑 <code>git diff e2e/</code>，應該是空的。<strong>如果你拿到的是資料夾／zip 副本（不是 git clone），這條會印 <code>Not a git repository</code>——那不是你做錯了。</strong>改用<strong>雜湊</strong>比對<span class="note">（雜湊＝把整個檔案算成一串固定長度的碼；檔案只要改一個字，這串碼就完全不同）</span>：<br><code>Get-FileHash e2e\tests\equipment.spec.ts</code>（Windows）／<code>shasum -a 256 e2e/tests/equipment.spec.ts</code>（Mac），跟講師發的原始雜湊對一次</td></tr>
           <tr><td><strong>共用件還在用嗎</strong>（新增）</td><td>LOOP 為了過測，很容易把「直接共用」的零件拆掉、自己重寫一套——共用檔本身沒被改，所以上面那條抽查抓不到。<br>在 <code>my-equipment-app</code> 跑 <code>Select-String -Path pages\equipment\crud\index.vue -Pattern "useTemplateListPage"</code>（Mac：<code>grep -n useTemplateListPage pages/equipment/crud/index.vue</code>），<strong>應該要找得到</strong>。找不到就代表 step2 的「複製 vs 共用」心法在這一步被放棄了</td></tr>
           <tr><td>最終真的綠</td><td>報告附 <code>7 passed</code>、exit 0 的總結行。<strong>若因為 (2) 類規格衝突而停在紅燈，報告要寫明停在哪一條、為什麼</strong></td></tr>
         </tbody>
