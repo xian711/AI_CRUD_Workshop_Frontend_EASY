@@ -296,6 +296,8 @@ bash preflight.sh</code></pre>
           <tr><td>電話怎麼驗</td><td>6～15 個字，數字、括號、空白都收</td><td>只收 09 開頭的 10 碼</td></tr>
           <tr><td>輸入 <code>(02) 1234-5678</code></td><td>會過</td><td>被擋</td></tr>
           <tr><td>血型選項</td><td>5 個，多一個「不明」</td><td>4 個</td></tr>
+          <tr><td><strong>血型預設值</strong></td><td><strong>一打開就已經選好「A」</strong>，不改就送出</td><td>預設是「請選擇血型」，沒選會被擋下來</td></tr>
+          <tr><td>血型有沒有驗</td><td><strong>完全沒驗</strong>，任何情況都不會擋</td><td>沒選就跳「請選擇血型」</td></tr>
           <tr><td>必填星號</td><td>沒有</td><td>4 個必填欄都有</td></tr>
           <tr><td class="grp" colspan="3">多做的｜兩邊都自己加東西——harness 管得住「怎麼寫」，管不住「做多少」</td></tr>
           <tr><td>關掉再開，資料還在嗎</td><td>在（自己加的）</td><td>在（自己加的）</td></tr>
@@ -322,7 +324,7 @@ bash preflight.sh</code></pre>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。AI 越強，這件事越重要——因為它自己決定的東西會越來越合理、越來越好看，<strong>你越不容易發現它其實沒照你們的規矩走</strong>。一句話結論：<strong>同一句需求，差的不是 AI 的能力，是你有沒有把決定權拿回來。</strong>
+        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。AI 越強，這件事越重要——因為它自己決定的東西會越來越合理、越來越好看，<strong>你越不容易發現它其實沒照你們的規矩走</strong>。<br><br>上面那張表最該記住的是<strong>血型預設值</strong>那一列：左邊那版一打開就替使用者選好「A」，志工沒改到，存進去的就是一筆錯的血型；而且它<strong>完全沒驗這一欄</strong>，錯了不會當場報錯，<strong>要等到真的要輸血才會知道</strong>。AI 不是不會寫驗證——是<strong>沒有人告訴它哪些欄位錯不起</strong>。這正是 harness 要寫下來的東西。一句話結論：<strong>同一句需求，差的不是 AI 的能力，是你有沒有把決定權拿回來。</strong>
       </div>
     </div>
   </section>
