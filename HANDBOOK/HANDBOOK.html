@@ -95,6 +95,7 @@
   .why .block-title{color:#166b3c;}
 
   h3{font-size:16px;margin:22px 0 8px;color:var(--brand-dark);}
+  .step-body a{color:var(--brand-dark);font-weight:600;word-break:break-all;}
   p{margin:10px 0;}
   ol,ul{padding-left:24px;margin:10px 0;}
   li{margin:5px 0;}
@@ -226,14 +227,14 @@
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
           <li>知道這門課要教什麼、怎麼進行。</li>
-          <li>確認機器準備好了（10 項檢查，名稱與腳本印出的完全一致：Node.js &gt;= 20、pnpm 已安裝、git 已安裝、port 3100 未被占用、磁碟剩餘空間 &gt;= 2GB、ExecutionPolicy 可執行腳本<span class="note">（macOS／Linux 這一項換成「curl 可用」）</span>、工作區可寫入、npm registry 連線、Playwright Chromium 已快取<span class="note">（step4 自動化瀏覽器測試要用的瀏覽器核心，沒快取會自動下載，所以只算 <code>[WARN]</code>）</span>、AI Agent CLI）。</li>
+          <li>確認機器準備好了（腳本會逐項印出 10 項檢查結果）。</li>
           <li>紅燈（<code>[FAIL]</code>）時，知道怎麼讓 AI 幫你把環境修好，而不是卡在那裡等人。</li>
         </ol>
       </div>
 
       <figure><img src="images/step0_start.jpg" alt="實戰起手式：取得專案庫、啟動終端機、環境檢查、啟動服務">
         <figcaption>開課前的四步。本課到「環境檢查」為止；<code>pnpm install</code> 與 <code>pnpm dev</code> 是 step2 才做。不熟終端機也沒關係：把 AI 當助教，直接跟它說「幫我打開這個資料夾並執行這支腳本」。</figcaption></figure>
-      <p>先把教材整包抓下來，再跑前置檢查：</p>
+      <p>本案教材在：<a href="https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY">https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY</a><br>請先把教材整包抓下來，再跑前置檢查：</p>
       <pre><code># Windows（PowerShell）｜先切到你要放教材的資料夾，例如 cd D:\
 git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
 cd AI_CRUD_Workshop_Frontend_EASY\step0_course_intro
