@@ -45,7 +45,7 @@ scene('打開 Claude Code，貼上起手 prompt', () => {
   ['右下的 Auto 是權限模式：大部分動作它會自己判斷能不能直接做。先用預設，不要動。', r => only(r, r.b2)],
   ['到手冊 step3 的「② 貼起手 prompt」，把整段選起來，按 Ctrl+C。', r => { hide(r.S[1]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) }],
   ['回到 VS Code，點一下輸入框，按 Ctrl+V 貼上。', r => { hide(r.bw.g); only(r); show(r.S[2]); later(300, () => only(r, r.c1)) }],
-  ['這段 prompt 會先叫 AI 讀四份文件：三份規矩加上 PRD。讀完先用選擇題問你三個決定，最後才開工。', r => { zoom(r.S[2], 'input', { pad: 30, max: 1.5 }); only(r, r.c1); show(r.four) }],
+  ['這段 prompt 只有 4 行：先叫 AI 讀四份文件，三份規矩加上 PRD。讀完先用選擇題問你三個決定，最後才開工。', r => { zoom(r.S[2], 'input', { pad: 30, max: 1.5 }); only(r, r.c1); show(r.four) }],
   ['確認沒問題，按右下角的送出鈕。', r => { hide(r.four); unzoom(r.S[2]); only(r, r.c2); clickAt(r, r.S[2], 'send') }],
   ['你們單位如果用別的 AI 工具，做法也一樣：貼 prompt、回答選擇題。', r => { hide(r.cur); only(r); show(r.any) }],
 ])
@@ -53,25 +53,26 @@ scene('打開 Claude Code，貼上起手 prompt', () => {
 scene('AI 先出選擇題，你拍板', () => {
   const r = {}; mhead('step3 ⑤', 'AI 不先寫程式，先出選擇題問你')
   const [a, b, c, d] = vsh(r, ['cc03-reading', 'cc04-question', 'cc05-d2', 'cc06-d3'])
-  r.a1 = hl(r, a, [360, 285, 612, 92], '好幾行 Read：AI 在讀檔', { below: true, size: 30 })
+  r.a1 = hl(r, a, [350, 325, 645, 92], '好幾行 Read：AI 在讀檔', { below: true, size: 30 })
   r.a2 = hl(r, a, [1001, 521, 26, 26], '要叫它停：按這個方塊', { col: C.coral, above: true, right: true, size: 26, pad: 6 })
   r.b1 = hl(r, b, [355, 222, 172, 28], '三題：D1・D2・D3', { below: true, size: 28 })
-  r.b2 = hl(r, b, [358, 292, 652, 64], 'D1：補上刪除（建議）', { col: C.green, below: true, size: 28 })
-  r.c1 = hl(r, c, [358, 326, 666, 62], 'D2：做 CSV 匯出（建議）', { col: C.green, below: true, size: 28 })
-  r.d1 = hl(r, d, [358, 316, 652, 62], 'D3：選「簡化」那一個', { col: C.green, below: true, size: 28 })
-  r.d2 = hl(r, d, [358, 482, 668, 32], 'Submit answers：送出', { col: C.coral, above: true, size: 28 })
+  r.b2 = hl(r, b, [361, 294, 648, 60], 'D1：補，硬刪除＋二次確認（建議）', { col: C.green, below: true, size: 28 })
+  r.c1 = hl(r, c, [361, 330, 662, 60], 'D2：做 CSV 匯出（建議）', { col: C.green, below: true, size: 28 })
+  r.d1 = hl(r, d, [361, 335, 237, 111], 'D3：簡化：類別-項目-流水', { col: C.green, above: true, size: 26 })
+  r.d3 = hl(r, d, [633, 266, 390, 201], '右邊是範例：IT-NBK-001', { col: C.teal, below: true, right: true, size: 24 })
+  r.d2 = hl(r, d, [361, 484, 663, 29], 'Submit answers：送出', { col: C.coral, above: true, size: 28 })
   r.diff = tip('照手冊的課堂拍板選：D1 補刪除、D2 做匯出、D3 簡化版。不要只認「建議」', { y: 806, size: 28, col: C.teal })
   r.you = tip('三題不用背。重點是：做取捨的人是你，不是 AI', { y: 806, size: 32 })
-  r.rescue = codeCard(70, 600, 1460, ['停，先不要寫程式、不要建任何檔案。', '請先針對 PRD 第 5 節的三個待決策點，用選擇題逐題問我（每題 2-4 個選項＋你的建議）。', '我拍板後你再列任務清單，等我確認才開工。'], { title: 'AI 沒問就寫程式：先按停止方塊，再貼手冊的救援 prompt', size: 26, col: C.coral })
+  r.rescue = codeCard(70, 640, 1460, ['停，先不要寫程式、不要建檔案。', '先用選擇題逐題問我 PRD 第 5 節的 D1～D3，我拍板後再列任務，等我說「開工」。'], { title: 'AI 沒問就寫程式：先按停止方塊，再貼手冊的救援 prompt', size: 26, col: C.coral })
   cursor(r)
   return r
 }, [
-  ['AI 先讀規矩和 PRD。看到好幾行 Read 開頭，就是它在讀檔。', r => { show(r.S[0]); zoom(r.S[0], [360, 285, 612, 92], { pad: 30, max: 1.6 }); later(500, () => only(r, r.a1)) }],
+  ['AI 先讀規矩和 PRD。看到好幾行 Read 開頭，就是它在讀檔。', r => { show(r.S[0]); zoom(r.S[0], [350, 325, 645, 92], { pad: 30, max: 1.6 }); later(500, () => only(r, r.a1)) }],
   ['AI 在跑的時候，輸入框右邊會變成一個方塊。要叫它停，就按這個方塊。', r => { unzoom(r.S[0]); only(r, r.a2) }],
   ['讀完，它不寫程式，先出選擇題。三題放在三個分頁：D1 刪除、D2 匯出、D3 編碼。', r => { to(r, r.S[1]); zoom(r.S[1], [340, 210, 700, 330], { pad: 10, max: 1.5 }); only(r, r.b1) }],
-  ['每題都標了「建議」，還附一句理由。D1 刪除：課堂上選「補上刪除」。選好，會自動跳到下一題。', r => { only(r, r.b2); clickAt(r, r.S[1], [358, 292, 652, 64], { fx: 0.05 }) }],
-  ['D2 匯出：選「做 CSV 匯出」。', r => { unzoom(r.S[1]); to(r, r.S[2]); zoom(r.S[2], [340, 250, 700, 300], { pad: 10, max: 1.5 }); only(r, r.c1); clickAt(r, r.S[2], [358, 326, 666, 62], { fx: 0.05 }) }],
-  ['D3 編碼：選「簡化」版，就是不加機關前綴、同一個編碼不累加數量。三題都選好，按「Submit answers」送出。', r => { unzoom(r.S[2]); to(r, r.S[3]); only(r, r.d1, r.d2); later(1500, () => clickAt(r, r.S[3], [358, 482, 668, 32], { fx: 0.2 })) }],
+  ['每題都標了「建議」，還附一句理由。D1 刪除：課堂上選「補，硬刪除＋二次確認」。選好，會自動跳到下一題。', r => { only(r, r.b2); clickAt(r, r.S[1], [361, 294, 648, 60], { fx: 0.05 }) }],
+  ['D2 匯出：選「做 CSV 匯出」。', r => { unzoom(r.S[1]); to(r, r.S[2]); zoom(r.S[2], [340, 250, 700, 300], { pad: 10, max: 1.5 }); only(r, r.c1); clickAt(r, r.S[2], [361, 330, 662, 60], { fx: 0.05 }) }],
+  ['D3 編碼：選「簡化：類別-項目-流水」，不加機關前綴、同一個編碼不累加數量。三題都選好，按「Submit answers」送出。', r => { unzoom(r.S[2]); to(r, r.S[3]); only(r, r.d1, r.d2); later(1500, () => clickAt(r, r.S[3], [361, 484, 663, 29], { fx: 0.2 })) }],
   ['你的畫面文字可能不一樣，AI 的「建議」也可能不同。照手冊的課堂拍板選：補刪除、做匯出、簡化版編碼。', r => { hide(r.cur); only(r); show(r.diff) }],
   ['三題不用背。重點是：在真實系統和課堂之間做取捨的人，是你，不是 AI。', r => { hide(r.diff); show(r.you) }],
   ['如果 AI 沒問就直接寫程式，先按停止方塊，再貼手冊的救援 prompt，叫它先問你。', r => { hide(r.you); show(r.rescue) }],

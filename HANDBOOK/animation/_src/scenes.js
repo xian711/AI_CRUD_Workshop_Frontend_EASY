@@ -184,7 +184,7 @@ scene('看到紅燈 [FAIL] 怎麼辦', () => {
   r.park = grp(L); R(r.park, 1010, 140, 530, 230, { fill: C.card, stroke: C.teal, sw: 4 }); T(r.park, 1040, 190, '比喻：連接埠＝停車格', { size: 30, weight: 900, fill: C.teal })
   T(r.park, 1040, 245, '範本網站要停 3100 號格', { size: 27 }); T(r.park, 1040, 290, '被別台車先停了，', { size: 27 }); T(r.park, 1040, 335, '就停不進去 → 紅燈', { size: 27, weight: 800, fill: C.red })
   r.steps = [['照「修復提示」做一次', C.teal], ['關掉終端機、開一個新的再跑', C.gold], ['還是紅，整段輸出貼給 AI', C.coral]].map(([t, col], i) => { const g = grp(L); const y = 395 + i * 80; R(g, 1010, y, 530, 68, { fill: C.card, stroke: col, sw: 4 }); mk('circle', { cx: 1048, cy: y + 34, r: 22, fill: col }, g); T(g, 1048, y + 44, String(i + 1), { size: 28, anchor: 'middle', weight: 900, fill: C.bg }); T(g, 1082, y + 44, t, { size: 25, weight: 800 }); return g })
-  r.prompt = codeCard(60, 650, 1480, ['這是工作坊環境前置檢查（step0_course_intro\\preflight.ps1）的完整輸出，我用 Windows 11。', '請說明每個 [FAIL] 的原因、給我可複製的修復指令，修完帶我重跑一次；不要改工作坊裡的任何檔案。'], { title: 'prompt＝你要對 AI 說的話。手冊 Step 0「看到 [FAIL] 紅燈怎麼辦」裡現成的這段，連同整份輸出一起貼', size: 22, col: C.coral })
+  r.prompt = codeCard(60, 650, 1480, ['這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。', '請說明每個 [FAIL] 的原因，給我可複製的修復指令；不要改工作坊的檔案。'], { title: 'prompt＝你要對 AI 說的話。手冊 Step 0「看到 [FAIL] 紅燈怎麼辦」裡現成的這段，連同整份輸出一起貼', size: 26, col: C.coral })
   return r
 }, [
   ['如果看到紅色的 [FAIL]，先別慌。這是一次真實的紅燈：3100 這個連接埠被別的程式占用了。', r => { show(r.t.g); later(500, () => { const m = r.t.mark(r.lines[1], 'FAIL', C.red); show(m); glow(m) }) }],

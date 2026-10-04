@@ -1,67 +1,91 @@
-// ── 場景檔第六部分：Step 4 實拍（LOOP 第 1 輪紅 → 修 → 第 2 輪全綠）、兩項抽查 ──
+// ── 場景檔第六部分：Step 4 實拍（第二版：一個 LOOP prompt → 修到全綠 → 子代理對抗審查 → 交報告 → 用眼睛驗收）──
 const RED = s => [[s, TC.err, 700]], GRN = s => [[s, TC.ok, 700]]
 
-scene('貼上 LOOP prompt，等它修到全綠', () => {
-  const r = {}; mhead('step4 ②', '貼上 LOOP prompt，讓 AI 自己跑')
+scene('只貼一個 LOOP prompt，之後 AI 自己跑', () => {
+  const r = {}; mhead('step4 ③', '只貼一個 prompt，之後 AI 自己跑')
   const [a] = vsh(r, ['cc19-root-explorer'])
   r.a1 = hl(r, a, 'tree', '回到教材根目錄', { right: true, size: 30, pad: 2 })
   r.bw = bwin(['br08-handbook-loopprompt'], 'HANDBOOK.html#step4'); r.B = r.bw.S
   r.h1 = hl(r, r.B[0], 'pre', '手冊 step4 的 LOOP prompt：整段複製', { col: OR, size: 28, below: true })
-  const [, b, c, d] = ['x', 'cc20-loop-pasted', 'cc23-loop-red', 'cc25-loop-report'].map((n, i) => { if (!i) return null; const g = scr(n, FV); r.S.push(g); return g })
+  const b = scr('cc20-loop-pasted', FV); r.S.push(b)
   r.b1 = hl(r, b, 'input', '新對話：貼上、送出', { above: true, size: 30 })
-  r.c1 = hl(r, c, [355, 385, 680, 80], 'AI 自己跑第一輪測試', { above: true, size: 30 })
-  r.d1 = hl(r, d, [340, 215, 700, 265], '自己判斷原因、改 1 個檔', { col: C.gold, above: true, size: 30 })
-  r.t = term({ y: 128, h: 600, size: 22, title: '測試結果（AI 跑的，實拍文字）', note: '第 1 輪' })
-  r.hands = tip('之後你不用插手：AI 會自己確認網頁有在跑，再跑測試', { y: 806, size: 28, col: C.teal })
+  r.b2 = hl(r, b, [365, 360, 640, 42], '這一行：全綠後開子代理對抗審查', { col: C.violet, above: true, size: 26 })
+  r.t = term({ y: 128, h: 600, size: 21, title: '測試結果（AI 跑的，實拍文字，省略檔名）', note: '第 1 輪' })
+  const c = scr('cc23v2-red', FV); r.S.push(c)
+  r.c1 = hl(r, c, [371, 227, 658, 39], '第 1 輪：E3、E4 紅', { col: C.red, below: true, size: 28 })
+  r.c2 = hl(r, c, [371, 410, 658, 40], '自己判斷原因：先查 PRD 有沒有寫', { col: C.gold, above: true, size: 28 })
+  r.hands = tip('之後你不用插手：AI 自己確認網頁有在跑，再跑測試', { y: 806, size: 28, col: C.teal })
   return r
 }, [
   ['LOOP 要在教材根目錄做。用「檔案」→「開啟資料夾」，回到 AI_CRUD_Workshop_Frontend_EASY。', r => { show(r.S[0]); later(500, () => only(r, r.a1)) }],
   ['開一個新的 Claude Code 對話，把手冊 step4 的 LOOP prompt 整段複製過來。', r => { hide(r.S[0]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) }],
   ['貼上，送出。', r => { hide(r.bw.g); only(r); show(r.S[1]); later(300, () => only(r, r.b1)) }],
-  ['之後你不用插手。AI 會自己確認網頁有在跑，再跑測試。', r => { to(r, r.S[2]); only(r, r.c1); show(r.hands) }],
-  ['這次第一輪：5 條綠、2 條紅，紅的是 E3 和 E4。', r => { hide([r.S[2], r.hands]); only(r); show(r.t.g)
-    r.t.out(['Running 7 tests using 1 worker', '…', RED('  2 failed'), RED('    E3 新增品項：連動下拉、編碼即時產生且不重複、儲存後筆數 +1'), RED('    E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁'), GRN('  5 passed (17.0s)'), '', RED('E2E FAIL：測試程序 exit code = 1。')], { gap: 350 }) }],
-  ['AI 自己判斷原因：表單少了唯讀的「品項編碼」欄位，數量的預設值應該是 0。它改了 1 個檔。', r => { hide(r.t.g); show(r.S[3]); later(400, () => only(r, r.d1)) }],
+  ['prompt 裡有一行很重要：全綠之後，開一個子代理做對抗審查。這一行，就是把挑錯也交給 AI。', r => { zoom(r.S[1], [353, 340, 679, 80], { pad: 20, max: 1.6 }); only(r, r.b2) }],
+  ['之後你不用插手。AI 會自己確認網頁有在跑，再跑測試。', r => { unzoom(r.S[1]); hide(r.S[1]); only(r); show([r.t.g, r.hands]) }],
+  ['第一輪：5 條綠、2 條紅，紅的是 E3 和 E4。', r => { hide(r.hands)
+    r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列'), GRN('  ok 2 › E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫、清除後還原'), RED('  x  3 › E3 新增品項：連動下拉、編碼即時產生且不重複、儲存後筆數 +1'), RED('  x  4 › E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁'), GRN('  ok 5 › E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'), GRN('  ok 6 › E6 範本不回歸：人員範本列表可用，且點得進檢視頁看到資料'), GRN('  ok 7 › E7 編輯品項：改第一列數量與存放地點，儲存後新值生效'), RED('  2 failed'), GRN('  5 passed (17.4s)'), '', RED('E2E FAIL：測試程序 exit code = 1。')], { gap: 260 }) }],
+  ['AI 自己判斷原因：先去查 PRD 有沒有寫，再看參考解怎麼做，最後改了 1 個檔。', r => { hide(r.t.g); show(r.S[2]); later(400, () => only(r, r.c1, r.c2)) }],
 ])
 
-scene('第二輪全綠：看懂報告', () => {
-  const r = {}; mhead('step4 ③', '第二輪 7 條全綠，報告要看三件事')
-  r.t = term({ y: 128, h: 600, size: 21, title: '測試結果（AI 跑的，實拍文字）', note: '第 2 輪' })
-  const [a, b, c] = vsh(r, ['cc25b-loop-conclusion', 'cc24-loop-green', 'cc26-loop-rules'])
-  r.a1 = hl(r, a, [340, 200, 700, 120], '結論：2 輪、改 1 個檔', { col: C.green, above: true, size: 30 })
-  r.b1 = hl(r, b, [360, 420, 680, 46], '規格外調整：PRD 沒寫的改動要標出來', { col: C.gold, above: true, size: 28 })
-  r.c1 = hl(r, c, [380, 186, 640, 80], '鐵律檢查：測試沒動、共用件沒拆', { col: C.green, below: true, size: 28 })
-  r.you = tip('「數量預設 0」PRD 沒寫，AI 標成規格外調整——要不要補進 PRD，由你決定', { y: 806, size: 26, col: C.gold })
-  r.min = box(L, 1080, 64, 400, 46, '這次實拍：約 3 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+scene('第二輪全綠，再叫子代理挑錯', () => {
+  const r = {}; mhead('step4 ④', '第二輪全綠，AI 再叫分身來挑錯')
+  r.t = term({ y: 128, h: 600, size: 21, title: '測試結果（AI 跑的，實拍文字，省略檔名）', note: '第 2 輪' })
+  const [a, b] = vsh(r, ['cc23v2-agent', 'cc23v2-agent-now'])
+  r.a1 = hl(r, a, [371, 228, 658, 39], '第 2 輪 7 條全綠', { col: C.green, below: true, size: 28 })
+  r.a2 = hl(r, a, [364, 290, 262, 26], 'Agent：AI 自己叫出子代理', { col: C.violet, above: true, size: 28 })
+  r.a3 = hl(r, a, [371, 322, 658, 75], '交代它：專挑假綠、和測試沒抓到的 App 問題', { col: C.violet, below: true, size: 26 })
+  r.b1 = hl(r, b, [478, 524, 62, 20], '1 agent：分身正在挑錯', { col: C.violet, above: true, size: 28, pad: 6 })
+  r.min = box(L, 1080, 64, 400, 46, '這次實拍：約 24 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.hands = tip('從貼上 prompt 到交報告，你都不用插手', { y: 806, size: 30, col: C.teal })
   return r
 }, [
-  ['第二輪就 7 條全綠：7 passed。這次從貼上 prompt 到全綠，大約 3 分鐘。', r => { show([r.t.g, r.min])
-    const L2 = r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列'), GRN('  ok 2 › E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫'), GRN('  ok 3 › E3 新增品項：連動下拉、編碼即時產生且不重複'), GRN('  ok 4 › E4 表單驗證：五個必填逐欄驗錯'), GRN('  ok 5 › E5 刪除確認：取消不變、確認後 -1'), GRN('  ok 6 › E6 範本不回歸：人員範本列表可用'), GRN('  ok 7 › E7 編輯品項：改數量與存放地點，儲存後新值生效'), '', GRN('  7 passed (7.3s)'), GRN('E2E 全綠：7 條 passed / 0 條 failed / 0 條 skipped。')], { gap: 260 })
-    later(3200, () => { const m = r.t.mark(L2[9], '全綠', C.green); show(m); glow(m) }) }],
-  ['報告第一件：每一輪紅了什麼、原因是什麼、改了哪個檔。', r => { hide([r.t.g, r.min]); show(r.S[0]); later(400, () => only(r, r.a1)) }],
-  ['第二件：找不到 PRD 出處的改動，要標成「規格外調整」。這次的「數量預設 0」就是。', r => { to(r, r.S[1]); only(r, r.b1) }],
-  ['這種地方要你裁決：要不要把它補進 PRD，由你決定，不是 AI。', r => show(r.you)],
-  ['第三件：鐵律檢查。測試沒被動過、共用零件沒被拆掉、沒有同一題修兩次。', r => { hide(r.you); to(r, r.S[2]); only(r, r.c1) }],
+  ['第二輪，7 條全綠：7 passed。', r => { show(r.t.g)
+    const L2 = r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列'), GRN('  ok 2 › E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫、清除後還原'), GRN('  ok 3 › E3 新增品項：連動下拉、編碼即時產生且不重複、儲存後筆數 +1'), GRN('  ok 4 › E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁'), GRN('  ok 5 › E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'), GRN('  ok 6 › E6 範本不回歸：人員範本列表可用，且點得進檢視頁看到資料'), GRN('  ok 7 › E7 編輯品項：改第一列數量與存放地點，儲存後新值生效'), '', GRN('  7 passed (7.0s)'), GRN('E2E 全綠：7 條 passed / 0 條 failed / 0 條 skipped。')], { gap: 220 })
+    later(2600, () => { const m = r.t.mark(L2[10], '全綠', C.green); show(m); glow(m) }) }],
+  ['接著，AI 照 prompt 自己叫出一個子代理，也就是它的分身，專門來挑錯。', r => { hide(r.t.g); show(r.S[0]); later(400, () => only(r, r.a1)); later(1800, () => only(r, r.a2)) }],
+  ['它交代分身：專挑測試的假綠，還有測試沒抓到的 App 問題。分身只回報，不改檔。', r => only(r, r.a2, r.a3)],
+  ['下面出現「1 agent」，就是分身正在工作。這次從貼上到交報告，大約 24 分鐘，你都不用插手。', r => { to(r, r.S[1]); only(r, r.b1); show([r.min, r.hands]) }],
 ])
 
-scene('驗收報告：兩項抽查', () => {
-  const r = {}; mhead('step4 ④', '別只看報告：自己做兩項抽查')
-  r.t = term({ y: 128, h: 640, size: 25, note: '放大給你看（實拍文字）' })
-  const [a, b] = vsh(r, ['vs31-git-diff', 'vs32-select-string'])
-  r.a1 = hl(r, a, 'cmd', 'git diff e2e/', { below: true, size: 28 })
-  r.a2 = hl(r, a, 'prompt', '什麼都沒印：初步沒問題', { col: C.green, below: true, size: 28 })
-  r.b1 = hl(r, b, 'hit', '193 行：載入共用零件', { col: C.green, below: true, size: 28 })
-  r.zip = grp(L); R(r.zip, 80, 776, 1440, 110, { fill: C.card, stroke: C.teal, sw: 3, rx: 14 })
-  T(r.zip, 110, 818, 'git diff 只看得到「還沒交給 git」的修改；AI 下過 git add 或 git commit 就看不出來', { size: 26, weight: 800, fill: C.teal })
-  T(r.zip, 110, 862, '要百分之百確定：用 Get-FileHash 跟講師發的雜湊比對（zip 副本也用這招）', { size: 26, weight: 800, fill: C.ink })
-  r.ln = tip('行號是這次實拍的位置，你的會不一樣；重點是找不找得到', { y: 790, size: 28, col: C.teal })
-  r.why = tip('報告是 AI 寫的；燈亮不等於做對，抽查要你自己來', { y: 790, size: 30 })
+scene('看報告：分身挑到的問題怎麼處理', () => {
+  const r = {}; mhead('step4 ⑤', '看報告：分身挑到的，AI 分兩種處理')
+  const [a, b, c, d] = vsh(r, ['cc25v2-conclusion', 'cc25v2-fixed', 'cc25v2-tests', 'cc26v2-question'])
+  r.a1 = hl(r, a, [366, 268, 662, 46], '結論：App 問題修了 5 個，測試的問題一條都沒改', { col: C.green, below: true, size: 24 })
+  r.a2 = hl(r, a, [371, 373, 658, 122], '每輪紀錄：紅了什麼、根因、改了哪個檔', { col: C.gold, above: true, size: 26 })
+  r.b1 = hl(r, b, [371, 336, 658, 42], 'B1：打字時游標被搶走——測試沒抓到，分身抓到了', { col: C.coral, above: true, size: 24 })
+  r.b2 = hl(r, b, [943, 423, 85, 66], '規格外調整：PRD 沒寫的要標出來', { col: C.gold, above: true, right: true, size: 24 })
+  r.c1 = hl(r, c, [371, 228, 658, 29], '測試本身的問題：一條都沒改，列給你裁決', { col: C.violet, below: true, size: 26 })
+  r.d1 = hl(r, d, [361, 265, 640, 24], '要你拍板的，AI 用選擇題問你', { col: C.gold, above: true, size: 26 })
+  r.d2 = hl(r, d, [361, 294, 648, 60], '例：數量預設 0，要不要補進 PRD', { col: C.green, below: true, size: 26 })
+  r.you = tip('你只做三件事：看報告、做裁決、自己在瀏覽器點一遍', { y: 806, size: 30 })
+  r.prdfix = tip('實拍之後，課程已拍板：PRD 第 2 節補上「數量預設 0」', { y: 806, size: 28, col: C.teal })
+  r.rt = term({ y: 128, h: 560, size: 26, title: '報告的「每輪紀錄」（實拍文字）', shell: 'Claude Code' }); r.rt.hideCursor()
   return r
 }, [
-  ['拿到報告，自己再做兩項抽查。報告是 AI 寫的，燈亮不等於做對。', r => { show([r.t.g, r.why]); r.t.prompt() }],
-  ['第一，在 step4_loop_e2e 資料夾跑 git diff e2e/。', r => { hide(r.why); r.t.clear(); r.t.cmd('cd step4_loop_e2e'); later(1800, () => r.t.cmd('git diff e2e/', { path: LAB + '\\step4_loop_e2e' })) }],
-  ['什麼都沒印出來，直接回到提示字元，是初步沒問題。git diff 只看得到還沒交給 git 的修改；要百分之百確定，就跟講師發的雜湊比對。', r => { show(r.zip); const p2 = r.t.prompt(LAB + '\\step4_loop_e2e'); later(500, () => { const m = r.t.mark(p2, '沒有輸出：初步沒問題', C.green); show(m) }) }],
-  ['第二，到 my-equipment-app，用 Select-String 搜尋 useTemplateListPage。', r => { hide(r.zip); r.t.clear(); r.t.cmd('cd ..\\step3_new_module\\my-equipment-app', { path: LAB + '\\step4_loop_e2e' }); later(2600, () => r.t.cmd('Select-String -Path pages\\equipment\\crud\\index.vue -Pattern "useTemplateListPage"', { path: MYAPP, cps: 30 })) }],
-  ['找得到是好現象：193 行載入共用零件，214 行呼叫它。如果一行都找不到，就請 AI 說明：共用零件是不是被拆掉、自己另寫了一套。', r => { show(r.ln); const L2 = r.t.out(['', 'pages\\equipment\\crud\\index.vue:5:  衍生資料一律 computed（NFR-T-05），列表狀態委由共用的 useTemplateListPage 工廠管理。', 'pages\\equipment\\crud\\index.vue:193:import { useTemplateListPage } from \'~/composables/useTemplateListPage\'', 'pages\\equipment\\crud\\index.vue:204:/** 與 useTemplateListPage 管理的頁碼 query key 一致；排序變更時要一併拿掉，讓頁面回到第 1 頁 */', 'pages\\equipment\\crud\\index.vue:214:const { filters, page, pageSize, resetFilters, buildReturnQuery } = useTemplateListPage({'], { gap: 300 }); later(1500, () => { show(r.t.mark(L2[2], '載入', C.green)); later(900, () => show(r.t.mark(L2[4], '真的呼叫', C.green))) }) }],
-  ['這是同一次的真實畫面。', r => { hide([r.t.g, r.ln]); show(r.S[1]); later(500, () => only(r, r.b1)) }],
+  ['報告一開頭就是結論：7 條全綠，連跑兩次都綠。分身挑到的 App 問題修了 5 個，測試的問題一條都沒改。', r => { show(r.S[0]); later(400, () => only(r, r.a1)) }],
+  ['每一輪紅了什麼、原因是什麼、改了哪個檔，都列成一張表。第 3 輪是分身挑完錯、AI 修好之後，又跑了兩次都綠。', r => { only(r); hide(r.S[0]); show(r.rt.g)
+    r.rt.out([[['第 1 輪｜紅了：E3、E4', TC.err, 800]], '  根因：E3 表單裡沒有「品項編碼」欄位，只有標題文字。E4 數量預設是空白，測試要 0', '  改了：[id].vue', '', [['第 2 輪｜紅了：無（7 passed）', TC.ok, 800]], '', [['第 3 輪（審查修完）｜紅了：無（7 passed，重跑一次也綠）', TC.ok, 800]], '  改了：index.vue、[id].vue、useEquipmentItems.ts、SRS、SDD'], { gap: 300 }) }],
+  ['分身挑到的 App 問題，AI 自己修好再跑。最嚴重的一個：在關鍵字框打字，停一下游標就被搶走，後面打的字全掉。這個 7 條測試都沒抓到。', r => { hide(r.rt.g); to(r, r.S[1]); only(r, r.b1) }],
+  ['PRD 沒寫、AI 自己加的改動，例如這次的數量預設 0，照 prompt 可以先改，但一定要標成「規格外調整」，最後交給你決定要不要留。', r => only(r, r.b2)],
+  ['測試本身的問題，AI 一條都沒改，全部列給你裁決。這就是鐵律：不准偷改答案卷。', r => { to(r, r.S[2]); only(r, r.c1) }],
+  ['需要你拍板的，AI 最後用選擇題問你。例如：數量預設 0，要不要補進 PRD。這一題課程已經拍板，現在的 PRD 已經補上了。', r => { to(r, r.S[3]); only(r, r.d1, r.d2); show(r.prdfix) }],
+  ['所以你只做三件事：看報告、做裁決、自己在瀏覽器點一遍。', r => { only(r); hide(r.prdfix); show(r.you); glow(r.you) }],
+])
+
+scene('驗收不用打指令：照表用眼睛核', () => {
+  const r = {}; mhead('step4 ⑥', '驗收不用打指令：照表用眼睛核')
+  r.bw = bwin(['br09-handbook-check', 'ea01-list'], 'HANDBOOK.html#step4'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'table', '', { col: OR })
+  r.hcap = tip('手冊 step4「你應該看到」這張表', { y: 806, size: 30, col: OR })
+  r.h2 = hl(r, r.B[0], 'review', '對抗審查有做', { col: C.violet, size: 28, above: true })
+  r.h3 = hl(r, r.B[0], 'click', '畫面真的能用：自己點一遍', { col: OR, size: 28, above: true })
+  r.h4 = hl(r, r.B[0], 'green', '7 passed＝測試檔跟基準一致', { col: C.green, size: 28, above: true })
+  r.e1 = tip('列表、新增、編輯、刪除各點一次；報告寫的改動多看一眼', { y: 806, size: 28, col: C.teal })
+  return r
+}, [
+  ['最後驗收，不用打任何指令。照手冊這張表，用眼睛核。', r => { show(r.bw.g); show(r.B[0]); show(r.hcap); later(300, () => only(r, r.h1)) }],
+  ['對抗審查有做：報告要寫分身挑到什麼。App 的問題修了沒，測試的問題有沒有列給你。', r => { hide(r.hcap); only(r, r.h2) }],
+  ['畫面真的能用：打開 localhost:3100/equipment/crud，自己點一遍。', r => only(r, r.h3)],
+  ['列表、新增、編輯、刪除，各點一次。報告寫的那幾個改動，多看一眼。', r => { only(r); burl(r.bw, 'localhost:3100/equipment/crud', true); swap(r.B, r.B[1]); show(r.e1) }],
+  ['最後要有 7 passed。測試腳本開跑前，會先比對測試檔和基準，對不上就拒跑。所以 7 passed 代表測試檔跟基準一致。AI 如果連基準一起重算，還是騙得過，所以報告也要看。', r => { hide(r.e1); burl(r.bw, 'HANDBOOK.html#step4'); swap(r.B, r.B[0]); only(r, r.h4) }],
 ])

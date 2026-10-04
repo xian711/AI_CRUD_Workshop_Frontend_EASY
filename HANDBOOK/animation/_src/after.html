@@ -42,11 +42,10 @@
       <h3>Step 4 讓 AI 修到全綠</h3>
       <ul>
         <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
-        <li>開新的 Claude Code 對話，貼手冊的 LOOP prompt</li>
+        <li>開新的 Claude Code 對話，貼手冊的 LOOP prompt（裡面已經寫好：全綠後開子代理對抗審查）</li>
         <li>等它交報告：<code>7 passed</code></li>
-        <li>抽查一：在 step4_loop_e2e 跑 <code>git diff e2e/</code>，應該是空的。它只看得到還沒交給 git 的修改；要百分之百確定（或拿到的是 zip 副本），用 <code>Get-FileHash</code> 跟講師發的雜湊比對</li>
-        <li>對抗審查：App 的問題交回 AI 修；測試本身的問題不叫 AI 改，交給講師裁決</li>
-        <li>抽查二：在 my-equipment-app 搜尋 <code>useTemplateListPage</code>，應該找得到；一行都找不到，就請 AI 說明共用零件是不是被拆掉、另寫了一套</li>
+        <li>用眼睛驗收：報告每一輪紅了什麼、改了哪個檔，最後有 <code>7 passed</code>；再自己在瀏覽器把裝備物資頁點一遍</li>
+        <li>對抗審查由 AI 自己開子代理做：App 的問題它修完再跑；測試本身的問題列給你裁決。想更放心，再找別家 AI（例如 Codex）審一次</li>
       </ul>
       <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準</p>
     </div>
@@ -60,7 +59,6 @@
       <li>開網頁：<code>open HANDBOOK/HANDBOOK.html</code>（Windows 是 <code>start</code>）</li>
       <li>複製範本：<code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是 robocopy）</li>
       <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）</li>
-      <li>抽查共用件：<code>grep -n useTemplateListPage pages/equipment/crud/index.vue</code>（Windows 是 Select-String）</li>
     </ul>
   </div>
 

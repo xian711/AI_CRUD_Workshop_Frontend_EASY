@@ -17,9 +17,9 @@ SKIP = ('_', 'x', 'cc11-build-t')
 # 個資處理：{檔名: [('crop', 左, 上, 右, 下) | ('fill', x0, y0, x1, y1, 顏色)]}（原始像素）
 FIX = {
     'vs08-open-folder-dialog': [('fill', 14, 205, 300, 412, (255, 255, 255)), ('crop', 14, 0, None, None)],
-    # Claude Code 的 Bash 指令露出 Windows 帳號（C:/Users/帳號/…）：蓋掉帳號，改寫成 user
-    'cc11-progress': [('retext', 866, 648, 911, 669, 'user', (18, 19, 20), (191, 191, 191))],
-    'cc12-done': [('retext', 876, 383, 924, 404, 'user', (18, 19, 20), (191, 191, 191))],
+    # 第二版實拍：AI 的選項裡出現 git 帳號名稱，蓋掉改寫成「帳號」
+    'cc09b-start-question': [('retext', 774, 752, 846, 781, '帳號', (25, 26, 27), (140, 140, 140), 'msjh.ttc', 22)],
+    'cc09d-go-selected': [('retext', 774, 752, 846, 781, '帳號', (25, 26, 27), (140, 140, 140), 'msjh.ttc', 22)],
 }
 used = []
 for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
@@ -31,10 +31,12 @@ for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
         if op[0] == 'fill':
             ImageDraw.Draw(im).rectangle(op[1:5], fill=op[5])
         elif op[0] == 'retext':
-            # ('retext', x0, y0, x1, y1, 新文字, 底色, 字色)：蓋掉一段字，再用等寬字型寫上新文字
+            # ('retext', x0, y0, x1, y1, 新文字, 底色, 字色[, 字型, 字級])：蓋掉一段字，再寫上新文字（預設等寬字型）
             from PIL import ImageFont
             d = ImageDraw.Draw(im); d.rectangle(op[1:5], fill=op[6])
-            d.text((op[1] + 2, op[2] + 1), op[5], font=ImageFont.truetype('consola.ttf', 19), fill=op[7])
+            font = ImageFont.truetype(op[8] if len(op) > 8 else 'consola.ttf', op[9] if len(op) > 9 else 19)
+            l, t, r, b = d.textbbox((0, 0), op[5], font=font)
+            d.text(((op[1] + op[3] - (r - l)) / 2 - l, (op[2] + op[4] - (b - t)) / 2 - t), op[5], font=font, fill=op[7])
         elif op[0] == 'crop':
             l, t, r, b = op[1], op[2], op[3] or im.size[0], op[4] or im.size[1]
             # meta 的座標是 CSS px；對話框的 meta 本來就是原始像素，一起位移

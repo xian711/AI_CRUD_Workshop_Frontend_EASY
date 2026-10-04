@@ -25,7 +25,7 @@ SRC_FILES = ['scenes.js', 'scenes-b.js', 'scenes-c.js', 'scenes-d.js', 'scenes-e
              'helpers.js', 'helpers-crud.js', 'engine-crud.html', 'after.html',
              'mk.sh', 'prep.py', 'build.py', 'check.mjs', 'sheet.py', 'export-index.mjs', 't-pause.mjs', 'install.py',
              'vsc-lib.mjs', 'driver.mjs', 'send.mjs', 'waitidle.sh', 'dlg.ps1', 'ocr-find.ps1',
-             'cap-a1.mjs', 'cap-a2.mjs', 'cap-a3.mjs', 'cap-a4.mjs', 'cap-a5.mjs', 'cap-b.mjs', 'cap-b2.mjs', 'cap-b3.mjs', 'cap-b4.mjs',
+             'cap-a1.mjs', 'cap-a2.mjs', 'cap-a3.mjs', 'cap-a4.mjs', 'cap-a5.mjs', 'cap-b.mjs', 'cap-b2.mjs', 'cap-b3.mjs', 'cap-b4.mjs', 'cap-c1.mjs', 'cap-c4.mjs', 'waitidle2.sh', 'c-busy2.json',
              'handbook-blocks.json']
 for f in SRC_FILES:
     p = os.path.join(HERE, f)
