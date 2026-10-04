@@ -17,6 +17,8 @@
 2. 跑前置檢查：進 `step0_course_intro`，Windows 跑 `.\preflight.ps1`，macOS／Linux 跑 `bash preflight.sh`。
 3. 全數 PASS 後，用瀏覽器打開 **`HANDBOOK/HANDBOOK.html`**——整堂課只看這一份，從 step0 走到 step5。
 
+> 想先看一遍怎麼操作？用瀏覽器打開 **`HANDBOOK/animation/index.html`**：手把手教學動畫，終端機、VS Code、瀏覽器全程實拍（Windows 版，有字幕和中文語音）。
+
 ## 資料夾一覽
 
 | 資料夾 | 是什麼 |

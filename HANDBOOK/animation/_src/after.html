@@ -1,0 +1,84 @@
+<section class="after">
+  <h2>文字版速查</h2>
+  <p>動畫裡的畫面，都是 2026-10-04 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <div class="roles">
+    <div class="role" style="--c:#f4b942">
+      <h3>Step 0 準備環境</h3>
+      <ul>
+        <li>VS Code 選單「終端機」→「新增終端」（快捷鍵 Ctrl+`）</li>
+        <li><code>cd D:\</code></li>
+        <li><code>git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git</code></li>
+        <li>「檔案」→「開啟資料夾」→ 選 AI_CRUD_Workshop_Frontend_EASY → 信任作者</li>
+        <li><code>cd step0_course_intro</code>，再 <code>.\preflight.ps1</code></li>
+      </ul>
+      <p class="out">看到「前置檢查全數通過，可以開課！」就過關</p>
+    </div>
+    <div class="role" style="--c:#39c0c8">
+      <h3>Step 2 玩範本</h3>
+      <ul>
+        <li>先回到教材根目錄：<code>cd ..</code>（開頭要是 <code>PS D:\AI_CRUD_Workshop_Frontend_EASY&gt;</code>）</li>
+        <li><code>cd step2_speedrun_kit/2.1_sample_app/sample-app</code></li>
+        <li><code>pnpm install</code> → <code>pnpm dev</code>（這個終端機不要關）</li>
+        <li>按住 Ctrl 點 <code>http://localhost:3100/</code></li>
+        <li>五個檢查點：新增、編輯、刪除確認、篩選＋網址、匯出 CSV</li>
+        <li>要再打指令：終端機右上角「＋」開第二個</li>
+      </ul>
+      <p class="out">共用的 3 個核心檔不要動；四份規矩在 sample-app 最上層</p>
+    </div>
+    <div class="role" style="--c:#ef8fc6">
+      <h3>Step 3 叫 AI 做新模組</h3>
+      <ul>
+        <li>教材根目錄整段貼上手冊 step3 ⓪ 的複製指令，出現 <code>&gt;&gt;</code> 後再按 Enter</li>
+        <li>「檔案」→「開啟資料夾」→ my-equipment-app</li>
+        <li>右下角「✻ Claude Code」→ 貼起手 prompt → 送出</li>
+        <li>三題選擇題照課堂拍板：D1 補刪除＋確認視窗、D2 做 CSV 匯出、D3 簡化版編碼（不加機關前綴、同一個編碼不累加數量）</li>
+        <li>確認任務清單 → 開工</li>
+        <li>驗收前先確認網頁有在跑：打不開就在 <code>step3_new_module\my-equipment-app</code> 執行 <code>pnpm dev</code></li>
+        <li>驗收：<code>http://localhost:3100/equipment/crud</code></li>
+      </ul>
+      <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
+    </div>
+    <div class="role" style="--c:#a996ff">
+      <h3>Step 4 讓 AI 修到全綠</h3>
+      <ul>
+        <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
+        <li>開新的 Claude Code 對話，貼手冊的 LOOP prompt</li>
+        <li>等它交報告：<code>7 passed</code></li>
+        <li>抽查一：在 step4_loop_e2e 跑 <code>git diff e2e/</code>，應該是空的。它只看得到還沒交給 git 的修改；要百分之百確定（或拿到的是 zip 副本），用 <code>Get-FileHash</code> 跟講師發的雜湊比對</li>
+        <li>對抗審查：App 的問題交回 AI 修；測試本身的問題不叫 AI 改，交給講師裁決</li>
+        <li>抽查二：在 my-equipment-app 搜尋 <code>useTemplateListPage</code>，應該找得到；一行都找不到，就請 AI 說明共用零件是不是被拆掉、另寫了一套</li>
+      </ul>
+      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px">用 macOS／Linux 的對照</h2>
+  <div class="where">
+    <p>動畫只拍 Windows。macOS 的步驟一樣，只有指令不同（都在手冊 HANDBOOK.html 裡）：</p>
+    <ul>
+      <li>前置檢查：<code>bash preflight.sh</code>（Windows 是 <code>.\preflight.ps1</code>）</li>
+      <li>開網頁：<code>open HANDBOOK/HANDBOOK.html</code>（Windows 是 <code>start</code>）</li>
+      <li>複製範本：<code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是 robocopy）</li>
+      <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）</li>
+      <li>抽查共用件：<code>grep -n useTemplateListPage pages/equipment/crud/index.vue</code>（Windows 是 Select-String）</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">卡住時</h2>
+  <div class="where">
+    <ul>
+      <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
+      <li><b>preflight 出現 [FAIL]</b>：照修復提示做 → 關掉終端機重開再跑 → 還是紅，整段輸出（連 [PASS] 的行）貼給 AI。</li>
+      <li><b>網頁一打開就是 500、寫著 useColorMode is not defined</b>：這次實拍在全新下載的參考解上也遇到過，重開一次就好。在跑 pnpm dev 的終端機按 Ctrl+C 停掉，再打一次 <code>pnpm dev</code>；還不行，刪掉該專案的 .nuxt、.output 兩個資料夾再跑。</li>
+      <li><b>pnpm 噴一大串紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
+      <li><b>localhost:3100 打不開</b>：多半是網頁伺服器沒在跑。到要看的專案資料夾（範本是 sample-app、新模組是 my-equipment-app）執行 <code>pnpm dev</code>，那個終端機不要關。</li>
+      <li><b>localhost:3100 開到別的網站，或 pnpm dev 說 3100 被占用</b>：別的程式先占了 3100，先關掉它（preflight 會檢查這一項）。</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">檔案位置</h2>
+  <div class="where">
+    <p>這支動畫在教材的「HANDBOOK\animation」資料夾裡，檔名是 index.html（用瀏覽器打開）。</p>
+    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：場景檔 scenes-all.js、截圖腳本、座標檔 meta.json。</p>
+  </div>
+</section>
