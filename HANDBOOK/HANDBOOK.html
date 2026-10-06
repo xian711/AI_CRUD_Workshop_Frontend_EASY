@@ -193,15 +193,15 @@
 <div class="hero">
   <div class="hero-card">
     <h1>用「範本 + harness + AI」<br>讓新 CRUD 模組的骨架快速交付</h1>
-    <a class="anim-link" href="animation/index.html">▶ 手把手教學動畫：終端機、VS Code、瀏覽器全程實拍</a>
+    <a class="anim-link" href="animation/index.html">▶ 手把手教學動畫：harness・SDD・LOOP・對抗審查，全程實拍</a>
   </div>
 </div>
 
 <main>
 
   <figure class="overview">
-    <img src="images/overview_metaphor.jpg" alt="用滷味比喻整套方法：harness 是滷包、範本是配方、SDD 是料理紀錄、知識累積是老滷汁">
-    <figcaption>一張圖看完整套方法：<strong>harness 是滷包</strong>（給 AI 的規矩）、<strong>範本是配方</strong>（AI 照著填的骨架）、<strong>SDD 是料理紀錄</strong>（改程式時文件同步更新）、<strong>知識累積是老滷汁</strong>（越熬越香）。</figcaption>
+    <img src="images/overview_metaphor.jpg" alt="用滷味比喻整套方法：harness 是滷包、範本是配方、SDD（規格驅動開發）是先寫料理紀錄再下鍋、改了配方紀錄跟著改、知識累積是老滷汁">
+    <figcaption>一張圖看完整套方法：<strong>harness 是滷包</strong>（給 AI 的規矩）、<strong>範本是配方</strong>（AI 照著填的骨架）、<strong>SDD 是照料理紀錄做菜</strong>（<strong>SDD＝規格驅動開發：先文件、再程式；程式改了，文件跟著改</strong>）、<strong>知識累積是老滷汁</strong>（越熬越香）。</figcaption>
   </figure>
 
   <div class="outline">
@@ -397,10 +397,10 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
       <h3>⑤ 認識 token：Design System</h3>
       <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距（開不了瀏覽器就改看同資料夾的 <code>TOKENS_SUMMARY.md</code>，純文字版，順帶解釋了「token 檔裡明明有 <code>#C8232C</code>、<code>24px</code>，為什麼不算硬編碼」），知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
 
-      <blockquote><strong>這三份想查才翻，現在別花時間讀：</strong><code>2.1_sample_app/SPEC-範例-人員CRUD.md</code>（需求規格：Use Cases、FR／BR／NFR、驗收清單）、<code>2.1_sample_app/SDD-CRUD標準範本-v1.1.md</code>（設計：檔案結構、行數預算、各檔實作規格）、<code>2.1_sample_app/DIAGRAMS.html</code>（7 張 UML 圖，用瀏覽器開）。它們是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</blockquote>
+      <blockquote><strong>這三份想查才翻，現在別花時間讀：</strong><code>2.1_sample_app/SPEC-範例-人員CRUD.md</code>（需求規格：Use Cases、FR／BR／NFR、驗收清單）、<code>2.1_sample_app/DESIGN-CRUD標準範本-v1.1.md</code>（設計文件：檔案結構、行數預算、各檔實作規格）、<code>2.1_sample_app/DIAGRAMS.html</code>（7 張 UML 圖，用瀏覽器開）。它們是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</blockquote>
 
       <div class="block-title"><span class="ico">🚑</span>裝不起來／跑不起來怎麼辦</div>
-      <p><code>pnpm install</code> 或 <code>pnpm dev</code> 噴一大串紅字，處置跟 step0 同一套：<strong>先看訊息有沒有明講原因</strong>（最常見是 port 3100 被別的程式占用、或公司網路擋住 npm），還是不行就<strong>把終端機從你打的指令那一行開始整段複製，貼給 AI Agent</strong>——只貼最後一行紅字它判不準。可以用這個 prompt：</p>
+      <p><code>pnpm install</code> 或 <code>pnpm dev</code> 噴一大串紅字，處置跟 step0 同一套：<strong>先看訊息有沒有明講原因</strong>（最常見是公司網路擋住 npm；port 3100 被占用不算錯，pnpm dev 會自動換埠印在終端機），還是不行就<strong>把終端機從你打的指令那一行開始整段複製，貼給 AI Agent</strong>——只貼最後一行紅字它判不準。可以用這個 prompt：</p>
       <pre><code>範本專案的 pnpm 指令失敗了，完整輸出在下面，我用 Windows 11。
 請說明原因，給我可複製的修復指令；不要改專案的程式碼。
 
@@ -446,7 +446,7 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
     </div>
     <div class="step-body">
       <figure><img src="images/step3_paradigm.jpg" alt="典範轉移：從執行者變成指揮官">
-        <figcaption>這一步你不寫程式：<strong>提需求、做決策、驗收成果</strong>是你的事；生成程式碼、修到測試全綠、寫 SRS／SDD 是 AI 的事。（本課只用一個 Agent，第二個 AI 到 step4 對抗審查才登場。）</figcaption></figure>
+        <figcaption>這一步你不寫程式：<strong>提需求、做決策、驗收成果</strong>是你的事；生成程式碼、修到測試全綠、寫 SRS、設計文件和圖是 AI 的事。（本課只用一個 Agent，第二個 AI 到 step4 對抗審查才登場。）</figcaption></figure>
       <div class="goal">
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
@@ -465,11 +465,13 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
 $dst = "step3_new_module\my-equipment-app"
 robocopy $src $dst /E /XD node_modules .nuxt .output | Out-Null
 Copy-Item step3_new_module\PRD-中心裝備物資.md $dst\
+Copy-Item step3_new_module\SRS-設計文件-最小樣板.md $dst\
 cd $dst
 pnpm install</code></pre>
       <p>macOS／Linux（終端機）：</p>
       <pre><code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output step2_speedrun_kit/2.1_sample_app/sample-app/ step3_new_module/my-equipment-app/
 cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
+cp step3_new_module/SRS-設計文件-最小樣板.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install</code></pre>
       <blockquote><strong>🚑 一開頁就 500、錯誤訊息寫 <code>useColorMode is not defined</code>？</strong>不是你的程式壞了，是舊的建置快取被複製過來了。關掉 dev server，把<strong>你這個工作專案</strong>（<code>my-equipment-app</code>）裡的 <code>.nuxt</code> 和 <code>.output</code> 兩個資料夾刪掉，再 <code>pnpm dev</code> 就好——它們是產物，砍了會自動重生。<strong>注意：刪的是你的工作專案，不要去刪 <code>2.1_sample_app/sample-app</code> 的。</strong>（上面的複製指令已經排除這兩個資料夾，正常不會遇到；這裡留著是為了萬一。）</blockquote>
@@ -479,11 +481,12 @@ pnpm install</code></pre>
 
       <h3>② 貼起手 prompt，讓 AI 先問問題</h3>
       <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。整段複製貼上：</p>
-      <pre><code>你是本專案的前端工程師，要用 CRUD 範本開發新模組「中心裝備物資」。
+      <pre><code>用 CRUD 範本做新模組「中心裝備物資」，走規格驅動開發（SDD）：先文件，再程式。
 先讀 CLAUDE.md、CODE-RULES-ui-本專案.md、使用說明-複製範本開發新模組.md、PRD-中心裝備物資.md，先不要寫程式。
-用選擇題逐題問我 PRD 第 5 節的 D1～D3，每題 2～4 個選項，標出建議和一句理由。
-我拍板後列約 8 個小任務（含 SRS／SDD），等我說「開工」才動手，每做完一個回報一行。</code></pre>
-      <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 列任務 → 你確認 → AI 逐項做並回報。</strong></p>
+PRD 第 5 節的 D1～D3 和其他沒寫清楚的地方，用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 SRS、設計文件、UML 圖和任務清單；等我說「開工」才寫程式，每做完一個回報一行。</code></pre>
+      <blockquote><strong>模型怎麼選：</strong>文件階段（選擇題、SRS、設計文件、圖）用 <strong>Opus 5.5</strong>、effort High<span class="note">（effort＝讓 AI 想得多深的設定）</span>。說「開工」寫程式前，把模型切成 <strong>Sonnet 5.5</strong>——有 harness 和範本，寫程式不用最貴的模型。<br><strong>一直跳出「允許嗎」？</strong>Claude Code 每個指令都問你的話，可以在輸入框右下角把核准模式切成 Auto（自動核准），課堂上才走得開；公司電腦照公司規定。</blockquote>
+      <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 出文件和任務 → 你確認 → AI 逐項做並回報。</strong>這就是 SDD（規格驅動開發）：先文件，再程式。</p>
       <div class="flow">你：貼<b>【起手 prompt】</b>
    ▼
 AI：依序讀 CLAUDE.md → CODE-RULES → 使用說明 → PRD
@@ -492,14 +495,14 @@ AI：先不寫程式，改用<b>「選擇題」</b>問你範圍（每題 2-4 選
    ▼
 你：一題一題拍板（可直接採納建議）
    ▼
-AI：輸出<b>「任務清單」</b>（8-10 個），停下等你確認
+AI：照最小樣板產出<b>「SRS、設計文件、圖、任務清單」</b>（任務 8-10 個），停下等你確認
    ▼
 你：說<b>「開工」</b>
    ▼
 AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <h3>③ 一題一題拍板</h3>
-      <p>AI 會問三題（對應 PRD 第 5 節的三個決策點），逐題拍板（可直接採納建議選項）：</p>
+      <p>AI 至少會問三題（對應 PRD 第 5 節的三個決策點；PRD 其他沒寫清楚的地方，它也可能多問幾題），逐題拍板（可直接採納建議選項）：</p>
       <div class="table-scroll">
       <table>
         <thead><tr><th>#</th><th>AI 會問</th><th>課堂拍板</th></tr></thead>
@@ -512,14 +515,14 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       </div>
       <blockquote>三題不用背。重點是理解：<strong>每題都是在「真實系統」和「課堂」之間做取捨，做取捨的人是你，不是 AI。</strong><br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼這段救援 prompt 打斷它：</blockquote>
       <pre><code>停，先不要寫程式、不要建檔案。
-先用選擇題逐題問我 PRD 第 5 節的 D1～D3，我拍板後再列任務，等我說「開工」。</code></pre>
+先用選擇題逐題問我 PRD 第 5 節的 D1～D3，我拍板後再產出文件和任務清單，等我說「開工」。</code></pre>
 
-      <h3>④ 確認任務清單、說「開工」</h3>
-      <p>AI 會產出約 8 個小到能單獨驗收的任務（T1 資料模型與 mock、T2 複製改名五檔、T3 列表頁、T4 表單頁、T5 連動下拉與編碼、T6 刪除＋CSV、T7 SRS/SDD、T8 自測）。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
-      <blockquote><strong>T7 的 SRS／SDD 不要用「有兩個檔就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-SDD-最小樣板.md</code>——那份把最低門檻定死成四段：SRS 要有<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>；SDD 要有<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>。缺一段就退回去補。裡面也用白話解釋了 SRS／SDD 這兩個縮寫對不寫程式的人到底是什麼、你只要親自核哪幾段。<br>想看<strong>填好的</strong>長什麼樣，<code>step3_new_module/docs/</code> 裡有參考解的 <code>SRS-裝備物資.md</code>、<code>SDD-裝備物資.md</code> 與任務清單 <code>TASKS.md</code>——一樣是<strong>先自己做，卡住再開</strong>。</blockquote>
+      <h3>④ 確認文件與任務清單、說「開工」</h3>
+      <p>拍板後，AI 先交出 SRS、設計文件、圖（DIAGRAMS 用瀏覽器開，看圖就好），再列一份小到能單獨驗收的任務清單（數量依 AI 怎麼拆而定，實拍那次是 14 個：複製改名、資料層、列表頁、明細頁、驗證、側欄、規則檢查、自測與文件對齊）。文件看得懂、任務順序合理，就回「開工」；覺得少了什麼先補一句再放行。</p>
+      <blockquote><strong>SRS、設計文件和圖不要用「有檔案就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-設計文件-最小樣板.md</code>——那份把最低門檻定死：SRS 四段（<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>）；設計文件四段（<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>）＋<strong>圖四張</strong>（用例、檔案架構、資料模型、新增流程）。缺一樣就退回去補。裡面也用白話解釋了 SDD（規格驅動開發）這套流程、SRS 和設計文件對不寫程式的人到底是什麼、你只要親自核哪幾段。<br>想看<strong>填好的</strong>長什麼樣，<code>step3_new_module/docs/</code> 裡有參考解的 <code>SRS-裝備物資.md</code>、<code>DESIGN-裝備物資.md</code>、<code>DIAGRAMS-裝備物資.html</code> 與任務清單 <code>TASKS.md</code>——一樣是<strong>先自己做，卡住再開</strong>。</blockquote>
 
       <h3>⑤ 驗收與修正</h3>
-      <p>確認 dev server 在跑（port 3100），打開 <code>http://localhost:3100/equipment/crud</code>，拿 <code>step3_new_module/PRD-中心裝備物資.md</code> 第 2 節的 12 欄規格逐項對照——每一欄檢查四件事：label 文字、必不必填、用哪種元件、驗證規則。</p>
+      <p>確認 dev server 在跑，打開它印出的網址再加上 <code>/equipment/crud</code>（預設 <code>http://localhost:3100/equipment/crud</code>；3100 被占用時 pnpm dev 會自動換埠，例如 3101），拿 <code>step3_new_module/PRD-中心裝備物資.md</code> 第 2 節的 12 欄規格逐項對照——每一欄檢查四件事：label 文字、必不必填、用哪種元件、驗證規則。</p>
 
       <div class="block-title"><span class="ico">📦</span>產出物：8 檔改名對照</div>
       <p>AI 做完後，用這張表核對它有沒有照「複製 vs 共用」的心法做。<strong>判斷準則就一句：跟實體長相有關的 → 複製改名；通用機制 → 直接共用。</strong>這正是 step2 ③ 那張 8 核心檔表實際套用的樣子。</p>
@@ -538,7 +541,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
         </tbody>
       </table>
       </div>
-      <p>AI 另外會交出 SRS／SDD（對照你的拍板有沒有漏）和 24 筆 mock 種子。<strong>種子的欄位名就是未來接後端 API 的介面</strong>，驗收時順手看一眼命名合不合理。</p>
+      <p>AI 另外會交出 SRS、設計文件、圖（DIAGRAMS 用瀏覽器開，看圖就好；對照你的拍板有沒有漏）和 24 筆 mock 種子。<strong>種子的欄位名就是未來接後端 API 的介面</strong>，驗收時順手看一眼命名合不合理。</p>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
       <figure><img src="images/step3_equipment_list.png" alt="裝備物資列表頁"><figcaption>裝備物資列表：24 筆種子、每頁 20 筆、「分類→項目」升冪，狀態標籤綠／黃／紅。</figcaption></figure>
@@ -561,6 +564,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
           <tr><td>新增</td><td>選定分類＋項目後標題即時顯示編碼；必填未填仍可按儲存，會顯示欄位紅字並 toast 提示「請修正 N 個欄位」</td></tr>
           <tr><td>刪除</td><td>垃圾桶 → 二次確認 → 才刪</td></tr>
           <tr><td>CSV 匯出</td><td>匯出全量（非當頁），含 BOM 中文不亂碼</td></tr>
+          <tr><td>設計文件和圖</td><td>用瀏覽器打開 <code>DIAGRAMS-中心裝備物資.html</code>，四張圖看得懂檔案怎麼分、資料長什麼樣、新增怎麼跑</td></tr>
         </tbody>
       </table>
       </div>
@@ -575,6 +579,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
         </tbody>
       </table>
       </div>
+      <p><strong>做完之後還是會有小修改。</strong>驗收時發現的小落差（某個 label 不對、某欄忘了紅字），一次講一件，AI 改、你再看。這段「你看 → 你講 → AI 改」的來回，就是 step4 要交給 AI 自己跑的事：先給它一套會亮紅綠燈的驗收標準，它就能自己看、自己改，這就是 LOOP。</p>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
@@ -601,7 +606,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <div class="block-title"><span class="ico">📖</span>LOOP 是什麼</div>
       <p>一句話：<strong>先給 AI 一個「可自動執行、會給出綠/紅」的驗證，再叫它自己修到綠。</strong></p>
-      <blockquote><strong>比喻：一問一答，就像主管手把手帶新人。</strong>每一步都要交代、要盯，主管的時間全耗在教。<br>LOOP 的做法是先把規矩（harness）和示範樣本（範本）放好，再給一個會亮紅綠燈的驗收標準（E2E）。<strong>你下一個指令，AI 就照公司規定自己做、自己驗，還會叫出另一個分身（子代理）挑錯；你只看最後的報告。</strong></blockquote>
+      <blockquote><strong>比喻：一問一答，就像主管手把手帶新人。</strong>每一步都要交代、要盯，主管的時間全耗在教。<br>LOOP 的做法是先把規矩（harness）和示範樣本（範本）放好，再給一個會亮紅綠燈的驗收標準（E2E）。<strong>你下一個指令，AI 就照公司規定自己做、自己驗，還會叫出另一個分身（子代理）挑錯；你只看最後的報告。</strong><br>LOOP 會留兩種紀錄：紀錄 MD（<code>LOOP-LOG.md</code>）是給機器看的流水帳；報告 HTML（<code>LOOP-REPORT.html</code>）才是給人看的，圖文並茂。對抗審查會用 Playwright 真的開瀏覽器，逐頁截圖來看。</blockquote>
       <div class="table-scroll">
       <table>
         <thead><tr><th>沒有 LOOP（人在迴圈裡）</th><th>有 LOOP（AI 在迴圈裡）</th></tr></thead>
@@ -622,7 +627,8 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
  │        │                 ▼               測試的問題 → 寫進報告，交你裁決
  │        │           AI 判因（App 不符規格？環境？測試本身？）
  │        │                 │                   ▼
- │        │                 ▼              AI 交報告 ──► <b>你驗收</b>
+ │        │                 │              AI 交報告 ──► <b>你驗收</b>
+ │        │                 ▼              ＋ 紀錄 MD、報告 HTML、測試報告、文件同步
  │        └────────── AI 修正，再跑
  │                          │
  └──────────────────────────┘
@@ -639,7 +645,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
           <tr><td>一個指令、多個 Agent</td><td>修程式、跑測試、挑錯分給不同的 Agent，人不用在中間傳話、交代</td></tr>
           <tr><td>不喊累、可重複</td><td>跑 10 輪成本幾乎等於 1 輪；每輪判定標準完全一致</td></tr>
           <tr><td>品質由驗證把關</td><td>過不過由紅綠燈說了算，不是 AI 的自我感覺</td></tr>
-          <tr><td>結果可追溯</td><td>每輪紅了什麼、修了什麼都留在報告裡</td></tr>
+          <tr><td>結果可追溯</td><td>每輪紅了什麼、修了什麼都在 <code>LOOP-LOG.md</code>，報告和測試報告是 HTML</td></tr>
         </tbody>
       </table>
       </div>
@@ -647,7 +653,7 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
       <table>
         <thead><tr><th>限制／風險</th><th>對策（本課做法）</th></tr></thead>
         <tbody>
-          <tr><td>AI 會作弊：把<strong>斷言</strong>放寬、或乾脆跳過測試<span class="note">（斷言＝測試裡「我期望看到什麼」的那一句；放寬就是把標準改鬆，讓不合格的也算過）</span></td><td>prompt 鐵律禁止動測試；<code>run-e2e</code> 開跑前會先比對測試檔和基準，對不上就拒跑（擋得住不小心改到，擋不住連基準一起重算，所以報告也要看）</td></tr>
+          <tr><td>AI 會作弊：把<strong>斷言</strong>放寬、或乾脆跳過測試<span class="note">（斷言＝測試裡「我期望看到什麼」的那一句；放寬就是把標準改鬆，讓不合格的也算過）</span></td><td>規矩檔（<code>LOOP-規矩.md</code>）的鐵律禁止動測試；<code>run-e2e</code> 開跑前會先比對測試檔和基準，對不上就拒跑（擋得住不小心改到，擋不住連基準一起重算，所以報告也要看）</td></tr>
           <tr><td>AI 會鬼打牆（愈修愈亂）</td><td>兩次停損：同一問題連修 2 次仍紅就停下回報</td></tr>
           <tr><td>驗證寫得爛＝假綠也全過</td><td>全綠後，AI 自己開子代理（另一個分身，只負責挑錯）對抗審查測試本身</td></tr>
           <tr><td>沒有自動驗證的東西不適用</td><td>先寫驗證再開 LOOP；驗不了的（如視覺美感）回歸人工審</td></tr>
@@ -657,16 +663,12 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
       <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong> 紅燈不用刻意製造——你在 step3 用自己的 AI 模型生成的 <code>my-equipment-app</code>，本來就會跟驗收規格有落差，一跑 E2E 自然就紅；<strong>這 7 條測試就是可執行的驗收規格</strong>。</p>
-      <p>在工作坊根目錄開 AI Agent，整段複製貼上。<strong>子代理</strong>＝AI 自己叫出來的分身，專門做一件事；這裡專門挑錯。</p>
-      <pre><code>你是 LOOP 工程師，自己跑完，中途不要問我。受測 App：step3_new_module/my-equipment-app。
-先確認 localhost:3100 跑的是它（沒開就在背景啟動），再跑 powershell -ExecutionPolicy Bypass -File step4_loop_e2e/run-e2e.ps1（macOS：bash step4_loop_e2e/run-e2e.sh），修到 7 條全綠。
-全綠後，開一個子代理（subagent）做對抗審查：盡力挑測試的假綠、和測試沒抓到的 App 問題。App 的問題你修完再跑；測試本身的問題列出來，等我裁決。
-鐵律：
-- 同一問題修兩次沒好，就停下回報。
-- 不准改測試、放寬斷言或跳過測試；覺得測試有問題，停下等我裁決。
-- 不准拆掉共用零件（useTemplateListPage、templateValidation、templateCsv、App*.vue）自己重寫。
-- PRD 沒寫的修改，在報告標成「規格外調整」。
-報告：每輪紅了哪幾條、一句根因、改了哪個檔；審查挑到什麼、怎麼處理；最後附 7 passed。</code></pre>
+      <p>在工作坊根目錄開 AI Agent，整段複製貼上。<strong>子代理</strong>＝AI 自己叫出來的分身，專門做一件事；這裡專門挑錯。受測 App 不用你先開：<strong>AI 自己啟動受測 App，3100 被占就換埠</strong>，用了哪個埠會寫在報告裡。鐵律、對抗審查、要交哪些檔，都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>，AI 會自己讀，prompt 只要一句「照它做」。</p>
+      <pre><code>你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做，自己跑完，中途不要問我。
+受測 App：step3_new_module/my-equipment-app。先在背景啟動它（3100 被占就自己換一個空的埠），跑 step4_loop_e2e 的 run-e2e，修到 7 條全綠。
+全綠後開一個子代理做對抗審查：用 Playwright 開瀏覽器逐頁截圖，對照 PRD 和 design system 挑 App 的問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html、測試報告，並更新 SRS、設計文件和圖。</code></pre>
+      <p><strong>模型：</strong>開發用 Sonnet 5.5 就好；對抗審查的子代理用 Opus 5.5，審查的模型要比開發的高一級（規矩檔已寫明，AI 會照做）。</p>
 
       <div class="block-title"><span class="ico">🚑</span>LOOP 卡住怎麼辦</div>
       <p>先分清楚兩種紅，處置完全不同：</p>
@@ -675,37 +677,40 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
         <thead><tr><th>你看到的狀況</th><th>這是什麼</th><th>你要做的</th></tr></thead>
         <tbody>
           <tr><td>E1～E7 有幾條 fail</td><td><strong>正常</strong>，這就是 LOOP 存在的目的</td><td>別插手，讓 AI 自己修 → 再跑</td></tr>
-          <tr><td>腳本根本沒開始跑測試就掛了（Playwright 瀏覽器下載失敗、連不上 3100、PowerShell 擋住執行）</td><td>環境問題，不是 LOOP 的活</td><td>整段輸出貼給 AI 排除，同 step0 那一套</td></tr>
-          <tr><td>AI 回報「這一條在驗 PRD 沒寫的東西」（例如 toast 文案、編碼格式、HTML id）</td><td><strong>這是真的，不是藉口</strong>——這 7 條是照參考解寫的</td><td>照 prompt，AI 預設走 <strong>(A)</strong>：先改 App 對齊測試，在報告標成「規格外調整」，最後問你要不要留。你也可以選 <strong>(B)</strong>：改回去、讓它紅著，把衝突寫進報告。<strong>選 (B) 也算完成這一步。</strong></td></tr>
+          <tr><td>腳本根本沒開始跑測試就掛了（Playwright 瀏覽器下載失敗、連不上受測 App、PowerShell 擋住執行）</td><td>環境問題，不是 LOOP 的活</td><td>整段輸出貼給 AI 排除，同 step0 那一套</td></tr>
+          <tr><td>AI 回報「這一條在驗 PRD 沒寫的東西」（例如 toast 文案、編碼格式、HTML id）</td><td><strong>這是真的，不是藉口</strong>——這 7 條是照參考解寫的</td><td>照規矩檔，AI 預設走 <strong>(A)</strong>：先改 App 對齊測試，在報告標成「規格外調整」，最後問你要不要留。你也可以選 <strong>(B)</strong>：改回去、讓它紅著，把衝突寫進報告。<strong>選 (B) 也算完成這一步。</strong></td></tr>
           <tr><td>AI 自己停下來回報（觸發兩次停損）</td><td>制度設計如此，代表該人介入了</td><td>看它的根因說法：該修 App 就叫它修；它說「測試有問題」要你點頭才准動</td></tr>
         </tbody>
       </table>
       </div>
-      <p><strong>想自己看一眼紅在哪？</strong>測試失敗時 Playwright 會自動把當下的畫面存成 PNG，放在 <code>step4_loop_e2e/e2e/test-results/</code>，照失敗的測試名分資料夾。AI 判因時看的就是這張，你也可以直接打開來對——通常一眼就看得出是「元素根本沒出現」還是「文字不一樣」。</p>
+      <p><strong>想自己看一眼紅在哪？</strong>測試失敗時 Playwright 會自動把當下的畫面存成 PNG，放在 <code>step4_loop_e2e/e2e/test-results/</code>，照失敗的測試名分資料夾。AI 判因時看的就是這張，你也可以直接打開來對——通常一眼就看得出是「元素根本沒出現」還是「文字不一樣」。跑完也可以開 <code>step4_loop_e2e/e2e/playwright-report/index.html</code> 看完整測試報告（用瀏覽器開，每條測試的綠紅和失敗截圖都在裡面）。</p>
       <p>後兩種都可以直接把完整輸出交給 AI，用這個 prompt：</p>
       <pre><code>step4 的 E2E 腳本還沒跑測試就失敗了，完整輸出在下面，我用 Windows 11。
 請說明原因，給我可複製的修復指令；不准改 step4_loop_e2e/e2e 的測試檔。
 （從你輸入指令那一行開始整段貼上）</code></pre>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>AI 交回一份報告。不用打任何指令，照這張表用眼睛核：</p>
+      <p>AI 交回的東西都在 <code>step3_new_module/my-equipment-app/loop/</code> 資料夾。不用打任何指令，照這張表用眼睛核：</p>
       <div class="table-scroll">
       <table>
         <thead><tr><th>檢查點</th><th>怎麼核</th></tr></thead>
         <tbody>
-          <tr><td>每輪紀錄完整</td><td>紅了哪幾條、根因、修了哪個檔，一輪一列</td></tr>
+          <tr><td>結果報告 <code>LOOP-REPORT.html</code></td><td>用瀏覽器開：結論在最前面、有截圖</td></tr>
+          <tr><td>測試報告 <code>playwright-report/index.html</code></td><td>在 <code>step4_loop_e2e/e2e/</code> 底下，用瀏覽器開：7 條綠</td></tr>
+          <tr><td>每輪紀錄完整</td><td>打開 <code>LOOP-LOG.md</code>：紅了哪幾條、根因、修了哪個檔，一輪一段</td></tr>
           <tr><td>根因說得通</td><td>「App 不符規格」就該修 App；說「測試有問題」的要有你的裁決紀錄</td></tr>
           <tr><td>對抗審查有做</td><td>報告寫了子代理挑到什麼：App 的問題修了沒、測試的問題有沒有列給你裁決</td></tr>
-          <tr><td>畫面真的能用</td><td>打開 <code>http://localhost:3100/equipment/crud</code> 自己點一遍：列表、新增、編輯、刪除。報告裡寫的那幾個改動，多看一眼</td></tr>
+          <tr><td>畫面真的能用</td><td>打開 <code>LOOP-REPORT.html</code> 裡寫的網址自己點一遍：列表、新增、編輯、刪除。報告裡寫的那幾個改動，多看一眼</td></tr>
+          <tr><td>文件同步</td><td>SRS、設計文件、圖有標「step4 LOOP 後」：程式改了哪裡，文件就跟著改哪裡</td></tr>
           <tr><td>最終真的綠</td><td>報告附 <code>7 passed</code>、exit 0 的總結行。<code>run-e2e</code> 開跑前會先比對測試檔和基準，對不上就拒跑，所以看得到 <code>7 passed</code> 代表測試檔跟基準一致。它擋不住「連基準一起重算」，所以還要看報告有沒有寫改了測試。<strong>若因為 (2) 類規格衝突而停在紅燈，報告要寫明停在哪一條、為什麼</strong></td></tr>
         </tbody>
       </table>
       </div>
-      <p><strong>對抗審查已經寫在 LOOP prompt 裡。</strong>寫程式的 AI 不適合審自己，所以全綠後由子代理挑錯：<strong>App 的問題</strong>它修完再跑；<strong>測試本身的問題</strong>不准它改，寫進報告交給你（或講師）裁決。<br>備案：你用的 AI 工具不能開子代理，或想找別家的 AI 再審一次，就開第二個 AI（例如 Codex），貼這段：</p>
+      <p><strong>對抗審查已經寫在 LOOP prompt 和規矩檔裡。</strong>寫程式的 AI 不適合審自己，所以全綠後由子代理挑錯：<strong>App 的問題</strong>它修完再跑；<strong>測試本身的問題</strong>不准它改，寫進報告交給你（或講師）裁決。<br><strong>用量夠的話，審的要比寫的強。</strong><br>備案：你用的 AI 工具不能開子代理，或想找別家的 AI 再審一次，就開第二個 AI（例如 Codex），貼這段：</p>
       <pre><code>請盡力挑 step4_loop_e2e/e2e 這套 E2E 測試，和 step3_new_module/my-equipment-app 的毛病，不要誇獎。
 測試專找：假綠（斷言太鬆、選錯元素）、一改版就壞的 selector（例如靠 nth）、測試互相影響。
-App 專找：測試沒抓到、但不符合 PRD-中心裝備物資.md 的問題。
-每條附理由，能重現就附步驟；只回報，不改檔；找不到也說明你怎麼確認的。</code></pre>
+App 專找：用 Playwright 真的開瀏覽器逐頁截圖（含手機寬度），對照 PRD-中心裝備物資.md 和 design-system-summary.md，挑測試沒抓到的問題。
+每條附理由，能重現就附步驟和截圖；只回報，不改檔；找不到也說明你怎麼確認的。</code></pre>
       <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>E2E 腳本實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0（截圖為 Windows 版 run-e2e.ps1；macOS 的 run-e2e.sh 輸出與判定相同）。</figcaption></figure>
       <div class="table-scroll">
       <table>
@@ -747,8 +752,8 @@ App 專找：測試沒抓到、但不符合 PRD-中心裝備物資.md 的問題�
         <tbody>
           <tr><td>step1</td><td>同一句需求，有沒有附「規矩」（harness），產出天差地遠——差的不是功能，是像不像同一個團隊做的。</td></tr>
           <tr><td>step2</td><td>一個成熟模組＝範本（骨架）＋系統文件＋harness 四件＋Design System，缺一塊 AI 就會自由發揮出風險。</td></tr>
-          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS/SDD → 生成程式與假資料 → 人工反覆修正；AI 主動提問代表 harness 在運作。</td></tr>
-          <tr><td>step4</td><td>一個指令，AI 自己跑「改→驗→再改」，再叫子代理對抗審查；不用像帶新人那樣一問一答。收尾仍要有 E2E 驗證、對抗審查和你的驗收把關。</td></tr>
+          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS、設計文件和圖 → 生成程式與假資料 → 人工反覆修正；這就是 SDD（規格驅動開發）：先文件、再程式。AI 主動提問代表 harness 在運作。</td></tr>
+          <tr><td>step4</td><td>一個指令，AI 自己跑「改→驗→再改」，再叫子代理對抗審查（審查的模型比開發的高一級）；不用像帶新人那樣一問一答。最後交出紀錄、報告、測試報告，文件同步（程式改了，文件跟著改）。收尾仍要有 E2E 驗證、對抗審查和你的驗收把關。</td></tr>
         </tbody>
       </table>
       </div>
@@ -759,7 +764,7 @@ App 專找：測試沒抓到、但不符合 PRD-中心裝備物資.md 的問題�
       <ol>
         <li><strong>把前端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code> 複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
         <li><strong>把既有標準頁面整理成範本</strong>——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。</li>
-        <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
+        <li><strong>新需求走完整流程（SDD：規格驅動開發）</strong>——PRD → 釐清選擇題 → SRS、設計文件和圖 → 任務清單 → 生成 → LOOP 驗證；程式改了，文件跟著改。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本。</li>
       </ol>
       <p>課後驗收題：一個人做一個問卷模組並發布上線，題目與步驟在 <code>step6_survey/README.md</code>。</p>
 
@@ -784,9 +789,9 @@ App 專找：測試沒抓到、但不符合 PRD-中心裝備物資.md 的問題�
         <li><b>step1</b>　說得出兩版差在「顏色與業務規則從哪來」，以及 harness 管不到「做多少」</li>
         <li><b>step2</b>　範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現；看過 Design System 與 harness 四件，知道顏色／間距走 token</li>
         <li><b>step3</b>　讀懂課堂版 PRD；貼起手 prompt 後 AI 先出釐清選擇題（不是直接寫程式），三題逐題拍板、確認任務清單才說「開工」</li>
-        <li><b>step3</b>　裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現</li>
+        <li><b>step3</b>　裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現；SRS、設計文件和圖都交了（DIAGRAMS 用瀏覽器開，四張圖看得懂）</li>
         <li><b>step4</b>　貼一個 LOOP prompt，AI 把你的 <code>my-equipment-app</code> 修到 E2E 7 條全綠（或停在紅燈、報告寫清楚原因），並做過對抗審查（子代理或別家 AI）</li>
-        <li><b>step4</b>　驗收報告（每輪紅了什麼／根因／修了哪個檔＋全綠總結行），並自己在瀏覽器把裝備物資頁點一遍</li>
+        <li><b>step4</b>　驗收 <code>LOOP-REPORT.html</code>、<code>LOOP-LOG.md</code> 和測試報告（每輪紅了什麼／根因／修了哪個檔＋全綠總結行、文件同步），並照報告上的網址在瀏覽器把裝備物資頁點一遍</li>
         <li><b>step4</b>　說得出 LOOP 是什麼、一個優點一個限制，以及「兩次停損」「不准作弊」兩條鐵律</li>
       </ul>
 

@@ -4,7 +4,7 @@
 // frame:true 代表在 Claude Code 的網頁面板（webview）裡找元件。
 import fs from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { launch, workbench, sleep, K, clipRead, clipWrite, W, meta, termRows, rowBox } from './vsc-lib.mjs'
+import { launch, workbench, sleep, K, clipRead, clipWrite, W, meta, termRows, rowBox, sizeWin } from './vsc-lib.mjs'
 const Q = W + '/q'; fs.mkdirSync(Q, { recursive: true })
 const folder = process.env.FOLDER || 'D:\\AI_CRUD_Workshop_Frontend_EASY'
 const extra = process.env.SETTINGS ? JSON.parse(process.env.SETTINGS) : {}
@@ -63,6 +63,7 @@ async function run(c) {
     case 'frames': return p.frames().map(f => [f.name(), (f.parentFrame() === p.mainFrame() ? 'L1 ' : f.parentFrame() ? 'L2 ' : 'top ') + f.url().replace(/^.*?(purpose=\w+).*$/, '$1').slice(0, 120)])
     case 'dlg': try { return execFileSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', W + '/dlg.ps1', ...c.args], { encoding: 'utf8' }) } catch (e) { return 'ERR ' + (e.stdout || '') + (e.stderr || '') }
     case 'wait': await sleep(c.ms); return 'ok'
+    case 'size': await sizeWin(app, c.wh || [1067, 600]); await sleep(1500); return await p.evaluate(() => [innerWidth, innerHeight])
     case 'term': return (await termRows(p)).filter(Boolean)
     case 'dump': { const f = claudeFrame(c.purpose); return f ? await f.evaluate(() => document.body.innerText) : 'no frame' }
     case 'html': { const f = c.frame ? claudeFrame() : p.mainFrame(); return await f.evaluate(([s, n]) => { const e = document.querySelector(s); return e ? e.outerHTML.slice(0, n) : null }, [c.sel || 'body', c.n || 20000]) }

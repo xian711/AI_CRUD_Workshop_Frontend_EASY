@@ -15,16 +15,16 @@
    ```
 
 2. 跑前置檢查：進 `step0_course_intro`，Windows 跑 `.\preflight.ps1`，macOS／Linux 跑 `bash preflight.sh`。
-3. 全數 PASS 後，用瀏覽器打開 **`HANDBOOK/HANDBOOK.html`**——整堂課只看這一份，從 step0 走到 step5。
+3. 沒有 FAIL（最後寫「可以開課」）後，用瀏覽器打開 **`HANDBOOK/HANDBOOK.html`**——整堂課只看這一份，從 step0 走到 step5。
 
-> 想先看一遍怎麼操作？用瀏覽器打開 **`HANDBOOK/animation/index.html`**：手把手教學動畫，終端機、VS Code、瀏覽器全程實拍（Windows 版，有字幕和中文語音）。
+> 想先看一遍怎麼操作？用瀏覽器打開 **`HANDBOOK/animation/index.html`**：手把手教學動畫，看 AI 怎麼照 harness、SDD（規格驅動開發：先文件、再程式；程式改了，文件跟著改）、LOOP、對抗審查開發，全程實拍（Windows 版，約 14 分鐘，有字幕和雙人預錄配音）。
 
 ## 資料夾一覽
 
 | 資料夾 | 是什麼 |
 |--------|--------|
 | `HANDBOOK/` | **學員唯一要讀的手冊**（HTML，含 20 張截圖與圖解、所有可複製的 prompt）。**請用瀏覽器打開**——它是為瀏覽器排版的，在終端機直接讀原始碼會很痛苦 |
-| `step0`～`step4` 各資料夾 | 上課的工作材料（前置檢查、A/B demo、範本、PRD、E2E 腳本）——HANDBOOK 會指示何時用哪個。step5 是課程總結，沒有工作材料，全在 HANDBOOK 裡 |
+| `step0`～`step4` 各資料夾 | 上課的工作材料（前置檢查、A/B demo、範本、PRD、SRS／設計文件最小樣板、E2E 腳本、LOOP 規矩）——HANDBOOK 會指示何時用哪個。step5 是課程總結，沒有工作材料，全在 HANDBOOK 裡 |
 | `step6_survey/` | **課後驗收題**：一個人做一個課程回饋問卷並發布上線。題目、PRD、起手 prompt、發布步驟都在它的 `README.md`；`solution/` 是參考解，卡住再開 |
 
 教材由 Claude（Fable 5）多代理協作產出、Codex（GPT-5.6）對抗審查、E2E 實跑驗證全綠後發佈。

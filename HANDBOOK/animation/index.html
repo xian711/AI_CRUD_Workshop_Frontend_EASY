@@ -19,46 +19,63 @@
   *{box-sizing:border-box}
   html,body{background:var(--page);color:var(--ink)}
   body{font-family:var(--sans);font-size:18px;line-height:1.6;margin:0}
-  .wrap{max-width:1500px;margin:0 auto;padding-inline:16px;padding-block:14px 48px}
-  header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:10px}
-  header.top h1{font-size:clamp(22px,2.4vw,32px);font-weight:900;margin:0;letter-spacing:.02em}
-  header.top p{margin:0;color:var(--mut);font-size:16px}
-  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:thin}
-  .chips button{flex:none;font:inherit;font-size:18px;font-weight:700;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 16px;cursor:pointer}
+  /* ===== 版面（RWD）：標題＋導覽＋舞台＋字幕＋控制列，盡量塞進同一個螢幕畫面 =====
+     舞台寬度（--stage-w）、字幕字級（--sub-fs）、字幕行數（--sub-n）由下方 JS 的 fit() 量完實際高度後設定。
+     沒有 JS 時，退回用 100vh 粗估的寬度。 */
+  :root{--stage-w:min(100%, calc((100vh - 330px) * 16 / 9));--sub-fs:24px;--sub-n:2;--lab-h:20px}
+  .wrap{max-width:1500px;margin:0 auto;padding-inline:16px;padding-block:8px 48px}
+  header.top{display:flex;align-items:baseline;gap:2px 14px;margin:0 0 6px;min-width:0}
+  header.top h1{flex:none;font-size:clamp(18px,1.45vw,26px);line-height:1.3;font-weight:900;margin:0;letter-spacing:.02em;white-space:nowrap}
+  header.top p{flex:1 1 0;min-width:0;margin:0;color:var(--mut);font-size:clamp(12.5px,.85vw,15px);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 章節膠囊：永遠單行；放不下就橫向捲動（捲軸隱藏、兩端淡出），目前這句所在的膠囊會自動捲到中間 */
+  .chips{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:4px;margin:-4px -4px 4px;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%)}
+  .chips::-webkit-scrollbar,.steps::-webkit-scrollbar{display:none}
+  .chips button{flex:none;font:inherit;font-size:clamp(13.5px,1.05vw,16px);font-weight:700;line-height:1.35;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 14px;cursor:pointer}
   .chips button[aria-current="true"]{color:#10263a;background:var(--gold);border-color:var(--gold)}
-  /* 兩層章節：上排 Step、下排該 Step 的段落 */
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px}
-  .steps button{font:inherit;text-align:left;color:var(--ink);background:var(--card);border:2px solid var(--line);border-top:6px solid var(--c);border-radius:12px;padding:6px 12px 8px;cursor:pointer;line-height:1.3}
-  .steps button b{display:block;font-size:16px;font-weight:900;color:var(--c);letter-spacing:.03em}
-  .steps button span{display:block;font-size:19px;font-weight:800}
+  /* 兩層章節：上排 Step（單行小膠囊）、下排該 Step 的段落 */
+  .steps{display:flex;gap:6px;margin:0 0 5px;scrollbar-width:none}
+  .steps[hidden]{display:none}
+  .steps button{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:center;gap:.4em;white-space:nowrap;font:inherit;font-size:clamp(13px,1.02vw,16px);line-height:1.35;color:var(--ink);background:var(--card);border:1px solid var(--line);border-bottom:3px solid var(--c);border-radius:10px;padding:3px 10px 2px;cursor:pointer}
+  .steps button b{flex:none;font-size:.92em;font-weight:900;color:var(--c);letter-spacing:.02em}
+  .steps button span{min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:800}
   .steps button[aria-current="true"]{background:#233f59;border-color:var(--c)}
-  .steps button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-  .chips button:focus-visible,.ctrl button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-  .stagebox{width:min(100%, calc((100vh - 230px) * 16 / 9));min-width:min(100%,640px);margin:0 auto;background:var(--stage);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .steps button:focus-visible{outline:3px solid var(--teal);outline-offset:-1px}
+  /* 視窗不夠寬（約 1260px 以下）：沒選到的 Step 只留標籤（Step 3），選到的那顆才顯示完整名稱；滑鼠移上去會顯示全名 */
+  @media (max-width:1259px){.steps button:not([aria-current="true"]) span{display:none}}
+  .chips button:focus-visible,.ctrl button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+  .stagebox{position:relative;width:var(--stage-w);max-width:100%;margin:0 auto;background:var(--stage);border:1px solid var(--line);border-radius:12px;overflow:hidden}
   #stage{display:block;width:100%;height:auto}
-  .sub{width:min(100%, calc((100vh - 230px) * 16 / 9));min-width:min(100%,640px);margin:10px auto 0;display:grid;gap:8px}
-  .subline{min-height:3.2em;background:#050d16;border-radius:12px;padding:12px 20px;font-size:clamp(21px,2.3vw,32px);font-weight:700;line-height:1.5;text-wrap:pretty}
-  /* 全螢幕（投影用）：舞台＋字幕＋控制列填滿螢幕 */
-  .player:fullscreen{background:var(--page);padding:12px 16px;overflow:auto;display:flex;flex-direction:column;justify-content:center}
-  .player:fullscreen .stagebox,.player:fullscreen .sub{width:min(100%, calc((100vh - 200px) * 16 / 9))}
-  .player:fullscreen .subline{font-size:clamp(24px,2.4vw,40px)}
+  .sub{width:var(--stage-w);max-width:100%;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+  /* 字幕框：高度固定（--sub-n 行），換句子時畫面不會跳；少數特別長的句子由 fitSubText() 暫時縮字（最小 18px）塞進同一個框 */
+  .subline{height:calc(var(--sub-fs) * var(--sub-n) * 1.45 + var(--lab-h) + 16px);overflow:hidden;background:#050d16;border-radius:12px;padding:8px 18px;font-size:var(--sub-cur,var(--sub-fs));font-weight:700;line-height:1.45;text-wrap:pretty;overflow-wrap:anywhere}
+  .subline small{display:block;height:18px;margin-bottom:2px;font-size:max(13px,.5em);line-height:18px;font-weight:700;color:var(--gold);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 全螢幕（投影用）：舞台＋字幕＋控制列填滿螢幕；尺寸同樣由 fit() 算 */
+  .player:fullscreen{background:var(--page);padding:10px 16px;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+  .player:fullscreen .stagebox,.player:fullscreen .sub{flex:none}
   .player:fullscreen .hint{display:none}
-  .subline small{display:block;font-size:.55em;font-weight:700;color:var(--gold);letter-spacing:.06em;margin-bottom:2px}
-  .bar{height:5px;background:var(--card);border-radius:3px;overflow:hidden}
+  .who{display:inline-block;font-size:.62em;font-weight:900;color:#10263a;background:var(--c);border-radius:999px;padding:0 .6em;margin-right:.55em;vertical-align:.16em}
+  .who.x{--c:#ff8a5b} .who.z{--c:#39c0c8}
+  .bar{height:4px;background:var(--card);border-radius:3px;overflow:hidden}
   .bar i{display:block;height:100%;width:0;background:var(--gold)}
-  .ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
-  .ctrl button{font:inherit;font-size:17px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;min-width:48px}
-  .ctrl button.main{background:var(--gold);color:#10263a;border-color:var(--gold);min-width:120px}
-  .ctrl select{font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;max-width:15em}
-  .ctrl label{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:15px;font-weight:700}
-  .ctrl select:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  /* 控制列：比舞台寬時，以舞台為中心往左右多出去（單行），放不下才折行 */
+  .ctrl{justify-self:center;width:max-content;max-width:min(calc(100vw - 24px),1500px);display:flex;flex-wrap:wrap;gap:6px 6px;align-items:center;justify-content:center}
+  .ctrl button{font:inherit;font-size:15px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 9px;cursor:pointer;min-width:44px}
+  .ctrl button.main{background:var(--gold);color:#10263a;border-color:var(--gold);min-width:104px}
+  .ctrl select{font:inherit;font-size:14.5px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 4px;max-width:16em}
+  .ctrl label{display:flex;align-items:center;gap:4px;color:var(--mut);font-size:14px;font-weight:700}
+  .ctrl select:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   .ctrl button.off{color:var(--mut);text-decoration:line-through}
-  .voicenote{color:var(--gold);font-size:15px;text-align:center;margin:0}
-  .stagebox{position:relative}
-  .startbtn{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);font:inherit;font-size:clamp(18px,2.2vw,28px);font-weight:900;color:#10263a;background:var(--gold);border:0;border-radius:999px;padding:.6em 1.4em;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+  .voicenote{color:var(--gold);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  .voicenote[hidden]{display:none}
+  .startbtn{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);font:inherit;font-size:clamp(16px,calc(var(--stage-w) / 45),28px);font-weight:900;color:#10263a;background:var(--gold);border:0;border-radius:999px;padding:.6em 1.4em;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.45)}
   .startbtn:focus-visible{outline:4px solid var(--teal);outline-offset:3px}
-  .ctrl .pos{color:var(--mut);font-size:15px;font-variant-numeric:tabular-nums;min-width:9em;text-align:center}
-  .hint{color:var(--mut);font-size:15px;text-align:center;margin:4px 0 0}
+  .ctrl .pos{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+  /* 鍵盤提示：可視區高度 800px 以上才顯示（矮螢幕要把高度讓給舞台） */
+  .hint{display:none;color:var(--mut);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  @media (min-height:800px){.hint{display:block}}
+  @media (max-height:700px){:root{--lab-h:0px}.subline small{display:none}}
   section.after{max-width:1100px;margin:44px auto 0}
   section.after h2{font-size:26px;font-weight:900;margin:0 0 6px;text-wrap:balance}
   section.after > p{color:var(--mut);margin:0 0 16px;max-width:65ch}
@@ -68,6 +85,8 @@
   .role ul{margin:0;padding-left:1.2em;font-size:17px}
   .role .out{margin:10px 0 0;font-size:16px;font-weight:700;color:var(--ink);background:#0b1826;border-radius:8px;padding:6px 10px}
   .where{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:17px}
+  section.after code{overflow-wrap:anywhere}
+  .role,.where{min-width:0}
   .where code{font-family:var(--mono);font-size:15px;color:var(--gold);word-break:break-all}
 
   #stage text{font-family:var(--sans)}
@@ -91,9 +110,8 @@
 
   /* ---- 嵌入模式（被 iframe 嵌入，或網址帶 #embed）---- */
   html.embed header.top, html.embed section.after, html.embed .hint{display:none}
-  html.embed .wrap{padding-block:6px 8px}
-  html.embed .stagebox, html.embed .sub{width:min(100%, calc((100vh - 255px) * 16 / 9))}
-  html.embed .subline{font-size:clamp(18px,2vw,26px);min-height:2.8em;padding:8px 16px}
+  html.embed .wrap{padding-block:4px 6px}
+  html.embed .subline{padding:6px 14px}
   /* ---- 問小港側欄 ---- */
   .askbtn{font:inherit;font-size:16px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
   .askbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -118,16 +136,27 @@
   @media (prefers-reduced-motion: reduce){
     #stage *{transition-duration:.01s!important;animation:none!important}
   }
+  /* 手機寬度：允許垂直捲動，但不出現水平捲軸 */
   @media (max-width:640px){
-    .stagebox,.sub{min-width:0;width:100%}
-    .ctrl button{padding:8px 10px;font-size:15px}
+    .wrap{padding-inline:10px}
+    header.top{flex-wrap:wrap}
+    header.top h1{flex:1 1 100%;min-width:0;white-space:normal;font-size:19px}
+    header.top p{flex-basis:100%;white-space:normal;font-size:13px}
+    .steps{overflow-x:auto}
+    .steps button{flex:none;font-size:14px}
+    .chips button{font-size:14px}
+    .ctrl{width:100%;max-width:100%}
+    .ctrl button{padding:7px 10px;font-size:15px}
+    .ctrl select{max-width:100%}
+    .subline{padding:8px 12px}
   }
+  @media (pointer:coarse){.hint{display:none}}
 </style>
 
 <div class="wrap">
   <header class="top">
     <h1>AI CRUD 工作坊 EASY 版　手把手教學動畫</h1>
-    <p>VS Code＋終端機＋瀏覽器，全程實拍　·　2026-10-04</p>
+    <p>harness・SDD・LOOP・對抗審查，全程實拍　·　小芸＋阿哲預錄配音（AI 語音）</p>
   </header>
 
   <nav class="steps" id="steps" aria-label="課程步驟" hidden></nav>
@@ -144,7 +173,7 @@
   </div>
 
   <div class="sub">
-    <div class="subline" id="subline" aria-live="polite"><small id="scenelabel">第 1 段</small><span id="subtext">載入中…</span></div>
+    <div class="subline" id="subline" aria-live="polite"><small id="scenelabel">第 1 段</small><span id="who" class="who" hidden></span><span id="subtext">載入中…</span></div>
     <div class="bar"><i id="barfill"></i></div>
     <div class="ctrl">
       <button id="bPrevScene" type="button" title="上一段">⏮ 上一段</button>
@@ -157,7 +186,7 @@
       <label for="speedSel">速度<select id="speedSel"><option value="0.75">0.75×（慢）</option><option value="1" selected>1×（正常）</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×（快）</option></select></label>
       <button id="bAsk" type="button" class="askbtn" hidden>💬 問小港</button>
       <button id="bFull" type="button" title="全螢幕（F）">⛶ 全螢幕</button>
-      <span class="pos" id="pos">1／33 段</span>
+      <span class="pos" id="pos">1／0 段</span>
     </div>
     <p class="voicenote" id="voiceNote" hidden></p>
     <p class="hint">空白鍵：暫停／播放　·　← →：上一句／下一句　·　F：全螢幕　·　上面的 Step 和章節可以直接跳　·　速度同時調整語音和字幕</p>
@@ -166,7 +195,9 @@
 
 <section class="after">
   <h2>文字版速查</h2>
-  <p>動畫裡的畫面，都是 2026-10-04 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>動畫裡的畫面，都是 2026-10-04～07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。播放器下面的「聲音」可以改回瀏覽器內建的聲音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
+  <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。文件有三份：<b>SRS</b>（這一版答應了什麼）、<b>設計文件 DESIGN</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
   <div class="roles">
     <div class="role" style="--c:#f4b942">
       <h3>Step 0 準備環境</h3>
@@ -185,35 +216,35 @@
         <li>先回到教材根目錄：<code>cd ..</code>（開頭要是 <code>PS D:\AI_CRUD_Workshop_Frontend_EASY&gt;</code>）</li>
         <li><code>cd step2_speedrun_kit/2.1_sample_app/sample-app</code></li>
         <li><code>pnpm install</code> → <code>pnpm dev</code>（這個終端機不要關）</li>
-        <li>按住 Ctrl 點 <code>http://localhost:3100/</code></li>
+        <li>按住 Ctrl 點終端機印出的網址（預設 <code>http://localhost:3100/</code>，被占用時 Nuxt 會自己換一個埠並印出來）</li>
         <li>五個檢查點：新增、編輯、刪除確認、篩選＋網址、匯出 CSV</li>
         <li>要再打指令：終端機右上角「＋」開第二個</li>
       </ul>
       <p class="out">共用的 3 個核心檔不要動；四份規矩在 sample-app 最上層</p>
     </div>
     <div class="role" style="--c:#ef8fc6">
-      <h3>Step 3 叫 AI 做新模組</h3>
+      <h3>Step 3 用 SDD 叫 AI 做新模組</h3>
       <ul>
         <li>教材根目錄整段貼上手冊 step3 ⓪ 的複製指令，出現 <code>&gt;&gt;</code> 後再按 Enter</li>
         <li>「檔案」→「開啟資料夾」→ my-equipment-app</li>
-        <li>右下角「✻ Claude Code」→ 貼起手 prompt → 送出</li>
-        <li>三題選擇題照課堂拍板：D1 補刪除＋確認視窗、D2 做 CSV 匯出、D3 簡化版編碼（不加機關前綴、同一個編碼不累加數量）</li>
-        <li>確認任務清單 → 開工</li>
-        <li>驗收前先確認網頁有在跑：打不開就在 <code>step3_new_module\my-equipment-app</code> 執行 <code>pnpm dev</code></li>
-        <li>驗收：<code>http://localhost:3100/equipment/crud</code></li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b> → 貼起手 prompt（4 行）→ 送出</li>
+        <li>選擇題照課堂拍板：D1 補刪除＋確認視窗、D2 做 CSV 匯出、D3 簡化版編碼；PRD 沒寫清楚的題目，選它標「建議」的就好</li>
+        <li>AI 先交 SRS、DESIGN、DIAGRAMS、TASKS 四個檔，再列任務清單。圖用瀏覽器開 <code>DIAGRAMS-中心裝備物資.html</code></li>
+        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b>（有規矩和範本，寫程式不用最貴的模型）</li>
+        <li>驗收：打開 AI 印出的網址（例如 <code>http://localhost:3101/equipment/crud</code>）。有小落差就一次講一件，講「看到什麼、期望什麼」</li>
       </ul>
       <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
     </div>
     <div class="role" style="--c:#a996ff">
-      <h3>Step 4 讓 AI 修到全綠</h3>
+      <h3>Step 4 讓 AI 修到全綠、分身挑錯</h3>
       <ul>
         <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
-        <li>開新的 Claude Code 對話，貼手冊的 LOOP prompt（裡面已經寫好：全綠後開子代理對抗審查）</li>
-        <li>等它交報告：<code>7 passed</code></li>
-        <li>用眼睛驗收：報告每一輪紅了什麼、改了哪個檔，最後有 <code>7 passed</code>；再自己在瀏覽器把裝備物資頁點一遍</li>
-        <li>對抗審查由 AI 自己開子代理做：App 的問題它修完再跑；測試本身的問題列給你裁決。想更放心，再找別家 AI（例如 Codex）審一次</li>
+        <li>開新的 Claude Code 對話（模型 Sonnet 5.5），貼手冊的 LOOP prompt（4 行；鐵律和產出都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>）</li>
+        <li>AI 自己啟動受測 App，3100 被占就自己換埠；跑 run-e2e 修到 7 條全綠；再開一個 Opus 5.5 的子代理，用 Playwright 開瀏覽器截圖做對抗審查</li>
+        <li>看三份東西：<code>my-equipment-app/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面、有截圖）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告）、SRS／DESIGN／DIAGRAMS 有沒有標「step4 LOOP 後」。<code>loop/LOOP-LOG.md</code> 是給機器看的流水帳，不用讀</li>
+        <li>要你裁決的，AI 用選擇題問；測試本身的問題它只列出來，不會自己改</li>
       </ul>
-      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準</p>
+      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準；審的模型要比寫的高一級</p>
     </div>
   </div>
 
@@ -224,7 +255,7 @@
       <li>前置檢查：<code>bash preflight.sh</code>（Windows 是 <code>.\preflight.ps1</code>）</li>
       <li>開網頁：<code>open HANDBOOK/HANDBOOK.html</code>（Windows 是 <code>start</code>）</li>
       <li>複製範本：<code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是 robocopy）</li>
-      <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）</li>
+      <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）；換埠用 <code>PORT=3101</code>（Windows 是 <code>$env:PORT='3101'</code>）</li>
     </ul>
   </div>
 
@@ -233,17 +264,18 @@
     <ul>
       <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
       <li><b>preflight 出現 [FAIL]</b>：照修復提示做 → 關掉終端機重開再跑 → 還是紅，整段輸出（連 [PASS] 的行）貼給 AI。</li>
-      <li><b>網頁一打開就是 500、寫著 useColorMode is not defined</b>：這次實拍在全新下載的參考解上也遇到過，重開一次就好。在跑 pnpm dev 的終端機按 Ctrl+C 停掉，再打一次 <code>pnpm dev</code>；還不行，刪掉該專案的 .nuxt、.output 兩個資料夾再跑。</li>
+      <li><b>網頁一打開就是 500、寫著 useColorMode is not defined</b>：舊的建置快取被複製過來了。在跑 pnpm dev 的終端機按 Ctrl+C 停掉，刪掉該專案的 .nuxt、.output 兩個資料夾再 <code>pnpm dev</code>。</li>
       <li><b>pnpm 噴一大串紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
-      <li><b>localhost:3100 打不開</b>：多半是網頁伺服器沒在跑。到要看的專案資料夾（範本是 sample-app、新模組是 my-equipment-app）執行 <code>pnpm dev</code>，那個終端機不要關。</li>
-      <li><b>localhost:3100 開到別的網站，或 pnpm dev 說 3100 被占用</b>：別的程式先占了 3100，先關掉它（preflight 會檢查這一項）。</li>
+      <li><b>網址打不開</b>：多半是網頁伺服器沒在跑。到要看的專案資料夾（範本是 sample-app、新模組是 my-equipment-app）執行 <code>pnpm dev</code>，看終端機印出的網址和埠號，那個終端機不要關。</li>
+      <li><b>pnpm dev 說 3100 被占用</b>：不用關掉別的程式，Nuxt 會自己換一個埠（例如 3101）印在終端機；LOOP 的 AI 也會自己換埠。</li>
+      <li><b>AI 要開 Chrome 或其他工具問你同不同意</b>：這門課用不到，選「No」，跟它說「不用開瀏覽器，繼續」。</li>
     </ul>
   </div>
 
   <h2 style="margin-top:28px">檔案位置</h2>
   <div class="where">
     <p>這支動畫在教材的「HANDBOOK\animation」資料夾裡，檔名是 index.html（用瀏覽器打開）。</p>
-    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：場景檔 scenes-all.js、截圖腳本、座標檔 meta.json。</p>
+    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：講稿 script_v4.py（字幕和配音都從這裡來）、場景檔 scenes-v4.js、配音腳本 make_v4_audio.py、截圖腳本、座標檔 meta.json。</p>
   </div>
 </section>
 
@@ -305,7 +337,7 @@ function stagger(list,gap,fn=show){list.forEach((e,i)=>later(i*gap,()=>fn(e)));}
 const scenes=[];
 function scene(title,build,steps){scenes.push({title,build,steps});}
 let uid=0;
-const META={"br01-handbook-top":{"w":1000,"h":519,"boxes":{"nav":[465,10,475,35],"hero":[60,90,880,210],"step0":[465,10,61,35],"anim":[94,220,413,42]}},"br02-handbook-step0":{"w":1000,"h":519,"boxes":{"head":[61,71,878,91],"goal":[89,188,822,166],"nav":[465,10,475,35]}},"br03-handbook-step3":{"w":1000,"h":519,"boxes":{"goal":[89,10059,822,166],"nav":[465,10,475,35]}},"br04-handbook-prompt":{"w":1000,"h":519,"boxes":{"pre":[89,11475,822,265]}},"br05-handbook-clone":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br06-handbook-copyblock":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,172]}},"br07-handbook-startprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br08-handbook-loopprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,288]}},"br09-handbook-check":{"w":1000,"h":519,"boxes":{"table":[89,70,822,443],"review":[89,265,822,74],"click":[89,339,822,74],"green":[89,413,822,100]}},"br10-noh":{"w":1000,"h":519,"boxes":{"h1":[146,24,246,30],"form":[109,146,782,75],"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38],"table":[109,355,782,34]}},"br11-noh-filled":{"w":1000,"h":519,"boxes":{"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38]}},"br12-noh-added":{"w":1000,"h":519,"boxes":{"table":[109,355,782,83],"row":[109,388,782,50],"blood":[596,166,175,38]}},"br13-wh":{"w":1000,"h":519,"boxes":{"h1":[36,24,928,45],"form":[61,192,878,151],"blood":[657,219,282,44],"phone":[359,219,282,44],"add":[841,299,98,44],"stars":[92,193,7,20]}},"br14-wh-empty-submit":{"w":1000,"h":519,"boxes":{"blood":[657,219,282,44],"bloodErr":[657,267,282,19],"nameErr":[61,267,282,19],"phoneErr":[359,267,282,19],"add":[841,302,98,44]}},"br15-wh-phone-blocked":{"w":1000,"h":519,"boxes":{"phone":[359,219,282,44],"phoneErr":[359,267,282,19],"bloodErr":[657,267,282,19]}},"br20-design-system":{"w":1000,"h":519,"boxes":{"h1":[268,111,684,38],"body":[0,0,1000,7655]}},"br30-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"filters":[0,65,223,122],"q":[273,195,288,47],"count":[248,297,68,27],"exp":[1094,290,122,40],"table":[273,379,918,525],"trash":[1151,425,28,28]}},"br31-new-empty":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"save":[1132,73,84,40]}},"br32-new-filled":{"w":1240,"h":644,"boxes":{"save":[1132,73,84,40],"name":[273,-237,295,47]}},"br33-saved":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"edit":[1119,39,28,28],"name":[273,371,78,49]}},"br34-edit":{"w":1240,"h":644,"boxes":{"note":[273,612,918,114],"save":[1132,73,84,40]}},"br35-validation":{"w":1240,"h":644,"boxes":{"name":[273,122,295,47],"err":[273,173,295,20],"save":[1132,73,84,40]}},"br36-edited":{"w":1240,"h":644,"boxes":{"edit":[1119,297,28,28]}},"br37-delete-confirm":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"msg":[380,275,480,86],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"br38-deleted":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"count":[248,297,68,27]}},"br39-filter-q":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br40-filter-status":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"status":[737,195,128,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br41-newtab":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27]}},"br42-export":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[880,552,336,68]}},"br42b-export-all":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[928,576,208,20],"count":[248,297,68,27],"pager":[252,972,176,32]}},"br42c-pager":{"w":1240,"h":644,"boxes":{"rows":[273,155,918,489],"foot":[656,715,36,27]}},"br43-mobile":{"w":390,"h":780,"boxes":{"first":[24,924,342,154]}},"cc-i1-activity":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34]}},"cc-i2-search":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34],"search":[57,67,249,25],"first":[53,106,256,70],"publisher":[118,151,72,17],"install":[266,151,34,18],"fake1":[53,178,256,70],"fake2":[53,250,256,70]}},"cc-i3-detail":{"w":1068,"h":601,"boxes":{"install":[516,198,34,23],"title":[514,82,298,34],"publisher":[513,118,174,23],"plan":[397,443,428,41],"id":[880,320,155,40]}},"cc00-statusbar":{"w":1068,"h":601,"boxes":{"status":[934,573,98,24],"claudeIcon":[8,254,36,36]}},"cc01-empty":{"w":1068,"h":601,"boxes":{"tab":[320,31,134,32],"status":[934,573,98,24],"input":[353,476,679,40],"model":[420,525,112,18],"mode":[939,521,58,26],"send":[1001,521,26,26],"titleIcon":[960,36,22,22]}},"cc02-prompt-pasted":{"w":1068,"h":601,"boxes":{"input":[353,398,679,118],"send":[1001,521,26,26]}},"cc03-reading":{"w":1068,"h":601,"boxes":{}},"cc03-t12":{"w":1068,"h":601,"boxes":{}},"cc03-t18":{"w":1068,"h":601,"boxes":{}},"cc03-t24":{"w":1068,"h":601,"boxes":{}},"cc03-t30":{"w":1068,"h":601,"boxes":{}},"cc03-t36":{"w":1068,"h":601,"boxes":{}},"cc03-t42":{"w":1068,"h":601,"boxes":{}},"cc03-t48":{"w":1068,"h":601,"boxes":{}},"cc03-t54":{"w":1068,"h":601,"boxes":{}},"cc03-t6":{"w":1068,"h":601,"boxes":{}},"cc03-t60":{"w":1068,"h":601,"boxes":{}},"cc04-question":{"w":1068,"h":601,"boxes":{"tabs":[363,226,41,16],"q":[361,266,648,20],"rec":[393,298,612,19],"submit":[361,484,663,29]}},"cc05-d2":{"w":1068,"h":601,"boxes":{"tabs":[420,262,43,16],"rec":[393,334,627,19],"submit":[361,484,663,29]}},"cc06-d3":{"w":1068,"h":601,"boxes":{"tabs":[476,226,43,16],"rec":[393,339,201,19],"submit":[361,484,663,29]}},"cc07-answered":{"w":1068,"h":601,"boxes":{}},"cc08-submitted":{"w":1068,"h":601,"boxes":{}},"cc08-t6":{"w":1068,"h":601,"boxes":{}},"cc09-tasks":{"w":1068,"h":601,"boxes":{}},"cc09a-tasklist":{"w":1068,"h":601,"boxes":{"title":[371,197,240,22],"docs":[383,272,645,75]}},"cc09b-start-question":{"w":1068,"h":601,"boxes":{}},"cc09c-decided":{"w":1068,"h":601,"boxes":{}},"cc09c-editcode":{"w":1068,"h":601,"boxes":{"q":[361,267,228,39],"rec":[361,314,237,95],"preview":[633,266,390,201]}},"cc09d-go-selected":{"w":1068,"h":601,"boxes":{"go":[393,305,627,19],"submit":[361,484,663,29]}},"cc10-build-start":{"w":1068,"h":601,"boxes":{}},"cc11-progress":{"w":1068,"h":601,"boxes":{}},"cc11v2-t060":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1080":{"w":1068,"h":601,"boxes":{}},"cc11v2-t120":{"w":1068,"h":601,"boxes":{}},"cc11v2-t180":{"w":1068,"h":601,"boxes":{}},"cc11v2-t240":{"w":1068,"h":601,"boxes":{}},"cc11v2-t300":{"w":1068,"h":601,"boxes":{}},"cc11v2-t360":{"w":1068,"h":601,"boxes":{}},"cc11v2-t420":{"w":1068,"h":601,"boxes":{}},"cc11v2-t480":{"w":1068,"h":601,"boxes":{}},"cc11v2-t540":{"w":1068,"h":601,"boxes":{}},"cc11v2-t600":{"w":1068,"h":601,"boxes":{}},"cc11v2-t660":{"w":1068,"h":601,"boxes":{}},"cc11v2-t720":{"w":1068,"h":601,"boxes":{}},"cc11v2-t780":{"w":1068,"h":601,"boxes":{}},"cc11v2-t840":{"w":1068,"h":601,"boxes":{}},"cc11v2-t900":{"w":1068,"h":601,"boxes":{}},"cc11v2-t960":{"w":1068,"h":601,"boxes":{}},"cc12-done":{"w":1068,"h":601,"boxes":{"sum":[371,373,646,56]}},"cc12b-next-question":{"w":1068,"h":601,"boxes":{}},"cc19-root-explorer":{"w":1068,"h":601,"boxes":{"tree":[49,91,261,417],"status":[934,573,98,24]}},"cc20-loop-pasted":{"w":1068,"h":601,"boxes":{"input":[353,295,679,220],"send":[1001,521,26,26],"tree":[49,91,265,417]}},"cc21-loop-start":{"w":1068,"h":601,"boxes":{}},"cc22-loop-t060":{"w":1068,"h":601,"boxes":{}},"cc22-loop-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t060":{"w":1068,"h":601,"boxes":{}},"cc22v2-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t180":{"w":1068,"h":601,"boxes":{}},"cc23-loop-red":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent-now":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent":{"w":1068,"h":601,"boxes":{"green":[371,228,658,39],"agent":[341,7784,688,35]}},"cc23v2-judge":{"w":1068,"h":601,"boxes":{"judge":[371,228,658,39]}},"cc23v2-red":{"w":1068,"h":601,"boxes":{"red":[371,227,658,39]}},"cc24-loop-done":{"w":1068,"h":601,"boxes":{}},"cc24-loop-green":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0060":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0120":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0180":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0240":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0300":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0360":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0420":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0480":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0540":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0600":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0660":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0720":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0780":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0840":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0900":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0960":{"w":1068,"h":601,"boxes":{}},"cc24v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc25-loop-report":{"w":1068,"h":601,"boxes":{}},"cc25b-loop-conclusion":{"w":1068,"h":601,"boxes":{}},"cc25v2-conclusion":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"sum":[371,273,658,39]}},"cc25v2-final":{"w":1068,"h":601,"boxes":{"head":[371,434,658,29],"pass":[379,491,326,33]}},"cc25v2-fixed":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"b1":[371,335,53,44]}},"cc25v2-rounds":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"r1":[371,297,73,63],"r3":[371,384,73,44]}},"cc25v2-tests":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"fake":[371,273,658,20]}},"cc26-loop-rules":{"w":1068,"h":601,"boxes":{}},"cc26v2-question":{"w":1068,"h":601,"boxes":{}},"ea01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,1554],"status":[887,441,44,24],"code":[443,456,99,20],"exp":[1094,290,122,40]}},"ea02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,287,295,78],"name":[584,287,295,78],"save":[1132,73,84,40]}},"ea03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,287,295,78],"list":[274,373,295,386]}},"ea04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,287,295,78],"name":[584,287,295,78],"list":[585,373,295,192]}},"ea05-code":{"w":1240,"h":644,"boxes":{"cat":[273,287,295,78],"name":[584,287,295,78],"title":[76,19,269,26]}},"ea06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,287,295,101],"qty":[273,404,295,101],"unit":[584,404,295,101],"spec":[273,578,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"ea07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"ea08-mobile":{"w":390,"h":780,"boxes":{}},"eq01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,2095],"status":[285,476,62,36],"code":[371,499,70,39],"exp":[1094,290,122,40]}},"eq02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"save":[1132,73,84,40]}},"eq03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"list":[274,305,295,386]}},"eq04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"list":[585,305,295,239]}},"eq05-code":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"title":[76,19,269,26]}},"eq06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,101],"qty":[273,336,295,101],"unit":[584,336,295,101],"spec":[273,454,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"eq07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"eq08-mobile":{"w":390,"h":780,"boxes":{}},"vs01-empty":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"menuFile":[35,0,56,30],"activity":[4,30,44,539]}},"vs02-menu-terminal":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"newTerm":[405,31,295,24]}},"vs03-terminal":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"tabTerm":[232,105,59,32],"prompt":[73,145,196,19],"max":[1011,110,22,22]}},"vs03b-terminal-max":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"prompt":[73,71,196,19]}},"vs04-cd-d":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,71,240,19],"prompt":[73,90,79,19]}},"vs05-clone-typed":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,703,19]}},"vs06-clone-done":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,695,19],"cloning":[73,109,422,19],"done":[73,246,343,19],"prompt":[73,265,79,19]}},"vs07-menu-file":{"w":1068,"h":601,"boxes":{"menuFile":[35,0,56,30],"openFolder":[36,161,298,24]}},"vs08-open-folder-dialog":{"w":1686.0,"h":1000.0,"boxes":{"HANDBOOK":[347.0,273.0,1350,48],"step3_new_module":[347.0,497.0,1350,48],"ok":[1219.0,901.0,218,52],"cancel":[1461.0,901.0,176,52],"address":[285.0,68.0,825,70]}},"vs09-trust":{"w":1068,"h":601,"boxes":{"dialog":[310,153,449,295],"yes":[417,388,172,25]}},"vs10-explorer":{"w":1068,"h":601,"boxes":{"explorer":[48,30,267,539],"tree":[49,91,265,417],"root":[53,91,257,22],"handbook":[53,91,257,22],"step0":[53,113,257,22],"step1":[53,135,257,22],"step2":[53,157,257,22],"step3":[53,179,257,22],"step4":[53,201,257,22],"step6":[53,223,257,22],"readme":[53,289,257,22]}},"vs11-terminal-root":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"prompt":[340,145,343,19]}},"vs12-preflight-fail":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"fail":[340,207,405,19],"hint":[340,226,713,19],"summary":[340,440,572,19]}},"vs13-preflight-pass":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"first":[340,148,713,19],"last":[340,362,379,19],"summary":[340,401,246,19]}},"vs14-start-handbook":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,590,19]}},"vs15-start-demo":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,713,19]}},"vs16-pnpm-install":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"done":[340,498,282,19]}},"vs17-pnpm-dev":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,226,88,19],"local":[340,401,317,19],"url":[463,401,150,18]}},"vs18-link-hover":{"w":1068,"h":601,"boxes":{"url":[463,401,150,18]}},"vs19-readme-raw":{"w":1068,"h":601,"boxes":{"tab":[320,31,132,32],"editor":[319,30,745,539],"file":[53,245,257,22],"tree":[49,91,265,417]}},"vs20-readme-preview":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h2":[372,63,625,38],"table":[372,324,625,965]}},"vs20b-readme-table":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"table":[105,76,892,529],"r1":[105,112,892,62],"r5":[105,358,892,62],"r6":[105,420,892,62],"r8":[105,544,892,61]}},"vs21-harness-files":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"sampleApp":[53,135,257,22],"claude":[53,419,257,22],"rules":[53,441,257,22],"ds":[53,463,257,22],"guide":[53,331,257,22],"agents":[53,353,257,22],"pages":[53,221,257,22],"components":[53,133,257,22]}},"vs22-claude-md":{"w":1068,"h":601,"boxes":{"tab":[320,31,130,32],"editor":[319,30,745,539],"file":[53,419,257,22]}},"vs22b-claude-md-wide":{"w":1068,"h":601,"boxes":{"tab":[53,31,130,32],"editor":[52,30,1012,539]}},"vs23-plus":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"plus":[803,110,22,22],"trash":[951,110,22,22],"max":[1011,110,22,22]}},"vs24-start-ds":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"cmd":[73,145,853,19],"plus":[938,110,22,22],"tabs":[944,137,119,432]}},"vs25-paste-warning":{"w":1068,"h":601,"boxes":{}},"vs25-pasted":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"first":[73,71,800,19],"robocopy":[73,109,581,19],"copy":[73,129,484,19],"install":[73,168,141,19]}},"vs26-step3-prep":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"done":[73,499,281,19],"prompt":[73,518,642,19]}},"vs27-myapp-explorer":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"guide":[53,333,257,22],"claude":[53,421,257,22],"rules":[53,443,257,22],"ds":[53,465,257,22]}},"vs28-prd-top":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h1":[372,80,625,50]}},"vs29-prd-fields":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,63,892,38],"table":[105,-117,536,144]}},"vs30-prd-decisions":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,64,892,38]}},"vs31-git-diff":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,164,580,19],"prompt":[340,183,475,19],"tabs":[944,137,119,432]}},"vs32-select-string":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,242,589,19],"hit":[336,337,580,42]}},"hb-step3-paradigm":{"w":1411,"h":761,"boxes":{}},"hb-step5-value":{"w":1375,"h":771,"boxes":{}},"hb-overview":{"w":1800,"h":1005,"boxes":{}}};
+const META={"br01-handbook-top":{"w":1000,"h":519,"boxes":{"nav":[465,10,475,35],"hero":[60,90,880,210],"step0":[465,10,61,35],"anim":[94,220,413,42]}},"br02-handbook-step0":{"w":1000,"h":519,"boxes":{"head":[61,71,878,91],"goal":[89,188,822,166],"nav":[465,10,475,35]}},"br03-handbook-step3":{"w":1000,"h":519,"boxes":{"goal":[89,10059,822,166],"nav":[465,10,475,35]}},"br04-handbook-prompt":{"w":1000,"h":519,"boxes":{"pre":[89,11475,822,265]}},"br05-handbook-clone":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br06-handbook-copyblock":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,172]}},"br07-handbook-startprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br08-handbook-loopprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,288]}},"br09-handbook-check":{"w":1000,"h":519,"boxes":{"table":[89,70,822,443],"review":[89,265,822,74],"click":[89,339,822,74],"green":[89,413,822,100]}},"br10-noh":{"w":1000,"h":519,"boxes":{"h1":[146,24,246,30],"form":[109,146,782,75],"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38],"table":[109,355,782,34]}},"br11-noh-filled":{"w":1000,"h":519,"boxes":{"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38]}},"br12-noh-added":{"w":1000,"h":519,"boxes":{"table":[109,355,782,83],"row":[109,388,782,50],"blood":[596,166,175,38]}},"br13-wh":{"w":1000,"h":519,"boxes":{"h1":[36,24,928,45],"form":[61,192,878,151],"blood":[657,219,282,44],"phone":[359,219,282,44],"add":[841,299,98,44],"stars":[92,193,7,20]}},"br14-wh-empty-submit":{"w":1000,"h":519,"boxes":{"blood":[657,219,282,44],"bloodErr":[657,267,282,19],"nameErr":[61,267,282,19],"phoneErr":[359,267,282,19],"add":[841,302,98,44]}},"br15-wh-phone-blocked":{"w":1000,"h":519,"boxes":{"phone":[359,219,282,44],"phoneErr":[359,267,282,19],"bloodErr":[657,267,282,19]}},"br20-design-system":{"w":1000,"h":519,"boxes":{"h1":[268,111,684,38],"body":[0,0,1000,7655]}},"br30-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"filters":[0,65,223,122],"q":[273,195,288,47],"count":[248,297,68,27],"exp":[1094,290,122,40],"table":[273,379,918,525],"trash":[1151,425,28,28]}},"br31-new-empty":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"save":[1132,73,84,40]}},"br32-new-filled":{"w":1240,"h":644,"boxes":{"save":[1132,73,84,40],"name":[273,-237,295,47]}},"br33-saved":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"edit":[1119,39,28,28],"name":[273,371,78,49]}},"br34-edit":{"w":1240,"h":644,"boxes":{"note":[273,612,918,114],"save":[1132,73,84,40]}},"br35-validation":{"w":1240,"h":644,"boxes":{"name":[273,122,295,47],"err":[273,173,295,20],"save":[1132,73,84,40]}},"br36-edited":{"w":1240,"h":644,"boxes":{"edit":[1119,297,28,28]}},"br37-delete-confirm":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"msg":[380,275,480,86],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"br38-deleted":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"count":[248,297,68,27]}},"br39-filter-q":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br40-filter-status":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"status":[737,195,128,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br41-newtab":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27]}},"br42-export":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[880,552,336,68]}},"br42b-export-all":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[928,576,208,20],"count":[248,297,68,27],"pager":[252,972,176,32]}},"br42c-pager":{"w":1240,"h":644,"boxes":{"rows":[273,155,918,489],"foot":[656,715,36,27]}},"br43-mobile":{"w":390,"h":780,"boxes":{"first":[24,924,342,154]}},"cc-i1-activity":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34]}},"cc-i2-search":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34],"search":[57,67,249,25],"first":[53,106,256,70],"publisher":[118,151,72,17],"install":[266,151,34,18],"fake1":[53,178,256,70],"fake2":[53,250,256,70]}},"cc-i3-detail":{"w":1068,"h":601,"boxes":{"install":[516,198,34,23],"title":[514,82,298,34],"publisher":[513,118,174,23],"plan":[397,443,428,41],"id":[880,320,155,40]}},"cc00-statusbar":{"w":1068,"h":601,"boxes":{"status":[934,573,98,24],"claudeIcon":[8,254,36,36]}},"cc01-empty":{"w":1068,"h":601,"boxes":{"tab":[543,31,134,32],"status":[934,573,98,24],"input":[353,476,679,40],"send":[1001,521,26,26],"model":[420,525,86,18]}},"cc02-prompt-pasted":{"w":1068,"h":601,"boxes":{"input":[353,378,679,137],"send":[1001,521,26,26],"model":[420,525,86,18]}},"cc03-reading":{"w":1068,"h":601,"boxes":{}},"cc03-t12":{"w":1068,"h":601,"boxes":{}},"cc03-t120":{"w":1068,"h":601,"boxes":{}},"cc03-t150":{"w":1068,"h":601,"boxes":{}},"cc03-t18":{"w":1068,"h":601,"boxes":{}},"cc03-t24":{"w":1068,"h":601,"boxes":{}},"cc03-t30":{"w":1068,"h":601,"boxes":{}},"cc03-t36":{"w":1068,"h":601,"boxes":{}},"cc03-t42":{"w":1068,"h":601,"boxes":{}},"cc03-t48":{"w":1068,"h":601,"boxes":{}},"cc03-t54":{"w":1068,"h":601,"boxes":{}},"cc03-t6":{"w":1068,"h":601,"boxes":{}},"cc03-t60":{"w":1068,"h":601,"boxes":{}},"cc03-t90":{"w":1068,"h":601,"boxes":{}},"cc05-d2":{"w":1068,"h":601,"boxes":{"tab":[420,262,43,16],"q":[361,301,663,20],"rec":[361,330,663,61]}},"cc06-d3":{"w":1068,"h":601,"boxes":{"tab":[476,226,43,16],"q":[361,266,648,20],"rec":[361,294,648,61],"full":[361,450,648,44]}},"cc07-answered":{"w":1068,"h":601,"boxes":{"submit":[361,484,663,29]}},"cc08-submitted":{"w":1068,"h":601,"boxes":{}},"cc08-t6":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t120":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t180":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t240":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t60":{"w":1068,"h":601,"boxes":{}},"cc09-tasks":{"w":1068,"h":601,"boxes":{}},"cc09a-docs4":{"w":1068,"h":601,"boxes":{"head":[371,163,655,37],"srs":[397,20887,632,39],"diag":[397,20887,632,39],"check":[371,306,119,17]}},"cc09a-tasklist":{"w":1068,"h":601,"boxes":{"head":[371,162,658,20],"t0":[371,231,581,24],"t1":[371,547,581,25],"t13":[371,547,581,25]}},"cc09b-q2-answered":{"w":1068,"h":601,"boxes":{"submit":[361,480,663,29]}},"cc09b-q2-edit":{"w":1068,"h":601,"boxes":{"tab":[413,275,49,16],"rec":[361,342,663,44]}},"cc09b-q2-phone":{"w":1068,"h":601,"boxes":{"tab":[476,222,49,16],"rec":[361,290,648,61]}},"cc09b-q2-row":{"w":1068,"h":601,"boxes":{"tab":[538,275,49,16],"rec":[361,342,663,44]}},"cc09b-q2-serial":{"w":1068,"h":601,"boxes":{"tabs":[363,258,36,16],"last":[538,258,49,16],"rec":[361,325,663,61],"submit":[361,480,663,29]}},"cc09b-q3-items":{"w":1068,"h":601,"boxes":{"tab":[425,258,49,16],"rec":[361,325,663,61]}},"cc09b-q3-sort":{"w":1068,"h":601,"boxes":{"tabs":[363,228,49,16],"last":[425,228,49,16],"rec":[361,296,663,44],"submit":[361,480,663,29]}},"cc09b-q4-id":{"w":1068,"h":601,"boxes":{"tab":[363,258,24,16],"q":[361,297,663,20],"rec":[361,325,663,61],"submit":[361,480,663,29]}},"cc09b-start-question":{"w":1068,"h":601,"boxes":{"tab":[363,279,49,16],"q":[361,318,663,20],"rec":[361,347,663,44],"no":[361,393,663,44],"submit":[361,484,663,29]}},"cc09c-decided":{"w":1068,"h":601,"boxes":{}},"cc09c-q2-submitted":{"w":1068,"h":601,"boxes":{}},"cc09c-q3-submitted":{"w":1068,"h":601,"boxes":{}},"cc09c-q4-submitted":{"w":1068,"h":601,"boxes":{}},"cc09d-go-selected":{"w":1068,"h":601,"boxes":{"rec":[361,347,663,44],"submit":[361,484,663,29]}},"cc09e-model-menu":{"w":1068,"h":601,"boxes":{"opus":[357,284,655,39],"sonnet":[357,366,655,39]}},"cc09f-go-typed":{"w":1068,"h":601,"boxes":{"input":[353,476,679,40],"model":[477,525,95,18],"send":[1001,521,26,26]}},"cc10-build-start":{"w":1068,"h":601,"boxes":{}},"cc11v2-t060":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1080":{"w":1068,"h":601,"boxes":{}},"cc11v2-t120":{"w":1068,"h":601,"boxes":{}},"cc11v2-t180":{"w":1068,"h":601,"boxes":{}},"cc11v2-t240":{"w":1068,"h":601,"boxes":{}},"cc11v2-t300":{"w":1068,"h":601,"boxes":{}},"cc11v2-t360":{"w":1068,"h":601,"boxes":{}},"cc11v2-t420":{"w":1068,"h":601,"boxes":{}},"cc11v2-t480":{"w":1068,"h":601,"boxes":{}},"cc11v2-t540":{"w":1068,"h":601,"boxes":{}},"cc11v2-t600":{"w":1068,"h":601,"boxes":{}},"cc11v2-t660":{"w":1068,"h":601,"boxes":{}},"cc11v2-t720":{"w":1068,"h":601,"boxes":{}},"cc11v2-t780":{"w":1068,"h":601,"boxes":{}},"cc11v2-t840":{"w":1068,"h":601,"boxes":{}},"cc11v2-t900":{"w":1068,"h":601,"boxes":{}},"cc11v2-t960":{"w":1068,"h":601,"boxes":{}},"cc11v4-port-msg":{"w":1068,"h":601,"boxes":{}},"cc11v4-question":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0180":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0240":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0300":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0360":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0420":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0480":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0540":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0600":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0660":{"w":1068,"h":601,"boxes":{}},"cc12-done":{"w":1068,"h":601,"boxes":{"sum":[130,339,65,17],"docs":[130,359,39,17],"time":[130,437,39,17],"model":[344,521,95,18]}},"cc12a-other-answer":{"w":1068,"h":601,"boxes":{}},"cc12a-submitted":{"w":1068,"h":601,"boxes":{}},"cc12a-t13-question":{"w":1068,"h":601,"boxes":{"tab":[363,262,46,16],"q":[361,301,663,20],"rec":[361,330,663,61]}},"cc12b-next-question":{"w":1068,"h":601,"boxes":{"tab":[363,233,36,16],"rec":[361,301,663,44],"e2e":[361,393,663,44]}},"cc12v4-question":{"w":1068,"h":601,"boxes":{}},"cc12v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc12v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc13-fix1-ask":{"w":1068,"h":601,"boxes":{"msg":[353,456,679,59],"send":[1001,521,26,26]}},"cc13-fix1-done":{"w":1068,"h":601,"boxes":{"done":[371,250,52,17],"why":[371,272,39,17],"how":[371,294,39,17]}},"cc14-fix2-ask":{"w":1068,"h":601,"boxes":{"msg":[353,456,679,59],"send":[1001,521,26,26]}},"cc14-fix2-done":{"w":1068,"h":601,"boxes":{"done":[371,211,52,17],"ask":[371,296,658,20]}},"cc19-root-explorer":{"w":1068,"h":601,"boxes":{"status":[934,573,98,24]}},"cc20-loop-pasted":{"w":1068,"h":601,"boxes":{"input":[219,378,679,137],"send":[867,521,26,26],"model":[286,525,95,18]}},"cc21-loop-start":{"w":1068,"h":601,"boxes":{}},"cc21v4-port":{"w":1068,"h":601,"boxes":{"port":[104,212,925,20]}},"cc22-loop-t060":{"w":1068,"h":601,"boxes":{}},"cc22-loop-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t060":{"w":1068,"h":601,"boxes":{}},"cc22v2-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t180":{"w":1068,"h":601,"boxes":{}},"cc23-loop-red":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent-now":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent":{"w":1068,"h":601,"boxes":{"green":[371,228,658,39],"agent":[341,7784,688,35]}},"cc23v2-judge":{"w":1068,"h":601,"boxes":{"judge":[371,228,658,39]}},"cc23v2-red":{"w":1068,"h":601,"boxes":{"red":[371,227,658,39]}},"cc23v4-agent-now":{"w":1068,"h":601,"boxes":{"pill":[362,525,37,18]}},"cc23v4-agent":{"w":1068,"h":601,"boxes":{"agent":[104,213,925,20],"task":[100,250,890,100]}},"cc23v4-red":{"w":1068,"h":601,"boxes":{"red":[104,212,925,20],"why":[104,693,925,20]}},"cc23v4-shots":{"w":1068,"h":601,"boxes":{"pill":[362,525,37,18],"run":[141,400,644,13]}},"cc24-loop-done":{"w":1068,"h":601,"boxes":{}},"cc24-loop-green":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0060":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0120":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0180":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0240":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0300":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0360":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0420":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0480":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0540":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0600":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0660":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0720":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0780":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0840":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0900":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0960":{"w":1068,"h":601,"boxes":{}},"cc24v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0180":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0240":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0300":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0360":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0420":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0480":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0540":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0600":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0660":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0720":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0780":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0840":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0900":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0960":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1020":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1080":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1140":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1200":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1260":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1320":{"w":1068,"h":601,"boxes":{}},"cc25-loop-report":{"w":1068,"h":601,"boxes":{}},"cc25b-loop-conclusion":{"w":1068,"h":601,"boxes":{}},"cc25v2-conclusion":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"sum":[371,273,658,39]}},"cc25v2-final":{"w":1068,"h":601,"boxes":{"head":[371,434,658,29],"pass":[379,491,326,33]}},"cc25v2-fixed":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"b1":[371,335,53,44]}},"cc25v2-rounds":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"r1":[371,297,73,63],"r3":[371,384,73,44]}},"cc25v2-tests":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"fake":[371,273,658,20]}},"cc25v4-conclusion":{"w":1068,"h":601,"boxes":{"head":[104,212,925,20],"report":[130,245,899,20],"url":[130,265,899,20]}},"cc25v4-fixed":{"w":1068,"h":601,"boxes":{"issue":[130,322,182,17],"focus":[156,341,873,20],"page":[156,360,873,20],"fixed":[156,380,873,20]}},"cc25v4-tests":{"w":1068,"h":601,"boxes":{"list":[104,162,925,20]}},"cc26-loop-rules":{"w":1068,"h":601,"boxes":{}},"cc26v2-question":{"w":1068,"h":601,"boxes":{}},"ea01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,1386],"status":[888,437,50,25],"code":[454,452,93,20],"exp":[1094,290,122,40]}},"ea02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"save":[1132,73,84,40]}},"ea03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"list":[274,305,295,386]}},"ea04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"list":[585,305,295,192]}},"ea05-code":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"title":[76,19,269,26]}},"ea06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,101],"qty":[273,336,295,101],"unit":[584,336,295,101],"spec":[273,510,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"ea07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"ea08-mobile":{"w":390,"h":780,"boxes":{}},"eq01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,2095],"status":[285,476,62,36],"code":[371,499,70,39],"exp":[1094,290,122,40]}},"eq02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"save":[1132,73,84,40]}},"eq03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"list":[274,305,295,386]}},"eq04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"list":[585,305,295,239]}},"eq05-code":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"title":[76,19,269,26]}},"eq06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,101],"qty":[273,336,295,101],"unit":[584,336,295,101],"spec":[273,454,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"eq07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"eq08-mobile":{"w":390,"h":780,"boxes":{}},"v3-loop-docedit":{"w":1068,"h":601,"boxes":{"diff1":[104,228,925,53],"head2":[100,309,560,18],"diff2":[104,354,925,53]}},"v3-loop-srsedit":{"w":1068,"h":601,"boxes":{"head":[100,196,560,16],"added":[576,272,452,64],"sddhead":[100,386,560,16]}},"v3-sdd-code":{"w":1068,"h":601,"boxes":{"h":[105,76,892,19],"h2":[105,-1076,892,28]}},"v3-sdd-evidence":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,154,892,554],"hex":[105,181,892,28],"log":[105,209,892,28],"shared":[105,492,892,63],"lines":[105,328,892,45]}},"v3-sdd-files":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,120,892,355],"shared":[105,340,892,45],"used":[669,120,327,28]}},"v3-sdd-loopnote":{"w":1068,"h":601,"boxes":{"lines":[105,223,892,45],"shared":[105,387,892,63]}},"v3-srs-accept":{"w":1068,"h":601,"boxes":{"h":[105,76,892,19],"note":[105,111,892,35],"table":[105,161,892,407]}},"v3-srs-decisions":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,120,892,278],"note":[105,407,892,17],"who":[950,120,47,45]}},"v3-srs-open":{"w":1068,"h":601,"boxes":{"file":[53,441,257,22],"title":[372,83,446,37],"sec1":[372,267,260,28]}},"v3-srs-risk":{"w":1068,"h":601,"boxes":{"h":[105,75,892,28],"qty":[180,292,785,20],"date":[180,310,600,20]}},"v3-srs-scope":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,378,892,185]}},"v3-srs-trace":{"w":1068,"h":601,"boxes":{"h2":[105,-28,892,28],"h":[105,76,892,19],"table":[105,110,892,484],"where":[309,110,364,45]}},"v4-design-after":{"w":1068,"h":601,"boxes":{"mark":[387,79,594,230],"tab":[507,31,217,32]}},"v4-design-code":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"list":[105,117,892,205]}},"v4-design-evidence":{"w":1068,"h":601,"boxes":{"h":[105,75,892,38],"table":[105,171,892,806],"hex":[105,356,892,62],"log":[105,417,892,62],"shared":[105,207,892,62],"lines":[105,479,892,62],"result":[661,171,336,36]}},"v4-design-files":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,178,1089,1476],"shared":[105,1239,1089,139],"used":[1044,178,149,61]}},"v4-design-open":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"tab":[263,31,240,32],"quote":[105,146,892,77]}},"v4-diag-class-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,129,1893,633]}},"v4-diag-class":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,167,1893,633]}},"v4-diag-copy5":{"w":1620,"h":455,"boxes":{}},"v4-diag-files-full":{"w":4950,"h":760,"boxes":{"h":[198,8,4554,58],"svg":[232,129,4487,458],"copy5":[232,128,1620,455],"shared3":[3688,378,1035,205]}},"v4-diag-files-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,167,4487,458]}},"v4-diag-files":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,166,4487,458]}},"v4-diag-other":{"w":1250,"h":250,"boxes":{}},"v4-diag-seq-create-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,130,1937,1413]}},"v4-diag-seq-create":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,130,1937,1413]}},"v4-diag-seq-del":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,129,1232,1065]}},"v4-diag-shared3":{"w":1035,"h":205,"boxes":{}},"v4-diag-top":{"w":1240,"h":644,"boxes":{"h1":[74,10,1091,75],"nav":[0,195,1240,98]}},"v4-diag-uc":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[63,129,1115,734]}},"v4-loop-docedit":{"w":1068,"h":601,"boxes":{"edit":[108,216,916,5336]}},"v4-loop-log":{"w":1068,"h":601,"boxes":{"body":[765,64,298,3562],"tab":[691,31,145,32]}},"v4-loop-report-a1":{"w":1240,"h":644,"boxes":{"h":[137,450,966,33],"why":[137,634,57,27],"fix":[137,721,76,27]}},"v4-loop-report-decide":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"q1":[138,121,964,33]}},"v4-loop-report-end":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"pass":[116,152,1008,95]}},"v4-loop-report-review":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"how":[116,100,1008,67],"stat":[116,185,1008,33]}},"v4-loop-report-rounds":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"table":[116,93,1008,489]}},"v4-loop-report-shots":{"w":1240,"h":644,"boxes":{"shot":[137,70,966,605]}},"v4-loop-report-sync":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"table":[116,154,1008,406]}},"v4-loop-report-top":{"w":1240,"h":644,"boxes":{"h1":[116,32,1008,52],"sum":[116,157,1008,186],"plain":[148,262,952,61]}},"v4-pw-report-open":{"w":1240,"h":644,"boxes":{}},"v4-pw-report":{"w":1240,"h":644,"boxes":{"pass":[704,22,43,19],"list":[108,0,1024,644]}},"v4-srs-accept":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"table":[105,117,892,453]}},"v4-srs-after":{"w":1068,"h":601,"boxes":{"mark":[387,79,594,230],"tab":[507,31,217,32]}},"v4-srs-decisions":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"h3":[105,137,892,25],"table":[105,178,892,298],"who":[940,178,57,61]}},"v4-srs-open":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"tab":[240,31,217,32]}},"v4-srs-q":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"table":[105,117,892,570],"q7":[105,600,892,87]}},"v4-srs-risk":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,129,892,555]}},"v4-srs-scope":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,474,445,252],"h3":[105,433,892,25]}},"v4-srs-trace":{"w":1068,"h":601,"boxes":{"h2":[105,14,892,38],"h":[105,75,892,25],"table":[105,116,892,761],"where":[350,116,259,61],"done":[282,116,68,61]}},"v4-tasks":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"table":[105,213,892,1053],"t0":[105,274,892,62],"t13":[105,1205,892,61],"status":[952,213,44,61]}},"vs01-empty":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"menuFile":[35,0,56,30],"activity":[4,30,44,539]}},"vs02-menu-terminal":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"newTerm":[405,31,295,24]}},"vs03-terminal":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"tabTerm":[232,105,59,32],"prompt":[73,145,196,19],"max":[1011,110,22,22]}},"vs03b-terminal-max":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"prompt":[73,71,196,19]}},"vs04-cd-d":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,71,240,19],"prompt":[73,90,79,19]}},"vs05-clone-typed":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,703,19]}},"vs06-clone-done":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,695,19],"cloning":[73,109,422,19],"done":[73,246,343,19],"prompt":[73,265,79,19]}},"vs07-menu-file":{"w":1068,"h":601,"boxes":{"menuFile":[35,0,56,30],"openFolder":[36,161,298,24]}},"vs08-open-folder-dialog":{"w":1686.0,"h":1000.0,"boxes":{"HANDBOOK":[347.0,273.0,1350,48],"step3_new_module":[347.0,497.0,1350,48],"ok":[1219.0,901.0,218,52],"cancel":[1461.0,901.0,176,52],"address":[285.0,68.0,825,70]}},"vs09-trust":{"w":1068,"h":601,"boxes":{"dialog":[310,153,449,295],"yes":[417,388,172,25]}},"vs10-explorer":{"w":1068,"h":601,"boxes":{"explorer":[48,30,267,539],"tree":[49,91,265,417],"root":[53,91,257,22],"handbook":[53,91,257,22],"step0":[53,113,257,22],"step1":[53,135,257,22],"step2":[53,157,257,22],"step3":[53,179,257,22],"step4":[53,201,257,22],"step6":[53,223,257,22],"readme":[53,289,257,22]}},"vs11-terminal-root":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"prompt":[340,145,343,19]}},"vs12-preflight-fail":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"fail":[340,207,405,19],"hint":[340,226,713,19],"summary":[340,440,572,19]}},"vs13-preflight-pass":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"first":[340,148,713,19],"last":[340,362,379,19],"summary":[340,401,246,19]}},"vs14-start-handbook":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,590,19]}},"vs15-start-demo":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,713,19]}},"vs16-pnpm-install":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"done":[340,498,282,19]}},"vs17-pnpm-dev":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,226,88,19],"local":[340,401,317,19],"url":[463,401,150,18]}},"vs18-link-hover":{"w":1068,"h":601,"boxes":{"url":[463,401,150,18]}},"vs19-readme-raw":{"w":1068,"h":601,"boxes":{"tab":[320,31,132,32],"editor":[319,30,745,539],"file":[53,245,257,22],"tree":[49,91,265,417]}},"vs20-readme-preview":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h2":[372,63,625,38],"table":[372,324,625,965]}},"vs20b-readme-table":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"table":[105,76,892,529],"r1":[105,112,892,62],"r5":[105,358,892,62],"r6":[105,420,892,62],"r8":[105,544,892,61]}},"vs21-harness-files":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"sampleApp":[53,135,257,22],"claude":[53,419,257,22],"rules":[53,441,257,22],"ds":[53,463,257,22],"guide":[53,331,257,22],"agents":[53,353,257,22],"pages":[53,221,257,22],"components":[53,133,257,22]}},"vs22-claude-md":{"w":1068,"h":601,"boxes":{"tab":[320,31,130,32],"editor":[319,30,745,539],"file":[53,419,257,22]}},"vs22b-claude-md-wide":{"w":1068,"h":601,"boxes":{"tab":[53,31,130,32],"editor":[52,30,1012,539]}},"vs23-plus":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"plus":[803,110,22,22],"trash":[951,110,22,22],"max":[1011,110,22,22]}},"vs24-start-ds":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"cmd":[73,145,853,19],"plus":[938,110,22,22],"tabs":[944,137,119,432]}},"vs25-paste-warning":{"w":1068,"h":601,"boxes":{}},"vs25-pasted":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"first":[73,145,800,19],"robocopy":[73,183,581,19],"copy":[73,203,484,19],"install":[73,261,141,19]}},"vs26-step3-prep":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"install":[73,261,132,19],"done":[73,436,281,19],"prompt":[73,456,642,19]}},"vs27-myapp-explorer":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"guide":[53,333,257,22],"claude":[53,421,257,22],"rules":[53,443,257,22],"ds":[53,465,257,22]}},"vs28-prd-top":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h1":[372,80,625,50]}},"vs29-prd-fields":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,63,892,38],"table":[105,-117,536,144]}},"vs30-prd-decisions":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,64,892,38]}},"vs31-git-diff":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,164,580,19],"prompt":[340,183,475,19],"tabs":[944,137,119,432]}},"vs32-select-string":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,242,589,19],"hit":[336,337,580,42]}},"hb-step3-paradigm":{"w":1411,"h":761,"boxes":{}},"hb-step5-value":{"w":1375,"h":771,"boxes":{}},"hb-overview":{"w":1800,"h":1005,"boxes":{}}};
 let HC='#f4b942';  // 標註框預設色：深色截圖用金色；淺色系統畫面在場景檔第一行寫 HC='#ff8a1f';
 const FR={x:120,y:116,w:1360,h:765};          // 一般：整張截圖
 const FD={x:430,y:128,w:1130,h:636};          // 示範：左邊步驟、右邊截圖
@@ -542,799 +574,575 @@ function codeCard(x, y, w, lines, o = {}) {
 /* 一句話重點條（畫面下方） */
 function tip(text, o = {}) { return box(L, o.x ?? 120, o.y ?? 800, o.w ?? 1360, o.h ?? 76, text, { size: o.size || 30, fill: '#2a2410', stroke: o.col || C.gold, sw: 3, color: o.col || C.gold, weight: 800, hidden: o.hidden !== false }); }
 
-// ============================================================
-// AI CRUD 工作坊 EASY 版：手把手教學動畫（場景檔）
-// 畫面來源：2026-10-04 在 Windows 11 實拍。VS Code 1.140（繁體中文介面）＋ Claude Code 擴充 2.1.289、
-//           Chrome（Playwright）。練習副本 D:\AI_CRUD_Workshop_Frontend_EASY（從 GitHub 真的 git clone 下來）。
-// 大字版終端機裡的每一行，都是同一次實拍時終端機印出來的真實文字（太長的地方用「…」省略）。
-// 2026-10-04 第二版：依學員（Antigravity／Claude Opus 5.5 扮演零程式經驗承辦）回饋修改。
-// ============================================================
-window.__spoken = [
-  [/Ctrl\+`/g, 'Control 加反引號'], [/Ctrl\+Shift\+V/g, 'Control 加 Shift 加 V'], [/Ctrl/g, 'Control'],
-  [/\.\\preflight\.ps1/g, '點、反斜線、preflight 點 P S 1'], [/cd \.\./g, 'C D 空一格、兩個點'],
-  [/run-e2e\.ps1/g, 'run E 2 E 點 P S 1'], [/\.html/g, ' 點 HTML'], [/\.md\b/g, ' 點 M D'],
-  [/pnpm/g, 'P N P M'], [/npm/g, 'N P M'], [/E2E/g, 'E 2 E'], [/CRUD/g, 'C R U D'], [/CSV/g, 'C S V'], [/PRD/g, 'P R D'],
-  [/SRS/g, 'S R S'], [/SDD/g, 'S D D'], [/LOOP/g, 'loop'], [/VS Code/g, 'V S Code'], [/README/g, 'read me'],
-  [/D:\\/g, 'D 槽'], [/C:\\/g, 'C 槽'], [/IT-006/g, 'I T 零零六'], [/E3/g, 'E 3'], [/E4/g, 'E 4'],
-  [/step(\d)/g, 'step $1'], [/\[PASS\]/g, 'PASS'], [/\[WARN\]/g, 'WARN'], [/\[FAIL\]/g, 'FAIL'], [/D([1-3])/g, 'D $1'], [/T([1-8])\b/g, 'T $1'],
-  [/localhost:3100/g, 'localhost 3100'], [/3100/g, '三一零零'], [/\+/g, ' 加 '], [/cd /g, 'C D '],
-]
-const OR = '#ff6a00'                         // 淺色網頁上的標註色
-const LAB = 'D:\\AI_CRUD_Workshop_Frontend_EASY'
-const SAMPLE = LAB + '\\step2_speedrun_kit\\2.1_sample_app\\sample-app'
-const MYAPP = LAB + '\\step3_new_module\\my-equipment-app'
-const FV = FR                                 // VS Code 截圖：整張
-function vsh(r, names, F = FV) { return shots(r, names, F) }
-const REAL = '這是你螢幕上實際會看到的樣子（字比較小是正常的）'
-function realNote() { return tip(REAL, { y: 820, h: 60, size: 24, col: C.teal }) }
-// 迷你鍵盤：標出 Ctrl 和反引號
-function miniKeys(x, y) {
-  const g = grp(L); R(g, x, y, 560, 250, { fill: '#0b1520', stroke: C.line, sw: 3, rx: 16 })
-  const key = (kx, ky, w, t, hot) => { R(g, kx, ky, w, 62, { fill: hot ? C.gold : '#e9edf1', stroke: hot ? '#fff' : '#9aa5b1', sw: hot ? 4 : 2, rx: 8 }); T(g, kx + w / 2, ky + 42, t, { size: 26, anchor: 'middle', weight: 900, fill: '#1d2733' }) }
-  key(x + 20, y + 20, 90, 'Esc'); key(x + 125, y + 20, 70, 'F1'); key(x + 210, y + 20, 70, 'F2')
-  key(x + 20, y + 95, 90, '` ~', true); key(x + 125, y + 95, 70, '1 !'); key(x + 210, y + 95, 70, '2 @'); key(x + 295, y + 95, 70, '3 #')
-  key(x + 20, y + 170, 110, 'Ctrl', true); key(x + 145, y + 170, 80, 'Win'); key(x + 240, y + 170, 80, 'Alt')
-  T(g, x + 400, y + 140, '同時按', { size: 26, weight: 800, fill: C.gold }); T(g, x + 400, y + 178, '這兩顆', { size: 26, weight: 800, fill: C.gold })
-  return g
+// 由 build_v3_data.py 產生：講稿與配音清單
+window.__script = [{"chap": "開場", "title": "這門課學什麼", "who": "小芸", "lines": ["這門課不教你寫程式，是教你怎麼讓 AI 照你們公司的規矩寫程式。", "我們用一碗滷味來比喻。harness 是滷包，也就是給 AI 的規矩；範本是配方。圖上的 Step 只是比喻的順序。", "SDD 是規格驅動開發：先寫好菜單和做法，確認過了才下鍋。菜改了，菜單也要跟著改。", "再加兩道關卡：LOOP 就是迴圈，讓 AI 改、驗、再改，跑到測試全部通過；對抗審查再找另一個 AI 來挑錯。", "你只要顧頭顧尾：頭是講清楚要什麼，該做的決定由你拍板；尾是驗收。中間交給 AI。"]}, {"chap": "開場", "title": "課程地圖", "who": "小芸", "lines": ["整堂課分六步。Step 0 準備環境，Step 1 看有規矩、沒規矩差在哪。", "Step 2 認識 harness，Step 3 用 SDD 做一個新模組。", "Step 4 讓 AI 用 LOOP 自己測試、自己修，直到測試全部通過，再做對抗審查。Step 5 總結，回公司怎麼用。", "指令都放在畫面上和手冊裡，照著貼就好。哪個視窗不能關、在哪個資料夾打，畫面下方的文字版速查有寫。"]}, {"chap": "Step 0", "title": "準備環境：三個動作", "who": "阿哲", "lines": ["開始前，先照手冊 Step 0 的清單裝好 VS Code、Git、Node.js、pnpm，還有 VS Code 裡的 AI 助手 Claude Code。", "Step 0 只有三個動作。第一，在 VS Code 開終端機，用 git clone 把教材下載下來；沒有 D 槽，就把 D 換成 C。", "第二，用「檔案」、「開啟資料夾」打開教材。問你信不信任作者，選「是」。", "第三，跑前置檢查 preflight。最後寫「可以開課」就過關；中間有黃色的 WARN 沒關係，只有紅色的 FAIL 要處理。", "指令在手冊裡，照著貼就好。"]}, {"chap": "Step 0", "title": "看到紅燈怎麼辦", "who": "阿哲", "lines": ["如果看到紅色的 FAIL，先別慌，下面會附修復提示，照著做一次。黃色的 WARN 不擋你，像 3100 被占用，之後會自動換埠。", "還是紅的，就把整段輸出貼給 AI，請它帶你修。手冊有現成的 prompt。", "一執行就跳出「已停用指令碼執行」的話，先跑畫面上這行 Set-ExecutionPolicy，再重跑。"]}, {"chap": "Step 1", "title": "同一句需求，兩個產出", "who": "小芸", "lines": ["Step 1 做了一個實驗：同一句需求請 AI 做兩次，一次沒給規矩，一次附上規矩。", "兩版都很好看，功能也都能用。最明顯的不同是顏色：左邊的橘色是 AI 自己挑的，右邊的品牌紅是公司規矩指定的。", "所以差別不在好不好看，在「這個決定是誰做的」。"]}, {"chap": "Step 1", "title": "錯不起的欄位：血型", "who": "小芸", "lines": ["最該記住的是血型。沒給規矩那版，一打開就替你選好 A，也完全不檢查。", "志工沒改到就按新增，存進去的就是錯的血型，要等到真的要輸血才會發現。", "有規矩那版，預設是「請選擇血型」，沒選就擋下來。", "AI 不是不會寫驗證，是沒人告訴它哪些欄位錯不起。這些錯不起的事，就是要放進滷包的規矩。"]}, {"chap": "Step 2", "title": "範本：AI 要照著做的示範", "who": "阿哲", "lines": ["Step 2 先把範本跑起來。開一個新的終端機，照手冊貼上三行指令，跑完這個視窗不要關，瀏覽器打開 localhost:3100。", "這就是範本：人員管理。新增、編輯、刪除、篩選、匯出，五個功能都做好、也驗過了。", "刪除會先跳確認視窗；篩選條件會寫進網址；匯出的是全部資料，不是只有這一頁。", "這些細節，就是之後 AI 做新模組時，要照著做的示範。"]}, {"chap": "Step 2", "title": "harness：四份給 AI 讀的規矩", "who": "小芸", "lines": ["範本資料夾最上層，放了四份給 AI 讀的規矩，這就是 harness。", "CLAUDE.md 是總綱：用什麼技術、哪些檔能改、哪些不能動，還有 10 條程式規則。有些 AI 會自動讀它，不會的，起手 prompt 會叫它讀。", "CODE-RULES 是細則，design-system-summary 管顏色和間距，使用說明教 AI 怎麼複製範本開新模組。", "你不用逐條讀懂，那是寫給 AI 的。但至少要掃過 CLAUDE.md，只有四十幾行，確認裡面的禁止事項跟你們公司一致。", "因為規矩寫錯，AI 會照著錯，而且錯得又快又整齊。"]}, {"chap": "Step 2", "title": "複製還是共用", "who": "小芸", "lines": ["範本有 8 個核心檔。判斷只有一句：跟這個資料長什麼樣子有關的，複製改名；通用的機制，直接共用。", "就像開分店：招牌和價目表要換，收銀機和冷氣照用。", "共用的東西一改，每家分店都受影響，所以規矩寫明：共用檔不准動。Step 3 的設計文件裡，會看到 AI 有沒有守住。"]}, {"chap": "Step 2", "title": "Design System：顏色不寫死", "who": "小芸", "lines": ["顏色和間距也一樣，有一份 Design System 集中管理。", "規矩要求一律用代號，叫 token，不准把色碼寫死。就像油漆說「品牌紅」，不說色碼。", "要換顏色，只改代號表一個地方，全站一起換。AI 有沒有照做，一樣會在設計文件裡留下證據。"]}, {"chap": "Step 3", "title": "SDD：先文件，再程式", "who": "小芸", "lines": ["Step 3 要做一個新模組：中心裝備物資。重點是 SDD，規格驅動開發。注意，SDD 不是一份文件，是做事的順序：先文件，你核過才寫程式。", "流程六步：PRD 是產品需求文件，寫你要什麼；AI 讀完先出選擇題，你拍板；AI 寫 SRS，也就是需求規格書；再寫設計文件和圖；列任務清單；最後才寫程式。", "SRS 回答「這一版答應了什麼」，設計文件回答「打算怎麼做」。圖讓你不用看程式，看圖就懂。", "為什麼要先寫？寫程式很便宜，改方向很貴。文件先對了，程式才不會做白工。"]}, {"chap": "Step 3", "title": "PRD：要簡潔，還留了三個決定給你", "who": "小芸", "lines": ["需求寫在 PRD，要簡潔。原系統有 26 欄，已經濃縮成一堂課做得完的 12 欄，一頁看完。", "PRD 第 5 節刻意留了三個決定：刪除要不要補、匯出要不要做、編碼要不要簡化。", "這三題由你拍板，不是 AI。做取捨的人，要對結果負責。"]}, {"chap": "Step 3", "title": "實拍：貼起手 prompt，AI 先讀規矩", "who": "阿哲", "lines": ["實際操作。再開一個新的終端機，貼上手冊的複製指令；出現兩個大於符號，就再按一次 Enter。做完用 VS Code 打開 my-equipment-app。", "打開 Claude Code，貼上手冊的起手 prompt，只有四句。第一句就說：走 SDD，先文件，再程式。", "模型先選 Opus 5.5，後面的 High 是「想多深」的設定。寫文件要想得深，用強一點的；等一下寫程式，再換便宜的 Sonnet。", "它叫 AI 先讀 CLAUDE.md、CODE-RULES、使用說明三份規矩，再讀 PRD，先不要寫程式。畫面上這些 Read、Bash，就是 AI 在打開檔案來讀。"]}, {"chap": "Step 3", "title": "實拍：AI 出選擇題，你拍板", "who": "阿哲", "lines": ["讀完，AI 沒有寫程式，先出選擇題。每題都有建議，還附一句理由。", "照手冊的課堂拍板選：補刪除、做匯出、編碼用簡化版。", "PRD 沒寫清楚的，它也不自己決定，分幾輪又問了 7 題：流水號怎麼算、編輯能不能改分類、電話格式，連每筆資料要不要一個固定編號，都停下來問。", "這就是 harness 在運作。規矩寫了「只在卡住、非問不可時才問人，而且用選擇題」，它就照做。"]}, {"chap": "Step 3", "title": "實拍：先交文件，你核過才開工", "who": "阿哲", "lines": ["拍板後，AI 先交文件：SRS、設計文件，還有圖，然後列出任務清單。這次是 14 個，每次數量不一定一樣。到這裡，程式一行都還沒寫。", "先別急著說開工。打開 SRS 核三段、看一眼圖，覺得少了什麼先補一句，確認了才開工。"]}, {"chap": "Step 3", "title": "打開 SRS：這一版答應了什麼", "who": "小芸", "lines": ["說開工之前，先打開 AI 寫的 SRS。第一段是已拍板決策：每一題的裁決、理由、誰拍板，都寫在上面。", "第二段是需求追溯：PRD 的 12 個欄位和驗收條件，每一條做在哪，都列出來。", "第三段是範圍外：這一版不做什麼，寫清楚，之後才不會吵。", "標了星號的三段，是 PM 一定要核的。你不用看程式，看這三段就知道它答應了什麼。"]}, {"chap": "Step 3", "title": "打開設計文件和圖：看圖，不用看程式", "who": "小芸", "lines": ["再看設計文件。第一段是檔案責任：哪些檔複製改名，哪些共用、沒改。三個共用核心檔都沒動；側欄加連結這種全站的小改，AI 會寫出來問你要不要。", "最後一段是遵守 harness 的證據：寫死的色碼、留在程式裡的除錯訊息，搜尋結果都是 0 筆。", "重點在圖。用瀏覽器打開 DIAGRAMS，四張圖：用例圖、檔案架構圖、資料模型，還有新增的流程。", "圖很清楚。看圖就知道檔案怎麼分、資料長什麼樣、新增時編碼怎麼算，不用讀程式。", "AI 不是說「我有照規矩」，是拿出證據和圖給你看。這就是文件的價值。"]}, {"chap": "Step 3", "title": "實拍：換模型、開工、做完", "who": "阿哲", "lines": ["文件核過了，說「開工」之前，把模型換成 Sonnet 5.5。有規矩和範本，寫程式不用最貴的模型。", "說「開工」，它才開始寫程式，一個一個做，自己跑檢查。這次大約 17 分鐘做完。", "最後我請它用五行交一份總結：做了什麼、產出哪些檔、花了多久。到這裡，你一行程式都沒碰過。"]}, {"chap": "Step 3", "title": "實拍：照 PRD 驗收畫面", "who": "阿哲", "lines": ["網頁是 AI 跑檢查時自己開的，它會告訴你網址。3100 還被範本占著，它換成 3101；不用去關任何程式。", "照著 PRD 一條一條驗收。24 筆種子資料都在；先選分類，項目才出現；編碼馬上算出來，像 IT-NBK-003。", "空表單按儲存會出紅字；按垃圾桶會先確認；縮到手機寬度，表格變成卡片。"]}, {"chap": "Step 3", "title": "實拍：做完還是有小修改", "who": "阿哲", "lines": ["驗收一定會有小落差。這次我發現兩個：空白日期的橫線長短不一樣；手機卡片少了「檢視」按鈕。", "一次講一件：看到什麼、期望什麼。AI 改一次，我再看一次。", "兩個小問題，來回講了兩輪。問題不大，但你得一直坐在電腦前面陪它。", "這段來回，就是 Step 4 要交出去的事。"]}, {"chap": "Step 4", "title": "別再一問一答：找另一個 AI 取代你", "who": "小芸", "lines": ["很多人用 AI 還是一問一答：你問一句，它做一步，像主管手把手帶新人，時間全耗在教。", "換個做法：規矩寫在 harness，示範放在範本，驗收標準寫成 E2E 測試：程式自己開瀏覽器，照使用者的順序點一遍。這堂課的 7 條測試教材已經寫好，你不用寫。", "再找另一個 AI，取代你剛才那個「來回要 AI 修」的角色。它的工作就是找碴、不准誇獎，所以叫對抗審查。", "這些放好，你只下一個指令。AI 自己做、自己驗、另一個 AI 挑錯，最後交報告給你。"]}, {"chap": "Step 4", "title": "LOOP：自動閱卷機，規矩寫在檔案裡", "who": "小芸", "lines": ["LOOP 就是讓 AI 自己跑「改程式、跑測試、再改」，直到全綠，也就是 7 條測試全部通過。", "負責閱卷的，是那 7 條 E2E 測試，放在 step4 的資料夾。AI 自己跑，不用你跑。", "兩條鐵律。第一，不准偷改標準答案：不准改測試，也不准放寬標準。第二，同一個問題修兩次還沒好，就停下來回報。", "鐵律和產出都寫在一份 LOOP 規矩檔裡，它也是 harness 的一份。prompt 只要說「照規矩做」。做完要交四樣：流水紀錄、結果報告、測試報告，還有同步過的文件。"]}, {"chap": "Step 4", "title": "實拍：一個 prompt，AI 自己換埠、自己判斷紅燈", "who": "阿哲", "lines": ["實際看一次。先用「檔案」、「開啟資料夾」重新打開最外層的教材資料夾，開一個新的 Claude Code 對話，模型選 Sonnet 5.5，貼上手冊的 LOOP prompt。", "送出之後就不用管了。我這裡設成 Auto，AI 執行指令不用每次問我；一直跳出「允許嗎」的話，照手冊改一次設定。3100 被占著，AI 自己換了一個埠，把網頁開起來。", "第一輪：5 條綠、2 條紅。它沒有急著改，先看測試留下的截圖、查 PRD 怎麼寫，再動手。"]}, {"chap": "Step 4", "title": "實拍：全綠之後，另一個 AI 開瀏覽器截圖審查", "who": "阿哲", "lines": ["第二輪，7 條測試全部綠燈。", "接著它照規矩叫出審查的 AI，用的是比寫程式高一級的 Opus 5.5。下面顯示的 Sonnet 是主對話，審查另外用 Opus，規矩檔寫好了，你不用自己切。", "Playwright 是讓程式自己開瀏覽器、點畫面、截圖的工具。審查的 AI 用它一頁一頁截圖，對照 PRD 和 design system 挑問題。「1 agent」就是它正在工作。從貼上到交報告，大約 24 分鐘，中間沒有人插手。"]}, {"chap": "Step 4", "title": "對抗審查挑到什麼", "who": "小芸", "lines": ["審查的 AI 挑到 15 條 App 問題。最重的兩條：打字搜尋打到一半，游標跑掉、字被吃掉；在第 2 頁點排序，沒回第 1 頁。這種問題，就是 Step 3 我得自己點出來的那一類，這次它自己找到。", "AI 自己修了 8 條再跑，還是全綠。沒修的 7 條 App 問題，還有 12 條測試的問題，它都列成選擇題交給你；看不懂就選標了「建議」的，或交給講師裁決。", "為什麼要另外找一個？寫程式的 AI 審自己，就像自己改自己的考卷，分數一定偏高。所以要另開一個沒參與寫程式、而且更強的 AI 來挑錯。"]}, {"chap": "Step 4", "title": "交出來的四樣東西", "who": "小芸", "lines": ["LOOP 做完交四樣東西，先看前三份。第一份是流水紀錄 LOOP-LOG：每一輪做了什麼。這是給機器看的，你不用讀。", "第二份是結果報告 LOOP-REPORT：一打開就是結論，後面有截圖。這份是給人看的。", "第三份是 Playwright 的測試報告：7 條每一條跑了什麼、花多久，都點得開。", "你要看的是報告：結論、截圖，和要你裁決的選擇題。看完再照報告上的網址自己點一遍，綠燈不等於做對。"]}, {"chap": "Step 4", "title": "程式改了，文件跟著改", "who": "小芸", "lines": ["第四樣最容易漏掉：程式改了，文件有沒有跟著改？", "這次 AI 修完程式，回頭把 SRS、設計文件和圖也更新了，改的地方標上「step4 LOOP 後」。", "SDD 的意思就在這裡：菜改了，菜單跟著改。下一個人接手，看文件就知道現在的程式長什麼樣子。"]}, {"chap": "Step 4", "title": "下次只要給規格，然後去泡茶", "who": "小芸", "lines": ["把這套流程串起來。下次要做新模組，你只要寫一份規格。", "AI 用選擇題跟你釐清，產出 SRS、設計文件和圖；你核過，交給 LOOP 實作，再由另一個 AI 審查。", "你不用坐在電腦前面陪它，可以去泡杯茶。回來看報告、拍板、驗收。", "想更放心，或你的工具不能叫出子代理，也就是另一個 AI，就開別家的 AI，例如 Codex，貼手冊的備案 prompt，再審一次。"]}, {"chap": "Step 5", "title": "回公司怎麼用", "who": "小芸", "lines": ["最後總結。你的心力花在兩端：頭是講清楚要什麼，該做的決定由你拍板；尾是驗收，燈亮不等於做對。", "回公司三步。第一，把四份規矩帶進你的專案，改成你們公司的規則。", "第二，把最成熟的頁面整理成範本。第三，新需求都走 SDD：規格、選擇題、文件、LOOP。", "課後還有一題作業，在 step6_survey 資料夾：用今天的流程自己做一個課程回饋問卷，做到能給別人填。"]}, {"chap": "Step 5", "title": "記住四句話", "who": "小芸", "lines": ["第一，範本給骨架，harness 給規矩。", "第二，SDD 先文件再程式，程式改了，文件跟著改。", "第三，LOOP 讓 AI 自己驗，再請另一個 AI 來挑錯。", "第四，最後由你拍板、由你驗收。"]}];
+window.__audio = {"1-1": {"src": "audio/2b7155d877ed.mp3", "sec": 6.12, "who": "小芸"}, "1-2": {"src": "audio/004987a37bc2.mp3", "sec": 10.6, "who": "小芸"}, "1-3": {"src": "audio/1efb4bd5e8c8.mp3", "sec": 9.68, "who": "小芸"}, "1-4": {"src": "audio/e7ef258df20b.mp3", "sec": 10.88, "who": "小芸"}, "1-5": {"src": "audio/0fed164a14ce.mp3", "sec": 8.52, "who": "小芸"}, "2-1": {"src": "audio/34a01f990aa4.mp3", "sec": 7.0, "who": "小芸"}, "2-2": {"src": "audio/5dd7c611a653.mp3", "sec": 5.2, "who": "小芸"}, "2-3": {"src": "audio/c3a8f163b111.mp3", "sec": 11.24, "who": "小芸"}, "2-4": {"src": "audio/917a745e2785.mp3", "sec": 8.84, "who": "小芸"}, "3-1": {"src": "audio/b6a6e1f76e0c.mp3", "sec": 10.24, "who": "阿哲"}, "3-2": {"src": "audio/23bf6179bb44.mp3", "sec": 10.52, "who": "阿哲"}, "3-3": {"src": "audio/b90d7855ffbc.mp3", "sec": 6.96, "who": "阿哲"}, "3-4": {"src": "audio/45b954114dfc.mp3", "sec": 10.76, "who": "阿哲"}, "3-5": {"src": "audio/05bd2b57f708.mp3", "sec": 2.84, "who": "阿哲"}, "4-1": {"src": "audio/c053f83b4381.mp3", "sec": 12.28, "who": "阿哲"}, "4-2": {"src": "audio/b9d92834ce29.mp3", "sec": 6.12, "who": "阿哲"}, "4-3": {"src": "audio/cec5977a1d9b.mp3", "sec": 8.6, "who": "阿哲"}, "5-1": {"src": "audio/a7c60ed7f42c.mp3", "sec": 8.12, "who": "小芸"}, "5-2": {"src": "audio/07b2e72dd183.mp3", "sec": 11.52, "who": "小芸"}, "5-3": {"src": "audio/6a7606827225.mp3", "sec": 4.64, "who": "小芸"}, "6-1": {"src": "audio/383a65dbdc93.mp3", "sec": 7.4, "who": "小芸"}, "6-2": {"src": "audio/ce703dd5156f.mp3", "sec": 7.0, "who": "小芸"}, "6-3": {"src": "audio/3c103ed0e31d.mp3", "sec": 5.84, "who": "小芸"}, "6-4": {"src": "audio/ca1e84cf99f6.mp3", "sec": 8.48, "who": "小芸"}, "7-1": {"src": "audio/f37a71a31090.mp3", "sec": 13.44, "who": "阿哲"}, "7-2": {"src": "audio/d7df23bc311c.mp3", "sec": 10.12, "who": "阿哲"}, "7-3": {"src": "audio/64ba631c6121.mp3", "sec": 8.76, "who": "阿哲"}, "7-4": {"src": "audio/3ee2c855f45d.mp3", "sec": 4.96, "who": "阿哲"}, "8-1": {"src": "audio/129562075efc.mp3", "sec": 5.68, "who": "小芸"}, "8-2": {"src": "audio/56deff34823b.mp3", "sec": 12.4, "who": "小芸"}, "8-3": {"src": "audio/e8d05db0fe96.mp3", "sec": 9.24, "who": "小芸"}, "8-4": {"src": "audio/1952b503a531.mp3", "sec": 11.52, "who": "小芸"}, "8-5": {"src": "audio/dd10b43dd5f9.mp3", "sec": 5.44, "who": "小芸"}, "9-1": {"src": "audio/8435cb0a2cc6.mp3", "sec": 9.08, "who": "小芸"}, "9-2": {"src": "audio/ef176d0582ea.mp3", "sec": 5.68, "who": "小芸"}, "9-3": {"src": "audio/df95c2dc6f1f.mp3", "sec": 10.44, "who": "小芸"}, "10-1": {"src": "audio/45ff415b28c8.mp3", "sec": 4.2, "who": "小芸"}, "10-2": {"src": "audio/97092168d2a7.mp3", "sec": 8.0, "who": "小芸"}, "10-3": {"src": "audio/d9ee12a5835c.mp3", "sec": 8.32, "who": "小芸"}, "11-1": {"src": "audio/b36eaaf69035.mp3", "sec": 15.16, "who": "小芸"}, "11-2": {"src": "audio/dd1a4ac0b954.mp3", "sec": 18.0, "who": "小芸"}, "11-3": {"src": "audio/fef3df43c964.mp3", "sec": 9.28, "who": "小芸"}, "11-4": {"src": "audio/f971b34168bf.mp3", "sec": 7.72, "who": "小芸"}, "12-1": {"src": "audio/40479b6f2ccf.mp3", "sec": 8.48, "who": "小芸"}, "12-2": {"src": "audio/8c7e4d309b04.mp3", "sec": 8.32, "who": "小芸"}, "12-3": {"src": "audio/dc93f7b89c6f.mp3", "sec": 5.68, "who": "小芸"}, "13-1": {"src": "audio/8ac40884dd4b.mp3", "sec": 14.48, "who": "阿哲"}, "13-2": {"src": "audio/a5fab7cfe0c6.mp3", "sec": 11.28, "who": "阿哲"}, "13-3": {"src": "audio/aa2dedecc529.mp3", "sec": 11.72, "who": "阿哲"}, "13-4": {"src": "audio/6ba9a7d8946e.mp3", "sec": 13.08, "who": "阿哲"}, "14-1": {"src": "audio/49435e0239e3.mp3", "sec": 6.2, "who": "阿哲"}, "14-2": {"src": "audio/81334639d1b8.mp3", "sec": 6.4, "who": "阿哲"}, "14-3": {"src": "audio/ce32977b7f49.mp3", "sec": 13.32, "who": "阿哲"}, "14-4": {"src": "audio/61c3d0e9cb39.mp3", "sec": 8.68, "who": "阿哲"}, "15-1": {"src": "audio/7e6e87652292.mp3", "sec": 14.0, "who": "阿哲"}, "15-2": {"src": "audio/fb887dc9044f.mp3", "sec": 9.28, "who": "阿哲"}, "16-1": {"src": "audio/71541fd70660.mp3", "sec": 10.88, "who": "小芸"}, "16-2": {"src": "audio/8c902073282d.mp3", "sec": 7.36, "who": "小芸"}, "16-3": {"src": "audio/d6bbd826ad98.mp3", "sec": 6.4, "who": "小芸"}, "16-4": {"src": "audio/d30edfa23980.mp3", "sec": 6.92, "who": "小芸"}, "17-1": {"src": "audio/3b19b7f77fc5.mp3", "sec": 14.2, "who": "小芸"}, "17-2": {"src": "audio/84153f7b0a88.mp3", "sec": 8.32, "who": "小芸"}, "17-3": {"src": "audio/2dd7c3946ea9.mp3", "sec": 10.08, "who": "小芸"}, "17-4": {"src": "audio/708698cd7417.mp3", "sec": 7.44, "who": "小芸"}, "17-5": {"src": "audio/1110189b2b85.mp3", "sec": 5.76, "who": "小芸"}, "18-1": {"src": "audio/6dedfc20dd03.mp3", "sec": 9.92, "who": "阿哲"}, "18-2": {"src": "audio/51f71d19f83f.mp3", "sec": 8.32, "who": "阿哲"}, "18-3": {"src": "audio/885e20eeb64f.mp3", "sec": 9.96, "who": "阿哲"}, "19-1": {"src": "audio/c846a37b6872.mp3", "sec": 10.04, "who": "阿哲"}, "19-2": {"src": "audio/c92dc5c19f58.mp3", "sec": 14.2, "who": "阿哲"}, "19-3": {"src": "audio/30f3ce705ade.mp3", "sec": 8.12, "who": "阿哲"}, "20-1": {"src": "audio/cf5a08d7d5ce.mp3", "sec": 10.12, "who": "阿哲"}, "20-2": {"src": "audio/da7e01fd8f1d.mp3", "sec": 6.52, "who": "阿哲"}, "20-3": {"src": "audio/400eddb962d0.mp3", "sec": 6.6, "who": "阿哲"}, "20-4": {"src": "audio/84ec014e8f81.mp3", "sec": 3.44, "who": "阿哲"}, "21-1": {"src": "audio/00b2380dc69f.mp3", "sec": 8.92, "who": "小芸"}, "21-2": {"src": "audio/f8cfc580de62.mp3", "sec": 15.12, "who": "小芸"}, "21-3": {"src": "audio/cb29332891a1.mp3", "sec": 10.2, "who": "小芸"}, "21-4": {"src": "audio/3f30d647bbda.mp3", "sec": 8.32, "who": "小芸"}, "22-1": {"src": "audio/461e721032aa.mp3", "sec": 8.24, "who": "小芸"}, "22-2": {"src": "audio/1f04d576b26a.mp3", "sec": 7.28, "who": "小芸"}, "22-3": {"src": "audio/b789fc350a9f.mp3", "sec": 12.0, "who": "小芸"}, "22-4": {"src": "audio/5c668a072969.mp3", "sec": 14.32, "who": "小芸"}, "23-1": {"src": "audio/ebf2de190714.mp3", "sec": 15.48, "who": "阿哲"}, "23-2": {"src": "audio/b9e12a93aa3c.mp3", "sec": 16.48, "who": "阿哲"}, "23-3": {"src": "audio/b85bc02bf7fe.mp3", "sec": 9.32, "who": "阿哲"}, "24-1": {"src": "audio/1ba22c8fef8f.mp3", "sec": 3.88, "who": "阿哲"}, "24-2": {"src": "audio/a2d59f1921d5.mp3", "sec": 14.2, "who": "阿哲"}, "24-3": {"src": "audio/840bdb1304e6.mp3", "sec": 19.2, "who": "阿哲"}, "25-1": {"src": "audio/4adbddb21e3a.mp3", "sec": 18.04, "who": "小芸"}, "25-2": {"src": "audio/b69729a08b2f.mp3", "sec": 14.0, "who": "小芸"}, "25-3": {"src": "audio/d98a4acbd374.mp3", "sec": 12.28, "who": "小芸"}, "26-1": {"src": "audio/9dac25555ea9.mp3", "sec": 10.36, "who": "小芸"}, "26-2": {"src": "audio/5de35e73cbc5.mp3", "sec": 7.4, "who": "小芸"}, "26-3": {"src": "audio/1aceff87f32e.mp3", "sec": 6.8, "who": "小芸"}, "26-4": {"src": "audio/9d2d999865ba.mp3", "sec": 11.68, "who": "小芸"}, "27-1": {"src": "audio/4049b382a5a3.mp3", "sec": 5.08, "who": "小芸"}, "27-2": {"src": "audio/645369c2c81e.mp3", "sec": 9.36, "who": "小芸"}, "27-3": {"src": "audio/8090db8a48a6.mp3", "sec": 9.36, "who": "小芸"}, "28-1": {"src": "audio/9574a254c088.mp3", "sec": 4.88, "who": "小芸"}, "28-2": {"src": "audio/8d3f4c321913.mp3", "sec": 9.24, "who": "小芸"}, "28-3": {"src": "audio/39af9e62dae1.mp3", "sec": 5.56, "who": "小芸"}, "28-4": {"src": "audio/c1d95ba7695c.mp3", "sec": 10.28, "who": "小芸"}, "29-1": {"src": "audio/31b1782bcf9e.mp3", "sec": 11.88, "who": "小芸"}, "29-2": {"src": "audio/10cc81caf12d.mp3", "sec": 6.72, "who": "小芸"}, "29-3": {"src": "audio/26a7a9edb1ef.mp3", "sec": 10.72, "who": "小芸"}, "29-4": {"src": "audio/65f466f6e395.mp3", "sec": 9.44, "who": "小芸"}, "30-1": {"src": "audio/559c313ee125.mp3", "sec": 4.08, "who": "小芸"}, "30-2": {"src": "audio/4fd10379831c.mp3", "sec": 6.52, "who": "小芸"}, "30-3": {"src": "audio/28a1ca7d6d48.mp3", "sec": 5.24, "who": "小芸"}, "30-4": {"src": "audio/a48713b65de9.mp3", "sec": 3.68, "who": "小芸"}};
+
+// ── 第三版：講稿（window.__script）驅動場景；字幕＝講稿＝配音，一字不差 ──
+// sc3(第幾段, 畫面, [每一句的動作…])：句數要跟講稿一樣，不一樣就在主控台警告
+function sc3(n, build, acts) {
+  const S = window.__script[n - 1];
+  if (!S) { console.warn('no script for scene', n); return; }
+  if (acts.length !== S.lines.length) console.warn('scene', n, S.title, 'acts', acts.length, '!= lines', S.lines.length);
+  const b = () => { const r = build() || {}; speakerBadge(S.who); return r; };
+  scenes.push({ title: S.title, who: S.who, build: b, steps: S.lines.map((t, k) => [t, acts[k] || (() => {})]), chap: CHAPS.length - 1 });
+}
+function hd(n, eb) { mhead(eb, window.__script[n - 1].title); }
+// 右上角：這一段誰講
+function speakerBadge(who) {
+  if (!who) return;
+  const col = who === '小芸' ? C.coral : C.teal, role = who === '小芸' ? '方法和觀念' : '實拍示範';
+  const g = grp(L, false); R(g, 1300, 14, 230, 40, { fill: '#0b1520', stroke: col, sw: 2, rx: 20 });
+  mk('circle', { cx: 1322, cy: 34, r: 11, fill: col }, g);
+  T(g, 1342, 42, who + '｜' + role, { size: 20, weight: 800, fill: col });
+}
+// 指令字卡：完整指令放在畫面上，聲音不逐字念
+function cmdCard(x, y, w, lines, title, o = {}) {
+  return codeCard(x, y, w, lines, { title: title || '照著打（手冊裡可以直接複製）', size: o.size || 26, col: o.col || C.gold });
+}
+// 一排流程方塊：[[字, 顏色]…]，回傳每一格（預設藏起來）
+function flowRow(y, items, o = {}) {
+  const w = o.w || 220, gap = o.gap || 25, h = o.h || 120, x0 = o.x ?? (800 - (items.length * w + (items.length - 1) * gap) / 2);
+  return items.map(([t, col], i) => {
+    const g = grp(L); const x = x0 + i * (w + gap);
+    R(g, x, y, w, h, { fill: C.card, stroke: col, sw: 4 });
+    T(g, x + w / 2, y + h / 2 - (t.split('\n').length - 1) * 18 + 12, t, { size: 30, anchor: 'middle', weight: 900, fill: col });
+    if (i) T(g, x - gap / 2, y + h / 2 + 12, '→', { size: 30, anchor: 'middle', fill: C.mut });
+    return g;
+  });
 }
 
-// ════════════════════════════ 開場 ════════════════════════════
-chapter('開場', '這堂課在做什麼', C.teal)
+// ============================================================
+// AI CRUD 工作坊 EASY 版：手把手教學動畫 第四版（SDD＝規格驅動開發；文件＝SRS＋設計文件＋圖；LOOP 交紀錄、報告、測試報告）
+// 講稿：tts-audition/script_v4.py → window.__script；配音 → window.__audio
+// 兩人分段：小芸（Sulafat）講方法和觀念，阿哲（Sadaltager）講實拍示範。指令只放在畫面字卡。
+// 畫面：2026-10-04～07 在 Windows 11 實拍（VS Code 繁中介面＋Claude Code、PowerShell、Chrome）。Step 3 文件用 Opus 5.5、寫程式用 Sonnet 5.5。
+// ============================================================
+const OR = '#ff6a00'                        // 淺色網頁上的標註色
+const FV = FR                                // VS Code 截圖：整張
+function vsh(r, names, F = FV) { return shots(r, names, F) }
+const RED = s => [[s, TC.err, 700]], GRN = s => [[s, TC.ok, 700]]
+const LAB = 'D:\\AI_CRUD_Workshop_Frontend_EASY'
 
-scene('三樣東西各管一件事', () => {
-  const r = {}
-  T(L, 800, 128, 'AI CRUD 工作坊 · EASY 版', { size: 64, anchor: 'middle', weight: 900 })
-  T(L, 800, 190, '用「範本＋規矩＋AI」長出一個新的資料管理頁面', { size: 34, anchor: 'middle', fill: C.mut })
-  const items = [['範本', '配方', '照著做，骨架不用從頭寫', C.teal], ['harness（規矩）', '滷包', 'AI 每次都照你們的規矩做', C.gold], ['AI', '幫你顧火的廚師', '改欄位、寫程式這種勞力', C.coral]]
-  r.c = items.map(([a, b, c, col], i) => { const g = grp(L); const x = 70 + i * 495; R(g, x, 250, 465, 330, { fill: C.card, stroke: col, sw: 5 })
-    T(g, x + 232, 330, a, { size: 46, anchor: 'middle', weight: 900, fill: col }); T(g, x + 232, 410, '＝ ' + b, { size: 40, anchor: 'middle', weight: 800 })
-    T(g, x + 232, 500, c, { size: 27, anchor: 'middle', fill: C.mut }); return g })
-  r.crud = box(L, 70, 620, 1460, 90, 'CRUD ＝ 新增（Create）・查詢（Read）・修改（Update）・刪除（Delete）', { size: 32, fill: '#0b1520', stroke: C.line, color: C.ink })
-  r.rule = box(L, 70, 740, 1460, 100, '你的工作：講清楚要什麼 → 讓 AI 照規矩做 → 最後由你驗收', { size: 40, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+// ════════════════════════════ 開場 ════════════════════════════
+chapter('開場', 'AI 開發四件事', C.teal)
+
+sc3(1, () => {
+  const r = {}; hd(1, '開場')
+  r.hero = box(L, 70, 300, 1460, 220, '這門課不教你寫程式\n教你讓 AI 照你們公司的規矩寫程式', { size: 54, fill: C.card, stroke: C.gold, color: C.ink, weight: 900 })
+  r.ov = scr('hb-overview', fitF('hb-overview', { x: 70, y: 120, w: 1460, h: 660 }))
+  r.t1 = tip('harness＝滷包（給 AI 的規矩）　·　範本＝配方', { y: 800, size: 32, col: C.gold })
+  r.t2 = tip('SDD＝規格驅動開發：先寫好菜單和做法再下鍋；菜改了，菜單跟著改', { y: 800, size: 30, col: C.violet })
+  const items = [['harness', '公司規矩', C.gold], ['SDD', '先文件，再程式', C.violet], ['LOOP', '自己跑測試、自己修', C.teal], ['對抗審查', '另一個 AI 挑錯', C.coral]]
+  r.cards = items.map(([a, b, col], i) => { const g = grp(L); const x = 70 + i * 372; R(g, x, 170, 344, 300, { fill: C.card, stroke: col, sw: 5 })
+    T(g, x + 172, 300, a, { size: 46, anchor: 'middle', weight: 900, fill: col }); T(g, x + 172, 370, b, { size: 28, anchor: 'middle', fill: C.ink }); return g })
+  r.ends = box(L, 70, 540, 1460, 200, '你只顧頭顧尾\n頭＝講清楚要什麼、幫 AI 拍板　·　尾＝驗收', { size: 40, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
   return r
 }, [
-  ['這堂課要用 AI，長出一個新的資料管理頁面。', r => { show(r.crud) }],
-  ['CRUD 就是新增、查詢、修改、刪除，四個最基本的資料操作。', r => glow(r.crud)],
-  ['三樣東西各管一件事：範本是配方，給你現成的骨架。', r => { show(r.c[0]); glow(r.c[0]) }],
-  ['harness 是滷包，就是交給 AI 的一套規矩。你不用懂裡面寫什麼，只要知道它放在哪；step2 會帶你去看。', r => { show(r.c[1]); glow(r.c[1]) }],
-  ['AI 是幫你顧火的廚師，負責改欄位、寫程式這種勞力。', r => { show(r.c[2]); glow(r.c[2]) }],
-  ['所以你的工作只有三件：講清楚要什麼、讓 AI 照規矩做、最後親自驗收。', r => { show(r.rule); glow(r.rule) }],
+  r => { show(r.hero); glow(r.hero) },
+  r => { hide(r.hero); show([r.ov, r.t1]) },
+  r => { hide(r.t1); show(r.t2); glow(r.ov) },
+  r => { hide([r.ov, r.t2]); stagger(r.cards, 350) },
+  r => { show(r.ends); glow(r.ends) },
 ])
 
-scene('三個視窗、六個步驟', () => {
-  const r = {}; mhead('先認識工具', '整堂課只用三個視窗')
-  const w3 = [['VS Code', '看檔案、開終端機、找 AI', C.teal], ['終端機', '打一行字、按 Enter，電腦回你結果', C.gold], ['瀏覽器', '看做出來的網頁', C.coral]]
-  r.w = w3.map(([a, b, col], i) => { const g = grp(L); const x = 70 + i * 495; R(g, x, 135, 465, 200, { fill: C.card, stroke: col, sw: 5 })
-    T(g, x + 232, 215, a, { size: 48, anchor: 'middle', weight: 900, fill: col }); T(g, x + 232, 285, b, { size: 27, anchor: 'middle' }); return g })
-  r.term = box(L, 70, 355, 1460, 70, '終端機就像對講機：打一行、按 Enter、等它回完，再打下一行', { size: 30, fill: '#2a2410', stroke: C.gold, color: C.gold })
-  const st = [['step0', '準備環境', 1], ['step1', '看差別', 1], ['step2', '玩範本', 1], ['step3', '叫 AI 做新模組', 1], ['step4', '讓 AI 修到全綠', 1], ['step5', '總結', 0], ['step6', '課後作業', 2]]
-  r.s = st.map(([a, b, f], i) => { const g = grp(L); const x = 60 + i * 212; const hot = i === 3; R(g, x, 455, 198, 150, { fill: hot ? '#3a1d2e' : C.card2, stroke: hot ? C.pink : f === 0 ? C.mut : C.line, sw: 4, dash: f === 0 ? '10 8' : null })
-    T(g, x + 99, 510, a, { size: 32, anchor: 'middle', weight: 900, fill: hot ? C.pink : f === 2 ? C.green : C.gold }); T(g, x + 99, 560, b, { size: 23, anchor: 'middle', weight: 800 }); return g })
-  r.fold = T(L, 800, 645, '虛線的 step5 只在手冊裡，沒有資料夾；step6 是上完課的作業', { size: 26, anchor: 'middle', fill: C.mut }); r.fold.classList.add('hid')
-  r.green = box(L, 70, 670, 1460, 70, '全綠＝自動檢查全部通過（都打勾）', { size: 30, fill: '#173a2a', stroke: C.green, color: C.green, weight: 800 })
-  r.up = grp(L); T(r.up, 800, 790, '▲ 動畫上方：Step 按鈕可以直接跳章節', { size: 30, anchor: 'middle', weight: 900, fill: C.teal })
-  T(r.up, 800, 850, '▼ 動畫下方：「◀ 上一句」沒聽懂就再聽一次', { size: 30, anchor: 'middle', weight: 900, fill: C.teal })
+sc3(2, () => {
+  const r = {}; hd(2, '開場')
+  const items = [['Step 0', '準備環境', C.mut, 0], ['Step 1', '有規矩、沒規矩差在哪', C.coral, 0], ['Step 2', '認識 harness', C.teal, 1], ['Step 3', '用 SDD 做新模組', C.pink, 1], ['Step 4', 'LOOP＋對抗審查', C.violet, 1], ['Step 5', '回公司怎麼用', C.green, 0]]
+  r.c = items.map(([a, b, col, key], i) => { const g = grp(L); const x = 70 + (i % 3) * 495, y = 140 + Math.floor(i / 3) * 290
+    R(g, x, y, 465, 250, { fill: key ? '#203f5a' : C.card, stroke: col, sw: key ? 6 : 3 })
+    T(g, x + 30, y + 70, a, { size: 40, weight: 900, fill: col }); T(g, x + 30, y + 150, b, { size: 34, weight: 800 })
+    if (key) T(g, x + 435, y + 70, '重點', { size: 26, anchor: 'end', weight: 900, fill: C.gold }); return g })
+  r.tip = tip('指令都放在畫面上和手冊裡，照著貼就好；時間花在 AI 怎麼做事', { y: 730, size: 32, col: C.gold })
   return r
 }, [
-  ['整堂課只用三個視窗：VS Code、終端機、還有瀏覽器。', r => stagger(r.w, 400)],
-  ['終端機就像對講機：你打一行字、按 Enter，電腦回你一段話。等它回完，再打下一行。', r => { glow(r.w[1]); show(r.term) }],
-  ['課程分成六步：從準備環境，一路做到讓 AI 自己修到全綠。', r => stagger(r.s.slice(0, 6), 250)],
-  ['全綠的意思是：自動檢查全部通過。', r => { show(r.green); glow(r.green) }],
-  ['教材裡有 step0 到 step4 的資料夾；step5 是總結，只在手冊裡；step6 是上完課的作業。', r => { show([r.s[6], r.fold]); glow(r.s[5]) }],
-  ['重頭戲是 step3：讓 AI 照規矩，做出一個新模組。', r => glow(r.s[3])],
-  ['這支動畫上方有 Step 按鈕可以跳章節；下方有「上一句」，沒聽懂就按它再聽一次。', r => show(r.up)],
+  r => stagger(r.c.slice(0, 2), 400),
+  r => stagger(r.c.slice(2, 4), 400),
+  r => stagger(r.c.slice(4), 400),
+  r => { show(r.tip); glow(r.tip) },
 ])
 
 // ════════════════════════════ Step 0 ════════════════════════════
 chapter('Step 0', '準備環境', C.gold)
 
-scene('打開 VS Code 的終端機', () => {
-  const r = {}; mhead('step0 ①', '在 VS Code 裡打開終端機')
-  const [a, b, c] = vsh(r, ['vs01-empty', 'vs02-menu-terminal', 'vs03-terminal'])
-  r.m = hl(r, a, 'menuTerm', '終端機（英文：Terminal）', { below: true, size: 24 })
-  r.n = hl(r, b, 'newTerm', '新增終端（英文：New Terminal）', { right: true, below: true, pad: 3, size: 24 })
-  r.p = hl(r, c, 'panel', '終端機就在下面', { inside: true, pad: 2 })
-  r.pr = hl(r, c, 'prompt', 'PS 開頭：可以打字了', { col: C.green, below: true })
-  r.k = miniKeys(960, 540); hide(r.k)
-  cursor(r)
+sc3(3, () => {
+  const r = {}; hd(3, 'step0')
+  r.three = [['1　下載教材', 'git clone'], ['2　打開資料夾', '信任作者，選「是」'], ['3　前置檢查', 'preflight 沒有 FAIL']].map(([h, s], i) => card(70 + i * 495, 200, 465, 260, h, [s], [C.teal, C.gold, C.green][i], { size: 32, ts: 40, lh: 56 }))
+  const [a, b, c] = vsh(r, ['vs06-clone-done', 'vs09-trust', 'vs13-preflight-pass'])
+  r.a1 = hl(r, a, 'done', '下載完成', { col: C.green, below: true })
+  r.b1 = hl(r, b, 'yes', '是，我信任作者', { col: C.green, below: true })
+  r.c1 = hl(r, c, 'summary', '沒有 FAIL：可以開課', { col: C.green, below: true })
+  r.k1 = cmdCard(120, 650, 1360, ['cd D:\\', 'git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git'], 'VS Code 終端機（選單「終端機」→「新增終端」）')
+  r.k3 = cmdCard(120, 650, 1360, ['cd step0_course_intro', '.\\preflight.ps1'], '在教材資料夾的終端機')
+  r.pre = card(120, 180, 1360, 420, '課前先裝好（手冊 Step 0 有清單）', ['VS Code　·　Git　·　Node.js　·　pnpm', 'VS Code 裡的 AI 助手：Claude Code 擴充', '沒有 D 槽，指令裡的 D 換成 C'], C.gold, { size: 34, ts: 40, lh: 70 })
   return r
 }, [
-  ['先打開 VS Code。上方選單找到「終端機」；英文介面叫 Terminal。', r => { show(r.S[0]); zoom(r.S[0], 'menuTerm', { pad: 160, max: 2.2 }); later(600, () => only(r, r.m)) }],
-  ['點下去，選「新增終端」；英文是 New Terminal。', r => { unzoom(r.S[0]); to(r, r.S[1]); zoom(r.S[1], 'newTerm', { pad: 120, max: 2.2 }); only(r, r.n) }],
-  ['畫面下方會多出一塊黑色區域，這就是終端機。', r => { unzoom(r.S[1]); to(r, r.S[2]); only(r, r.p) }],
-  ['看到 PS 開頭、後面有一個閃動的方塊，就可以打字了。', r => { zoom(r.S[2], 'prompt', { pad: 120, max: 2.2 }); only(r, r.pr) }],
-  ['以後也可以按快捷鍵 Ctrl+`。反引號在鍵盤左上角、Esc 的正下方。', r => { unzoom(r.S[2]); only(r); show(r.k); glow(r.k) }],
+  r => { show(r.pre); glow(r.pre) },
+  r => { hide(r.pre); stagger(r.three, 350) },
+  r => { hide(r.three); show([r.S[0], r.k1]); later(500, () => only(r, r.a1)) },
+  r => { hide(r.k1); to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); show(r.k3); only(r, r.c1) },
 ])
 
-scene('下載教材：git clone', () => {
-  const r = {}; mhead('step0 ②', '把整包教材下載到你的電腦')
-  r.t = term({ y: 128, h: 560, size: 27, path: 'C:\\Users\\你的帳號', note: '放大給你看' })
-  r.url = codeCard(80, 700, 1440, ['git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git'], { title: '教材網址（手冊 Step 0 也有，可以直接複製）', size: 28, col: C.gold })
-  r.cdtip = tip('cd ＝ 切換到某個資料夾，像在檔案總管點進去一樣', { y: 716, size: 30, col: C.teal })
-  r.tip = tip('git clone ＝ 把網路上的整包教材，完整複製一份到你的電腦', { y: 716, size: 30 })
-  r.nogit = tip('出現「無法辨識 git」的紅字＝還沒裝 git：到 git-scm.com 下載安裝，再重開 VS Code', { y: 716, size: 26, col: C.coral })
-  const [v] = vsh(r, ['vs06-clone-done'])
-  r.v1 = hl(r, v, 'done', 'done：下載完成', { col: C.green, below: true })
-  r.real = realNote()
+sc3(4, () => {
+  const r = {}; hd(4, 'step0')
+  r.t = term({ x: 60, y: 128, w: 1480, h: 330, size: 24, note: 'FAIL 與 WARN' })
+  r.lines = r.t.out(['[PASS] git 已安裝 — 偵測到 git version 2.54.0.windows.1', '[FAIL] pnpm 已安裝 — 找不到 pnpm',
+    '       修復提示：執行「npm install -g pnpm」，裝完關掉終端機重開再跑一次', '[WARN] port 3100 未被占用 — port 3100 已被占用（不用關別人的程式：pnpm dev 會自動換一個埠印在終端機；step4 的 AI 也會自己換埠）', '有 1 項檢查未通過，請依上方修復提示處理後重新執行 preflight.ps1。'], { gap: 0 })
+  r.prompt = codeCard(60, 490, 1480, ['這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。', '請說明每個 [FAIL] 的原因，給我可複製的修復指令；不要改工作坊的檔案。', '（把整份輸出貼在後面）'], { title: '手冊 Step 0 的求救 prompt：連同整份輸出一起貼給 AI', size: 28, col: C.coral })
+  r.ep = cmdCard(60, 490, 1480, ['Set-ExecutionPolicy -Scope CurrentUser RemoteSigned'], '出現「已停用指令碼執行」：先打這一行，再重跑 .\\preflight.ps1', { size: 30, col: C.coral })
   return r
 }, [
-  ['第一步，切到要放教材的地方。cd 的意思是「切換到某個資料夾」，像在檔案總管點進去一樣。', r => { show([r.t.g, r.cdtip]); r.t.prompt() }],
-  ['例如放 D 槽，就輸入 cd D:\\，按 Enter。電腦只有 C 槽的話，就輸入 cd C:\\。', r => { r.t.clear(); r.t.cmd('cd D:\\') }],
-  ['第二步，輸入 git clone，空一格，再貼上教材網址，按 Enter。網址在手冊 Step 0，可以直接複製。', r => { hide(r.cdtip); show(r.url); r.t.cmd('git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git', { path: 'D:\\', cps: 26 }) }],
-  ['git clone 的意思，是把網路上的整包教材，完整複製一份到你的電腦。', r => { hide(r.url); show(r.tip); r.t.out(["Cloning into 'AI_CRUD_Workshop_Frontend_EASY'...", 'remote: Enumerating objects: 1518, done.', 'remote: Counting objects: 100% (1518/1518), done.', 'remote: Compressing objects: 100% (1244/1244), done.', 'remote: Total 1518 (delta 319), reused 1439 (delta 241), pack-reused 0 (from 0)', 'Receiving objects: 100% (1518/1518), 5.87 MiB | 17.42 MiB/s, done.'], { gap: 380 }) }],
-  ['看到 Updating files … done，下一行又出現 PS D:\\>，就下載好了。D 槽會多一個 AI_CRUD_Workshop_Frontend_EASY 資料夾。', r => { hide(r.tip); const L2 = r.t.out(['Resolving deltas: 100% (319/319), done.', 'Updating files: 100% (1705/1705), done.'], { gap: 300 }); r.t.prompt('D:\\'); later(900, () => { const m = r.t.mark(L2[1], '下載完成', C.green); show(m); glow(m) }) }],
-  ['如果出現「無法辨識 git」的紅字，代表還沒裝 git。到 git-scm.com 下載安裝，再重開 VS Code。', r => { show(r.nogit) }],
-  ['這是你螢幕上實際會看到的樣子，字比較小是正常的。', r => { hide([r.t.g, r.nogit]); show([r.S[0], r.real]); later(700, () => only(r, r.v1)) }],
-])
-
-scene('用 VS Code 打開教材資料夾', () => {
-  const r = {}; mhead('step0 ③', '用 VS Code 打開教材資料夾')
-  r.S = [scr('vs07-menu-file', FV), scr('vs08-open-folder-dialog', fitF('vs08-open-folder-dialog', { x: 120, y: 116, w: 1360, h: 765 })), scr('vs09-trust', FV), scr('vs10-explorer', FV)]
-  const [a, d0, c, d] = r.S
-  r.a1 = hl(r, a, 'openFolder', '開啟資料夾…', { right: true, below: true, pad: 3 })
-  r.b0 = hl(r, d0, [10, 560, 280, 270], '本機 → DATA (D:)', { col: OR, size: 28, right: false, lx: 140, pad: 4 })
-  r.b1 = hl(r, d0, 'address', '上方路徑：D:\\AI_CRUD_Workshop_Frontend_EASY', { col: OR, below: true, size: 28 })
-  r.b2 = hl(r, d0, 'ok', '選取資料夾', { col: OR, size: 32 })
-  r.c1 = hl(r, c, 'yes', '是，我信任作者', { col: C.green, below: true, size: 30 })
-  r.c2 = hl(r, c, [325, 360, 420, 22], '這個勾選框不用勾', { col: C.gold, above: true, size: 24 })
-  r.d1 = hl(r, d, 'tree', '左邊：檔案總管', { right: true, pad: 2 })
-  r.d2 = hl(r, d, [53, 113, 257, 132], 'step0～4：每一步的材料　step6：課後作業', { lx: 560, below: true, size: 26 })
-  r.d3 = hl(r, d, 'handbook', 'HANDBOOK：學習手冊', { lx: 560 })
-  cursor(r)
-  return r
-}, [
-  ['接著用 VS Code 打開剛下載的資料夾。點上方選單「檔案」，選「開啟資料夾」。', r => { show(r.S[0]); only(r, r.a1); clickAt(r, r.S[0], 'openFolder', { fx: 0.25 }) }],
-  ['在跳出的視窗，左邊點「本機」，再點 D 槽；D 槽可能叫「DATA (D:)」。按兩下 AI_CRUD_Workshop_Frontend_EASY 進去。', r => { to(r, r.S[1]); hide(r.cur); only(r, r.b0) }],
-  ['看到上方路徑是這個資料夾，就按右下角的「選取資料夾」。', r => { only(r, r.b1, r.b2); clickAt(r, r.S[1], 'ok') }],
-  ['VS Code 會問你：是否信任這個資料夾的作者？教材是你剛下載的，按「是，我信任作者」。下面的勾選框不用勾。', r => { to(r, r.S[2]); hide(r.cur); zoom(r.S[2], 'dialog', { pad: 30, max: 1.8 }); only(r, r.c1, r.c2) }],
-  ['左邊是檔案總管。step0 到 step4 是每一步的材料，step6 是課後作業；step5 是總結，只在手冊裡。', r => { unzoom(r.S[2]); to(r, r.S[3]); only(r, r.d1, r.d2) }],
-  ['HANDBOOK 資料夾裡是學習手冊，整堂課照著它走。', r => only(r, r.d3)],
-])
-
-scene('前置檢查：preflight', () => {
-  const r = {}; mhead('step0 ④', '跑前置檢查，確認電腦準備好了')
-  r.t = term({ y: 128, h: 572, size: 25, note: '放大給你看' })
-  const [v] = vsh(r, ['vs13-preflight-pass'])
-  r.v1 = hl(r, v, 'summary', '可以開課！', { col: C.green, below: true })
-  r.card = tip('比喻：出門前的檢查清單——護照、機票、錢包，一項一項打勾，全部打勾才出門', { y: 720, size: 28 })
-  r.names = tip('這些名字不用懂，只看每一行開頭是不是綠色的 [PASS]', { y: 806, size: 30, col: C.green })
-  r.warn = grp(L); R(r.warn, 80, 712, 1440, 168, { fill: '#1b1a10', stroke: C.gold, sw: 3, rx: 14 })
-  T(r.warn, 110, 750, '範例（乾淨的電腦最常見）：', { size: 24, weight: 800, fill: C.gold })
-  const wt = T(r.warn, 110, 800, '[WARN] Playwright Chromium 已快取 — 未找到 Chromium 快取；step4 首跑會自動下載', { size: 26, weight: 700, fill: TC.warn }); wt.style.fontFamily = MONO
-  T(r.warn, 110, 852, '黃色 [WARN]＝提醒，可以開課　·　紅色 [FAIL]＝一定要處理', { size: 28, weight: 900, fill: C.ink })
-  r.real = realNote()
-  r.ep = codeCard(80, 712, 1440, ['Set-ExecutionPolicy -Scope CurrentUser RemoteSigned'], { title: '出現「已停用指令碼執行」或「未經數位簽署」的紅字：先打這一行，再重跑 .\\preflight.ps1', size: 30, col: C.coral })
-  return r
-}, [
-  ['再開一次終端機。這次它會直接停在教材資料夾裡。', r => { show(r.t.g); r.t.prompt() }],
-  ['先輸入 cd step0_course_intro，按 Enter。', r => { r.t.clear(); r.t.cmd('cd step0_course_intro') }],
-  ['再輸入 .\\preflight.ps1，按 Enter。最前面的點和反斜線不能漏。', r => { r.t.cmd('.\\preflight.ps1', { path: LAB + '\\step0_course_intro' }) }],
-  ['如果一按 Enter 就出現「已停用指令碼執行」或「未經數位簽署」的紅字，是電腦不准跑腳本。先打畫面下方這一行，再重跑一次；公司電腦改不了，就找 IT 或講師。', r => { show(r.ep) }],
-  ['這支腳本像出門前的檢查清單，會一項一項檢查 10 件事。', r => { hide(r.ep); show(r.card);
-    r.t.out(['===== AI CRUD 工作坊 EASY 版 — 前置檢查 =====', '[PASS] Node.js >= 20 — 偵測到 v24.13.0', '[PASS] pnpm 已安裝 — 偵測到 pnpm 10.33.0', '[PASS] git 已安裝 — 偵測到 git version 2.54.0.windows.1',
-      '[PASS] port 3100 未被占用 — port 3100 目前空閒（範本專案 sample-app 會用這個埠）', '[PASS] 磁碟剩餘空間 >= 2GB — D: 剩餘約 1238.56 GB', '[PASS] ExecutionPolicy 可執行腳本 — 生效原則為 RemoteSigned（CurrentUser=RemoteSigned／LocalMachine=AllSigned）', '[PASS] 工作區可寫入 — 工作坊根目錄可建立／刪除暫存檔',
-      '[PASS] npm registry 連線 — 可連上 registry.npmjs.org', '[PASS] Playwright Chromium 已快取 — 已找到 8 個 chromium 快取目錄（step4 E2E 可直接跑）', '[PASS] AI Agent CLI — 偵測到：claude、codex'], { gap: 330 }) }],
-  ['這些名字不用懂，只要看每一行開頭，是不是綠色的 [PASS]。', r => { hide(r.card); show(r.names) }],
-  ['最後一行寫「前置檢查全數通過，可以開課！」，就過關了。', r => { const L2 = r.t.out(['', '前置檢查全數通過，可以開課！'], { gap: 200, color: TC.ok }); later(500, () => { const m = r.t.mark(L2[1], '過關', C.green); show(m); glow(m) }) }],
-  ['黃色的 [WARN] 是提醒，也可以開課。乾淨的電腦最常看到的是這一行。只有紅色的 [FAIL] 一定要處理。', r => { hide(r.names); show(r.warn) }],
-  ['這是你螢幕上實際會看到的樣子。', r => { hide([r.t.g, r.warn]); show([r.S[0], r.real]); later(700, () => only(r, r.v1)) }],
-])
-
-scene('看到紅燈 [FAIL] 怎麼辦', () => {
-  const r = {}; mhead('step0 ⑤', '看到紅燈不用慌，照三步走')
-  r.t = term({ x: 60, y: 128, w: 920, h: 500, size: 23, note: '真實紅燈' })
-  const L1 = ['[PASS] git 已安裝 — 偵測到 git version 2.54.0.windows.1', '[FAIL] port 3100 未被占用 — port 3100 已被占用', '       修復提示：請關閉占用 3100 的程式，或執行「Get-Process -Id (Get-NetTCPConnection -LocalPort 3100).OwningProcess」找出並結束該程序', '…', '有 1 項檢查未通過，請依上方修復提示處理後重新執行 preflight.ps1。']
-  r.lines = r.t.out(L1, { gap: 0 })
-  r.park = grp(L); R(r.park, 1010, 140, 530, 230, { fill: C.card, stroke: C.teal, sw: 4 }); T(r.park, 1040, 190, '比喻：連接埠＝停車格', { size: 30, weight: 900, fill: C.teal })
-  T(r.park, 1040, 245, '範本網站要停 3100 號格', { size: 27 }); T(r.park, 1040, 290, '被別台車先停了，', { size: 27 }); T(r.park, 1040, 335, '就停不進去 → 紅燈', { size: 27, weight: 800, fill: C.red })
-  r.steps = [['照「修復提示」做一次', C.teal], ['關掉終端機、開一個新的再跑', C.gold], ['還是紅，整段輸出貼給 AI', C.coral]].map(([t, col], i) => { const g = grp(L); const y = 395 + i * 80; R(g, 1010, y, 530, 68, { fill: C.card, stroke: col, sw: 4 }); mk('circle', { cx: 1048, cy: y + 34, r: 22, fill: col }, g); T(g, 1048, y + 44, String(i + 1), { size: 28, anchor: 'middle', weight: 900, fill: C.bg }); T(g, 1082, y + 44, t, { size: 25, weight: 800 }); return g })
-  r.prompt = codeCard(60, 650, 1480, ['這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。', '請說明每個 [FAIL] 的原因，給我可複製的修復指令；不要改工作坊的檔案。'], { title: 'prompt＝你要對 AI 說的話。手冊 Step 0「看到 [FAIL] 紅燈怎麼辦」裡現成的這段，連同整份輸出一起貼', size: 26, col: C.coral })
-  return r
-}, [
-  ['如果看到紅色的 [FAIL]，先別慌。這是一次真實的紅燈：3100 這個連接埠被別的程式占用了。', r => { show(r.t.g); later(500, () => { const m = r.t.mark(r.lines[1], 'FAIL', C.red); show(m); glow(m) }) }],
-  ['連接埠像停車格：範本網站要停 3100 號格，被別台車先停了，就停不進去。', r => show(r.park)],
-  ['第一步，照它下面的「修復提示」做一次。', r => { hide(r.park); show(r.steps[0]); later(400, () => { const m = r.t.mark(r.lines[2], '修復提示', C.gold); show(m) }) }],
-  ['第二步，關掉終端機，開一個新的再跑。照提示裝了新程式的話，要新開的終端機才找得到它。', r => show(r.steps[1])],
-  ['第三步，還是紅，就請 AI 幫忙。prompt 就是你要對 AI 說的話，手冊 Step 0 有一段現成的。', r => { show([r.steps[2], r.prompt]) }],
-  ['把這段 prompt 和整份輸出，連同 [PASS] 的行，一起貼給你會用的 AI，請它帶你修。', r => glow(r.prompt)],
-])
-
-scene('打開學習手冊', () => {
-  const r = {}; mhead('step0 ⑥', '用瀏覽器打開學習手冊 HANDBOOK')
-  r.t = term({ y: 128, h: 380, size: 27, note: '放大給你看', path: LAB + '\\step0_course_intro' })
-  const [v] = vsh(r, ['vs14-start-handbook'])
-  r.v1 = hl(r, v, 'cmd', 'start 加檔名：用瀏覽器打開', { above: true })
-  r.bw = bwin(['br01-handbook-top', 'br02-handbook-step0'], 'file:///D:/AI_CRUD_Workshop_Frontend_EASY/HANDBOOK/HANDBOOK.html'); r.B = r.bw.S
-  r.b1 = hl(r, r.B[0], 'nav', 'Step 0～5：點了直接跳', { col: OR, below: true, size: 30 })
-  r.b2 = hl(r, r.B[1], 'goal', '「這一步要做到」：先看這裡', { col: OR, below: true, size: 30 })
-  r.up = tip('cd ..＝回到上一層資料夾（cd 空一格，再兩個點）', { y: 540, size: 32, col: C.teal })
-  return r
-}, [
-  ['準備好之後，打開學習手冊。剛才在 step0_course_intro 裡，先輸入 cd ..，按 Enter，回到上一層的教材資料夾。', r => { show([r.t.g, r.up]); r.t.prompt(); later(400, () => { r.t.clear(); r.t.cmd('cd ..', { path: LAB + '\\step0_course_intro' }); later(1800, () => r.t.prompt(LAB)) }) }],
-  ['再輸入 start HANDBOOK\\HANDBOOK.html，按 Enter。start 加檔名，會用你預設的瀏覽器打開它。', r => { hide(r.up); r.t.clear(); r.t.cmd('start HANDBOOK\\HANDBOOK.html', { path: LAB, cps: 24 }) }],
-  ['這是你螢幕上實際會看到的樣子。', r => { hide(r.t.g); show(r.S[0]); later(600, () => only(r, r.v1)) }],
-  ['瀏覽器會打開手冊。上方有 Step 0 到 Step 5 的按鈕，點了就跳到那一步。', r => { hide(r.S[0]); only(r); show(r.bw.g); show(r.B[0]); later(400, () => only(r, r.b1)) }],
-  ['每一步開頭都有「這一步要做到」，先看這裡，就知道這一步的目標。', r => { swap(r.B, r.B[1]); only(r, r.b2) }],
+  r => { show(r.t.g); later(400, () => { const m = r.t.mark(r.lines[1], 'FAIL', C.red); show(m); glow(m) }); later(1400, () => show(r.t.mark(r.lines[2], '修復提示', C.gold))); later(4200, () => { const w = r.t.mark(r.lines[3], 'WARN：不擋你', C.gold); show(w); glow(w) }) },
+  r => { show(r.prompt); glow(r.prompt) },
+  r => { hide(r.prompt); show(r.ep); glow(r.ep) },
 ])
 
 // ════════════════════════════ Step 1 ════════════════════════════
 chapter('Step 1', '為什麼要給 AI 規矩', C.coral)
 
-scene('同一句需求，兩個產出', () => {
-  const r = {}; mhead('step1 ①', '同一句需求，只差有沒有附規矩')
+sc3(5, () => {
+  const r = {}; hd(5, 'step1')
   const A1 = { x: 40, y: 150, w: 750, h: 470, bar: 56 }, A2 = { x: 810, y: 150, w: 750, h: 470, bar: 56 }
   r.b1 = bwin(['br10-noh'], 'no-harness.html', A1); r.b2 = bwin(['br13-wh'], 'with-harness.html', A2)
   show(r.b1.S[0]); show(r.b2.S[0])
-  r.l1 = T(L, 415, 660, '沒給規矩', { size: 40, anchor: 'middle', weight: 900, fill: C.coral }); r.l1.classList.add('hid')
-  r.l2 = T(L, 1185, 660, '有給規矩（harness）', { size: 40, anchor: 'middle', weight: 900, fill: C.teal }); r.l2.classList.add('hid')
+  r.l1 = T(L, 415, 670, '沒給規矩', { size: 40, anchor: 'middle', weight: 900, fill: C.coral }); r.l1.classList.add('hid')
+  r.l2 = T(L, 1185, 670, '有給規矩（harness）', { size: 40, anchor: 'middle', weight: 900, fill: C.teal }); r.l2.classList.add('hid')
   r.c1 = hl(r, r.b1.S[0], 'add', '橘色：AI 自己挑的', { col: OR, below: true, size: 26 })
-  r.c2 = hl(r, r.b2.S[0], 'add', '品牌紅：規則指定的', { col: OR, below: true, size: 26 })
-  const [v] = vsh(r, ['vs15-start-demo'])
-  r.v1 = hl(r, v, 'cmd', 'start step1_why_harness\\demo\\no-harness.html', { above: true, size: 24 })
-  r.tip = tip('差別不在美醜，在「這個決定是誰做的」', { y: 720, size: 36 })
-  r.with = tip('把 no-harness 換成 with-harness 再打一次，就能打開另一個', { y: 806, size: 28, col: C.teal })
+  r.c2 = hl(r, r.b2.S[0], 'add', '品牌紅：規矩指定的', { col: OR, below: true, size: 26 })
+  r.tip = tip('差別不在好不好看，在「這個決定是誰做的」', { y: 730, size: 38 })
   return r
 }, [
-  ['step1 用同一句需求，請 AI 各做一次：一次沒給規矩，一次附上規矩。這就是兩次的成品。', r => { show([r.b1.g, r.b2.g, r.l1, r.l2]) }],
-  ['兩個成品放在 step1_why_harness 的 demo 資料夾。在終端機輸入 start 加檔名打開。', r => { hide([r.b1.g, r.b2.g, r.l1, r.l2]); show(r.S[0]); later(500, () => only(r, r.v1)) }],
-  ['把 no-harness 換成 with-harness，再打一次，就能打開另一個。', r => show(r.with)],
-  ['兩版都很好看，新增和刪除也都能用。', r => { hide([r.S[0], r.with]); only(r); show([r.b1.g, r.b2.g, r.l1, r.l2]) }],
-  ['差別在顏色從哪來：左邊的橘色是 AI 自己挑的；右邊的品牌紅，是規則指定的。', r => { zoom(r.b1.S[0], 'add', { pad: 90, max: 2.4 }); zoom(r.b2.S[0], 'add', { pad: 90, max: 2.4 }); only(r, r.c1, r.c2) }],
-  ['所以差別不在美醜，在「這個決定是誰做的」。', r => { unzoom(r.b1.S[0]); unzoom(r.b2.S[0]); only(r); show(r.tip); glow(r.tip) }],
+  r => show([r.b1.g, r.b2.g, r.l1, r.l2]),
+  r => { zoom(r.b1.S[0], 'add', { pad: 90, max: 2.4 }); zoom(r.b2.S[0], 'add', { pad: 90, max: 2.4 }); only(r, r.c1, r.c2) },
+  r => { unzoom(r.b1.S[0]); unzoom(r.b2.S[0]); only(r); show(r.tip); glow(r.tip) },
 ])
 
-scene('錯不起的欄位：血型', () => {
-  const r = {}; mhead('step1 ②', '最該記住的一列：血型')
-  r.bw = bwin(['br10-noh', 'br12-noh-added', 'br14-wh-empty-submit', 'br15-wh-phone-blocked'], 'no-harness.html'); r.B = r.bw.S
+sc3(6, () => {
+  const r = {}; hd(6, 'step1')
+  r.bw = bwin(['br10-noh', 'br12-noh-added', 'br14-wh-empty-submit'], 'no-harness.html'); r.B = r.bw.S
   r.a1 = hl(r, r.B[0], 'blood', '一打開就選好「A」', { col: C.red, below: true, size: 30 })
-  r.a2 = hl(r, r.B[1], 'row', '(02) 市話也收、血型存成 A', { col: C.red, below: true, size: 30 })
+  r.a2 = hl(r, r.B[1], 'row', '血型存成 A，完全不檢查', { col: C.red, below: true, size: 30 })
   r.b1 = hl(r, r.B[2], 'bloodErr', '沒選血型 → 擋下來', { col: OR, below: true, size: 30, pad: 6 })
-  r.b2 = hl(r, r.B[3], 'phoneErr', '只收 09 開頭 10 碼', { col: OR, below: true, size: 30, pad: 6 })
   r.bag = tip('哪些欄位錯不起、要怎麼檢查——這些就是要放進滷包的規矩', { y: 806, size: 30, col: C.gold })
   return r
 }, [
-  ['最該記住的是血型。沒給規矩那版，一打開就替你選好「A」，而且完全不檢查。', r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], 'blood', { pad: 160, max: 1.8 }); only(r, r.a1) }],
-  ['志工沒改到就按新增，存進去的就是錯的血型。要等到真的要輸血，才會發現。', r => { unzoom(r.B[0]); swap(r.B, r.B[1]); only(r, r.a2) }],
-  ['有給規矩那版，預設是「請選擇血型」，沒選就擋下來。', r => { burl(r.bw, 'with-harness.html'); swap(r.B, r.B[2]); only(r, r.b1) }],
-  ['電話也一樣：規矩寫了只收 09 開頭 10 碼，(02) 市話就會被擋。', r => { swap(r.B, r.B[3]); only(r, r.b2) }],
-  ['AI 不是不會寫驗證，是沒人告訴它哪些欄位錯不起。這些錯不起的事，就是要放進滷包的規矩。', r => { only(r); show(r.bag) }],
+  r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], 'blood', { pad: 160, max: 1.8 }); only(r, r.a1) },
+  r => { unzoom(r.B[0]); swap(r.B, r.B[1]); only(r, r.a2) },
+  r => { burl(r.bw, 'with-harness.html'); swap(r.B, r.B[2]); only(r, r.b1) },
+  r => { only(r); show(r.bag); glow(r.bag) },
 ])
 
 // ════════════════════════════ Step 2 ════════════════════════════
-chapter('Step 2', '玩範本、認識規矩', C.teal)
+chapter('Step 2', 'harness：給 AI 的規矩', C.teal)
 
-scene('安裝並啟動範本', () => {
-  const r = {}; mhead('step2 ①', '安裝並啟動範本：pnpm install → pnpm dev')
-  r.t = term({ y: 128, h: 600, size: 24, note: '放大給你看' })
+sc3(7, () => {
+  const r = {}; hd(7, 'step2')
   const [a] = vsh(r, ['vs17-pnpm-dev'])
-  r.v1 = hl(r, a, 'url', 'http://localhost:3100/', { col: C.green, below: true })
-  r.v2 = hl(r, a, 'url', '按住 Ctrl 再點這個網址', { col: C.gold, below: true, size: 30, pad: 8 })
-  r.slash = tip('路徑裡的斜線，用 / 或 \\ 都可以，PowerShell 兩種都認得', { y: 750, size: 28, col: C.teal })
-  r.pkg = tip('套件＝範本要用到的零件，第一次要先下載', { y: 750, size: 30, col: C.teal })
-  r.shop = tip('pnpm dev 像打開店門：店開著，瀏覽器才進得來。這個終端機不要關', { y: 750, size: 28 })
-  r.lh = tip('localhost＝你自己這台電腦，只有你看得到', { y: 806, size: 30, col: C.teal })
-  r.err = tip('第一次打開是 500、寫著 useColorMode is not defined：在這個終端機按 Ctrl+C 停掉，再打一次 pnpm dev', { y: 806, size: 24, col: C.coral })
+  r.a1 = hl(r, a, 'url', 'http://localhost:3100/', { col: C.green, below: true })
+  r.k = cmdCard(120, 660, 1360, ['cd step2_speedrun_kit/2.1_sample_app/sample-app', 'pnpm install', 'pnpm dev'], '在教材資料夾的終端機（pnpm dev 這個視窗要一直開著）', { size: 24 })
+  r.bw = bwin(['br30-list', 'br37-delete-confirm', 'br42b-export-all'], 'localhost:3100/template/crud'); r.B = r.bw.S
+  r.b1 = hl(r, r.B[0], 'table', '人員管理：新增、編輯、刪除、篩選、匯出', { col: OR, size: 28, above: true })
+  r.b2 = hl(r, r.B[1], 'dialog', '刪除前先確認', { col: C.red, size: 28, below: true })
+  r.b3 = hl(r, r.B[2], 'toast', '匯出全部 24 筆，不是只有這一頁', { col: OR, size: 26, above: true, right: true, pad: 18 })
+  r.ans = tip('範本＝AI 做新模組時，要照著抄的標準答案', { y: 806, size: 32, col: C.gold })
   return r
 }, [
-  ['step2 先把範本跑起來。確認終端機開頭是 PS D:\\AI_CRUD_Workshop_Frontend_EASY>，再輸入 cd step2_speedrun_kit/2.1_sample_app/sample-app。', r => { show(r.t.g); r.t.cmd('cd step2_speedrun_kit/2.1_sample_app/sample-app', { cps: 30 }) }],
-  ['路徑裡的斜線，用 / 或 \\ 都可以，PowerShell 兩種都認得。', r => show(r.slash)],
-  ['再輸入 pnpm install。套件就是範本要用到的零件，第一次要先下載，大約要等一兩分鐘。', r => { hide(r.slash); show(r.pkg); r.t.cmd('pnpm install', { path: SAMPLE }); later(1600, () => r.t.out(['Lockfile is up to date, resolution step is skipped', 'Packages: +726', '   ╭─────────────────────────────────────────╮', '   │   Update available! 10.33.0 → 12.9.1.   │', '   │    To update, run: pnpm add -g pnpm     │', '   ╰─────────────────────────────────────────╯'], { gap: 300 })) }],
-  ['中間如果出現「Update available」的框框，是 pnpm 有新版本，不用理它。最後出現 Done，就裝好了。', r => { hide(r.pkg); later(200, () => { const up = r.t.lines.find(t => t.textContent.includes('Update available')); if (up) show(r.t.mark(up, '不用理它', C.teal)) });
-    const L2 = r.t.out(['Progress: resolved 726, reused 726, downloaded 0, added 726, done', '…', 'Done in 8.7s using pnpm v10.33.0'], { gap: 350, delay: 900 }); later(2200, () => { const m = r.t.mark(L2[2], '裝好了', C.green); show(m) }) }],
-  ['接著輸入 pnpm dev，啟動網頁伺服器。', r => { r.t.clear(); r.t.cmd('pnpm dev', { path: SAMPLE }); later(1500, () => r.t.out(['> crud-standard-template@1.0.0 dev', '> nuxt dev', '●  Nuxt 3.21.1 (with Nitro 2.13.4, Vite 7.3.1 and Vue 3.5.30)', '  ➜ Local:    http://localhost:3100/', '  ➜ Network:  use --host to expose', '✔ Vite client built in 95ms'], { gap: 350 })) }],
-  ['pnpm dev 像打開店門：店開著，瀏覽器才進得來。所以這個終端機要一直開著，不要關。', r => { show(r.shop) }],
-  ['看到 localhost:3100 這一行，就是網址。localhost 指的就是你自己這台電腦。', r => { hide([r.t.g, r.shop]); show([r.S[0], r.lh]); later(600, () => only(r, r.v1)) }],
-  ['滑鼠移到網址上，按住 Ctrl 再點，瀏覽器就會打開範本。', r => { hide(r.lh); zoom(r.S[0], 'url', { pad: 140, max: 2 }); only(r, r.v2) }],
-  ['第一次打開如果是 500、寫著 useColorMode is not defined，先在這個終端機按 Ctrl+C 停掉，再打一次 pnpm dev。', r => { unzoom(r.S[0]); only(r); show(r.err) }],
+  r => { show([r.S[0], r.k]); later(500, () => only(r, r.a1)) },
+  r => { hide([r.S[0], r.k]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.b1)) },
+  r => { swap(r.B, r.B[1]); only(r, r.b2); later(3200, () => { swap(r.B, r.B[2]); only(r, r.b3) }) },
+  r => { show(r.ans); glow(r.ans) },
 ])
-// ── 場景檔第二部分：Step 2（五個檢查點～Design System）、Step 3（指揮官～準備工作區）──
-function stepNote(t) { const g = box(L, 1180, 64, 300, 46, t, { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900, hidden: false }); return g }
 
-scene('五個檢查點（上）：新增、編輯、刪除', () => {
-  const r = {}; mhead('step2 ②', '當使用者玩一輪：新增、編輯、刪除')
-  stepNote('檢查點 1～3／5')
-  const N = ['br30-list', 'br31-new-empty', 'br32-new-filled', 'br33-saved', 'br34-edit', 'br37-delete-confirm']
-  r.bw = bwin(N, 'localhost:3100/template/crud'); r.B = r.bw.S
-  r.a1 = hl(r, r.B[0], 'q', '篩選', { col: OR, size: 28 })
-  r.a2 = hl(r, r.B[0], [273, 379, 918, 260], '表格', { col: OR, size: 28, inside: true })
-  r.a3 = hl(r, r.B[0], 'add', '新增人員', { col: OR, size: 28, below: true, right: true })
-  r.sample = card(880, 330, 600, 330, '範例假資料（照格式填就好）', ['姓名：王小美', '生日：1992-05-20', '證號：A223456789', '電話：0912345678', '地址：臺東縣臺東市中華路100號'], C.teal, { size: 26, ts: 28, lh: 44 })
-  r.b1 = hl(r, r.B[2], 'save', '填好按「儲存」', { col: OR, size: 30, below: true, right: true })
-  r.c1 = hl(r, r.B[3], 'toast', '已新增人員', { col: C.green, size: 30, right: true })
-  r.c2 = hl(r, r.B[3], [273, 371, 918, 49], '新增的王小美', { col: C.green, size: 28 })
-  r.c3 = hl(r, r.B[3], [1119, 381, 28, 28], '鉛筆＝編輯', { col: OR, size: 28, pad: 8, right: true })
-  r.d1 = hl(r, r.B[4], 'note', '改一下備註', { col: OR, size: 30 })
-  r.d2 = hl(r, r.B[4], 'save', '再按「儲存」', { col: OR, size: 30, below: true, right: true })
-  r.e0 = hl(r, r.B[0], [1151, 474, 28, 28], '垃圾桶＝刪除', { col: C.red, size: 28, pad: 8, right: true })
-  r.e1 = hl(r, r.B[5], 'title', '標題：刪除人員', { col: C.red, size: 30, right: true })
-  r.e2 = hl(r, r.B[5], 'ok', '按「刪除」才會真的刪', { col: C.red, size: 30, below: true, right: true })
+sc3(8, () => {
+  const r = {}; hd(8, 'step2')
+  const [a, b] = vsh(r, ['vs21-harness-files', 'vs22b-claude-md-wide'])
+  r.a1 = hl(r, a, 'sampleApp', 'sample-app 最上層', { lx: 560 })
+  r.a2 = hl(r, a, [53, 331, 257, 22], '使用說明', { lx: 560, col: C.gold })
+  r.a3 = hl(r, a, [53, 419, 257, 66], 'CLAUDE.md・CODE-RULES・design-system-summary', { lx: 560, col: C.gold, size: 24 })
+  r.b1 = hl(r, b, [52, 60, 1012, 40], 'CLAUDE.md：總綱（技術、檔案地圖、10 條程式規則）', { below: true, size: 28 })
+  r.c1 = hl(r, a, [53, 441, 257, 44], 'CODE-RULES：細則　·　design-system-summary：顏色和間距', { lx: 560, col: C.teal, size: 24, below: true })
+  r.c2 = null
+  r.c3 = hl(r, a, 'guide', '使用說明：怎麼複製範本開新模組', { lx: 560, col: C.teal })
+  r.who = [['寫給 AI 讀', '你不用逐條讀懂', C.teal], ['人負責確認', '規矩寫得對不對', C.gold]].map(([h, s, col], i) => card(120 + i * 690, 640, 670, 150, h, [s], col, { size: 30, ts: 36 }))
+  r.warn = tip('規矩寫錯，AI 會照著錯，而且錯得又快又整齊', { y: 806, size: 32, col: C.coral })
   return r
 }, [
-  ['這就是範本：人員管理。上面是篩選，中間是表格，右上角是「新增人員」。', r => { show(r.bw.g); show(r.B[0]); only(r, r.a1, r.a2, r.a3) }],
-  ['檢查點一：按「新增人員」，把有紅色星號的必填欄位填好。這是假資料，照格式填就好。', r => { burl(r.bw, 'localhost:3100/template/crud/new', true); swap(r.B, r.B[1]); only(r); show(r.sample) }],
-  ['填好之後，按右上角的「儲存」。', r => { hide(r.sample); swap(r.B, r.B[2]); zoom(r.B[2], 'save', { pad: 120, max: 1.7 }); only(r, r.b1) }],
-  ['右下角跳出「已新增人員」，列表就多了王小美這一筆。', r => { unzoom(r.B[2]); burl(r.bw, 'localhost:3100/template/crud'); swap(r.B, r.B[3]); only(r, r.c1, r.c2) }],
-  ['檢查點二：在王小美這一列的右邊，按鉛筆圖示「編輯」。', r => { zoom(r.B[3], [1080, 371, 110, 49], { pad: 80, max: 2 }); only(r, r.c3) }],
-  ['改一下資料，再按「儲存」。', r => { unzoom(r.B[3]); burl(r.bw, 'localhost:3100/template/crud/…?mode=edit'); swap(r.B, r.B[4]); only(r, r.d1, r.d2) }],
-  ['檢查點三：按某一列右邊的垃圾桶。刪哪一筆都可以，這只是測試資料。', r => { burl(r.bw, 'localhost:3100/template/crud'); swap(r.B, r.B[0]); zoom(r.B[0], [1080, 460, 110, 56], { pad: 80, max: 2 }); only(r, r.e0) }],
-  ['會先跳出確認視窗。標題寫「刪除人員」，按「刪除」才會真的刪。', r => { unzoom(r.B[0]); swap(r.B, r.B[5]); zoom(r.B[5], 'dialog', { pad: 60, max: 1.6 }); only(r, r.e1, r.e2) }],
+  r => { show(r.S[0]); later(500, () => only(r, r.a1, r.a2, r.a3)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[0]); only(r, r.c1, r.c3) },
+  r => { only(r); stagger(r.who, 400) },
+  r => { show(r.warn); glow(r.warn) },
 ])
 
-scene('五個檢查點（下）：篩選、網址、匯出', () => {
-  const r = {}; mhead('step2 ③', '篩選、網址、匯出，再加兩個加分題')
-  stepNote('檢查點 4～5／5')
-  const N = ['br39-filter-q', 'br40-filter-status', 'br41-newtab', 'br42b-export-all', 'br35-validation']
-  r.bw = bwin(N, 'localhost:3100/template/crud'); r.B = r.bw.S
-  r.a1 = hl(r, r.B[0], 'q', '打「陳」', { col: OR, size: 30, below: true })
-  r.a2 = hl(r, r.B[0], 'count', '馬上只剩 1 筆', { col: OR, size: 30, below: true })
-  r.b1 = hl(r, r.B[1], 'status', '狀態：在職', { col: OR, size: 30, below: true })
-  r.urlBox = grp(L); R(r.urlBox, 284, 120, 1170, 50, { fill: 'none', stroke: OR, sw: 5, rx: 22 }); r.H = r.H || []; r.H.push(r.urlBox)
-  r.keys = grp(L); [['點網址列', 0], ['Ctrl+C', 1], ['Ctrl+T 開新分頁', 2], ['Ctrl+V', 3], ['Enter', 4]].forEach(([t, i]) => { box(r.keys, 150 + i * 266, 640, 246, 70, t, { size: 26, fill: '#0b1520', stroke: C.gold, color: C.gold, weight: 900, hidden: false }); if (i < 4) T(r.keys, 150 + i * 266 + 256, 686, '›', { size: 34, fill: C.mut }) })
-  r.tab2 = grp(L); R(r.tab2, 1250, 118, 210, 46, { fill: '#ffffff', stroke: C.green, sw: 4, rx: 12 }); T(r.tab2, 1355, 150, '新分頁', { size: 24, anchor: 'middle', weight: 900, fill: '#1a7f37' })
-  r.c1 = hl(r, r.B[2], 'q', '新分頁：條件還在', { col: C.green, size: 30, below: true })
-  r.clr = hl(r, r.B[3], [966, 196, 90, 46], '先按「清除」', { col: OR, size: 28, below: true })
-  r.d1 = hl(r, r.B[3], 'exp', '匯出 CSV', { col: OR, size: 30, below: true, right: true })
-  r.d2 = hl(r, r.B[3], 'count', '共 24 筆', { col: OR, size: 30, below: true })
-  r.d3 = hl(r, r.B[3], 'toast', '已匯出 24 筆：全部，不只這一頁', { col: C.green, size: 28, right: true, pad: 30 })
-  r.dl = tip('匯出的檔案會存到你的「下載」資料夾，可以用 Excel 打開', { y: 806, size: 28, col: C.teal })
-  r.e1 = hl(r, r.B[4], 'err', '清空必填 → 紅字', { col: C.red, size: 30, below: true })
-  const mF = fitF('br43-mobile', { x: 1000, y: 140, w: 470, h: 730 })
-  r.mob = grp(L); R(r.mob, mF.x - 16, mF.y - 16, mF.w + 32, mF.h + 32, { fill: '#0b0f14', stroke: '#5b6670', sw: 4, rx: 34 }); const ms = scrIn('br43-mobile', mF, r.mob); show(ms)
-  r.mobT = box(L, 120, 260, 820, 300, '加分二：把瀏覽器視窗的右邊框\n往左拖，拖到很窄\n表格會變成一張一張卡片', { size: 38, fill: C.card, stroke: C.teal, color: C.ink, weight: 800 })
-  return r
-}, [
-  ['檢查點四：關鍵字打「陳」，表格馬上只剩一筆。', r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], [248, 180, 700, 160], { pad: 30, max: 1.6 }); only(r, r.a1, r.a2) }],
-  ['再把狀態選「在職」，條件會寫進網址。', r => { unzoom(r.B[0]); burl(r.bw, 'localhost:3100/template/crud?q=陳&status=在職', true); swap(r.B, r.B[1]); only(r, r.b1, r.urlBox) }],
-  ['點一下網址列，按 Ctrl+C 複製；按 Ctrl+T 開新分頁，按 Ctrl+V 貼上，再按 Enter。', r => { only(r, r.urlBox); show(r.keys) }],
-  ['新分頁打開，篩選條件還在。', r => { hide(r.keys); swap(r.B, r.B[2]); show(r.tab2); only(r, r.c1) }],
-  ['檢查點五：先按「清除」把條件拿掉，再按「匯出 CSV」。', r => { hide(r.tab2); burl(r.bw, 'localhost:3100/template/crud'); swap(r.B, r.B[3]); only(r, r.clr, r.d1) }],
-  ['表格一頁只顯示一部分，匯出的卻是全部，這裡是 24 筆。檔案會存到「下載」資料夾。', r => { only(r, r.d2, r.d3); show(r.dl) }],
-  ['加分一：編輯時把姓名清空，再按儲存，欄位下方會出現紅字。', r => { hide(r.dl); burl(r.bw, 'localhost:3100/template/crud/…?mode=edit'); swap(r.B, r.B[4]); zoom(r.B[4], 'name', { pad: 90, max: 1.8 }); only(r, r.e1) }],
-  ['加分二：把瀏覽器視窗的右邊框往左拖，拖到很窄，表格會變成一張一張卡片。', r => { unzoom(r.B[4]); only(r); hide(r.bw.g); show([r.mob, r.mobT]) }],
-])
-
-scene('範本的 8 個核心檔', () => {
-  const r = {}; mhead('step2 ④', '看懂範本：8 個核心檔')
-  const [a, b] = vsh(r, ['vs19-readme-raw', 'vs20-readme-preview'])
-  r.a0 = hl(r, a, [53, 157, 257, 44], '點小箭頭展開', { lx: 560, col: C.gold })
-  r.a1 = hl(r, a, 'file', '2.1_sample_app 裡的 README.md', { lx: 560 })
-  r.b1 = hl(r, b, 'h2', '往下捲到「8 個核心檔」', { below: true })
+sc3(9, () => {
+  const r = {}; hd(9, 'step2')
   const rows = [['列表頁 index.vue', 1], ['明細頁 [id].vue', 1], ['資料層 useTemplateMembers', 1], ['欄位元件 TemplateFormField', 1], ['狀態標籤 TemplateStatusBadge', 1], ['列表狀態工廠 useTemplateListPage', 0], ['驗證引擎 templateValidation', 0], ['CSV 匯出 templateCsv', 0]]
   r.tbl = grp(L); R(r.tbl, 70, 120, 1460, 660, { fill: C.card, stroke: C.line, sw: 3 })
   T(r.tbl, 800, 168, '跟「這個資料長什麼樣子」有關 → 複製改名；通用的機制 → 直接共用', { size: 30, anchor: 'middle', weight: 900, fill: C.gold })
   r.rowG = rows.map(([n, copy], i) => { const g = grp(r.tbl, false); const y = 195 + i * 70; R(g, 90, y, 1420, 60, { fill: copy ? '#173a3c' : '#3a2a14', rx: 10 })
     T(g, 120, y + 41, (i + 1) + '. ' + n, { size: 30, weight: 800 }); T(g, 1250, y + 41, copy ? '複製改名' : '直接共用', { size: 32, weight: 900, fill: copy ? C.teal : C.gold }); return g })
-  r.names = tip('表格裡的名字不用懂，只看右邊：綠的複製改名，橘的直接共用、不要動', { y: 800, size: 28, col: C.teal })
   r.cmp = box(L, 70, 790, 1460, 90, '比喻：開分店——招牌、菜單要換（複製改名）；收銀機、冷氣照用（直接共用）', { size: 31, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  r.rule = box(L, 70, 790, 1460, 90, '規矩寫明：共用檔不准動 → Step 3 的設計文件會檢查 AI 有沒有守住', { size: 31, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 800 })
   return r
 }, [
-  ['接著看範本長什麼樣子。在左邊檔案總管，點 step2_speedrun_kit 前面的小箭頭展開，再展開 2.1_sample_app。', r => { show(r.S[0]); later(500, () => only(r, r.a0)) }],
-  ['點裡面的 README.md。左邊有好幾個 README，要點 2.1_sample_app 裡的這一個。', r => only(r, r.a1)],
-  ['先點一下文件內容，再按 Ctrl+Shift+V，會換成排版好的預覽。往下捲，找到「8 個核心檔」。', r => { to(r, r.S[1]); only(r, r.b1) }],
-  ['判斷只有一句：跟這個資料長什麼樣子有關的，複製改名；通用的機制，直接共用。', r => { hide(r.S[1]); only(r); show(r.tbl) }],
-  ['表格裡的名字不用懂，看右邊就好：前 5 個複製改名，後 3 個直接共用、不要動。', r => { show(r.names); stagger(r.rowG.slice(0, 5), 200, glow); later(1200, () => stagger(r.rowG.slice(5), 250, glow)) }],
-  ['就像開分店：招牌和菜單要換，收銀機和冷氣照用。共用的東西一改，每家分店都受影響。', r => { hide(r.names); show(r.cmp); glow(r.cmp) }],
+  r => { show(r.tbl); stagger(r.rowG.slice(0, 5), 200, glow); later(1200, () => stagger(r.rowG.slice(5), 250, glow)) },
+  r => { show(r.cmp); glow(r.cmp) },
+  r => { hide(r.cmp); show(r.rule); stagger(r.rowG.slice(5), 250, glow) },
 ])
 
-scene('滷包放在哪：給 AI 的四份規矩', () => {
-  const r = {}; mhead('step2 ⑤', '滷包放在哪：給 AI 的四份規矩')
-  const [a, b] = vsh(r, ['vs21-harness-files', 'vs22b-claude-md-wide'])
-  r.a1 = hl(r, a, 'sampleApp', 'sample-app 最上層', { lx: 560 })
-  r.a2 = hl(r, a, 'guide', '① 使用說明', { lx: 560, col: C.gold })
-  r.a3 = hl(r, a, [53, 419, 257, 66], '② CLAUDE.md　③ CODE-RULES　④ design-system-summary', { lx: 560, col: C.gold, size: 24 })
-  r.a4 = hl(r, a, 'agents', 'AGENTS.md：給其他 AI 的便條，只寫「去讀 CLAUDE.md」', { lx: 560, col: C.mut, size: 22 })
-  r.b1 = hl(r, b, [52, 60, 1012, 40], 'CLAUDE.md：專案憲法，整份只有 48 行', { below: true })
-  r.c = [['不用逐條讀懂', '那是寫給 AI 讀的', C.teal], ['掃過 CLAUDE.md', '48 行、30 秒看完', C.gold], ['滷包跟著鍋子走', 'step3 複製時一起帶走', C.coral]].map(([h, s, col], i) => card(80 + i * 490, 640, 460, 140, h, [s], col, { size: 28, ts: 34 }))
-  r.warn = tip('規矩寫錯，AI 會照著錯，而且錯得又快又整齊。規矩要有人負責、有人審', { y: 800, size: 28, col: C.coral })
-  return r
-}, [
-  ['sample-app 資料夾的最上層，有四份給 AI 的規矩：使用說明、CLAUDE.md、CODE-RULES、design-system-summary。', r => { show(r.S[0]); later(500, () => only(r, r.a1, r.a2, r.a3)) }],
-  ['旁邊的 AGENTS.md 是給其他 AI 的入口便條，內容只寫「去讀 CLAUDE.md」，不用管它。', r => only(r, r.a4)],
-  ['你不用逐條讀懂，那是寫給 AI 讀的。人只要掃過 CLAUDE.md：整份只有 48 行，30 秒看完。', r => { to(r, r.S[1]); only(r, r.b1); later(300, () => show(r.c[0])); later(900, () => show(r.c[1])) }],
-  ['滷包跟著鍋子走：step3 複製整個 sample-app 時，這四份會一起帶過去。', r => show(r.c[2])],
-  ['但要記得：規矩寫錯，AI 會照著錯，而且錯得又快又整齊。規矩的內容要有人負責、有人審。', r => show(r.warn)],
-])
-
-scene('Design System：顏色不寫死', () => {
-  const r = {}; mhead('step2 ⑥', 'Design System：顏色和間距都用代號')
-  const [b] = vsh(r, ['vs24-start-ds'])
-  r.a1 = hl(r, b, 'plus', '＋ 再開一個終端機', { below: true, right: true })
-  r.a2 = hl(r, b, 'tabs', '右邊列出所有終端機', { right: true, size: 26 })
-  r.b1 = hl(r, b, 'cmd', 'start 加 DESIGN_SYSTEM.html', { below: true })
+sc3(10, () => {
+  const r = {}; hd(10, 'step2')
   r.bw = bwin(['br20-design-system'], 'DESIGN_SYSTEM.html'); r.B = r.bw.S
   r.c1 = hl(r, r.B[0], [268, 100, 690, 160], '顏色、字級、間距集中管理', { col: OR, size: 30, below: true })
-  r.jargon = tip('網頁裡的術語不用懂，記住下面這句就好', { y: 806, size: 30, col: C.teal })
   r.paint = box(L, 120, 640, 1360, 150, '比喻：油漆色號\n說「品牌紅」，不說「#C8232C」。要換色，只改色號表一處', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  r.ev = tip('AI 有沒有照做：設計文件裡會留下證據（寫死的色碼 0 筆）', { y: 806, size: 30, col: C.violet })
   return r
 }, [
-  ['pnpm dev 那個終端機要一直開著。要再打指令，就按終端機右上角的「＋」，開第二個。', r => { show(r.S[0]); later(500, () => only(r, r.a1, r.a2)) }],
-  ['在新的終端機輸入 start step2_speedrun_kit\\2.2_design_system\\DESIGN_SYSTEM.html。', r => only(r, r.b1)],
-  ['這就是 Design System：顏色、字級、間距都集中在這裡管理。網頁裡的術語不用懂。', r => { hide(r.S[0]); only(r); show(r.bw.g); show(r.B[0]); show(r.jargon); later(400, () => only(r, r.c1)) }],
-  ['記住一句：顏色和間距一律用代號，叫 token，不要直接寫死。', r => { hide(r.jargon); only(r); show(r.paint); glow(r.paint) }],
-  ['就像油漆色號：說「品牌紅」，不說色碼。要換顏色，只改色號表一個地方，全站一起換。', r => glow(r.paint)],
+  r => { show(r.bw.g); show(r.B[0]); later(400, () => only(r, r.c1)) },
+  r => { only(r); show(r.paint); glow(r.paint) },
+  r => { show(r.ev); glow(r.ev) },
 ])
 
 // ════════════════════════════ Step 3 ════════════════════════════
-chapter('Step 3', '叫 AI 做新模組', C.pink)
+chapter('Step 3', 'SDD：先文件，再程式', C.pink)
 
-scene('你是指揮官：先讀 PRD', () => {
-  const r = {}; mhead('step3 ①', '重頭戲：你不寫程式，你是指揮官')
-  r.mod = box(L, 70, 300, 1460, 220, '新模組：中心裝備物資\n網址會是 /equipment/crud', { size: 54, fill: '#3a1d2e', stroke: C.pink, color: C.ink, weight: 900 })
-  const pF = fitF('hb-step3-paradigm', { x: 70, y: 130, w: 1460, h: 600 })
-  r.p = scr('hb-step3-paradigm', pF); r.S = [r.p]
-  r.cap = tip('以前：自己動手做　→　現在：指揮 AI 做（提需求、做決定、驗收）', { y: 760, size: 32 })
-  const [a, b] = ['vs29-prd-fields', 'vs30-prd-decisions'].map(n => { const g = scr(n, FV); r.S.push(g); return g })
-  r.a1 = hl(r, a, 'h2', '課堂版：12 欄', { below: true })
-  r.b1 = hl(r, b, [105, 105, 892, 330], 'D1 刪除・D2 匯出・D3 編碼', { inside: true })
-  r.where = tip('PRD 在 step3_new_module 資料夾：點兩下 PRD-中心裝備物資.md，再按 Ctrl+Shift+V', { y: 820, h: 60, size: 24, col: C.teal })
+sc3(11, () => {
+  const r = {}; hd(11, 'step3')
+  r.head = box(L, 70, 140, 1460, 110, 'SDD＝規格驅動開發：先文件，再程式', { size: 44, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.nodes = flowRow(290, [['PRD\n寫需求', C.teal], ['選擇題\n你拍板', C.gold], ['SRS\n答應什麼', C.violet], ['設計文件\n＋圖', C.violet], ['任務\n清單', C.pink], ['程式\nAI 寫', C.coral]], { w: 220, gap: 25 })
+  r.sync = box(L, 70, 430, 1460, 70, '程式改了，文件跟著改（Step 4 會看到）', { size: 30, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 800 })
+  r.two = [['SRS', '這一版答應了什麼', C.violet], ['設計文件＋圖', '打算怎麼做；看圖就懂', C.violet]].map(([h, s, col], i) => card(315 + i * 490, 520, 465, 150, h, [s], col, { size: 30, ts: 38 }))
+  r.cost = box(L, 70, 700, 1460, 130, '寫程式很便宜，改方向很貴\n文件先對了，程式才不會做白工', { size: 36, fill: C.card, stroke: C.coral, color: C.ink, weight: 900 })
   return r
 }, [
-  ['step3 是重頭戲：用同一套範本和規矩，長出新模組「中心裝備物資」。', r => { show(r.mod); glow(r.mod) }],
-  ['這一步你不寫程式：以前自己動手做，現在指揮 AI 做。提需求、做決定、驗收成果，是你的事。', r => { hide(r.mod); show([r.p, r.cap]) }],
-  ['題目寫在 PRD，也就是需求文件，放在 step3_new_module 資料夾裡。點兩下打開，再按 Ctrl+Shift+V 看排版。', r => { hide(r.cap); to(r, r.S[1]); show(r.where); only(r, r.a1) }],
-  ['原系統有 26 欄，已經濃縮成一堂課做得完的 12 欄。', r => only(r, r.a1)],
-  ['PRD 第 5 節刻意留了三個決定給你：刪除要不要補、匯出要不要做、編碼規則要不要簡化。', r => { to(r, r.S[2]); only(r, r.b1) }],
+  r => { show(r.head); glow(r.head) },
+  r => { stagger(r.nodes, 300); later(2000, () => show(r.sync)) },
+  r => { glow([r.nodes[2], r.nodes[3]]); stagger(r.two, 350) },
+  r => { show(r.cost); glow(r.cost) },
 ])
 
-scene('準備工作區：複製範本', () => {
-  const r = {}; mhead('step3 ②', '先把範本複製一份，當成你的工作專案')
-  r.bw = bwin(['br06-handbook-copyblock'], 'HANDBOOK.html#step3'); r.B = r.bw.S
-  r.h1 = hl(r, r.B[0], 'pre', '整段選起來，按 Ctrl+C', { col: OR, size: 30, below: true })
-  r.S = [scr('vs25-pasted', FV), scr('vs26-step3-prep', FV), scr('vs08-open-folder-dialog', fitF('vs08-open-folder-dialog', { x: 120, y: 116, w: 1360, h: 765 })), scr('vs27-myapp-explorer', FV)]
-  const [a, b, d0, c] = r.S
-  r.a0 = hl(r, a, [73, 71, 640, 19], '開頭要是 PS D:\\AI_CRUD_Workshop_Frontend_EASY>', { below: true, size: 26 })
-  r.a2 = hl(r, a, 'robocopy', '會自動跳過三個暫存資料夾', { below: true })
-  r.a3 = hl(r, a, 'install', '最後 pnpm install', { below: true })
-  r.b1 = hl(r, b, 'done', 'Done：裝好了', { col: C.green, above: true })
-  r.b2 = hl(r, b, 'prompt', '已經在 my-equipment-app 裡', { col: C.green, above: true, right: true })
-  r.f1 = hl(r, d0, 'step3_new_module', '點兩下 step3_new_module', { col: OR, size: 30, below: true })
-  r.f2 = tip('再點兩下裡面的 my-equipment-app，按「選取資料夾」', { y: 806, size: 30, col: OR })
-  r.c1 = hl(r, c, [53, 333, 257, 22], '使用說明', { lx: 560, col: C.gold })
-  r.c2 = hl(r, c, [53, 421, 257, 66], 'CLAUDE.md・CODE-RULES・design-system-summary', { lx: 560, col: C.gold, size: 24 })
-  r.enter = tip('貼上後每行前面會出現 >>，這時再按一次 Enter 才會開始跑', { y: 806, size: 28, col: C.teal })
-  r.close = tip('換資料夾時，原本的終端機（含 pnpm dev）會關掉，沒關係；上一層信任過，不會再問', { y: 806, size: 24, col: C.teal })
+sc3(12, () => {
+  const r = {}; hd(12, 'step3')
+  const [a, b] = vsh(r, ['vs29-prd-fields', 'vs30-prd-decisions'])
+  r.a1 = hl(r, a, 'h2', '第 2 節：濃縮成 12 欄，一頁看完', { below: true })
+  r.b1 = hl(r, b, 'h2', '第 5 節：三個決定留給你', { col: C.gold, below: true })
+  r.you = tip('刪除補不補・匯出做不做・編碼簡不簡化——由你拍板，不是 AI', { y: 806, size: 30, col: C.gold })
   return r
 }, [
-  ['先把範本複製一份，當成你自己的工作專案 my-equipment-app。', r => { show(r.bw.g); show(r.B[0]) }],
-  ['打開手冊 step3 的「⓪ 準備工作區」，用滑鼠把 Windows 那段指令整段選起來，按 Ctrl+C。', r => only(r, r.h1)],
-  ['回到 VS Code，用第二個終端機。確認開頭是 PS D:\\AI_CRUD_Workshop_Frontend_EASY>，按 Ctrl+V 貼上。', r => { hide(r.bw.g); only(r); show(r.S[0]); later(500, () => only(r, r.a0)) }],
-  ['貼上之後，每一行前面會出現兩個大於符號。這時再按一次 Enter，才會開始跑。', r => { show(r.enter) }],
-  ['這段指令會自動跳過三個暫存資料夾，你不用做任何事。最後會切進 my-equipment-app，跑 pnpm install。', r => { hide(r.enter); only(r, r.a2, r.a3) }],
-  ['看到 Done，就好了。', r => { to(r, r.S[1]); only(r, r.b1, r.b2) }],
-  ['接著用「檔案」→「開啟資料夾」，在教材資料夾裡點兩下 step3_new_module。', r => { to(r, r.S[2]); only(r, r.f1) }],
-  ['再點兩下裡面的 my-equipment-app，按「選取資料夾」。', r => { show(r.f2) }],
-  ['換資料夾時，原本的終端機會關掉，pnpm dev 也會停，沒關係。上一層已經信任過，不會再問。', r => { hide(r.f2); to(r, r.S[3]); show(r.close); only(r) }],
-  ['四份規矩已經跟著過來了。PRD 也在裡面，往下捲就看得到。', r => { hide(r.close); only(r, r.c1, r.c2) }],
-])
-// ── 場景檔第三部分：Step 3（安裝 Claude Code、貼起手 prompt、選擇題）──
-scene('第一次用：安裝 Claude Code', () => {
-  const r = {}; mhead('step3 ③', '第一次用：先安裝 Claude Code 擴充')
-  const [a, b, c] = vsh(r, ['cc-i1-activity', 'cc-i2-search', 'cc-i3-detail', 'cc00-statusbar'].slice(0, 3))
-  r.S.push(scr('cc00-statusbar', FV))
-  r.a1 = hl(r, a, 'ext', '延伸模組', { right: false, lx: 230, size: 30, pad: 6 })
-  r.b1 = hl(r, b, 'search', '輸入 Claude Code', { lx: 560, size: 30 })
-  r.b2 = hl(r, b, 'first', '', { col: C.green })
-  r.b3 = hl(r, b, 'fake1', '', { col: C.red })
-  r.b4 = hl(r, b, 'fake2', '', { col: C.red })
-  r.pick = tip('綠框才對：發行者 Anthropic、有藍色勾勾　｜　紅框：名字很像的別家，不要選', { y: 806, size: 28, col: C.green })
-  r.c1 = hl(r, c, 'publisher', 'Anthropic ✓ anthropic.com', { col: C.green, below: true, size: 26 })
-  r.c2 = hl(r, c, 'install', '安裝', { col: C.coral, below: true, size: 32, pad: 6 })
-  r.c3 = hl(r, c, 'plan', '要用 Pro、Max、Team、Enterprise 方案或用量計費', { col: C.gold, above: true, size: 24 })
-  r.d1 = hl(r, r.S[3], 'status', '裝好後：✻ Claude Code', { col: C.coral, above: true, right: true, size: 28, pad: 6 })
-  r.acct = tip('第一次打開會請你登入：帳號請依講師或公司的說明準備', { y: 806, size: 28, col: C.teal })
-  cursor(r)
-  return r
-}, [
-  ['第一次用 Claude Code，要先安裝它的 VS Code 擴充。點左邊的「延伸模組」圖示。', r => { show(r.S[0]); only(r, r.a1); clickAt(r, r.S[0], 'ext') }],
-  ['在搜尋框輸入 Claude Code。', r => { to(r, r.S[1]); hide(r.cur); only(r, r.b1) }],
-  ['名字很像的有好幾個。要選發行者是 Anthropic、旁邊有藍色勾勾的那一個。', r => { zoom(r.S[1], [53, 100, 256, 230], { pad: 20, max: 1.8 }); only(r, r.b2, r.b3, r.b4); show(r.pick) }],
-  ['點進去，按「安裝」。', r => { hide(r.pick); unzoom(r.S[1]); to(r, r.S[2]); only(r, r.c1, r.c2) }],
-  ['說明頁有寫：要用 Claude 的付費方案登入。第一次打開會請你登入，帳號請依講師或公司的說明準備。', r => { only(r, r.c3); show(r.acct) }],
-  ['安裝好之後，右下角的狀態列會出現「✻ Claude Code」。', r => { hide(r.acct); to(r, r.S[3]); zoom(r.S[3], 'status', { pad: 120, max: 2 }); only(r, r.d1) }],
+  r => { show(r.S[0]); later(500, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { show(r.you); glow(r.you) },
 ])
 
-scene('打開 Claude Code，貼上起手 prompt', () => {
-  const r = {}; mhead('step3 ④', '打開 Claude Code，貼上起手 prompt')
-  const [a, b, c] = vsh(r, ['cc00-statusbar', 'cc01-empty', 'cc02-prompt-pasted'])
-  r.a1 = hl(r, a, 'status', '✻ Claude Code', { col: C.coral, above: true, right: true, size: 30, pad: 6 })
-  r.b1 = hl(r, b, [350, 470, 684, 84], '輸入框：在這裡跟 AI 說話', { above: true, size: 30 })
-  r.b2 = hl(r, b, 'mode', 'Auto：權限模式，先用預設', { below: true, right: true, size: 26, pad: 4 })
-  r.bw = bwin(['br07-handbook-startprompt'], 'HANDBOOK.html#step3'); r.B = r.bw.S
-  r.h1 = hl(r, r.B[0], 'pre', '整段選起來，按 Ctrl+C', { col: OR, size: 30, below: true })
-  r.c1 = hl(r, c, 'input', '按 Ctrl+V 貼上', { above: true, size: 30 })
-  r.c2 = hl(r, c, 'send', '送出', { col: C.coral, below: true, right: true, size: 30, pad: 6 })
-  r.four = tip('prompt 點名的四份＝三份規矩（CLAUDE.md、CODE-RULES、使用說明）＋ PRD', { y: 806, size: 26, col: C.teal })
-  r.any = tip('你們單位如果用別的 AI 工具，做法也一樣：貼 prompt、回答選擇題', { y: 806, size: 28, col: C.teal })
-  cursor(r)
+sc3(13, () => {
+  const r = {}; hd(13, 'step3')
+  const [a, b, c] = vsh(r, ['vs26-step3-prep', 'cc02-prompt-pasted', 'cc03-reading'])
+  r.a1 = hl(r, a, 'done', 'Done：範本複製好、套件裝好', { col: C.green, above: true })
+  r.a2 = hl(r, a, 'prompt', '已經在 my-equipment-app 裡', { col: C.green, below: true, right: true })
+  r.b1 = hl(r, b, 'input', '起手 prompt：只有 4 行，第一行就說走 SDD', { above: true, size: 28 })
+  r.b2 = hl(r, b, 'model', 'Opus 5.5 High：想得深', { col: C.gold, below: true, right: true, size: 26 })
+  r.c1 = hl(r, c, [350, 325, 645, 92], '好幾行 Read：AI 在讀規矩和 PRD', { below: true, size: 28 })
+  r.cp = tip('複製指令在手冊 step3「⓪ 準備工作區」，整段貼上', { y: 806, size: 28, col: C.teal })
   return r
 }, [
-  ['打開 Claude Code：點右下角狀態列的「✻ Claude Code」。', r => { show(r.S[0]); only(r, r.a1); clickAt(r, r.S[0], 'status') }],
-  ['會開出一個對話分頁。下面的輸入框，就是跟 AI 說話的地方。', r => { to(r, r.S[1]); hide(r.cur); only(r, r.b1) }],
-  ['右下的 Auto 是權限模式：大部分動作它會自己判斷能不能直接做。先用預設，不要動。', r => only(r, r.b2)],
-  ['到手冊 step3 的「② 貼起手 prompt」，把整段選起來，按 Ctrl+C。', r => { hide(r.S[1]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) }],
-  ['回到 VS Code，點一下輸入框，按 Ctrl+V 貼上。', r => { hide(r.bw.g); only(r); show(r.S[2]); later(300, () => only(r, r.c1)) }],
-  ['這段 prompt 只有 4 行：先叫 AI 讀四份文件，三份規矩加上 PRD。讀完先用選擇題問你三個決定，最後才開工。', r => { zoom(r.S[2], 'input', { pad: 30, max: 1.5 }); only(r, r.c1); show(r.four) }],
-  ['確認沒問題，按右下角的送出鈕。', r => { hide(r.four); unzoom(r.S[2]); only(r, r.c2); clickAt(r, r.S[2], 'send') }],
-  ['你們單位如果用別的 AI 工具，做法也一樣：貼 prompt、回答選擇題。', r => { hide(r.cur); only(r); show(r.any) }],
+  r => { show([r.S[0], r.cp]); later(500, () => only(r, r.a1, r.a2)) },
+  r => { hide(r.cp); to(r, r.S[1]); only(r, r.b1) },
+  r => { zoom(r.S[1], 'model', { pad: 120, max: 2.2 }); only(r, r.b2) },
+  r => { unzoom(r.S[1]); to(r, r.S[2]); zoom(r.S[2], [350, 325, 645, 92], { pad: 30, max: 1.6 }); later(500, () => only(r, r.c1)) },
 ])
 
-scene('AI 先出選擇題，你拍板', () => {
-  const r = {}; mhead('step3 ⑤', 'AI 不先寫程式，先出選擇題問你')
-  const [a, b, c, d] = vsh(r, ['cc03-reading', 'cc04-question', 'cc05-d2', 'cc06-d3'])
-  r.a1 = hl(r, a, [350, 325, 645, 92], '好幾行 Read：AI 在讀檔', { below: true, size: 30 })
-  r.a2 = hl(r, a, [1001, 521, 26, 26], '要叫它停：按這個方塊', { col: C.coral, above: true, right: true, size: 26, pad: 6 })
-  r.b1 = hl(r, b, [355, 222, 172, 28], '三題：D1・D2・D3', { below: true, size: 28 })
-  r.b2 = hl(r, b, [361, 294, 648, 60], 'D1：補，硬刪除＋二次確認（建議）', { col: C.green, below: true, size: 28 })
-  r.c1 = hl(r, c, [361, 330, 662, 60], 'D2：做 CSV 匯出（建議）', { col: C.green, below: true, size: 28 })
-  r.d1 = hl(r, d, [361, 335, 237, 111], 'D3：簡化：類別-項目-流水', { col: C.green, above: true, size: 26 })
-  r.d3 = hl(r, d, [633, 266, 390, 201], '右邊是範例：IT-NBK-001', { col: C.teal, below: true, right: true, size: 24 })
-  r.d2 = hl(r, d, [361, 484, 663, 29], 'Submit answers：送出', { col: C.coral, above: true, size: 28 })
-  r.diff = tip('照手冊的課堂拍板選：D1 補刪除、D2 做匯出、D3 簡化版。不要只認「建議」', { y: 806, size: 28, col: C.teal })
-  r.you = tip('三題不用背。重點是：做取捨的人是你，不是 AI', { y: 806, size: 32 })
-  r.rescue = codeCard(70, 640, 1460, ['停，先不要寫程式、不要建檔案。', '先用選擇題逐題問我 PRD 第 5 節的 D1～D3，我拍板後再列任務，等我說「開工」。'], { title: 'AI 沒問就寫程式：先按停止方塊，再貼手冊的救援 prompt', size: 26, col: C.coral })
-  cursor(r)
+sc3(14, () => {
+  const r = {}; hd(14, 'step3')
+  const [a, b, c, d] = vsh(r, ['cc05-d2', 'cc06-d3', 'cc09b-q2-serial', 'cc09b-q4-id'])
+  r.a1 = hl(r, a, 'rec', '每題都有「建議」＋一句理由', { col: C.green, below: true, size: 28 })
+  r.b1 = hl(r, b, 'rec', 'D3：簡化版編碼，例 PW-GEN-003', { col: C.green, below: true, size: 26 })
+  r.pick = tip('課堂拍板：D1 補刪除・D2 做匯出・D3 簡化版編碼', { y: 806, size: 30, col: C.teal })
+  r.c1 = hl(r, c, [358, 252, 232, 28], 'PRD 沒寫清楚的：流水號、編輯、電話、點列', { col: C.gold, below: true, size: 26 })
+  r.d1 = hl(r, d, 'q', '連主鍵要不要加，都停下來問', { col: C.gold, above: true, size: 26 })
+  r.cnt = box(L, 1080, 64, 400, 46, '這次多問了 7 題，都是選擇題', { size: 22, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.rule = codeCard(70, 640, 1460, ['只在卡住、非問不可時才問人，用選擇題（2–4 選項、標建議）；不發明元件與商業規則。'], { title: 'CLAUDE.md 寫的規矩（harness）', size: 30, col: C.gold })
   return r
 }, [
-  ['AI 先讀規矩和 PRD。看到好幾行 Read 開頭，就是它在讀檔。', r => { show(r.S[0]); zoom(r.S[0], [350, 325, 645, 92], { pad: 30, max: 1.6 }); later(500, () => only(r, r.a1)) }],
-  ['AI 在跑的時候，輸入框右邊會變成一個方塊。要叫它停，就按這個方塊。', r => { unzoom(r.S[0]); only(r, r.a2) }],
-  ['讀完，它不寫程式，先出選擇題。三題放在三個分頁：D1 刪除、D2 匯出、D3 編碼。', r => { to(r, r.S[1]); zoom(r.S[1], [340, 210, 700, 330], { pad: 10, max: 1.5 }); only(r, r.b1) }],
-  ['每題都標了「建議」，還附一句理由。D1 刪除：課堂上選「補，硬刪除＋二次確認」。選好，會自動跳到下一題。', r => { only(r, r.b2); clickAt(r, r.S[1], [361, 294, 648, 60], { fx: 0.05 }) }],
-  ['D2 匯出：選「做 CSV 匯出」。', r => { unzoom(r.S[1]); to(r, r.S[2]); zoom(r.S[2], [340, 250, 700, 300], { pad: 10, max: 1.5 }); only(r, r.c1); clickAt(r, r.S[2], [361, 330, 662, 60], { fx: 0.05 }) }],
-  ['D3 編碼：選「簡化：類別-項目-流水」，不加機關前綴、同一個編碼不累加數量。三題都選好，按「Submit answers」送出。', r => { unzoom(r.S[2]); to(r, r.S[3]); only(r, r.d1, r.d2); later(1500, () => clickAt(r, r.S[3], [361, 484, 663, 29], { fx: 0.2 })) }],
-  ['你的畫面文字可能不一樣，AI 的「建議」也可能不同。照手冊的課堂拍板選：補刪除、做匯出、簡化版編碼。', r => { hide(r.cur); only(r); show(r.diff) }],
-  ['三題不用背。重點是：在真實系統和課堂之間做取捨的人，是你，不是 AI。', r => { hide(r.diff); show(r.you) }],
-  ['如果 AI 沒問就直接寫程式，先按停止方塊，再貼手冊的救援 prompt，叫它先問你。', r => { hide(r.you); show(r.rescue) }],
-])
-// ── 場景檔第四部分：Step 3（開工～驗收；驗收畫面是這次 Claude Code 實際做出來的 my-equipment-app）──
-scene('確認任務清單，說「開工」', () => {
-  const r = {}; mhead('step3 ⑥', '確認任務清單，再說「開工」')
-  const [a, e, b, c, d] = vsh(r, ['cc09a-tasklist', 'cc09c-editcode', 'cc09b-start-question', 'cc11v2-t600', 'cc12-done'])
-  r.a0 = hl(r, a, [371, 197, 240, 22], '8 個任務', { above: true, size: 30 })
-  r.a1 = hl(r, a, [383, 272, 645, 75], '前兩個：先寫 SRS、SDD 規格文件', { col: C.green, below: true, size: 28 })
-  r.e1 = hl(r, e, [361, 267, 228, 39], 'PRD 沒寫的，AI 停下來問你', { col: C.gold, above: true, size: 26 })
-  r.e2 = hl(r, e, [361, 314, 237, 95], '選建議：建立後不改編碼', { col: C.green, below: true, size: 26 })
-  r.b1 = hl(r, b, [361, 301, 662, 43], '開工（建議）', { col: C.green, below: true, size: 30 })
-  r.b2 = hl(r, b, [361, 484, 663, 29], 'Submit answers', { col: C.coral, above: true, size: 28 })
-  r.c1 = hl(r, c, [350, 240, 680, 150], 'AI 一個一個做，自己跑指令檢查', { above: true, size: 30, lx: 420 })
-  r.d1 = hl(r, d, [371, 373, 646, 56], '總結：8 個任務完成，驗收條件也自己測過', { col: C.green, above: true, size: 26 })
-  r.time = box(L, 1080, 64, 400, 46, '這次實拍：約 19 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
-  r.nav = tip('它也提醒：側邊選單沒加裝備物資，要直接打網址 localhost:3100/equipment/crud', { y: 806, size: 26, col: C.teal })
-  return r
-}, [
-  ['三題拍板之後，AI 列出 8 個任務。前兩個就是手冊要的 SRS、SDD 規格文件。', r => { show(r.S[0]); later(500, () => only(r, r.a0, r.a1)) }],
-  ['PRD 沒寫清楚的地方，AI 也會停下來問你。這次它問：編輯時，分類和編碼可以改嗎？選「建議」就好。', r => { to(r, r.S[1]); only(r, r.e1, r.e2) }],
-  ['最後它問：可以開工嗎？清單順序合理，就選「開工」，再按「Submit answers」。', r => { to(r, r.S[2]); only(r, r.b1, r.b2) }],
-  ['接著 AI 一個一個任務做，自己跑指令檢查。這次實拍花了大約 19 分鐘。', r => { to(r, r.S[3]); only(r, r.c1); show(r.time) }],
-  ['做完它會交一份總結：8 個任務都完成，PRD 的 8 條驗收條件，它也自己開瀏覽器測過了。', r => { to(r, r.S[4]); only(r, r.d1) }],
-  ['它還提醒：側邊選單沒有加上裝備物資，要直接打網址進去。', r => { show(r.nav) }],
+  r => { show(r.S[0]); zoom(r.S[0], 'rec', { pad: 120, max: 1.6 }); later(400, () => only(r, r.a1)) },
+  r => { unzoom(r.S[0]); to(r, r.S[1]); only(r, r.b1); show(r.pick) },
+  r => { hide(r.pick); to(r, r.S[2]); only(r, r.c1); show(r.cnt); later(3800, () => { to(r, r.S[3]); only(r, r.d1) }) },
+  r => { only(r); hide(r.cnt); show(r.rule); glow(r.rule) },
 ])
 
-scene('驗收：列表、連動下拉、編碼', () => {
-  const r = {}; mhead('step3 ⑦', '驗收：打開 /equipment/crud，對照 PRD')
-  r.bw = bwin(['ea01-list', 'ea03-cat-open', 'ea04-item-open', 'ea05-code'], 'localhost:3100/equipment/crud'); r.B = r.bw.S
-  r.src = box(L, 980, 64, 500, 46, '畫面：這次 AI 實際做出來的', { size: 24, fill: '#3a1d2e', stroke: C.pink, color: C.ink, weight: 900 })
+sc3(15, () => {
+  const r = {}; hd(15, 'step3')
+  const [a, b] = vsh(r, ['cc09a-docs4', 'cc09a-tasklist'])
+  r.a1 = hl(r, a, 'head', '先交 4 個檔：SRS、設計文件、圖、任務清單', { col: C.green, below: true, size: 26 })
+  r.a2 = hl(r, b, 'head', '14 個任務，程式一行都還沒寫', { col: C.green, below: true, size: 26 })
+  r.chk = box(L, 120, 300, 1360, 260, '先別急著說開工\n打開 SRS 核三段、看一眼圖，確認了才開工', { size: 44, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)); later(4200, () => { to(r, r.S[1]); only(r, r.a2) }) },
+  r => { only(r); hide(r.S); show(r.chk); glow(r.chk) },
+])
+
+sc3(16, () => {
+  const r = {}; hd(16, 'step3 ・ SRS')
+  const [a, b, c, d] = vsh(r, ['v4-srs-decisions', 'v4-srs-q', 'v4-srs-trace', 'v4-srs-scope'])
+  r.a1 = hl(r, a, 'table', 'D1～D3：裁決、理由、誰拍板', { col: C.violet, above: true, size: 28 })
+  r.a2 = hl(r, b, 'table', '追加的 7 題也一題一列記下來', { col: C.gold, above: true, size: 28 })
+  r.b1 = hl(r, c, 'table', '需求追溯：12 欄各做在哪', { col: C.violet, above: true, size: 28 })
+  r.b2 = hl(r, c, 'where', '做在哪個檔', { col: C.gold, below: true, size: 26 })
+  r.d1 = hl(r, d, 'h', '範圍外：這一版不做什麼', { col: C.violet, below: true, size: 28 })
+  r.d2 = hl(r, d, 'table', '', { col: C.violet })
+  r.pm = [['1. 已拍板決策', '答應了哪些取捨'], ['2. 需求追溯', '每個需求做在哪'], ['3. 範圍外', '這一版不做什麼']].map(([h, s], i) => card(70 + i * 495, 300, 465, 220, '★ ' + h, [s], C.gold, { size: 30, ts: 34 }))
+  r.pmt = box(L, 70, 600, 1460, 120, 'PM 必核的三段：不用看程式，看這三段就知道它答應了什麼', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.S[0]); later(300, () => only(r, r.a1)); later(4200, () => { to(r, r.S[1]); only(r, r.a2) }) },
+  r => { to(r, r.S[2]); only(r, r.b1, r.b2) },
+  r => { to(r, r.S[3]); only(r, r.d1, r.d2) },
+  r => { only(r); hide(r.S[3]); stagger(r.pm, 350); later(1200, () => show(r.pmt)) },
+])
+
+sc3(17, () => {
+  const r = {}; hd(17, 'step3 ・ 設計文件＋圖')
+  const [a, b] = vsh(r, ['v4-design-files', 'v4-design-evidence'])
+  r.a1 = hl(r, a, 'h', '檔案責任：5 個複製改名、3 個共用', { col: C.violet, below: true, size: 28 })
+  r.a2 = hl(r, a, 'shared', '直接共用、未修改：還寫了有沒有真的在用', { col: C.gold, above: true, size: 26 })
+  r.c1 = hl(r, b, 'h', '遵守 harness 的證據', { col: C.green, below: true, size: 30 })
+  r.c2 = hl(r, b, 'hex', '寫死的色碼：0 筆', { col: C.green, right: true, size: 26 })
+  r.c3 = hl(r, b, 'log', 'console.log：0 筆', { col: C.green, right: true, below: true, size: 26 })
+  r.bw = bwin(['v4-diag-uc', 'v4-diag-files-wide', 'v4-diag-class-wide', 'v4-diag-seq-create-wide'], 'DIAGRAMS-中心裝備物資.html'); r.B = r.bw.S
+  r.u1 = hl(r, r.B[0], 'svg', '① 用例圖：誰能做哪些事', { col: OR, size: 26, above: true })
+  r.f0 = hl(r, r.B[1], 'h', '② 檔案架構圖：哪些複製改名、哪些直接共用', { col: OR, size: 26, below: true })
+  r.k1 = hl(r, r.B[2], 'h', '③ 資料模型：一筆品項長什麼樣', { col: OR, size: 26, below: true })
+  r.q1 = hl(r, r.B[3], 'h', '④ 新增品項：選分類 → 選項目 → 編碼算出來 → 儲存', { col: OR, size: 24, below: true })
+  r.cp = scr('v4-diag-copy5', fitF('v4-diag-copy5', { x: 70, y: 140, w: 1460, h: 400 }))
+  r.cpT = tip('紅：5 個檔從範本複製改名（跟「裝備物資長什麼樣」有關）', { y: 556, size: 28, col: C.red })
+  r.sh = scr('v4-diag-shared3', fitF('v4-diag-shared3', { x: 70, y: 640, w: 1460, h: 150 }))
+  r.shT = tip('藍：3 個檔直接共用、一行都不改（通用機制）', { y: 806, size: 28, col: '#4da3ff' })
+  r.ev = tip('AI 不是說「我有照規矩」，是拿出證據和圖給你看', { y: 806, size: 32, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(300, () => only(r, r.a1)); later(2200, () => { zoom(r.S[0], 'shared', { pad: 120, max: 1.7 }); only(r, r.a2) }) },
+  r => { unzoom(r.S[0]); to(r, r.S[1]); only(r, r.c1); later(2600, () => only(r, r.c2, r.c3)) },
+  r => { only(r); hide(r.S); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.u1)); later(3800, () => { swap(r.B, r.B[1]); only(r, r.f0) }) },
+  r => { only(r); hide(r.bw.g); show([r.cp, r.cpT]); later(1800, () => show([r.sh, r.shT])); later(4000, () => { hide([r.cp, r.cpT, r.sh, r.shT]); show(r.bw.g); swap(r.B, r.B[2]); only(r, r.k1) }); later(6200, () => { swap(r.B, r.B[3]); only(r, r.q1) }) },
+  r => { later(3000, () => { only(r); hide(r.bw.g); show(r.ev); glow(r.ev) }) },
+])
+
+sc3(18, () => {
+  const r = {}; hd(18, 'step3')
+  const [c, d, e, f] = vsh(r, ['cc09e-model-menu', 'cc09f-go-typed', 'cc11v4-t0300', 'cc12-done'])
+  r.c1 = hl(r, c, 'sonnet', '寫程式改用 Sonnet 5.5', { col: C.gold, below: true, size: 28 })
+  r.d1 = hl(r, d, 'model', 'Sonnet 5.5 High', { col: C.gold, above: true, size: 26 })
+  r.d2 = hl(r, d, 'input', '說「開工」', { col: C.green, above: true, right: true, size: 26 })
+  r.e1 = hl(r, e, [350, 230, 680, 200], 'AI 一個一個做，自己跑檢查', { above: true, size: 28 })
+  r.f1 = hl(r, f, 'sum', '五行總結：做了什麼、哪些檔、花多久', { col: C.green, above: true, size: 26 })
+  r.time = box(L, 1080, 64, 400, 46, '這次實拍：約 17 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.cheap = tip('有規矩和範本，寫程式不用最貴的模型', { y: 806, size: 30, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.c1)); show(r.cheap); later(4000, () => { to(r, r.S[1]); only(r, r.d1, r.d2) }) },
+  r => { hide(r.cheap); to(r, r.S[2]); only(r, r.e1); show(r.time) },
+  r => { to(r, r.S[3]); only(r, r.f1) },
+])
+
+sc3(19, () => {
+  const r = {}; hd(19, 'step3')
+  r.bw = bwin(['ea01-list', 'ea04-item-open', 'ea05-code', 'ea06-validation', 'ea07-delete'], 'localhost:3101/equipment/crud'); r.B = r.bw.S
   r.a1 = hl(r, r.B[0], 'count', '共 24 筆', { col: OR, size: 30, below: true })
-  r.a2 = hl(r, r.B[0], [878, 430, 62, 180], '狀態用顏色標：綠＝正常', { col: OR, size: 26, below: true, right: true })
-  r.a3 = hl(r, r.B[0], [443, 456, 99, 20], '品項編碼', { col: OR, size: 26, below: true, pad: 6 })
-  r.b1 = hl(r, r.B[1], 'list', '先選分類', { col: OR, size: 30, right: true })
-  r.c1 = hl(r, r.B[2], 'list', '項目只出現這個分類的', { col: OR, size: 30, right: true })
-  r.d1 = hl(r, r.B[3], [268, 170, 205, 32], '編碼馬上算出來：IT-NBK-003', { col: C.green, size: 30, below: true })
-  r.prd = tip('對照 PRD 第 2 節的 12 欄：名稱、必不必填、用什麼元件、怎麼驗證', { y: 806, size: 28, col: C.teal })
-  r.diff = tip('你的 AI 做出來會有一點不同，以 PRD 為準', { y: 806, size: 30, col: C.teal })
-  r.dev = grp(L); R(r.dev, 160, 250, 1280, 330, { fill: C.card, stroke: C.gold, sw: 4 })
-  T(r.dev, 800, 320, '先確認網頁伺服器有在跑', { size: 40, weight: 900, anchor: 'middle', fill: C.gold })
-  T(r.dev, 800, 385, '換資料夾時，原本的 pnpm dev 已經關掉了', { size: 30, anchor: 'middle' })
-  T(r.dev, 800, 440, '這次 AI 做完已經幫忙開好；瀏覽器打不開的話：', { size: 30, anchor: 'middle' })
-  const dc = T(r.dev, 800, 520, '在 my-equipment-app 的終端機輸入 pnpm dev', { size: 34, weight: 800, anchor: 'middle', fill: C.green }); dc.style.fontFamily = MONO
-  return r
-}, [
-  ['驗收前，先確認網頁伺服器有在跑。這次 AI 做完已經幫忙開好；如果瀏覽器打不開，就在 my-equipment-app 的終端機輸入 pnpm dev。', r => { show(r.dev) }],
-  ['驗收：在瀏覽器打開 localhost:3100/equipment/crud。這是這次 AI 實際做出來的頁面。', r => { hide(r.dev); show(r.bw.g); show(r.B[0]); show(r.diff) }],
-  ['拿 PRD 第 2 節的 12 欄逐項對照：名稱、必不必填、用什麼元件、怎麼驗證。', r => { hide(r.diff); show(r.prd) }],
-  ['列表有 24 筆種子資料，每一筆都有品項編碼，狀態用顏色標出來。', r => { hide(r.prd); zoom(r.B[0], [248, 280, 940, 360], { pad: 10, max: 1.4 }); only(r, r.a1, r.a2, r.a3) }],
-  ['新增時，要先選分類。', r => { unzoom(r.B[0]); burl(r.bw, 'localhost:3100/equipment/crud/new', true); swap(r.B, r.B[1]); only(r, r.b1) }],
-  ['選好分類，項目才能選，而且只出現這個分類的項目。', r => { swap(r.B, r.B[2]); only(r, r.c1) }],
-  ['分類和項目都選好，品項編碼就馬上算出來：IT-NBK-003，就是剛才 D3 拍板的「類別-項目-流水」。', r => { swap(r.B, r.B[3]); zoom(r.B[3], [248, 160, 700, 280], { pad: 10, max: 1.6 }); only(r, r.d1) }],
-])
-
-scene('驗收：驗證、刪除、手機＋修正心法', () => {
-  const r = {}; mhead('step3 ⑧', '驗收：驗證、刪除、手機，有落差就請 AI 修')
-  r.bw = bwin(['ea06-validation', 'ea07-delete'], 'localhost:3100/equipment/crud/new'); r.B = r.bw.S
-  r.a1 = hl(r, r.B[0], [273, 330, 920, 380], '空表單儲存 → 欄位紅字', { col: C.red, size: 30, above: true })
-  r.a2 = hl(r, r.B[0], 'toast', '請修正 5 個欄位', { col: C.red, size: 26, above: true, right: true, pad: 24 })
-  r.b1 = hl(r, r.B[1], [780, 369, 56, 40], '按「刪除」才會真的刪', { col: C.red, size: 28, below: true, right: true })
+  r.b1 = hl(r, r.B[1], 'list', '只出現這個分類的項目', { col: OR, size: 28, right: true })
+  r.c1 = hl(r, r.B[2], [268, 170, 205, 32], '編碼馬上算出來：IT-NBK-003', { col: C.green, size: 30, below: true })
+  r.d1 = hl(r, r.B[3], 'toast', '空表單按儲存：請修正 4 個欄位', { col: C.red, size: 26, above: true, right: true, pad: 18 })
+  r.e1 = hl(r, r.B[4], 'ok', '按「刪除」才會真的刪', { col: C.red, size: 26, below: true, right: true })
   const mF = fitF('ea08-mobile', { x: 1000, y: 140, w: 470, h: 730 })
   r.mob = grp(L); R(r.mob, mF.x - 16, mF.y - 16, mF.w + 32, mF.h + 32, { fill: '#0b0f14', stroke: '#5b6670', sw: 4, rx: 34 }); show(scrIn('ea08-mobile', mF, r.mob))
-  r.mobT = box(L, 120, 300, 820, 200, '縮到手機寬度\n表格變成卡片', { size: 44, fill: C.card, stroke: C.teal, color: C.ink, weight: 800 })
-  r.rules = [['一次只修一件事', '一則訊息只提一個問題', C.teal], ['講清楚「看到什麼 vs 期望什麼」', '例：看到 2026/7/1，期望 2026-07-01', C.gold], ['修兩次不好，就換個說法', '別在同一串一直盧', C.coral]].map(([h, s, col], i) => card(120, 150 + i * 220, 1360, 190, h, [s], col, { size: 32, ts: 40, lh: 52 }))
+  r.mobT = box(L, 120, 360, 820, 160, '縮到手機寬度\n表格變成卡片', { size: 44, fill: C.card, stroke: C.teal, color: C.ink, weight: 800 })
   return r
 }, [
-  ['什麼都不填，直接按儲存。必填欄位要出現紅字，右下角提示「請修正 5 個欄位」。', r => { show(r.bw.g); show(r.B[0]); only(r, r.a1, r.a2) }],
-  ['按垃圾桶，要先跳出確認視窗，按「刪除」才會真的刪。', r => { burl(r.bw, 'localhost:3100/equipment/crud'); swap(r.B, r.B[1]); zoom(r.B[1], [380, 211, 480, 222], { pad: 60, max: 1.6 }); only(r, r.b1) }],
-  ['把視窗縮到手機寬度，表格要變成卡片。', r => { unzoom(r.B[1]); only(r); hide(r.bw.g); show([r.mob, r.mobT]) }],
-  ['有落差就請 AI 修。心法一：一次只修一件事。', r => { hide([r.mob, r.mobT]); show(r.rules[0]) }],
-  ['心法二：講清楚「看到什麼、期望什麼」。例如：看到 2026/7/1，期望顯示成 2026-07-01。', r => show(r.rules[1])],
-  ['心法三：修兩次還不好，就換個說法重講，別在同一串一直盧。', r => show(r.rules[2])],
+  r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], [248, 280, 940, 360], { pad: 10, max: 1.4 }); later(400, () => only(r, r.a1)) },
+  r => { unzoom(r.B[0]); burl(r.bw, 'localhost:3101/equipment/crud/new'); swap(r.B, r.B[1]); only(r, r.b1); later(3600, () => { swap(r.B, r.B[2]); only(r, r.c1) }) },
+  r => { swap(r.B, r.B[3]); only(r, r.d1); later(3000, () => { burl(r.bw, 'localhost:3101/equipment/crud'); swap(r.B, r.B[4]); only(r, r.e1) }); later(6200, () => { only(r); hide(r.bw.g); show([r.mob, r.mobT]) }) },
 ])
-// ── 場景檔第五部分：Step 4（LOOP）、Step 5（總結）──
-chapter('Step 4', '讓 AI 自己修到全綠', C.violet)
 
-scene('別再一問一答：AI 不是要你帶的新人', () => {
-  const r = {}; mhead('step4 ①', '別再一問一答：AI 不是要你帶的新人')
-  r.old = card(70, 140, 700, 330, '一問一答＝主管手把手帶新人', ['你問一句，它做一步', '每一步都要交代、要盯', '主管的時間全耗在教'], C.coral, { size: 32, ts: 36, lh: 56 })
-  r.neu = card(830, 140, 700, 330, '規矩＋樣本＋LOOP＝有 SOP 的團隊', ['harness＝公司規定', '範本＝示範樣本', 'E2E 測試＝驗收標準'], C.green, { size: 32, ts: 34, lh: 56 })
+sc3(20, () => {
+  const r = {}; hd(20, 'step3')
+  const [a, b, c, d] = vsh(r, ['cc13-fix1-ask', 'cc13-fix1-done', 'cc14-fix2-ask', 'cc14-fix2-done'])
+  r.a1 = hl(r, a, 'msg', '第 1 件：看到什麼、期望什麼，一次講一件', { col: C.gold, below: true, size: 26 })
+  r.b1 = hl(r, b, 'done', 'AI 改好，我再去看一次', { col: C.green, above: true, size: 26 })
+  r.c1 = hl(r, c, 'msg', '第 2 件：再講一次、再改一次', { col: C.gold, below: true, size: 26 })
+  r.d1 = hl(r, d, 'done', '改好了', { col: C.green, above: true, size: 26 })
+  r.pain = box(L, 120, 300, 1360, 260, '問題不大，但你得一直坐在電腦前面陪它\n看 → 講 → 等 → 再看 → 再講……', { size: 44, fill: '#3a2a14', stroke: C.coral, color: C.coral, weight: 900 })
+  r.next = tip('這段來回，就是 Step 4 要交給 AI 分身的事', { y: 806, size: 32, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1); later(3000, () => { to(r, r.S[2]); only(r, r.c1) }); later(5600, () => { to(r, r.S[3]); only(r, r.d1) }) },
+  r => { only(r); hide(r.S); show(r.pain); glow(r.pain) },
+  r => { show(r.next); glow(r.next) },
+])
+
+// ════════════════════════════ Step 4 ════════════════════════════
+chapter('Step 4', 'LOOP＋對抗審查', C.violet)
+
+sc3(21, () => {
+  const r = {}; hd(21, 'step4')
+  r.old = card(70, 140, 700, 300, '一問一答＝主管手把手帶新人', ['你問一句，它做一步', '每一步都要交代、要盯', '時間全耗在教'], C.coral, { size: 32, ts: 36, lh: 56 })
+  r.neu = card(830, 140, 700, 300, '規矩＋範本＋測試', ['harness＝公司規定', '範本＝示範樣本', 'E2E 測試＝驗收標準'], C.green, { size: 32, ts: 36, lh: 56 })
+  r.sub = box(L, 70, 470, 1460, 120, '找另一個 AI，取代「來回要 AI 修」的你 ＝ 對抗審查（找碴、不准誇獎）', { size: 40, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
   const g = grp(L); r.flow = g
-  const steps = [['你下一個指令', C.gold], ['AI 做＋自己驗', C.teal], ['子代理挑錯', C.violet], ['你只看報告', C.green]]
-  steps.forEach(([t, col], i) => { const x = 70 + i * 375; R(g, x, 560, 330, 110, { fill: C.card, stroke: col, sw: 4 }); T(g, x + 165, 628, t, { size: 34, anchor: 'middle', weight: 900, fill: col }); if (i) T(g, x - 22, 628, '→', { size: 44, anchor: 'middle', fill: C.mut }) })
-  T(g, 800, 730, '子代理＝AI 自己叫出來的分身，專門做一件事；這裡專門挑錯', { size: 28, anchor: 'middle', fill: C.mut })
-  r.save = box(L, 70, 770, 1460, 90, '省下的，是你一來一回交代、教學的時間', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  const steps = [['你下一個指令', C.gold], ['AI 做＋自己驗', C.teal], ['另一個 AI 挑錯', C.violet], ['交報告給你', C.green]]
+  steps.forEach(([t, col], i) => { const x = 70 + i * 375; R(g, x, 640, 330, 110, { fill: C.card, stroke: col, sw: 4 }); T(g, x + 165, 708, t, { size: 34, anchor: 'middle', weight: 900, fill: col }); if (i) T(g, x - 22, 708, '→', { size: 44, anchor: 'middle', fill: C.mut }) })
   return r
 }, [
-  ['很多人用 AI 還在一問一答：你問一句，它做一步。', r => show(r.old)],
-  ['這就像主管手把手帶新人，每一步都要交代、要盯，時間全耗在教。', r => glow(r.old)],
-  ['換個做法：規矩寫在 harness，示範樣本就是範本，驗收標準就是 E2E 測試。', r => show(r.neu)],
-  ['這些放好了，AI 自己就有 know-how，會照公司規定走。', r => glow(r.neu)],
-  ['你只下一個指令：AI 自己做、自己驗，再叫一個分身挑錯，最後交報告給你。', r => { show(r.flow); glow(r.flow) }],
-  ['子代理，就是 AI 自己叫出來的分身，專門做一件事。省下的，是你一來一回交代、教學的時間。', r => { show(r.save); glow(r.save) }],
+  r => { show(r.old); glow(r.old) },
+  r => { show(r.neu); glow(r.neu) },
+  r => { show(r.sub); glow(r.sub) },
+  r => { show(r.flow); glow(r.flow) },
 ])
 
-scene('LOOP 是什麼：自動閱卷機', () => {
-  const r = {}; mhead('step4 ②', 'LOOP：讓 AI 自己「改 → 驗 → 再改」')
+sc3(22, () => {
+  const r = {}; hd(22, 'step4')
   const g = grp(L); r.flow = g
   const nodes = [['AI 改程式', 230, C.teal], ['跑 7 條 E2E 測試', 620, C.gold], ['全綠？', 1010, C.green]]
-  nodes.forEach(([t, x, col]) => { R(g, x - 160, 190, 320, 110, { fill: C.card, stroke: col, sw: 4 }); T(g, x, 258, t, { size: 34, anchor: 'middle', weight: 900, fill: col }) })
-  T(g, 425, 255, '→', { size: 48, anchor: 'middle', fill: C.mut }); T(g, 815, 255, '→', { size: 48, anchor: 'middle', fill: C.mut })
-  R(g, 1240, 190, 300, 110, { fill: '#173a2a', stroke: C.green, sw: 4 }); T(g, 1390, 245, '是 → 子代理挑錯', { size: 30, anchor: 'middle', weight: 900, fill: C.green }); T(g, 1390, 282, '再交報告給你', { size: 26, anchor: 'middle' }); T(g, 1180, 255, '→', { size: 48, anchor: 'middle', fill: C.mut })
-  mk('path', { d: 'M1010,300 v70 H230 v-70', fill: 'none', stroke: C.red, 'stroke-width': 5, 'marker-end': 'url(#ah-red)' }, g)
-  T(g, 620, 400, '否（有紅燈）：AI 自己判斷原因、修好、再跑', { size: 30, anchor: 'middle', weight: 800, fill: C.red })
-  r.exam = box(L, 70, 450, 1460, 110, '比喻：AI 自己寫考卷、交給自動閱卷機、看分數再改，直到 7 題全對', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
-  r.e2e = box(L, 70, 580, 1460, 90, '閱卷機＝ 7 條 E2E 測試：程式自己開瀏覽器，照使用者的順序點一遍，再判定對不對', { size: 29, fill: C.card, stroke: C.line, color: C.ink })
-  r.rules = [['鐵律一：不准偷改答案卷', '不准改測試、不准放寬標準', C.red], ['鐵律二：同一題錯兩次就舉手', '停下來回報，換人判斷', C.coral]].map(([h, s, col], i) => card(70 + i * 740, 690, 720, 180, h, [s], col, { size: 30, ts: 36 }))
+  nodes.forEach(([t, x, col]) => { R(g, x - 160, 160, 320, 100, { fill: C.card, stroke: col, sw: 4 }); T(g, x, 222, t, { size: 32, anchor: 'middle', weight: 900, fill: col }) })
+  T(g, 425, 220, '→', { size: 48, anchor: 'middle', fill: C.mut }); T(g, 815, 220, '→', { size: 48, anchor: 'middle', fill: C.mut })
+  R(g, 1240, 160, 300, 100, { fill: '#173a2a', stroke: C.green, sw: 4 }); T(g, 1390, 203, '是 → 另一個 AI 挑錯', { size: 28, anchor: 'middle', weight: 900, fill: C.green }); T(g, 1390, 240, '再交報告', { size: 24, anchor: 'middle' }); T(g, 1180, 220, '→', { size: 48, anchor: 'middle', fill: C.mut })
+  mk('path', { d: 'M1010,260 v60 H230 v-60', fill: 'none', stroke: C.red, 'stroke-width': 5, 'marker-end': 'url(#ah-red)' }, g)
+  T(g, 620, 350, '否（有紅燈）：AI 自己判斷原因、修好、再跑', { size: 28, anchor: 'middle', weight: 800, fill: C.red })
+  r.e2e = box(L, 70, 390, 1460, 100, '閱卷機＝7 條 E2E 測試：程式自己開瀏覽器，照使用者的順序點一遍，再判定對不對', { size: 29, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.rules = [['鐵律一：不准偷改標準答案', '不准改測試、不准放寬標準', C.red], ['鐵律二：同一問題修兩次沒好就停', '停下來回報，交給人判斷', C.coral]].map(([h, s, col], i) => card(70 + i * 740, 520, 720, 160, h, [s], col, { size: 28, ts: 34 }))
+  r.file = box(L, 70, 520, 440, 310, '規矩檔\nLOOP-規矩.md\n\n鐵律、埠、審查方式\n產出格式、模型', { size: 28, fill: C.card, stroke: C.violet, color: C.ink, weight: 800 })
+  r.outs = [['LOOP-LOG.md', '流水紀錄（機器看）', C.mut], ['LOOP-REPORT.html', '結果報告（人看、有圖）', C.gold], ['playwright-report', '測試報告', C.green], ['SRS・DESIGN・圖', '文件同步', C.violet]].map(([h, s, col], i) => card(540 + (i % 2) * 500, 520 + Math.floor(i / 2) * 160, 480, 145, h, [s], col, { size: 24, ts: 28, lh: 40 }))
   return r
 }, [
-  ['step4 要讓 AI 自己跑「改程式、跑測試、再改」，這個循環叫 LOOP。', r => { show(r.flow) }],
-  ['比喻：AI 自己寫考卷，交給自動閱卷機，看分數再改，直到全對。', r => { show(r.exam); glow(r.exam) }],
-  ['閱卷機就是 7 條 E2E 測試：程式自己開一個瀏覽器，照使用者的順序點一遍，再判定對不對。', r => show(r.e2e)],
-  ['全綠之後，AI 還會叫一個子代理來挑錯。沒有 LOOP，人要一直手動點、回報哪裡壞；有了 LOOP，人只看最後的結果。', r => glow(r.flow)],
-  ['兩條鐵律。第一，不准偷改答案卷：不准改測試，也不准放寬標準。', r => show(r.rules[0])],
-  ['第二，同一題錯兩次就舉手：停下來回報，換人判斷，不要無限撞牆。', r => show(r.rules[1])],
+  r => { show(r.flow); glow(r.flow) },
+  r => { show(r.e2e); glow(r.e2e) },
+  r => stagger(r.rules, 500),
+  r => { hide(r.rules); show(r.file); glow(r.file); stagger(r.outs, 350) },
 ])
-// ── 場景檔第六部分：Step 4 實拍（第二版：一個 LOOP prompt → 修到全綠 → 子代理對抗審查 → 交報告 → 用眼睛驗收）──
-const RED = s => [[s, TC.err, 700]], GRN = s => [[s, TC.ok, 700]]
 
-scene('只貼一個 LOOP prompt，之後 AI 自己跑', () => {
-  const r = {}; mhead('step4 ③', '只貼一個 prompt，之後 AI 自己跑')
-  const [a] = vsh(r, ['cc19-root-explorer'])
-  r.a1 = hl(r, a, 'tree', '回到教材根目錄', { right: true, size: 30, pad: 2 })
-  r.bw = bwin(['br08-handbook-loopprompt'], 'HANDBOOK.html#step4'); r.B = r.bw.S
-  r.h1 = hl(r, r.B[0], 'pre', '手冊 step4 的 LOOP prompt：整段複製', { col: OR, size: 28, below: true })
-  const b = scr('cc20-loop-pasted', FV); r.S.push(b)
-  r.b1 = hl(r, b, 'input', '新對話：貼上、送出', { above: true, size: 30 })
-  r.b2 = hl(r, b, [365, 360, 640, 42], '這一行：全綠後開子代理對抗審查', { col: C.violet, above: true, size: 26 })
-  r.t = term({ y: 128, h: 600, size: 21, title: '測試結果（AI 跑的，實拍文字，省略檔名）', note: '第 1 輪' })
-  const c = scr('cc23v2-red', FV); r.S.push(c)
-  r.c1 = hl(r, c, [371, 227, 658, 39], '第 1 輪：E3、E4 紅', { col: C.red, below: true, size: 28 })
-  r.c2 = hl(r, c, [371, 410, 658, 40], '自己判斷原因：先查 PRD 有沒有寫', { col: C.gold, above: true, size: 28 })
-  r.hands = tip('之後你不用插手：AI 自己確認網頁有在跑，再跑測試', { y: 806, size: 28, col: C.teal })
+sc3(23, () => {
+  const r = {}; hd(23, 'step4')
+  const [a, b, c] = vsh(r, ['cc20-loop-pasted', 'cc21v4-port', 'cc23v4-red'])
+  r.a1 = hl(r, a, 'input', 'LOOP prompt：4 行，第一行就說照規矩檔做', { col: C.violet, above: true, size: 26 })
+  r.a2 = hl(r, a, 'model', 'Sonnet 5.5：寫程式用便宜的', { col: C.gold, below: true, size: 24 })
+  r.b1 = hl(r, b, 'port', '3100 被占，AI 自己換成 3101 把網頁開起來', { col: C.gold, below: true, size: 26 })
+  r.c1 = hl(r, c, 'red', '第 1 輪：5 綠 2 紅（E3、E7）', { col: C.red, below: true, size: 28 })
+  r.c2 = hl(r, c, 'why', '先找根因（Root cause），再動手', { col: C.gold, above: true, size: 26 })
+  r.hands = tip('送出之後就不用管了：AI 自己開網頁、跑測試、判斷原因', { y: 806, size: 28, col: C.teal })
   return r
 }, [
-  ['LOOP 要在教材根目錄做。用「檔案」→「開啟資料夾」，回到 AI_CRUD_Workshop_Frontend_EASY。', r => { show(r.S[0]); later(500, () => only(r, r.a1)) }],
-  ['開一個新的 Claude Code 對話，把手冊 step4 的 LOOP prompt 整段複製過來。', r => { hide(r.S[0]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) }],
-  ['貼上，送出。', r => { hide(r.bw.g); only(r); show(r.S[1]); later(300, () => only(r, r.b1)) }],
-  ['prompt 裡有一行很重要：全綠之後，開一個子代理做對抗審查。這一行，就是把挑錯也交給 AI。', r => { zoom(r.S[1], [353, 340, 679, 80], { pad: 20, max: 1.6 }); only(r, r.b2) }],
-  ['之後你不用插手。AI 會自己確認網頁有在跑，再跑測試。', r => { unzoom(r.S[1]); hide(r.S[1]); only(r); show([r.t.g, r.hands]) }],
-  ['第一輪：5 條綠、2 條紅，紅的是 E3 和 E4。', r => { hide(r.hands)
-    r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列'), GRN('  ok 2 › E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫、清除後還原'), RED('  x  3 › E3 新增品項：連動下拉、編碼即時產生且不重複、儲存後筆數 +1'), RED('  x  4 › E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁'), GRN('  ok 5 › E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'), GRN('  ok 6 › E6 範本不回歸：人員範本列表可用，且點得進檢視頁看到資料'), GRN('  ok 7 › E7 編輯品項：改第一列數量與存放地點，儲存後新值生效'), RED('  2 failed'), GRN('  5 passed (17.4s)'), '', RED('E2E FAIL：測試程序 exit code = 1。')], { gap: 260 }) }],
-  ['AI 自己判斷原因：先去查 PRD 有沒有寫，再看參考解怎麼做，最後改了 1 個檔。', r => { hide(r.t.g); show(r.S[2]); later(400, () => only(r, r.c1, r.c2)) }],
+  r => { show(r.S[0]); later(400, () => only(r, r.a1, r.a2)) },
+  r => { to(r, r.S[1]); only(r, r.b1); show(r.hands) },
+  r => { hide(r.hands); to(r, r.S[2]); only(r, r.c1); later(3200, () => only(r, r.c2)) },
 ])
 
-scene('第二輪全綠，再叫子代理挑錯', () => {
-  const r = {}; mhead('step4 ④', '第二輪全綠，AI 再叫分身來挑錯')
+sc3(24, () => {
+  const r = {}; hd(24, 'step4')
   r.t = term({ y: 128, h: 600, size: 21, title: '測試結果（AI 跑的，實拍文字，省略檔名）', note: '第 2 輪' })
-  const [a, b] = vsh(r, ['cc23v2-agent', 'cc23v2-agent-now'])
-  r.a1 = hl(r, a, [371, 228, 658, 39], '第 2 輪 7 條全綠', { col: C.green, below: true, size: 28 })
-  r.a2 = hl(r, a, [364, 290, 262, 26], 'Agent：AI 自己叫出子代理', { col: C.violet, above: true, size: 28 })
-  r.a3 = hl(r, a, [371, 322, 658, 75], '交代它：專挑假綠、和測試沒抓到的 App 問題', { col: C.violet, below: true, size: 26 })
-  r.b1 = hl(r, b, [478, 524, 62, 20], '1 agent：分身正在挑錯', { col: C.violet, above: true, size: 28, pad: 6 })
+  const [a, b] = vsh(r, ['cc23v4-agent', 'cc23v4-shots'])
+  r.a1 = hl(r, a, 'agent', 'Agent：另一個 AI 來審查（Opus 5.5，比寫程式高一級）', { col: C.violet, above: true, size: 26 })
+  r.a2 = hl(r, a, 'task', '交代它：只挑錯、不誇獎；用 Playwright（自動開瀏覽器截圖的工具）逐頁看', { col: C.violet, below: true, size: 24 })
+  r.b1 = hl(r, b, 'pill', '1 agent：審查的 AI 正在工作（在讀它拍的截圖）', { col: C.violet, above: true, size: 26, pad: 6 })
   r.min = box(L, 1080, 64, 400, 46, '這次實拍：約 24 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
-  r.hands = tip('從貼上 prompt 到交報告，你都不用插手', { y: 806, size: 30, col: C.teal })
   return r
 }, [
-  ['第二輪，7 條全綠：7 passed。', r => { show(r.t.g)
-    const L2 = r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列'), GRN('  ok 2 › E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫、清除後還原'), GRN('  ok 3 › E3 新增品項：連動下拉、編碼即時產生且不重複、儲存後筆數 +1'), GRN('  ok 4 › E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯誤不離頁'), GRN('  ok 5 › E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'), GRN('  ok 6 › E6 範本不回歸：人員範本列表可用，且點得進檢視頁看到資料'), GRN('  ok 7 › E7 編輯品項：改第一列數量與存放地點，儲存後新值生效'), '', GRN('  7 passed (7.0s)'), GRN('E2E 全綠：7 條 passed / 0 條 failed / 0 條 skipped。')], { gap: 220 })
-    later(2600, () => { const m = r.t.mark(L2[10], '全綠', C.green); show(m); glow(m) }) }],
-  ['接著，AI 照 prompt 自己叫出一個子代理，也就是它的分身，專門來挑錯。', r => { hide(r.t.g); show(r.S[0]); later(400, () => only(r, r.a1)); later(1800, () => only(r, r.a2)) }],
-  ['它交代分身：專挑測試的假綠，還有測試沒抓到的 App 問題。分身只回報，不改檔。', r => only(r, r.a2, r.a3)],
-  ['下面出現「1 agent」，就是分身正在工作。這次從貼上到交報告，大約 24 分鐘，你都不用插手。', r => { to(r, r.S[1]); only(r, r.b1); show([r.min, r.hands]) }],
+  r => { show(r.t.g)
+    const L2 = r.t.out(['Running 7 tests using 1 worker', GRN('  ok 1 › E1 列表載入'), GRN('  ok 2 › E2 關鍵字篩選'), GRN('  ok 3 › E3 新增品項'), GRN('  ok 4 › E4 表單驗證'), GRN('  ok 5 › E5 刪除確認'), GRN('  ok 6 › E6 範本不回歸'), GRN('  ok 7 › E7 編輯品項'), '', GRN('  7 passed')], { gap: 180 })
+    later(2000, () => { const m = r.t.mark(L2[9], '全綠', C.green); show(m); glow(m) }) },
+  r => { hide(r.t.g); show(r.S[0]); later(400, () => only(r, r.a1, r.a2)) },
+  r => { to(r, r.S[1]); only(r, r.b1); show(r.min) },
 ])
 
-scene('看報告：分身挑到的問題怎麼處理', () => {
-  const r = {}; mhead('step4 ⑤', '看報告：分身挑到的，AI 分兩種處理')
-  const [a, b, c, d] = vsh(r, ['cc25v2-conclusion', 'cc25v2-fixed', 'cc25v2-tests', 'cc26v2-question'])
-  r.a1 = hl(r, a, [366, 268, 662, 46], '結論：App 問題修了 5 個，測試的問題一條都沒改', { col: C.green, below: true, size: 24 })
-  r.a2 = hl(r, a, [371, 373, 658, 122], '每輪紀錄：紅了什麼、根因、改了哪個檔', { col: C.gold, above: true, size: 26 })
-  r.b1 = hl(r, b, [371, 336, 658, 42], 'B1：打字時游標被搶走——測試沒抓到，分身抓到了', { col: C.coral, above: true, size: 24 })
-  r.b2 = hl(r, b, [943, 423, 85, 66], '規格外調整：PRD 沒寫的要標出來', { col: C.gold, above: true, right: true, size: 24 })
-  r.c1 = hl(r, c, [371, 228, 658, 29], '測試本身的問題：一條都沒改，列給你裁決', { col: C.violet, below: true, size: 26 })
-  r.d1 = hl(r, d, [361, 265, 640, 24], '要你拍板的，AI 用選擇題問你', { col: C.gold, above: true, size: 26 })
-  r.d2 = hl(r, d, [361, 294, 648, 60], '例：數量預設 0，要不要補進 PRD', { col: C.green, below: true, size: 26 })
-  r.you = tip('你只做三件事：看報告、做裁決、自己在瀏覽器點一遍', { y: 806, size: 30 })
-  r.prdfix = tip('實拍之後，課程已拍板：PRD 第 2 節補上「數量預設 0」', { y: 806, size: 28, col: C.teal })
-  r.rt = term({ y: 128, h: 560, size: 26, title: '報告的「每輪紀錄」（實拍文字）', shell: 'Claude Code' }); r.rt.hideCursor()
+sc3(25, () => {
+  const r = {}; hd(25, 'step4')
+  const [a, b] = vsh(r, ['cc25v4-fixed', 'cc25v4-tests'])
+  r.a1 = hl(r, a, 'focus', '打字搜尋會掉焦點、吃字', { col: C.coral, above: true, size: 26 })
+  r.a3 = hl(r, a, 'page', '第 2 頁點排序，沒回第 1 頁', { col: C.coral, below: true, size: 26 })
+  r.a2 = hl(r, a, 'fixed', 'AI 自己修好再跑，還是全綠', { col: C.green, below: true, size: 26 })
+  r.b1 = hl(r, b, 'list', '12 條測試問題：只列出來，一個都沒改', { col: C.violet, below: true, size: 26 })
+  r.exam = box(L, 120, 300, 1360, 260, '比喻：自己改自己的考卷\n分數一定偏高，所以另開一個更強的 AI 來挑錯', { size: 46, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
   return r
 }, [
-  ['報告一開頭就是結論：7 條全綠，連跑兩次都綠。分身挑到的 App 問題修了 5 個，測試的問題一條都沒改。', r => { show(r.S[0]); later(400, () => only(r, r.a1)) }],
-  ['每一輪紅了什麼、原因是什麼、改了哪個檔，都列成一張表。第 3 輪是分身挑完錯、AI 修好之後，又跑了兩次都綠。', r => { only(r); hide(r.S[0]); show(r.rt.g)
-    r.rt.out([[['第 1 輪｜紅了：E3、E4', TC.err, 800]], '  根因：E3 表單裡沒有「品項編碼」欄位，只有標題文字。E4 數量預設是空白，測試要 0', '  改了：[id].vue', '', [['第 2 輪｜紅了：無（7 passed）', TC.ok, 800]], '', [['第 3 輪（審查修完）｜紅了：無（7 passed，重跑一次也綠）', TC.ok, 800]], '  改了：index.vue、[id].vue、useEquipmentItems.ts、SRS、SDD'], { gap: 300 }) }],
-  ['分身挑到的 App 問題，AI 自己修好再跑。最嚴重的一個：在關鍵字框打字，停一下游標就被搶走，後面打的字全掉。這個 7 條測試都沒抓到。', r => { hide(r.rt.g); to(r, r.S[1]); only(r, r.b1) }],
-  ['PRD 沒寫、AI 自己加的改動，例如這次的數量預設 0，照 prompt 可以先改，但一定要標成「規格外調整」，最後交給你決定要不要留。', r => only(r, r.b2)],
-  ['測試本身的問題，AI 一條都沒改，全部列給你裁決。這就是鐵律：不准偷改答案卷。', r => { to(r, r.S[2]); only(r, r.c1) }],
-  ['需要你拍板的，AI 最後用選擇題問你。例如：數量預設 0，要不要補進 PRD。這一題課程已經拍板，現在的 PRD 已經補上了。', r => { to(r, r.S[3]); only(r, r.d1, r.d2); show(r.prdfix) }],
-  ['所以你只做三件事：看報告、做裁決、自己在瀏覽器點一遍。', r => { only(r); hide(r.prdfix); show(r.you); glow(r.you) }],
+  r => { show(r.S[0]); zoom(r.S[0], [120, 310, 920, 100], { pad: 30, max: 1.5 }); later(400, () => only(r, r.a1, r.a3)); later(5200, () => only(r, r.a2)) },
+  r => { unzoom(r.S[0]); to(r, r.S[1]); only(r, r.b1) },
+  r => { only(r); hide(r.S[1]); show(r.exam); glow(r.exam) },
 ])
 
-scene('驗收不用打指令：照表用眼睛核', () => {
-  const r = {}; mhead('step4 ⑥', '驗收不用打指令：照表用眼睛核')
-  r.bw = bwin(['br09-handbook-check', 'ea01-list'], 'HANDBOOK.html#step4'); r.B = r.bw.S
-  r.h1 = hl(r, r.B[0], 'table', '', { col: OR })
-  r.hcap = tip('手冊 step4「你應該看到」這張表', { y: 806, size: 30, col: OR })
-  r.h2 = hl(r, r.B[0], 'review', '對抗審查有做', { col: C.violet, size: 28, above: true })
-  r.h3 = hl(r, r.B[0], 'click', '畫面真的能用：自己點一遍', { col: OR, size: 28, above: true })
-  r.h4 = hl(r, r.B[0], 'green', '7 passed＝測試檔跟基準一致', { col: C.green, size: 28, above: true })
-  r.e1 = tip('列表、新增、編輯、刪除各點一次；報告寫的改動多看一眼', { y: 806, size: 28, col: C.teal })
+sc3(26, () => {
+  const r = {}; hd(26, 'step4 ・ 四樣產出')
+  const [a] = vsh(r, ['v4-loop-log'])
+  r.a1 = hl(r, a, 'tab', 'LOOP-LOG.md：每一輪做了什麼，給機器看的流水帳', { col: C.mut, below: true, size: 26 })
+  r.bw = bwin(['v4-loop-report-top', 'v4-loop-report-shots', 'v4-pw-report', 'v4-loop-report-decide'], 'my-equipment-app/loop/LOOP-REPORT.html'); r.B = r.bw.S
+  r.b1 = hl(r, r.B[0], 'sum', '一打開就是結論', { col: OR, size: 28, below: true })
+  r.b2 = hl(r, r.B[1], 'shot', '審查 AI 的截圖就在報告裡', { col: OR, size: 26, above: true })
+  r.c1 = hl(r, r.B[2], 'pass', 'Playwright 測試報告：7 條，每一條點得開', { col: C.green, size: 26, below: true })
+  r.d1 = hl(r, r.B[3], 'q1', '要你裁決的，列成選擇題', { col: OR, size: 26, below: true })
+  r.only = tip('看報告：結論、截圖、裁決題；看完再自己點一遍，綠燈不等於做對', { y: 806, size: 30, col: C.gold })
   return r
 }, [
-  ['最後驗收，不用打任何指令。照手冊這張表，用眼睛核。', r => { show(r.bw.g); show(r.B[0]); show(r.hcap); later(300, () => only(r, r.h1)) }],
-  ['對抗審查有做：報告要寫分身挑到什麼。App 的問題修了沒，測試的問題有沒有列給你。', r => { hide(r.hcap); only(r, r.h2) }],
-  ['畫面真的能用：打開 localhost:3100/equipment/crud，自己點一遍。', r => only(r, r.h3)],
-  ['列表、新增、編輯、刪除，各點一次。報告寫的那幾個改動，多看一眼。', r => { only(r); burl(r.bw, 'localhost:3100/equipment/crud', true); swap(r.B, r.B[1]); show(r.e1) }],
-  ['最後要有 7 passed。測試腳本開跑前，會先比對測試檔和基準，對不上就拒跑。所以 7 passed 代表測試檔跟基準一致。AI 如果連基準一起重算，還是騙得過，所以報告也要看。', r => { hide(r.e1); burl(r.bw, 'HANDBOOK.html#step4'); swap(r.B, r.B[0]); only(r, r.h4) }],
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { only(r); hide(r.S[0]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.b1)); later(4200, () => { swap(r.B, r.B[1]); only(r, r.b2) }) },
+  r => { burl(r.bw, 'step4_loop_e2e/e2e/playwright-report/index.html'); swap(r.B, r.B[2]); only(r, r.c1) },
+  r => { burl(r.bw, 'my-equipment-app/loop/LOOP-REPORT.html'); swap(r.B, r.B[3]); only(r, r.d1); later(2000, () => { show(r.only); glow(r.only) }) },
 ])
-// ── 場景檔第七部分：對抗審查、Step 5 總結 ──
-scene('備案：再請別家 AI 審一次', () => {
-  const r = {}; mhead('step4 ⑦', '想更放心：再請別家 AI 審一次')
-  r.p1 = card(70, 140, 700, 230, '子代理＝同一家 AI 的分身', ['一個指令就做完，很方便', '但想法可能跟自己很像'], C.gold, { size: 30, ts: 36 })
-  r.p2 = card(830, 140, 700, 230, '備案：找別家 AI（例如 Codex）', ['工具不能開子代理時', '或想要第二意見時'], C.teal, { size: 30, ts: 36 })
-  r.prompt = codeCard(70, 400, 1460, ['請盡力挑 step4_loop_e2e/e2e 這套 E2E 測試，和 step3_new_module/my-equipment-app 的毛病，不要誇獎。', '測試專找：假綠（斷言太鬆、選錯元素）、一改版就壞的 selector（例如靠 nth）、測試互相影響。', 'App 專找：測試沒抓到、但不符合 PRD-中心裝備物資.md 的問題。', '每條附理由，能重現就附步驟；只回報，不改檔；找不到也說明你怎麼確認的。'], { title: '手冊 step4 的備案 prompt：貼給別家 AI', size: 24, col: C.violet })
-  r.loop = box(L, 70, 730, 1460, 140, 'App 的問題 → 交回原本的 AI 修 → 再跑 E2E → 再審\n測試本身的問題 → 不叫 AI 改，停下來交給講師裁決', { size: 30, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+
+sc3(27, () => {
+  const r = {}; hd(27, 'step4 ・ 文件同步')
+  r.q = box(L, 120, 330, 1360, 200, '程式改了，文件有沒有跟著改？', { size: 56, fill: C.card, stroke: C.violet, color: C.ink, weight: 900 })
+  const [b, c] = vsh(r, ['v4-srs-after', 'v4-design-after'])
+  r.bw = bwin(['v4-loop-report-sync'], 'my-equipment-app/loop/LOOP-REPORT.html'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'h', '報告第 ⑦ 段：文件同步', { col: OR, size: 26, below: true })
+  r.b1 = hl(r, b, 'mark', 'SRS：標上「step4 LOOP 後」', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'mark', '設計文件也標上', { col: C.gold, below: true, size: 28 })
+  r.dish = box(L, 120, 330, 1360, 220, '菜改了，菜單跟著改\n下一個人接手，看文件就知道現在的程式長什麼樣子', { size: 40, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
   return r
 }, [
-  ['子代理是同一家 AI 的分身。一個指令就做完，很方便，但想法可能跟自己很像。', r => show(r.p1)],
-  ['想更放心，或你用的工具不能開子代理，就開別家的 AI，例如 Codex，貼手冊這段短 prompt。', r => { show([r.p2, r.prompt]) }],
-  ['它會挑兩邊：測試的假綠、一改版就壞的寫法、測試互相影響；還有測試沒抓到、不符合 PRD 的 App 問題。', r => glow(r.prompt)],
-  ['挑到的問題，一樣分兩種。App 的問題，交回原本的 AI 修，再跑、再審。測試本身的問題，不要叫 AI 改，交給講師裁決。', r => { show(r.loop); glow(r.loop) }],
+  r => { show(r.q); glow(r.q) },
+  r => { hide(r.q); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1)); later(3600, () => { hide(r.bw.g); only(r); show(r.S[0]); later(300, () => only(r, r.b1)) }); later(7000, () => { to(r, r.S[1]); only(r, r.c1) }) },
+  r => { only(r); hide(r.S); show(r.dish); glow(r.dish) },
 ])
 
-chapter('Step 5', '總結', C.green)
-
-scene('你的心力花在頭和尾', () => {
-  const r = {}; mhead('step5 ①', '你的心力，花在頭和尾')
-  const vF = fitF('hb-step5-value', { x: 70, y: 125, w: 1460, h: 600 })
-  r.v = scr('hb-step5-value', vF); r.S = [r.v]
-  r.steps = [['把四份規矩帶進你的專案', ['改成你們公司的', '色票、命名、禁止事項']], ['把最成熟的頁面整理成範本', ['分出「複製區」', '和「共用區」']], ['新需求照這套流程走', ['PRD → 選擇題', '→ 生成 → LOOP 驗證']]].map(([h, s], i) => card(70 + i * 495, 150, 465, 230, (i + 1) + '. ' + h, s, [C.teal, C.gold, C.coral][i], { size: 32, ts: 30, lh: 50 }))
-  r.s6 = tip('課後驗收題：step6_survey，一個人做一個課程回饋問卷，並發布上線', { y: 420, size: 30, col: C.green })
+sc3(28, () => {
+  const r = {}; hd(28, 'step4 ・ 下次怎麼做')
+  r.nodes = flowRow(200, [['你寫規格', C.teal], ['AI 選擇題\n釐清', C.gold], ['SRS・設計\n文件・圖', C.violet], ['你核過', C.gold], ['LOOP 實作\n另一個 AI 審查', C.coral], ['看報告\n拍板驗收', C.green]], { w: 225, gap: 20, h: 130 })
+  r.tea = box(L, 120, 400, 1360, 200, '你不用坐在電腦前面陪它\n去泡杯茶，回來看報告、拍板、驗收', { size: 44, fill: '#173a2a', stroke: C.green, color: C.green, weight: 900 })
+  r.p2 = card(70, 640, 1460, 200, '備案：找別家 AI（例如 Codex）再審一次', ['工具不能開子代理時，或想要第二意見時', '貼手冊 step4 的備案 prompt'], C.teal, { size: 28, ts: 34 })
   return r
 }, [
-  ['最後總結。你的心力，該花在兩端。', r => show(r.v)],
-  ['頭，是講清楚要什麼：三個決定由你拍板。尾，是驗收：燈亮不等於做對。', r => glow(r.v)],
-  ['中間的複製改名、寫欄位、修到全綠、互相挑錯，交給 AI。規矩和範本放好，AI 自己就有 know-how，不用你一步一步教。', r => glow(r.v)],
-  ['回公司三步：先把四份規矩帶進你的專案，改成你們公司的規則。', r => { hide(r.v); show(r.steps[0]) }],
-  ['再把最成熟的頁面整理成範本；之後的新需求，都照這套流程走。', r => { show(r.steps[1]); later(900, () => show(r.steps[2])) }],
-  ['課後驗收題在 step6_survey：一個人做一個課程回饋問卷，並發布上線。', r => show(r.s6)],
+  r => stagger(r.nodes.slice(0, 2), 400),
+  r => stagger(r.nodes.slice(2, 6), 350),
+  r => { show(r.tea); glow(r.tea) },
+  r => { show(r.p2); glow(r.p2) },
 ])
 
-scene('記住四句話', () => {
-  const r = {}; mhead('總結', '記住四句話')
-  const L4 = [['範本給骨架', '複製改名就有列表、表單、驗證、匯出', C.teal], ['harness 給規矩', '四份規矩跟著專案走，AI 每次照做', C.gold], ['AI 出勞力', '寫程式、修到全綠、互相挑錯，交給它', C.coral], ['最後由你驗收', '燈亮不等於做對', C.green]]
-  r.rows = L4.map(([a, b, col], i) => { const g = grp(L); const y = 150 + i * 175; R(g, 70, y, 1460, 150, { fill: C.card, stroke: col, sw: 5 })
+// ════════════════════════════ Step 5 ════════════════════════════
+chapter('Step 5', '回公司怎麼用', C.green)
+
+sc3(29, () => {
+  const r = {}; hd(29, 'step5')
+  r.v = scr('hb-step5-value', fitF('hb-step5-value', { x: 70, y: 125, w: 1460, h: 600 })); r.S = [r.v]
+  r.steps = [['把四份規矩帶進你的專案', ['改成你們公司的', '色票、命名、禁止事項']], ['把最成熟的頁面整理成範本', ['分出「複製區」', '和「共用區」']], ['新需求都走 SDD', ['規格 → 選擇題 → 文件', '→ LOOP → 報告']]].map(([h, s], i) => card(70 + i * 495, 150, 465, 230, (i + 1) + '. ' + h, s, [C.teal, C.gold, C.coral][i], { size: 30, ts: 30, lh: 48 }))
+  r.s6 = tip('課後驗收題：step6_survey，一個人做一個課程回饋問卷，並發布上線', { y: 440, size: 30, col: C.green })
+  return r
+}, [
+  r => { show(r.v); glow(r.v) },
+  r => { hide(r.v); show(r.steps[0]) },
+  r => { show([r.steps[1], r.steps[2]]) },
+  r => { show(r.s6); glow(r.s6) },
+])
+
+sc3(30, () => {
+  const r = {}; hd(30, '總結')
+  const L4 = [['範本給骨架，harness 給規矩', C.teal], ['SDD 先文件再程式，程式改了文件跟著改', C.violet], ['LOOP 讓 AI 自己驗，再請另一個 AI 挑錯', C.coral], ['最後由你拍板、由你驗收', C.green]]
+  r.rows = L4.map(([a, col], i) => { const g = grp(L); const y = 150 + i * 175; R(g, 70, y, 1460, 150, { fill: C.card, stroke: col, sw: 5 })
     mk('circle', { cx: 150, cy: y + 75, r: 46, fill: col }, g); T(g, 150, y + 92, String(i + 1), { size: 46, anchor: 'middle', weight: 900, fill: C.bg })
-    T(g, 230, y + 92, a, { size: 52, weight: 900 }); T(g, 760, y + 90, b, { size: 32, fill: C.mut }); return g })
+    T(g, 230, y + 92, a, { size: 46, weight: 900 }); return g })
   return r
 }, [
-  ['第一，範本給骨架。', r => show(r.rows[0])],
-  ['第二，harness 給規矩。', r => show(r.rows[1])],
-  ['第三，AI 出勞力。', r => show(r.rows[2])],
-  ['第四，最後一定由你驗收。燈亮，不等於做對。', r => { show(r.rows[3]); glow(r.rows[3]) }],
+  r => { show(r.rows[0]); glow(r.rows[0]) },
+  r => { show(r.rows[1]); glow(r.rows[1]) },
+  r => { show(r.rows[2]); glow(r.rows[2]) },
+  r => { show(r.rows[3]); glow(r.rows[3]) },
 ])
 
 /* ---------- 播放器 ---------- */
@@ -1347,12 +1155,16 @@ const chips=$('chips');
 /* 兩層章節：有 chapter() 時，上排是 Step，下排只列目前 Step 的段落 */
 const CH=(window.__chaps||[]);const stepsNav=$('steps');let chipShown=-2;
 if(CH.length){stepsNav.hidden=false;CH.forEach((c,ci)=>{const b=document.createElement('button');b.type='button';b.style.setProperty('--c',c.color);
-  b.innerHTML=`<b>${c.tag}</b><span>${c.title}</span>`;b.addEventListener('click',()=>{const i=scenes.findIndex(s=>s.chap===ci);if(i>=0){$('bStart').hidden=true;goto(i,0);}});stepsNav.appendChild(b);});}
+  b.innerHTML=`<b>${c.tag}</b><span>${c.title}</span>`;b.title=`${c.tag}　${c.title}`;b.setAttribute('aria-label',b.title);b.addEventListener('click',()=>{const i=scenes.findIndex(s=>s.chap===ci);if(i>=0){$('bStart').hidden=true;goto(i,0);}});stepsNav.appendChild(b);});}
 scenes.forEach((s,i)=>{const b=document.createElement('button');b.type='button';
   const k=CH.length?scenes.slice(0,i+1).filter(x=>x.chap===s.chap).length:0;b.textContent=CH.length?`${k}. ${s.title}`:(i+1)+'. '+s.title;b.dataset.chap=s.chap;
   b.addEventListener('click',()=>{goto(i,0);});chips.appendChild(b);});
 function syncNav(){if(!CH.length)return;const c=scenes[cur].chap;[...stepsNav.children].forEach((b,i)=>b.setAttribute('aria-current',i===c?'true':'false'));
-  if(chipShown!==c){[...chips.children].forEach(b=>{b.hidden=+b.dataset.chap!==c;});chipShown=c;}}
+  if(chipShown!==c){[...chips.children].forEach(b=>{b.hidden=+b.dataset.chap!==c;});chipShown=c;chips.scrollLeft=0;updateFade();}
+  try{centerIn(stepsNav,stepsNav.children[c]);}catch(e){}}
+/* 只捲「那一排自己」，不要用 scrollIntoView（會連整個頁面或外層網頁一起捲） */
+function centerIn(box,el){if(!box||!el||el.hidden||box.scrollWidth<=box.clientWidth+1)return;
+  const b=box.getBoundingClientRect(),r=el.getBoundingClientRect();box.scrollLeft=Math.max(0,box.scrollLeft+(r.left-b.left)-(b.width-r.width)/2);}
 $('bFull').addEventListener('click',()=>{const el=$('player');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});});
 function durOf(t){return Math.min(15000,Math.max(4200,t.length*250+1300))/speed;}
 /* ---------- 語音 ---------- */
@@ -1360,17 +1172,23 @@ const synth=('speechSynthesis' in window)?window.speechSynthesis:null;let voiceO
 const CIRC='①②③④⑤⑥⑦⑧⑨⑩';
 function spoken(t){(window.__spoken||[]).forEach(([re,s])=>{t=t.replace(re,s);});return t.replace(/[\u2460-\u2469]/g,c=>(CIRC.indexOf(c)+1)+' 號').replace(/!(\d+)/g,'$1 號').replace(/(\d+):(\d+)/g,'$1 比 $2').replace(/＝/g,'等於').replace(/・/g,' ').replace(/○○/g,'某某').replace(/～/g,'到').replace(/→/g,'到').replace(/＋/g,'加').replace(/／/g,'、').replace(/([A-Za-z0-9.\-]+)\/([A-Za-z0-9.\-]+)/g,'$1 $2').replace(/[「」（）]/g,' ');}
 let CLOUD=false,curAudio=null;const audioCache=new Map();
+/* 預錄配音：window.__audio = {'段-句': {src, sec, who}}；播完自動下一句，暫停會記住位置 */
+const REC=window.__audio||{};const HAS_REC=Object.keys(REC).length>0;let recResume=null;
+function isRec(){return HAS_REC&&$('voiceSel').value==='rec';}
+function recFor(i,k){return REC[(i+1)+'-'+(k+1)];}
+if(HAS_REC)voiceOn=true;
 const CLOUD_VOICES=[['zh-TW-HsiaoChenNeural','☁ 曉臻（女）'],['zh-TW-YunJheNeural','☁ 雲哲（男）'],['zh-TW-HsiaoYuNeural','☁ 曉雨（女）']];
 function addCloudOptions(sel){if(!CLOUD)return;CLOUD_VOICES.slice().reverse().forEach(([id,label])=>{if([...sel.options].some(o=>o.value==='cloud:'+id))return;const o=document.createElement('option');o.value='cloud:'+id;o.textContent=label;sel.insertBefore(o,sel.firstChild);});}
-function loadVoices(){if(!synth)return;const zh=synth.getVoices().filter(v=>/^(zh|cmn)/i.test(v.lang));
+function loadVoices(){if(!synth&&!HAS_REC)return;const zh=synth?synth.getVoices().filter(v=>/^(zh|cmn)/i.test(v.lang)):[];
   const sc=v=>(/TW/i.test(v.lang)?100:/HK/i.test(v.lang)?30:50)+(/Natural|Online/i.test(v.name)?20:0)+(/Google/i.test(v.name)?5:0);zh.sort((a,b)=>sc(b)-sc(a));voices=zh;
   const sel=$('voiceSel'),prev=sel.value;sel.innerHTML='';
-  if(!zh.length){sel.innerHTML='<option value="">預設中文</option>';}
+  if(!zh.length&&!HAS_REC){sel.innerHTML='<option value="">預設中文</option>';}
   zh.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name.replace(/^Microsoft\s+/,'').replace(/\s*Online \(Natural\)/,'').replace(/\s*-\s*Chinese.*$/,'')+'（'+v.lang+'）';sel.appendChild(o);});
   addCloudOptions(sel);
+  if(HAS_REC){const o=document.createElement('option');o.value='rec';o.textContent='🎙 預錄雙人配音（小芸／阿哲）';sel.insertBefore(o,sel.firstChild);}
   sel.value=[...sel.options].some(o=>o.value===prev)?prev:(sel.options[0]?sel.options[0].value:'');
-  const note=$('voiceNote');if(!zh.length){note.textContent='這個瀏覽器找不到中文語音，會用預設聲音念；念不出來時字幕照常播放。建議用 Edge 或 Chrome。';note.hidden=false;}else note.hidden=true;}
-if(synth){loadVoices();synth.onvoiceschanged=loadVoices;}else{$('voiceNote').textContent='這個瀏覽器不支援語音，字幕照常播放。';$('voiceNote').hidden=false;$('bVoice').disabled=true;voiceOn=false;$('bVoice').textContent='🔇 無語音';}
+  const note=$('voiceNote');if(!zh.length&&!HAS_REC){note.textContent='這個瀏覽器找不到中文語音，會用預設聲音念；念不出來時字幕照常播放。建議用 Edge 或 Chrome。';note.hidden=false;}else note.hidden=true;}
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices;}else if(HAS_REC){loadVoices();const sel=$('voiceSel');sel.innerHTML='<option value="rec">🎙 預錄雙人配音（小芸／阿哲）</option>';}else{$('voiceNote').textContent='這個瀏覽器不支援語音，字幕照常播放。';$('voiceNote').hidden=false;$('bVoice').disabled=true;voiceOn=false;$('bVoice').textContent='🔇 無語音';}
 function isCloud(){return CLOUD&&$('voiceSel').value.startsWith('cloud:');}
 function stopAudio(){if(curAudio){curAudio.onended=null;curAudio.onerror=null;curAudio.pause();curAudio=null;}}
 function ttsFetch(text,voice){const k=voice+'|'+text;if(audioCache.has(k))return audioCache.get(k);
@@ -1384,34 +1202,43 @@ function cloudSpeak(text,tok){const voice=$('voiceSel').value.slice(6);
   ttsFetch(text,voice).then(src=>{if(tok!==stepToken||!playing)return;stopAudio();curAudio=new Audio(src);curAudio.playbackRate=speed;
     curAudio.onended=()=>next(500/speed);curAudio.onerror=fail;curAudio.play().catch(fail);}).catch(fail);
   const nx=nextText();if(nx)ttsFetch(nx,voice).catch(()=>{});}
-function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth)return;synth.cancel();const u=new SpeechSynthesisUtterance(spoken(text));u.lang='zh-TW';const v=voices.find(x=>x.name===$('voiceSel').value);if(v){u.voice=v;u.lang=v.lang;}u.rate=speed;
+function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth){timer=setTimeout(()=>{if(tok===stepToken)advance();},durOf(text));return;}synth.cancel();const u=new SpeechSynthesisUtterance(spoken(text));u.lang='zh-TW';const v=voices.find(x=>x.name===$('voiceSel').value);if(v){u.voice=v;u.lang=v.lang;}u.rate=speed;
   const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
   u.onend=()=>next(700/speed);
   u.onerror=e=>{if(e.error==='interrupted'||e.error==='canceled')return;next(Math.max(300,stepDur-(performance.now()-stepStart)));};
   setTimeout(()=>{if(tok===stepToken&&playing)synth.speak(u);},60);}
-function startClock(){clearTimeout(timer);const tok=++stepToken;
-  if(voiceOn&&(synth||isCloud())){speak(scenes[cur].steps[stepI][0],tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},stepDur*2.5+5000);}
+function playRec(r,tok){stopAudio();const a=new Audio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  const fail=()=>{if(tok!==stepToken)return;stopAudio();speak(scenes[cur].steps[stepI][0],tok);};
+  if(recResume&&recResume.k===r.src){a.currentTime=recResume.t;}recResume=null;
+  a.onended=()=>next(600/speed);a.onerror=fail;a.play().catch(fail);}
+function startClock(){clearTimeout(timer);const tok=++stepToken;const r=voiceOn&&isRec()&&recFor(cur,stepI);
+  if(r){playRec(r,tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},(r.sec*1000)/speed+8000);}
+  else if(voiceOn&&(synth||isCloud())){speak(scenes[cur].steps[stepI][0],tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},stepDur*2.5+5000);}
   else timer=setTimeout(()=>{if(tok===stepToken)advance();},Math.max(300,remain));}
 function stopVoice(){stepToken++;if(synth)synth.cancel();stopAudio();}
-function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textContent=ch?`${ch.tag}　${ch.title}　›　${s.title}`:`第 ${cur+1} 段　${s.title}`;$('subtext').textContent=s.steps[stepI][0];syncNav();
+function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textContent=ch?`${ch.tag}　${ch.title}　›　${s.title}`:`第 ${cur+1} 段　${s.title}`;$('subtext').textContent=s.steps[stepI][0];const wb=$('who');if(s.who){wb.hidden=false;wb.textContent=s.who;wb.className='who '+(s.who==='小芸'?'x':'z');}else wb.hidden=true;syncNav();
   $('pos').textContent=`${cur+1}／${scenes.length} 段　·　${stepI+1}／${s.steps.length} 句`;
   [...chips.children].forEach((b,i)=>b.setAttribute('aria-current',i===cur?'true':'false'));
-  const act=chips.children[cur];if(act&&act.scrollIntoView)try{act.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}
+  try{centerIn(chips,chips.children[cur]);}catch(e){}
+  fitSubText();
   try{history.replaceState(null,'','#s'+(cur+1)+'-'+(stepI+1));}catch(e){}
   try{if(window.parent!==window)window.parent.postMessage({type:'anim:state',anim:ANIM_ID,scene:cur+1,step:stepI+1,title:s.title,text:s.steps[stepI][0],total:scenes.length},'*');}catch(e){}
   const w=$('askWhere');if(w)w.textContent=`正在看：第 ${cur+1} 段　${s.title}`;}
 let gotoTok=0;
-function goto(i,s){clearTimeout(timer);stopVoice();timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
+function goto(i,s){clearTimeout(timer);stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
   instant=true;svg.classList.add('instant');layer.innerHTML='';L=layer;refs=scenes[i].build()||{};
   for(let k=0;k<s;k++)scenes[i].steps[k][1](refs);
   svg.getBoundingClientRect();
   requestAnimationFrame(()=>{if(gt!==gotoTok)return;svg.classList.remove('instant');instant=false;runStep(s);});}
-function runStep(s){stepI=s;const st=scenes[cur].steps[s];st[1](refs);setSub();stepDur=durOf(st[0]);remain=stepDur;stepStart=performance.now();if(playing)startClock();}
+function durNow(t){const r=voiceOn&&isRec()&&recFor(cur,stepI);return r?(r.sec*1000+600)/speed:durOf(t);}
+function runStep(s){stepI=s;recResume=null;const st=scenes[cur].steps[s];st[1](refs);setSub();stepDur=durNow(st[0]);remain=stepDur;stepStart=performance.now();if(playing)startClock();}
 function advance(){clearTimeout(timer);if(stepI+1<scenes[cur].steps.length)runStep(stepI+1);else if(cur+1<scenes.length)goto(cur+1,0);else{ended=true;setPlaying(false);$('bPlay').textContent='↺ 重播';}}
 function back(){if(stepI>0)goto(cur,stepI-1);else if(cur>0)goto(cur-1,scenes[cur-1].steps.length-1);}
 function setPlaying(p){clearTimeout(timer);if(p){$('bStart').hidden=true;}
-  if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
-  else if(!p&&playing){playing=false;stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
+  if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&isRec()&&recFor(cur,stepI)){const done=recResume?recResume.t*1000/speed:0;remain=stepDur-done;}else if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
+  else if(!p&&playing){playing=false;if(curAudio&&curAudio._rec)recResume={k:curAudio._rec,t:curAudio.currentTime};stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
+window.__dbg=()=>({cur,stepI,playing,curAudio});
 $('bPlay').addEventListener('click',()=>{if(ended){playing=true;$('bPlay').textContent='⏸ 暫停';goto(0,0);return;}setPlaying(!playing);});
 $('bStart').addEventListener('click',()=>{setPlaying(true);});
 ['chips','bNext','bPrev','bNextScene','bPrevScene'].forEach(id=>$(id).addEventListener('click',()=>{$('bStart').hidden=true;}));
@@ -1420,9 +1247,9 @@ $('bNext').addEventListener('click',fwd);
 $('bPrev').addEventListener('click',back);
 $('bNextScene').addEventListener('click',()=>{if(cur+1<scenes.length)goto(cur+1,0);});
 $('bPrevScene').addEventListener('click',()=>{goto(stepI>0?cur:Math.max(0,cur-1),0);});
-function restartSentence(){if(!playing)return;stepDur=durOf(scenes[cur].steps[stepI][0]);remain=stepDur;stepStart=performance.now();startClock();}
-$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;if(curAudio)curAudio.playbackRate=speed;restartSentence();});
-$('voiceSel').addEventListener('change',()=>{if(voiceOn)restartSentence();});
+function restartSentence(){if(!playing)return;recResume=null;stepDur=durNow(scenes[cur].steps[stepI][0]);remain=stepDur;stepStart=performance.now();startClock();}
+$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;goto(cur,stepI);});  // 暫停中也重設這一句，剩餘時間才會照新速度算
+$('voiceSel').addEventListener('change',()=>{stopVoice();recResume=null;if(playing)restartSentence();});  // 靜音時也要重排換句計時器，不然會卡住
 $('bVoice').addEventListener('click',()=>{voiceOn=!voiceOn;$('bVoice').textContent=voiceOn?'🔊 語音：開':'🔇 語音：關';$('bVoice').classList.toggle('off',!voiceOn);stopVoice();restartSentence();});
 document.addEventListener('keydown',e=>{if(e.target&&/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
   if(e.key===' '){e.preventDefault();$('bPlay').click();}else if(e.key==='ArrowRight'){fwd();}else if(e.key==='ArrowLeft'){back();}else if(e.key==='f'||e.key==='F'){$('bFull').click();}});
@@ -1456,9 +1283,58 @@ $('askClose').addEventListener('click',()=>openAsk(false));
 $('askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('askInput').value.trim();if(!q)return;$('askInput').value='';ask(q);});
 const TIPS=(window.__askTips||[]);TIPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>ask(t));$('askTips').appendChild(b);});
 fetch('/api/config',{headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(j=>{if(!j)throw 0;
-  CLOUD=true;const sel=$('voiceSel');addCloudOptions(sel);sel.value=sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
+  CLOUD=true;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
   if(j.live&&!EMBED){const b=$('bAsk');b.hidden=false;b.addEventListener('click',()=>openAsk(!$('askDrawer').classList.contains('open')));}
 }).catch(()=>{if(ASK_URL&&!EMBED){const b=$('bAsk');const a=document.createElement('a');a.className='askbtn';a.href=ASK_URL;a.target='_blank';a.rel='noopener';a.textContent='💬 問小港（另開網頁）';a.style.textDecoration='none';b.replaceWith(a);}});
+/* ---------- 版面：把整個播放器（標題＋導覽＋舞台＋字幕＋控制列）塞進第一屏 ----------
+   做法：舞台寬度 = min(容器寬, 可用高度 × 16/9)。「可用高度」不是猜的，而是設一個寬度、量實際排出來的高度、
+   再修正寬度，重複幾次直到剛好貼齊可視區底部。視窗大小、全螢幕、字體載入、導覽列換行都會重算。
+   字幕：字級跟著舞台寬度（舞台寬 / 36，桌面 22～32px；全螢幕上限 40px；手機與嵌入模式最小 18px），框的高度固定為 --sub-n 行。
+   一行塞不下的長句，只有那一句會暫時縮字（最小 18px）。 */
+const RT=document.documentElement,SUB_FLOOR=18,SUB_LH=1.45,SUB_PAD=16;
+let fitting=false,fitQ=0,lastW=0,subBase=24,nBoost=0,mEl=null,mTxt=null;const mCache=new Map();
+const TEXTS=scenes.flatMap(sc=>sc.steps.map(x=>x[0]));
+/* 隱形的量尺：跟字幕框同樣的樣式，用來算「這個寬度、這個字級，最長的句子要幾行」 */
+function measurer(){if(mEl)return mEl;mEl=document.createElement('div');mEl.className='subline';mEl.setAttribute('aria-hidden','true');
+  mEl.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;height:auto;overflow:visible;width:100px';
+  mEl.innerHTML='<span class="who x">小芸</span><span></span>';mTxt=mEl.lastChild;$('subline').parentNode.appendChild(mEl);return mEl;}
+function maxLines(w,fs){const k=w+'|'+fs;if(mCache.has(k))return mCache.get(k);const m=measurer();m.style.width=w+'px';m.style.fontSize=fs+'px';
+  let n=1;for(const t of TEXTS){mTxt.textContent=t;n=Math.max(n,Math.round((m.offsetHeight-SUB_PAD)/(fs*SUB_LH)));}
+  if(mCache.size>300)mCache.clear();mCache.set(k,n);return n;}
+function fit(){
+  if(fitting)return;fitting=true;
+  try{
+    const pl=$('player'),sb=pl.querySelector('.stagebox'),sub=pl.querySelector('.sub');if(!pl||!sb||!sub)return;
+    const full=document.fullscreenElement===pl,embed=RT.classList.contains('embed'),cs=getComputedStyle(pl);
+    const pT=full?parseFloat(cs.paddingTop)||0:0,pB=full?parseFloat(cs.paddingBottom)||0:0,pX=full?(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0):0;
+    const maxW=Math.max(200,Math.floor(pl.clientWidth-pX)),minW=Math.min(maxW,400);   /* 矮到放不下時（例如手機橫放）寧可讓頁面捲動，也不要把舞台縮到看不清楚 */
+    const vh=full?pl.clientHeight:window.innerHeight,tail=full?pB:6;
+    const K=embed?44:36,fMin=(maxW<=640||embed)?18:22,fMax=full?40:(embed?26:32);
+    const apply=w=>{const fs=Math.round(Math.min(fMax,Math.max(fMin,w/K)));
+      RT.style.setProperty('--stage-w',w+'px');RT.style.setProperty('--sub-fs',fs+'px');
+      RT.style.setProperty('--sub-n',Math.max(2,maxLines(w,SUB_FLOOR))+nBoost);subBase=fs;};
+    const over=()=>{const a=sb.getBoundingClientRect(),b=sub.getBoundingClientRect();
+      return (full?pT:a.top+window.scrollY)+(a.bottom-a.top)+(b.bottom-a.bottom)+tail-vh;};
+    let w=Math.min(maxW,Math.max(minW,lastW||maxW)),o;
+    for(let i=0;i<8;i++){apply(w);o=over();const t=Math.min(maxW,Math.max(minW,w-o*16/9));if(Math.abs(t-w)<1.5)break;w=Math.round(t);}
+    for(let k=0;k<6&&o>0.5&&w>minW;k++){w=Math.max(minW,Math.floor(w-o*16/9)-1);apply(w);o=over();}   /* 保證不超出：寧可小一點點 */
+    lastW=w;fitSubText();updateFade();
+  }finally{fitting=false;}}
+/* 這一句字幕塞進固定高度的框；塞不下就一次縮 1px，最多縮到 18px */
+function fitSubText(){const sl=$('subline');if(!sl)return;let f=subBase;sl.style.setProperty('--sub-cur',f+'px');
+  for(let g=0;g<40&&sl.scrollHeight>sl.clientHeight+1&&f>SUB_FLOOR;g++){f-=1;sl.style.setProperty('--sub-cur',f+'px');}
+  if(sl.scrollHeight>sl.clientHeight+1&&nBoost<3){nBoost++;scheduleFit();}}   /* 量尺跟實際有落差時，多留一行 */
+function scheduleFit(){if(fitQ)return;fitQ=requestAnimationFrame(()=>{fitQ=0;fit();});}
+/* 章節膠囊太多放不下時：兩端淡出提示還有，滑鼠滾輪可以橫向滾 */
+function updateFade(){const o=chips.scrollWidth>chips.clientWidth+1;chips.style.setProperty('--fl',o&&chips.scrollLeft>2?'22px':'0px');
+  chips.style.setProperty('--fr',o&&chips.scrollLeft+chips.clientWidth<chips.scrollWidth-2?'22px':'0px');}
+chips.addEventListener('scroll',updateFade,{passive:true});
+chips.addEventListener('wheel',e=>{if(chips.scrollWidth<=chips.clientWidth+1||Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;e.preventDefault();chips.scrollLeft+=e.deltaY;},{passive:false});
+window.addEventListener('resize',()=>{nBoost=0;scheduleFit();});
+document.addEventListener('fullscreenchange',()=>{nBoost=0;lastW=0;scheduleFit();setTimeout(scheduleFit,150);});
+if(window.ResizeObserver){const ro=new ResizeObserver(scheduleFit);[document.querySelector('header.top'),$('steps'),$('chips'),document.querySelector('.sub')].forEach(e=>e&&ro.observe(e));}
+if(document.fonts){const refit=()=>{mCache.clear();scheduleFit();};if(document.fonts.ready)document.fonts.ready.then(refit);if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',refit);}
+fit();
 playing=false;{const h0=parseHash();goto(h0?h0[0]:0,h0?h0[1]:0);}
 })();
 </script>

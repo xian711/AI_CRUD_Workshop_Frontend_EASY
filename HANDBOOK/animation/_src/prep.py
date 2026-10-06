@@ -17,9 +17,10 @@ SKIP = ('_', 'x', 'cc11-build-t')
 # 個資處理：{檔名: [('crop', 左, 上, 右, 下) | ('fill', x0, y0, x1, y1, 顏色)]}（原始像素）
 FIX = {
     'vs08-open-folder-dialog': [('fill', 14, 205, 300, 412, (255, 255, 255)), ('crop', 14, 0, None, None)],
-    # 第二版實拍：AI 的選項裡出現 git 帳號名稱，蓋掉改寫成「帳號」
-    'cc09b-start-question': [('retext', 774, 752, 846, 781, '帳號', (25, 26, 27), (140, 140, 140), 'msjh.ttc', 22)],
-    'cc09d-go-selected': [('retext', 774, 752, 846, 781, '帳號', (25, 26, 27), (140, 140, 140), 'msjh.ttc', 22)],
+    # 第四版（2026-10-07）重拍後，cc09b-start-question／cc09d-go-selected／v3-srs-open 的舊遮罩已不適用，拿掉；
+    # 新畫面的 git 帳號在拍攝時就用 DOM 文字取代遮掉（mk-c8.py 的 MASK），拍完用 ocr-find.ps1 再掃一次
+    # LOOP 對話裡 Bash 輸出印了本機暫存路徑（含 Windows 帳號），整行蓋掉
+    'cc21v4-port': [('fill', 1105, 591, 1845, 618, (36, 37, 38))],
 }
 used = []
 for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):

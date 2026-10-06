@@ -46,18 +46,23 @@
     color: var(--accent);
   }
   section p.desc {
-    font-size: 21px;
+    font-size: 22px;
     color: var(--sub);
     margin: 0 0 20px;
   }
+  /* 圖照原尺寸畫（字才夠大），比畫面寬就左右捲動，不縮小 */
   .mermaid {
     width: 100%;
     overflow-x: auto;
     background: #fff;
-    display: flex;
-    justify-content: center;
+    text-align: center;
   }
-  .mermaid svg { max-width: none !important; }
+  .mermaid svg { max-width: none !important; height: auto; }
+  /* mermaid 把循序圖的編號圓點（12px）和類別圖的 1／*（11px）寫死成小字；這裡放大到跟其他字一樣 22px */
+  .mermaid .sequenceNumber { font-size: 22px; transform: translateY(4px); }
+  .mermaid marker#sequencenumber circle { r: 11px; }
+  .mermaid foreignObject { overflow: visible; }
+  .mermaid .edgeTerminals .edgeLabel { font-size: 22px; }
   footer {
     padding: 28px 6vw 60px;
     font-size: 18px;
@@ -70,7 +75,7 @@
 
 <header>
   <h1>UML 圖面 — CRUD 標準範本</h1>
-  <p>對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、SDD-CRUD標準範本-v1.1.md（設計）｜ 展示路徑：/template/crud</p>
+  <p>對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、DESIGN-CRUD標準範本-v1.1.md（設計文件）｜ 展示路徑：/template/crud</p>
 </header>
 
 <nav>
@@ -113,7 +118,7 @@ flowchart LR
   <h2>② 檔案架構圖（8 個新檔 + 共用資產）</h2>
   <p class="desc">頁面薄、邏輯下沉：狀態工廠與純函式可被任何新模組複製重用；共用元件直接取用既有資產（藍色）。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'20px'},'flowchart':{'nodeSpacing':40,'rankSpacing':60}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':40,'rankSpacing':60}}}%%
 flowchart TB
   subgraph PAGES["pages/template/crud/"]
     LIST["index.vue<br/>列表頁：篩選・排序・分頁・匯出・刪除"]
@@ -160,7 +165,7 @@ flowchart TB
   <h2>③ 類別圖（資料模型與模組介面）</h2>
   <p class="desc">TemplateMember 17 欄涵蓋教學代表型態；CRUD API 全非同步（Promise），未來換後端不動呼叫端。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
 classDiagram
   class TemplateMember {
     +string id  「M-001」
@@ -225,7 +230,7 @@ classDiagram
   <h2>④ 頁面模式狀態圖（/template/crud/[id]）</h2>
   <p class="desc">一條路由三種模式：以 id==='new' 與 ?mode=edit 判定（FR-T-301），return query 全程攜帶以還原列表狀態（FR-T-602）。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'21px'}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
 stateDiagram-v2
   direction LR
   [*] --> 列表頁
@@ -246,7 +251,7 @@ stateDiagram-v2
   <h2>⑤ 循序圖：查詢與 URL 狀態同步（FR-T-101~105・601）</h2>
   <p class="desc">篩選變更即時過濾並重設頁碼；URL 僅寫入非預設值（debounce 300ms），卸載時清理排程防止跨頁污染（審查發現的必修項）。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':240}}}%%
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
@@ -276,7 +281,7 @@ sequenceDiagram
   <h2>⑥ 循序圖：新增／編輯儲存（FR-T-301~305・BR-T-01~03）</h2>
   <p class="desc">驗證是純函式：規則資料化、與 UI 分離；錯誤顯示於欄位下方紅字並聚焦第一個錯誤欄位，不是只有 toast。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':250}}}%%
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
@@ -311,7 +316,7 @@ sequenceDiagram
   <h2>⑦ 循序圖：刪除（UC-T-05・FR-T-401~402・BR-T-04）</h2>
   <p class="desc">刪除必經二次確認且文案含姓名；當頁因刪除變空時自動退回前一頁。</p>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'19px'},'sequence':{'actorFontSize':20,'messageFontSize':18,'noteFontSize':18,'width':250}}}%%
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
@@ -338,11 +343,16 @@ sequenceDiagram
 </section>
 
 <footer>
-  <p>圖面基準：SDD-CRUD標準範本-v1.1（含實作階段勘誤）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；投影教學建議瀏覽器縮放 125%。</p>
+  <p>圖面基準：DESIGN-CRUD標準範本-v1.1（含實作階段勘誤）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
 </footer>
 
 <script>
-  mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+  mermaid.initialize({
+    startOnLoad: true, theme: 'neutral', securityLevel: 'loose',
+    // 不縮小到畫面寬：照原尺寸畫，字級才是真的 22px
+    flowchart: { useMaxWidth: false }, sequence: { useMaxWidth: false }, class: { useMaxWidth: false },
+    state: { useMaxWidth: false },
+  });
 </script>
 </body>
 </html>

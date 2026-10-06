@@ -88,8 +88,7 @@ if [ "$port_checked" -eq 0 ]; then
     # 沒有可用的檢查工具時不阻擋開課（與 Windows 版同樣記為警告）
     add_result "port 3100 未被占用" 1 "找不到 lsof／ss／netstat 可檢查（略過，開課時請自行確認 port 3100 空閒）" "" 1
 elif [ "$port_busy" -eq 1 ]; then
-    add_result "port 3100 未被占用" 0 "port 3100 已被占用" \
-        "請關閉占用 3100 的程式：執行「lsof -nP -iTCP:3100 -sTCP:LISTEN」找出 PID，再「kill <PID>」" 0
+    add_result "port 3100 未被占用" 1 "port 3100 已被占用（不用關別人的程式：pnpm dev 會自動換一個埠印在終端機；step4 的 AI 也會自己換埠）" "" 1
 else
     add_result "port 3100 未被占用" 1 "port 3100 目前空閒（範本專案 sample-app 會用這個埠）" "" 0
 fi

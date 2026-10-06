@@ -17,7 +17,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [['list']],
+  // list：印在終端機，run-e2e 靠它數 passed，不能拿掉。
+  // html：測試報告寫到 e2e/playwright-report/index.html，用瀏覽器開；open: 'never' 不自動跳視窗。
+  reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   use: {
     baseURL: BASE_URL,
     trace: 'off',

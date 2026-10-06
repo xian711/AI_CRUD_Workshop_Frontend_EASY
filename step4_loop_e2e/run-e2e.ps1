@@ -14,6 +14,7 @@
          （且是本課範本 App，非別的程式佔埠）。
       2. e2e 資料夾裝相依（node_modules 與 playwright 皆就緒才跳過 npm ci）＋確保 chromium 已裝。
       3. 跑 Playwright 7 條測試，解析輸出印 PASS/FAIL 總結，exit code 對應。
+         測試報告在 e2e/playwright-report/index.html（每跑一次自動重寫，用瀏覽器開）。
 
     在 step4_loop_e2e 目錄執行：
       powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
@@ -79,7 +80,7 @@ try {
     } else {
         $seen = @{}
         $lineNo = 0
-        foreach ($line in (Get-Content -LiteralPath $HashManifest)) {
+        foreach ($line in (Get-Content -LiteralPath $HashManifest -Encoding UTF8)) {
             $lineNo++
             $trimmed = $line.Trim()
             if ($trimmed -eq '' -or $trimmed.StartsWith('#')) { continue }

@@ -179,11 +179,6 @@
    ]
   }
  },
- "cc11-progress": {
-  "w": 1068,
-  "h": 601,
-  "boxes": {}
- },
  "vs32-select-string": {
   "w": 1068,
   "h": 601,
@@ -268,52 +263,10 @@
    ]
   }
  },
- "cc09a-tasklist": {
-  "w": 1068,
-  "h": 601,
-  "boxes": {
-   "title": [
-    371,
-    197,
-    240,
-    22
-   ],
-   "docs": [
-    383,
-    272,
-    645,
-    75
-   ]
-  }
- },
- "cc09c-editcode": {
-  "w": 1068,
-  "h": 601,
-  "boxes": {
-   "q": [
-    361,
-    267,
-    228,
-    39
-   ],
-   "rec": [
-    361,
-    314,
-    237,
-    95
-   ],
-   "preview": [
-    633,
-    266,
-    390,
-    201
-   ]
-  }
- },
  "ea01-list": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud",
+  "url": "http://localhost:3101/equipment/crud",
   "boxes": {
    "title": [
     76,
@@ -337,18 +290,18 @@
     273,
     379,
     918,
-    1554
+    1386
    ],
    "status": [
-    887,
-    441,
-    44,
-    24
+    888,
+    437,
+    50,
+    25
    ],
    "code": [
-    443,
-    456,
-    99,
+    454,
+    452,
+    93,
     20
    ],
    "exp": [
@@ -362,21 +315,26 @@
  "ea02-new-empty": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud/new",
+  "url": "http://localhost:3101/equipment/crud/new",
   "boxes": {
    "cat": [
     273,
-    287,
+    219,
     295,
     78
    ],
    "name": [
     584,
-    287,
+    219,
     295,
     78
    ],
-   "code": null,
+   "code": [
+    896,
+    219,
+    295,
+    78
+   ],
    "save": [
     1132,
     73,
@@ -388,17 +346,17 @@
  "ea03-cat-open": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud/new",
+  "url": "http://localhost:3101/equipment/crud/new",
   "boxes": {
    "cat": [
     273,
-    287,
+    219,
     295,
     78
    ],
    "list": [
     274,
-    373,
+    305,
     295,
     386
    ]
@@ -407,23 +365,23 @@
  "ea04-item-open": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud/new",
+  "url": "http://localhost:3101/equipment/crud/new",
   "boxes": {
    "cat": [
     273,
-    287,
+    219,
     295,
     78
    ],
    "name": [
     584,
-    287,
+    219,
     295,
     78
    ],
    "list": [
     585,
-    373,
+    305,
     295,
     192
    ]
@@ -432,21 +390,26 @@
  "ea05-code": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud/new",
+  "url": "http://localhost:3101/equipment/crud/new",
   "boxes": {
    "cat": [
     273,
-    287,
+    219,
     295,
     78
    ],
    "name": [
     584,
-    287,
+    219,
     295,
     78
    ],
-   "code": null,
+   "code": [
+    896,
+    219,
+    295,
+    78
+   ],
    "title": [
     76,
     19,
@@ -458,29 +421,29 @@
  "ea06-validation": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud/new",
+  "url": "http://localhost:3101/equipment/crud/new",
   "boxes": {
    "cat": [
     273,
-    287,
+    219,
     295,
     101
    ],
    "qty": [
     273,
-    404,
+    336,
     295,
     101
    ],
    "unit": [
     584,
-    404,
+    336,
     295,
     101
    ],
    "spec": [
     273,
-    578,
+    510,
     918,
     145
    ],
@@ -501,7 +464,7 @@
  "ea07-delete": {
   "w": 1240,
   "h": 644,
-  "url": "http://localhost:3100/equipment/crud",
+  "url": "http://localhost:3101/equipment/crud",
   "boxes": {
    "dialog": [
     380,
@@ -532,72 +495,738 @@
  "ea08-mobile": {
   "w": 390,
   "h": 780,
-  "url": "http://localhost:3100/equipment/crud",
+  "url": "http://localhost:3101/equipment/crud",
   "boxes": {}
  },
- "cc19-root-explorer": {
+ "v3-srs-open": {
   "w": 1068,
   "h": 601,
   "boxes": {
-   "tree": [
-    49,
-    91,
-    261,
-    417
+   "file": [
+    53,
+    441,
+    257,
+    22
    ],
-   "status": [
-    934,
-    573,
-    98,
-    24
+   "title": [
+    372,
+    83,
+    446,
+    37
+   ],
+   "sec1": [
+    372,
+    267,
+    260,
+    28
    ]
   }
  },
- "cc01-empty": {
+ "v3-srs-decisions": {
   "w": 1068,
   "h": 601,
   "boxes": {
-   "tab": [
-    320,
-    31,
-    134,
-    32
+   "h": [
+    105,
+    76,
+    892,
+    28
    ],
-   "status": [
-    934,
-    573,
-    98,
-    24
+   "table": [
+    105,
+    120,
+    892,
+    278
    ],
-   "input": [
-    353,
-    476,
-    679,
-    40
+   "note": [
+    105,
+    407,
+    892,
+    17
    ],
-   "model": [
-    420,
-    525,
-    112,
+   "who": [
+    950,
+    120,
+    47,
+    45
+   ]
+  }
+ },
+ "v3-srs-trace": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h2": [
+    105,
+    -28,
+    892,
+    28
+   ],
+   "h": [
+    105,
+    76,
+    892,
+    19
+   ],
+   "table": [
+    105,
+    110,
+    892,
+    484
+   ],
+   "where": [
+    309,
+    110,
+    364,
+    45
+   ]
+  }
+ },
+ "v3-srs-accept": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    76,
+    892,
+    19
+   ],
+   "note": [
+    105,
+    111,
+    892,
+    35
+   ],
+   "table": [
+    105,
+    161,
+    892,
+    407
+   ]
+  }
+ },
+ "v3-srs-scope": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    76,
+    892,
+    28
+   ],
+   "table": [
+    105,
+    378,
+    892,
+    185
+   ]
+  }
+ },
+ "v3-srs-risk": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    75,
+    892,
+    28
+   ],
+   "qty": [
+    180,
+    292,
+    785,
+    20
+   ],
+   "date": [
+    180,
+    310,
+    600,
+    20
+   ]
+  }
+ },
+ "v3-sdd-files": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    76,
+    892,
+    28
+   ],
+   "table": [
+    105,
+    120,
+    892,
+    355
+   ],
+   "shared": [
+    105,
+    340,
+    892,
+    45
+   ],
+   "used": [
+    669,
+    120,
+    327,
+    28
+   ]
+  }
+ },
+ "v3-sdd-code": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    76,
+    892,
+    19
+   ],
+   "h2": [
+    105,
+    -1076,
+    892,
+    28
+   ]
+  }
+ },
+ "v3-sdd-evidence": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "h": [
+    105,
+    76,
+    892,
+    28
+   ],
+   "table": [
+    105,
+    154,
+    892,
+    554
+   ],
+   "hex": [
+    105,
+    181,
+    892,
+    28
+   ],
+   "log": [
+    105,
+    209,
+    892,
+    28
+   ],
+   "shared": [
+    105,
+    492,
+    892,
+    63
+   ],
+   "lines": [
+    105,
+    328,
+    892,
+    45
+   ]
+  }
+ },
+ "v3-sdd-loopnote": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "lines": [
+    105,
+    223,
+    892,
+    45
+   ],
+   "shared": [
+    105,
+    387,
+    892,
+    63
+   ]
+  }
+ },
+ "v3-loop-docedit": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "diff1": [
+    104,
+    228,
+    925,
+    53
+   ],
+   "head2": [
+    100,
+    309,
+    560,
     18
    ],
-   "mode": [
-    939,
-    521,
-    58,
-    26
+   "diff2": [
+    104,
+    354,
+    925,
+    53
+   ]
+  }
+ },
+ "v3-loop-srsedit": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "head": [
+    100,
+    196,
+    560,
+    16
    ],
-   "send": [
-    1001,
-    521,
-    26,
-    26
+   "added": [
+    576,
+    272,
+    452,
+    64
    ],
-   "titleIcon": [
-    960,
-    36,
+   "sddhead": [
+    100,
+    386,
+    560,
+    16
+   ]
+  }
+ },
+ "v4-diag-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h1": [
+    74,
+    10,
+    1091,
+    75
+   ],
+   "nav": [
+    0,
+    195,
+    1240,
+    98
+   ]
+  }
+ },
+ "v4-diag-uc": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    50,
+    8,
+    1141,
+    58
+   ],
+   "svg": [
+    63,
+    129,
+    1115,
+    734
+   ]
+  }
+ },
+ "v4-diag-files": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    50,
+    8,
+    1141,
+    58
+   ],
+   "svg": [
+    50,
+    166,
+    4487,
+    458
+   ]
+  }
+ },
+ "v4-diag-class": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    50,
+    8,
+    1141,
+    58
+   ],
+   "svg": [
+    50,
+    167,
+    1893,
+    633
+   ]
+  }
+ },
+ "v4-diag-seq-create": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    50,
+    8,
+    1141,
+    58
+   ],
+   "svg": [
+    50,
+    130,
+    1937,
+    1413
+   ]
+  }
+ },
+ "v4-diag-seq-del": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    50,
+    8,
+    1141,
+    58
+   ],
+   "svg": [
+    50,
+    129,
+    1232,
+    1065
+   ]
+  }
+ },
+ "v4-diag-files-wide": {
+  "w": 1900,
+  "h": 1000,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    76,
+    8,
+    1748,
+    58
+   ],
+   "svg": [
+    76,
+    167,
+    4487,
+    458
+   ]
+  }
+ },
+ "v4-diag-class-wide": {
+  "w": 1900,
+  "h": 1000,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    76,
+    8,
+    1748,
+    58
+   ],
+   "svg": [
+    76,
+    129,
+    1893,
+    633
+   ]
+  }
+ },
+ "v4-diag-seq-create-wide": {
+  "w": 1900,
+  "h": 1000,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    76,
+    8,
+    1748,
+    58
+   ],
+   "svg": [
+    76,
+    130,
+    1937,
+    1413
+   ]
+  }
+ },
+ "v4-diag-files-full": {
+  "w": 4950,
+  "h": 760,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/DIAGRAMS-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87.html",
+  "boxes": {
+   "h": [
+    198,
+    8,
+    4554,
+    58
+   ],
+   "svg": [
+    232,
+    129,
+    4487,
+    458
+   ],
+   "copy5": [
+    232,
+    128,
+    1620,
+    455
+   ],
+   "shared3": [
+    3688,
+    378,
+    1035,
+    205
+   ]
+  }
+ },
+ "v4-diag-copy5": {
+  "w": 1620,
+  "h": 455,
+  "boxes": {}
+ },
+ "v4-diag-shared3": {
+  "w": 1035,
+  "h": 205,
+  "boxes": {}
+ },
+ "v4-diag-other": {
+  "w": 1250,
+  "h": 250,
+  "boxes": {}
+ },
+ "v4-loop-report-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h1": [
+    116,
+    32,
+    1008,
+    52
+   ],
+   "sum": [
+    116,
+    157,
+    1008,
+    186
+   ],
+   "plain": [
+    148,
+    262,
+    952,
+    61
+   ]
+  }
+ },
+ "v4-loop-report-rounds": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    116,
+    12,
+    1008,
+    69
+   ],
+   "table": [
+    116,
+    93,
+    1008,
+    489
+   ]
+  }
+ },
+ "v4-loop-report-review": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    116,
+    12,
+    1008,
+    69
+   ],
+   "how": [
+    116,
+    100,
+    1008,
+    67
+   ],
+   "stat": [
+    116,
+    185,
+    1008,
+    33
+   ]
+  }
+ },
+ "v4-loop-report-shots": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "shot": [
+    137,
+    70,
+    966,
+    605
+   ]
+  }
+ },
+ "v4-loop-report-decide": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    116,
+    12,
+    1008,
+    69
+   ],
+   "q1": [
+    138,
+    121,
+    964,
+    33
+   ]
+  }
+ },
+ "v4-pw-report": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step4_loop_e2e/e2e/playwright-report/index.html",
+  "boxes": {
+   "pass": [
+    704,
     22,
-    22
+    43,
+    19
+   ],
+   "list": [
+    108,
+    0,
+    1024,
+    644
+   ]
+  }
+ },
+ "v4-pw-report-open": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step4_loop_e2e/e2e/playwright-report/index.html#?testId=1991ef99b92b8776b436-8f168f5526a8f3f5fec2",
+  "boxes": {
+   "title": null
+  }
+ },
+ "v4-loop-report-a1": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    137,
+    450,
+    966,
+    33
+   ],
+   "why": [
+    137,
+    634,
+    57,
+    27
+   ],
+   "fix": [
+    137,
+    721,
+    76,
+    27
+   ]
+  }
+ },
+ "v4-loop-report-sync": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    116,
+    12,
+    1008,
+    69
+   ],
+   "table": [
+    116,
+    154,
+    1008,
+    406
+   ]
+  }
+ },
+ "v4-loop-report-end": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Frontend_EASY/step3_new_module/my-equipment-app/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    116,
+    12,
+    1008,
+    69
+   ],
+   "pass": [
+    116,
+    152,
+    1008,
+    95
+   ]
+  }
+ },
+ "cc23v4-agent": {
+  "w": 1068,
+  "h": 601,
+  "boxes": {
+   "agent": [
+    104,
+    213,
+    925,
+    20
+   ],
+   "task": [
+    100,
+    250,
+    890,
+    100
    ]
   }
  }

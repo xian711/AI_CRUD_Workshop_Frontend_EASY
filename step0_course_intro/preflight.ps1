@@ -79,7 +79,7 @@ try {
     if ($null -eq $portInUse -or $portInUse.Count -eq 0) {
         Add-Result -Name "port 3100 未被占用" -Pass $true -Detail "port 3100 目前空閒（範本專案 sample-app 會用這個埠）" -FixHint ""
     } else {
-        Add-Result -Name "port 3100 未被占用" -Pass $false -Detail "port 3100 已被占用" -FixHint "請關閉占用 3100 的程式，或執行「Get-Process -Id (Get-NetTCPConnection -LocalPort 3100).OwningProcess」找出並結束該程序"
+        Add-Result -Name "port 3100 未被占用" -Pass $true -Warn $true -Detail "port 3100 已被占用（不用關別人的程式：pnpm dev 會自動換一個埠印在終端機；step4 的 AI 也會自己換埠）" -FixHint ""
     }
 } catch {
     # Get-NetTCPConnection 在部分環境（如舊版 PowerShell 或受限權限）可能不存在，不可讓腳本中斷

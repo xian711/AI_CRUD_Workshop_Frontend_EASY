@@ -66,7 +66,7 @@ export async function launch({ folder, settings = {}, size = [1067, 600], dsf = 
 
 export async function sizeWin(app, [w, h]) {
   await app.evaluate(({ BrowserWindow }, [w, h]) => {
-    for (const b of BrowserWindow.getAllWindows()) { if (!b.isVisible()) continue; if (b.isMaximized()) b.unmaximize(); b.setContentSize(w, h); b.setPosition(30, 30) }
+    for (const b of BrowserWindow.getAllWindows()) { if (!b.isVisible()) continue; if (b.isFullScreen()) b.setFullScreen(false); if (b.isMaximized()) b.unmaximize(); b.setContentSize(w, h); b.setPosition(30, 30) }
   }, [w, h])
 }
 

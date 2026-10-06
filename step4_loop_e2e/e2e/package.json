@@ -2,7 +2,7 @@
   "name": "easy-e2e",
   "version": "1.0.0",
   "private": true,
-  "description": "AI CRUD 工作坊 EASY 版｜裝備物資模組精簡 E2E（7 條）。獨立 Playwright 專案，鎖 http://localhost:3100，與 solution-app 完全隔離。",
+  "description": "AI CRUD 工作坊 EASY 版｜裝備物資模組精簡 E2E（7 條）。獨立 Playwright 專案，預設打 http://localhost:3100（可用 PORT／BASE_URL 換埠），與 solution-app 完全隔離。測試報告在 playwright-report/index.html。",
   "scripts": {
     "test": "playwright test",
     "report": "playwright show-report"

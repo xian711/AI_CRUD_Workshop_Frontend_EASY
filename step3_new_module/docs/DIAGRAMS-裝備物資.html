@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML 圖面 — 中心裝備物資</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --sub: #555;
+    --accent: #0084d1;
+    --line: #d9d9d9;
+    --bg-soft: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    color: var(--ink);
+    background: #fff;
+    font-size: 20px;
+    line-height: 1.7;
+  }
+  header {
+    padding: 48px 6vw 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 { font-size: 44px; margin: 0 0 8px; }
+  header p  { font-size: 22px; color: var(--sub); margin: 0; }
+  nav {
+    padding: 16px 6vw;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+    font-size: 19px;
+  }
+  nav a { color: var(--accent); text-decoration: none; margin-right: 20px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+  section {
+    padding: 40px 4vw 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  section h2 {
+    font-size: 34px;
+    margin: 0 0 6px;
+    color: var(--accent);
+  }
+  section p.desc {
+    font-size: 22px;
+    color: var(--sub);
+    margin: 0 0 20px;
+  }
+  /* 圖照原尺寸畫（字才夠大），比畫面寬就左右捲動，不縮小 */
+  .mermaid {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+    text-align: center;
+  }
+  .mermaid svg { max-width: none !important; height: auto; }
+  footer {
+    padding: 28px 6vw 60px;
+    font-size: 18px;
+    color: var(--sub);
+  }
+  @media print { nav { display: none; } section { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>UML 圖面 — 中心裝備物資（課堂版參考解）</h1>
+  <p>對應文件（同資料夾）：SRS-裝備物資.md（需求規格）、DESIGN-裝備物資.md（設計文件）｜ 展示路徑：/equipment/crud ｜ PM 看圖就好，不用看程式。</p>
+</header>
+
+<nav>
+  <a href="#uc">① 用例圖</a>
+  <a href="#arch">② 檔案架構圖</a>
+  <a href="#class">③ 資料模型類別圖</a>
+  <a href="#seq-create">④ 循序圖：新增品項＋編碼產生</a>
+</nav>
+
+<section id="uc">
+  <h2>① 用例圖：誰能做哪些事</h2>
+  <p class="desc">管理人員在列表頁與明細頁完成六件事；刪除（D1）和匯出（D2）是課堂拍板補上的，新增和編輯都會用到品項編碼自動產生（D3）。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':60,'rankSpacing':70}}}%%
+flowchart LR
+  actor(("👤 裝備物資管理人員"))
+  subgraph SYS["中心裝備物資（/equipment/crud）"]
+    UC1(["UC-EQ-01 查詢瀏覽品項<br/>（關鍵字・分類・狀態・排序・分頁）"])
+    UC2(["UC-EQ-02 檢視品項明細"])
+    UC3(["UC-EQ-03 新增品項"])
+    UC4(["UC-EQ-04 編輯品項"])
+    UC5(["UC-EQ-05 刪除品項<br/>（二次確認｜D1）"])
+    UC6(["UC-EQ-06 匯出 CSV<br/>（篩選＋排序後全量｜D2）"])
+    CODE(["品項編碼自動產生<br/>（BR-EQ-01｜D3）"])
+  end
+  actor --> UC1
+  actor --> UC2
+  actor --> UC3
+  actor --> UC4
+  actor --> UC5
+  actor --> UC6
+  UC2 -. «extend» .-> UC4
+  UC3 -. «include» .-> CODE
+  UC4 -. «include» .-> CODE
+  </pre>
+</section>
+
+<section id="arch">
+  <h2>② 檔案架構圖：複製改名 vs 直接共用</h2>
+  <p class="desc">橘色 5 個檔從範本複製改名（跟「品項長什麼樣」有關）；藍色是直接共用、沒有修改的通用零件；既有檔只動了一處導覽入口。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':30,'rankSpacing':80}}}%%
+flowchart LR
+  LAYOUT["layouts/template.vue<br/>既有檔：只加<br/>一個導覽入口"]
+  subgraph COPY["複製改名（5 檔）"]
+    LIST["列表頁 index.vue<br/>pages/equipment/crud/<br/>篩選・排序・分頁・匯出・刪除"]
+    DETAIL["明細頁 [id].vue<br/>pages/equipment/crud/<br/>檢視／編輯／新增 三合一"]
+    ITEMS["資料層 useEquipmentItems.ts<br/>composables/<br/>型別・查表・種子・CRUD・編碼"]
+    FF["EquipmentFormField.vue<br/>components/equipment/<br/>label＋紅星＋錯誤紅字"]
+    SB["EquipmentStatusBadge.vue<br/>components/equipment/<br/>狀態 → 綠／黃／紅"]
+  end
+  subgraph SHARE["直接共用（3 檔，未修改）"]
+    LISTPAGE["useTemplateListPage.ts<br/>篩選＋分頁＋URL 同步"]
+    VAL["templateValidation.ts<br/>驗證純函式"]
+    CSV["templateCsv.ts<br/>CSV 匯出（含 BOM）"]
+  end
+  APPC["其他共用零件（不修改）<br/>AppConfirmModal・AppSortHeader<br/>AppTableFooter・AppSafeTeleport<br/>useTableSort"]
+  API[("未來後端 API")]
+  LAYOUT -. 入口 .-> LIST
+  LIST --> ITEMS
+  LIST --> SB
+  DETAIL --> ITEMS
+  DETAIL --> FF
+  LIST --> LISTPAGE
+  LIST --> CSV
+  DETAIL --> VAL
+  LIST --> APPC
+  DETAIL --> APPC
+  ITEMS -. useFetch .-> API
+  style COPY fill:#fff4e0,stroke:#e6a23c
+  style SHARE fill:#e8f4fb,stroke:#0084d1
+  style APPC fill:#e8f4fb,stroke:#0084d1
+  style API fill:#f7f8fa,stroke:#999,stroke-dasharray: 5 5
+  </pre>
+</section>
+
+<section id="class">
+  <h2>③ 資料模型類別圖：一筆品項長什麼樣</h2>
+  <p class="desc">一筆品項（EquipmentItem）有 12 個業務欄位＋系統流水 id；欄位名就是未來後端 API 的介面。編碼由分類的 2 碼＋項目的 3 碼＋流水 3 碼組成。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
+classDiagram
+  class EquipmentItem {
+    +string id  「E-001」系統流水
+    +string code  「IT-LAP-001」系統產生
+    +string categoryKey  分類
+    +string name  項目
+    +number qty  數量，≥ 0
+    +string unit  單位
+    +string spec1  規格說明
+    +string keeper  保管人
+    +string keeperPhone  保管人電話
+    +string locationName  存放地點
+    +EquipmentStatus status  狀態
+    +string purchaseDate  採購日期 YYYY-MM-DD
+    +string specNote  備註
+  }
+  class EquipmentStatus {
+    &lt;&lt;enumeration&gt;&gt;
+    normal 正常・綠
+    maintenance 維修中・黃
+    scrapped 已報廢・紅
+  }
+  class EQUIPMENT_CATEGORIES {
+    &lt;&lt;lookup table&gt;&gt;
+    value 例：ICT
+    code 類別 2 碼，例：IT
+    label 中文，例：資通訊設備
+    items 該分類的標準項目
+  }
+  class ITEM_CODE_MAP {
+    &lt;&lt;lookup table&gt;&gt;
+    項目名 → 項目 3 碼
+    例：筆記型電腦 → LAP
+    查無或「其他」分類 → OTH
+  }
+  class useEquipmentItems {
+    +records: Readonly Ref~EquipmentItem[]~
+    +getById(id) Promise~EquipmentItem?~ 深拷貝
+    +create(input) Promise~EquipmentItem~
+    +update(id, input) Promise~EquipmentItem~
+    +remove(id) Promise~void~
+  }
+  class nextEquipmentCode {
+    &lt;&lt;function&gt;&gt;
+    +nextEquipmentCode(categoryKey, name) string
+  }
+  useEquipmentItems --> EquipmentItem : 管理多筆（module 單例）
+  EquipmentItem --> EquipmentStatus : status
+  EquipmentItem ..> EQUIPMENT_CATEGORIES : categoryKey 查表
+  useEquipmentItems ..> nextEquipmentCode : create／update 時呼叫
+  nextEquipmentCode ..> EQUIPMENT_CATEGORIES : 類別 2 碼
+  nextEquipmentCode ..> ITEM_CODE_MAP : 項目 3 碼
+  </pre>
+</section>
+
+<section id="seq-create">
+  <h2>④ 循序圖：新增品項＋編碼產生</h2>
+  <p class="desc">選定分類和項目後，編碼馬上算出來給你看；按儲存先驗證，有錯就紅字並停在表單頁，全對才寫入，寫入時再算一次編碼，保證不重複。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
+sequenceDiagram
+  actor U as 管理人員
+  participant D as [id].vue（明細頁）
+  participant M as useEquipmentItems
+  participant V as templateValidation
+  participant T as useToast
+
+  U->>D: 進入 /equipment/crud/new
+  D->>D: 新增模式・空白表單（狀態預設「正常」）
+  U->>D: 選分類「資通訊設備」
+  D->>D: 項目下拉只列這個分類的標準項目
+  U->>D: 選項目「筆記型電腦」
+  D->>M: nextEquipmentCode('ICT', '筆記型電腦')
+  M-->>D: IT-LAP-003（同前綴最大流水 ＋1）
+  D->>D: 標題區即時顯示編碼（唯讀）
+  U->>D: 填數量、單位、規格說明，按「儲存」
+  D->>V: validateFields(form, rulesFor())
+  V-->>D: 錯誤清單（必填、電話格式）
+  D->>D: 另外檢查：數量 ≥ 0、採購日期不晚於今天
+  alt 有錯誤
+    D->>D: 欄位下方紅字＋聚焦第一個錯誤欄位
+    D->>T: 「請修正 N 個欄位」，停在表單頁
+  else 全部通過
+    D->>M: create(payload)
+    M->>M: 產生 id（E-025）＋再算一次 code，保證不重複
+    M-->>D: 新品項（深拷貝）
+    D->>T: 「已新增品項」（綠色）
+    D->>D: 返回列表，總筆數 ＋1
+  end
+  </pre>
+</section>
+
+<footer>
+  <p>圖面基準：同資料夾 DESIGN-裝備物資.md、SRS-裝備物資.md（課堂版 v1.0）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true, theme: 'neutral', securityLevel: 'loose',
+    // 不縮小到畫面寬：照原尺寸畫，字級才是真的 22px
+    flowchart: { useMaxWidth: false }, sequence: { useMaxWidth: false }, class: { useMaxWidth: false },
+  });
+</script>
+</body>
+</html>

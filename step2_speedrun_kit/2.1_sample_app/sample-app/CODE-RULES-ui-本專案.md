@@ -1,7 +1,7 @@
 # CODE-RULES-ui（防災協作平台前端程式規範）
 
 > 用途：本專案前端的實際程式規則，AI 改前端碼前必讀。本專案是 **Nuxt 3 + Nuxt UI**，不是 Vite/Pinia/axios 架構，規則以本檔為準。
-> 提煉自同資料夾 `CLAUDE.md` ＋ 工作坊 `step2_speedrun_kit/2.1_sample_app/SDD-CRUD標準範本-v1.1.md` 的 UIUX 規範與 Clean Code 對照表。純後端工作不必讀本檔。
+> 提煉自同資料夾 `CLAUDE.md` ＋ 工作坊 `step2_speedrun_kit/2.1_sample_app/DESIGN-CRUD標準範本-v1.1.md` 的 UIUX 規範與 Clean Code 對照表。純後端工作不必讀本檔。
 
 | 項目 | 規範 |
 |---|---|
@@ -42,6 +42,6 @@
 | 狀態 badge | `components/template/TemplateStatusBadge.vue` |
 | Design System 摘要 / Token 規則 | 同資料夾 `design-system-summary.md`；token 實檔見工作坊 `step2_speedrun_kit/2.2_design_system/` |
 
-## Clean Code 對照（教學錨點，詳見 SDD §10）
+## Clean Code 對照（教學錨點，詳見設計文件（DESIGN）§10）
 
 抽取共用列表狀態（Extract Function）、查表取代條件（Replace Conditional with Lookup）、純函式驗證分離業務與 UI、後端接縫（針對介面而非實作）、字面量種子（顯性優於聰明）、Guard Clauses、防禦性深拷貝、具名常數、開放封閉（擴充 FormRow 而非改）、複用 AppAddressPicker、單檔行數預算、誠實標注抽象邊界（僅字串 filter）。

@@ -4,4 +4,4 @@
 # 由 step4_loop_e2e/tools/update-e2e-hash.ps1 或同資料夾的 .sh 產生。
 # 格式：<sha256>  <相對 step4_loop_e2e/ 的路徑>
 d7943bccf4a55bc70667323e63b0c7b94d723b60b4c77d641ae99dc6fb97ec27  e2e/tests/equipment.spec.ts
-2e7d56a134f609a806d8ed5c0683ce03862bb49d2c9da71ca99ee5bf746a2b71  e2e/playwright.config.ts
+0d975012fb0d5cd255ae83dec8a4af8f4e2549c28d5c7e0622456c813c184043  e2e/playwright.config.ts

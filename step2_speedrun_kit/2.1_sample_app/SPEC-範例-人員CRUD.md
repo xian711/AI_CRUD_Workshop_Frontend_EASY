@@ -2,7 +2,7 @@
 
 > 用途：把「CRUD 標準範本」的人員 CRUD 填成一份**完整示範規格**（教學用「填好的考卷」，非最小雛形）。回公司要交規格文件時，可以照這份的章節骨架寫。
 > 本檔已**併入原 `SRS-CRUD標準範本-v1.0`**（目的與定位、示範實體、Use Cases、FR-T／BR-T／NFR-T、範圍外、驗收清單），
-> 所以規格只需要看這一份；**設計與實作細節**見同資料夾 `SDD-CRUD標準範本-v1.1.md`，架構圖見 `DIAGRAMS.html`。
+> 所以規格只需要看這一份；**設計與實作細節**見同資料夾 `DESIGN-CRUD標準範本-v1.1.md`，架構圖見 `DIAGRAMS.html`。
 > 說明：本專案目前**無後端**，故 Mode 選 **UI**（前端雛形，資料綁 mock）。純 UI 雛形其實只需填 Feature 與 CRUD UI Spec 兩節；此處為教學完整性補齊 FR/BR/圖/Mock/Done，並在 API 相關節標交接記號。
 
 Mode: `UI`（雛形：資料綁 mock，API 串接點標 `// TODO: DEV 串接`）
@@ -12,7 +12,7 @@ Mode: `UI`（雛形：資料綁 mock，API 串接點標 `// TODO: DEV 串接`）
 | 項目 | 內容 |
 |------|------|
 | 文件版本 | SPEC v1.1（2026-08-19 併入 SRS-CRUD標準範本 v1.0） |
-| 狀態 | 已核准（供 SDD／實作使用） |
+| 狀態 | 已核准（供設計文件（DESIGN）／實作使用） |
 | 範圍 | 前端 ＋ UIUX（本專案尚無後端；資料層預留後端接軌接縫） |
 | 示範資料來源 | 人力暨輪值編排（`/township/hr/team?view=roster`）之簡化人員名冊 |
 
@@ -149,7 +149,7 @@ FR-T 需求以 Given / When / Then 表述；優先級用 MoSCoW。
 
 ## 範圍外（本版不做）
 
-- 後端 API 串接（資料層已預留接縫，見同資料夾 `SDD-CRUD標準範本-v1.1.md`）
+- 後端 API 串接（資料層已預留接縫，見同資料夾 `DESIGN-CRUD標準範本-v1.1.md`）
 - 批次操作、拖曳指派、雙 Tab 視圖（roster 的編組架構功能屬業務特化，不屬標準範本）
 - 匯入 CSV、照片上傳、權限控制
 - 自動化測試框架導入（列為後續建議）
@@ -158,7 +158,7 @@ FR-T 需求以 Given / When / Then 表述；優先級用 MoSCoW。
 
 `[SD 待定] 後端尚未建置`。本版為前端 UI 雛形，資料層以 `useTemplateMembers`（前端 mock、module-level ref 單例）實作，全函式回 Promise，接縫已預留：未來以 `useFetch('/api/template/members'...)` 替換內部實作，呼叫端不變。
 
-同資料夾 SDD §2.3 預留之 RESTful 端點草案（`[SD 待定]`，供後端接軌時定案）：
+同資料夾設計文件（DESIGN）§2.3 預留之 RESTful 端點草案（`[SD 待定]`，供後端接軌時定案）：
 
 | 對應資料層函式 | Method | Path | 說明 |
 |---|---|---|---|
@@ -172,7 +172,7 @@ Response envelope、驗證錯誤碼、權限中介層 → `[SD 待定]`（後端
 
 ## Data / DB
 
-`[SD 待定]`：本版無 DB。實體 `TemplateMember`（17 欄，見 Fields）暫存於前端 mock 資料層。未來資料表命名、審計欄位、migration 留待後端 SDD。
+`[SD 待定]`：本版無 DB。實體 `TemplateMember`（17 欄，見 Fields）暫存於前端 mock 資料層。未來資料表命名、審計欄位、migration 留待後端的設計文件（DESIGN）。
 
 | Name | Notes |
 |---|---|
@@ -219,7 +219,7 @@ Page sections:
 - Delete Confirm：`AppConfirmModal`（danger、title「刪除人員」、message 含姓名）；confirm 後自行關閉。
 - Toast / Alert：`useToast()`，成功綠/錯誤紅。
 
-Fields（17 欄，對照上方「示範實體」＋同資料夾 SDD §7.2）：
+Fields（17 欄，對照上方「示範實體」＋同資料夾設計文件（DESIGN）§7.2）：
 
 | Field | Type | Required | UI Component | Validation | Notes |
 |---|---|---:|---|---|---|
@@ -251,7 +251,7 @@ Permissions:
 
 ## Assumptions
 
-- 無後端：資料層為前端 mock，全非同步以預留接縫（見「設計原則」的「後端就緒」）。驗證方式：`useTemplateMembers.ts` 函式簽章與 SDD §2.3 一致。
+- 無後端：資料層為前端 mock，全非同步以預留接縫（見「設計原則」的「後端就緒」）。驗證方式：`useTemplateMembers.ts` 函式簽章與設計文件（DESIGN）§2.3 一致。
 - 無權限控制與自動化測試（見「範圍外」）。驗證方式：本檔「範圍外」章節明列。
 - 模組屬「平時」類別 → 白/淡色底，不做災時/演練樣式。驗證方式：`design-token.css` 模組底色規則。
 
