@@ -928,11 +928,10 @@ chapter('Step 3', '做新模組', C.pink)
 
 sc3(19, () => {
   const r = {}; hd(19, 'step3')
-  const [a] = vsh(r, ['vs11-terminal-root'])
+  const [a, b, c] = vsh(r, ['vs11-terminal-root', 'vs25-pasted', 'vs26-step3-prep'])
   r.a1 = hl(r, a, 'prompt', '新的終端機：開頭是教材根目錄', { col: C.green, below: true, size: 28 })
   r.bw = bwin(['hb5-step3-copy'], HB + '#step3'); r.B = r.bw.S
   r.h1 = hl(r, r.B[0], 'pre', '手冊「⓪ 準備工作區」：黑底框反白 → Ctrl+C', { col: OR, below: true, size: 26 })
-  const [, b, c] = vsh(r, ['vs11-terminal-root', 'vs25-pasted', 'vs26-step3-prep'])
   r.b1 = hl(r, b, 'install', '出現 >> 時再按一次 Enter', { col: C.gold, below: true, size: 28 })
   r.c1 = hl(r, c, 'done', 'Done：複製好、套件裝好', { col: C.green, above: true, size: 28 })
   r.c2 = hl(r, c, 'prompt', '已經在 my-equipment-app 裡', { col: C.green, below: true, right: true, size: 26 })
