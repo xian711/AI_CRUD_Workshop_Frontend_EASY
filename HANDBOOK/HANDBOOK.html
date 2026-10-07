@@ -193,7 +193,8 @@
 <div class="hero">
   <div class="hero-card">
     <h1>用「範本 + harness + AI」<br>讓新 CRUD 模組的骨架快速交付</h1>
-    <a class="anim-link" href="animation/index.html">▶ 手把手教學動畫：harness・SDD・LOOP・對抗審查，全程實拍</a>
+    <a class="anim-link" href="animation/index.html">▶ 教學動畫（講課版）：harness・SDD・LOOP・對抗審查，全程實拍</a>
+    <a class="anim-link" href="animation-hands/index.html">▶ 手把手版（跟著做）：Step 0～5 每一步都示範</a>
   </div>
 </div>
 
@@ -412,7 +413,7 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
         <figure><img src="images/step2_template_list.png" alt="範本人員 CRUD 列表頁"><figcaption>範本列表頁：表格＋篩選＋分頁＋匯出 CSV。</figcaption></figure>
         <figure><img src="images/step2_template_form.png" alt="範本新增表單"><figcaption>新增表單：Label 在上、必填加紅星、送出防重複。</figcaption></figure>
         <figure><img src="images/step2_template_detail.png" alt="範本檢視頁"><figcaption>檢視頁：單筆明細，可切到編輯。</figcaption></figure>
-        <figure><img src="images/step2_template_confirm.png" alt="刪除二次確認框"><figcaption>刪除確認框：鈕寫「刪除人員」而非空泛的「確認」。</figcaption></figure>
+        <figure><img src="images/step2_template_confirm.png" alt="刪除二次確認框"><figcaption>刪除確認框：標題寫「刪除人員」並帶出姓名，按紅色「刪除」才刪，不是空泛的「確認」。</figcaption></figure>
       </div>
       <div class="fig-grid">
         <figure><img src="images/step2_design_system.png" alt="Design System 展示頁"><figcaption>Design System：色票、間距、字級集中管理，AI 照這份配色。</figcaption></figure>
@@ -424,7 +425,7 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
         <tbody>
           <tr><td>新增人員 → 儲存</td><td>成功 toast<span class="note">（畫面角落跳出來、幾秒後自己消失的小提示）</span>，列表出現新增那筆</td></tr>
           <tr><td>進檢視頁 → 編輯 → 儲存</td><td>值更新，回列表反映變更</td></tr>
-          <tr><td>垃圾桶 → 二次確認</td><td>鈕寫「刪除人員」，按下才刪</td></tr>
+          <tr><td>垃圾桶 → 二次確認</td><td>跳出「刪除人員」確認框，按紅色「刪除」才刪</td></tr>
           <tr><td>打「陳」＋狀態篩選 → 複製網址開新分頁</td><td>表格即時過濾，新分頁完整還原篩選與排序</td></tr>
           <tr><td>匯出 CSV</td><td>匯出的是<strong>篩選＋排序後的全量</strong>，非只當頁</td></tr>
         </tbody>

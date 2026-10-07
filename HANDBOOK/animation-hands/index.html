@@ -1,0 +1,1472 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI CRUD 前端手把手</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --page:#0b1826; --stage:#10263a; --card:#16324a; --line:#2a4d6b;
+    --ink:#eef3f7; --mut:#9db3c6; --gold:#f4b942; --teal:#39c0c8; --pink:#ef8fc6;
+    --coral:#ff8a5b; --violet:#a996ff; --red:#ff5d6c; --green:#5ad18a;
+    --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+    --mono:'JetBrains Mono',Consolas,'Courier New',monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--page);color:var(--ink)}
+  body{font-family:var(--sans);font-size:18px;line-height:1.6;margin:0}
+  /* ===== 版面（RWD）：標題＋導覽＋舞台＋字幕＋控制列，盡量塞進同一個螢幕畫面 =====
+     舞台寬度（--stage-w）、字幕字級（--sub-fs）、字幕行數（--sub-n）由下方 JS 的 fit() 量完實際高度後設定。
+     沒有 JS 時，退回用 100vh 粗估的寬度。 */
+  :root{--stage-w:min(100%, calc((100vh - 330px) * 16 / 9));--sub-fs:24px;--sub-n:2;--lab-h:20px}
+  .wrap{max-width:1500px;margin:0 auto;padding-inline:16px;padding-block:8px 48px}
+  header.top{display:flex;align-items:baseline;gap:2px 14px;margin:0 0 6px;min-width:0}
+  header.top h1{flex:none;font-size:clamp(18px,1.45vw,26px);line-height:1.3;font-weight:900;margin:0;letter-spacing:.02em;white-space:nowrap}
+  header.top p{flex:1 1 0;min-width:0;margin:0;color:var(--mut);font-size:clamp(12.5px,.85vw,15px);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 章節膠囊：永遠單行；放不下就橫向捲動（捲軸隱藏、兩端淡出），目前這句所在的膠囊會自動捲到中間 */
+  .chips{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:4px;margin:-4px -4px 4px;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%)}
+  .chips::-webkit-scrollbar,.steps::-webkit-scrollbar{display:none}
+  .chips button{flex:none;font:inherit;font-size:clamp(13.5px,1.05vw,16px);font-weight:700;line-height:1.35;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 14px;cursor:pointer}
+  .chips button[aria-current="true"]{color:#10263a;background:var(--gold);border-color:var(--gold)}
+  /* 兩層章節：上排 Step（單行小膠囊）、下排該 Step 的段落 */
+  .steps{display:flex;gap:6px;margin:0 0 5px;scrollbar-width:none}
+  .steps[hidden]{display:none}
+  .steps button{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:center;gap:.4em;white-space:nowrap;font:inherit;font-size:clamp(13px,1.02vw,16px);line-height:1.35;color:var(--ink);background:var(--card);border:1px solid var(--line);border-bottom:3px solid var(--c);border-radius:10px;padding:3px 10px 2px;cursor:pointer}
+  .steps button b{flex:none;font-size:.92em;font-weight:900;color:var(--c);letter-spacing:.02em}
+  .steps button span{min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+  .steps button[aria-current="true"]{background:#233f59;border-color:var(--c)}
+  .steps button:focus-visible{outline:3px solid var(--teal);outline-offset:-1px}
+  /* 視窗不夠寬（約 1260px 以下）：沒選到的 Step 只留標籤（Step 3），選到的那顆才顯示完整名稱；滑鼠移上去會顯示全名 */
+  @media (max-width:1259px){.steps button:not([aria-current="true"]) span{display:none}}
+  .chips button:focus-visible,.ctrl button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+  .stagebox{position:relative;width:var(--stage-w);max-width:100%;margin:0 auto;background:var(--stage);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  #stage{display:block;width:100%;height:auto}
+  .sub{width:var(--stage-w);max-width:100%;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+  /* 字幕框：高度固定（--sub-n 行），換句子時畫面不會跳；少數特別長的句子由 fitSubText() 暫時縮字（最小 18px）塞進同一個框 */
+  .subline{height:calc(var(--sub-fs) * var(--sub-n) * 1.45 + var(--lab-h) + 16px);overflow:hidden;background:#050d16;border-radius:12px;padding:8px 18px;font-size:var(--sub-cur,var(--sub-fs));font-weight:700;line-height:1.45;text-wrap:pretty;overflow-wrap:anywhere}
+  .subline small{display:block;height:18px;margin-bottom:2px;font-size:max(13px,.5em);line-height:18px;font-weight:700;color:var(--gold);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 全螢幕（投影用）：舞台＋字幕＋控制列填滿螢幕；尺寸同樣由 fit() 算 */
+  .player:fullscreen{background:var(--page);padding:10px 16px;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+  .player:fullscreen .stagebox,.player:fullscreen .sub{flex:none}
+  .player:fullscreen .hint{display:none}
+  .who{display:inline-block;font-size:.62em;font-weight:900;color:#10263a;background:var(--c);border-radius:999px;padding:0 .6em;margin-right:.55em;vertical-align:.16em}
+  .who.x{--c:#ff8a5b} .who.z{--c:#39c0c8}
+  .bar{height:4px;background:var(--card);border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--gold)}
+  /* 控制列：比舞台寬時，以舞台為中心往左右多出去（單行），放不下才折行 */
+  .ctrl{justify-self:center;width:max-content;max-width:min(calc(100vw - 24px),1500px);display:flex;flex-wrap:wrap;gap:6px 6px;align-items:center;justify-content:center}
+  .ctrl button{font:inherit;font-size:15px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 9px;cursor:pointer;min-width:44px}
+  .ctrl button.main{background:var(--gold);color:#10263a;border-color:var(--gold);min-width:104px}
+  .ctrl select{font:inherit;font-size:14.5px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 4px;max-width:16em}
+  .ctrl label{display:flex;align-items:center;gap:4px;color:var(--mut);font-size:14px;font-weight:700}
+  .ctrl select:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+  .ctrl button.off{color:var(--mut);text-decoration:line-through}
+  .voicenote{color:var(--gold);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  .voicenote[hidden]{display:none}
+  .startbtn{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);font:inherit;font-size:clamp(16px,calc(var(--stage-w) / 45),28px);font-weight:900;color:#10263a;background:var(--gold);border:0;border-radius:999px;padding:.6em 1.4em;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+  .startbtn:focus-visible{outline:4px solid var(--teal);outline-offset:3px}
+  .ctrl .pos{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+  /* 鍵盤提示：可視區高度 800px 以上才顯示（矮螢幕要把高度讓給舞台） */
+  .hint{display:none;color:var(--mut);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  @media (min-height:800px){.hint{display:block}}
+  @media (max-height:700px){:root{--lab-h:0px}.subline small{display:none}}
+  section.after{max-width:1100px;margin:44px auto 0}
+  section.after h2{font-size:26px;font-weight:900;margin:0 0 6px;text-wrap:balance}
+  section.after > p{color:var(--mut);margin:0 0 16px;max-width:65ch}
+  .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .role{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:12px;padding:14px 16px}
+  .role h3{margin:0 0 6px;font-size:20px;color:var(--c)}
+  .role ul{margin:0;padding-left:1.2em;font-size:17px}
+  .role .out{margin:10px 0 0;font-size:16px;font-weight:700;color:var(--ink);background:#0b1826;border-radius:8px;padding:6px 10px}
+  .where{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:17px}
+  section.after code{overflow-wrap:anywhere}
+  .role,.where{min-width:0}
+  .where code{font-family:var(--mono);font-size:15px;color:var(--gold);word-break:break-all}
+
+  #stage text{font-family:var(--sans)}
+  #stage .mono{font-family:var(--mono)}
+  #stage g,#stage text,#stage path,#stage rect,#stage circle{transition:opacity .6s ease, transform 1.2s cubic-bezier(.45,0,.2,1)}
+  #stage .hid{opacity:0}
+  #stage.paused *{animation-play-state:paused!important}
+  #stage .dim{opacity:.22}
+  #stage .draw{stroke-dasharray:1 1;stroke-dashoffset:1;opacity:0;transition:stroke-dashoffset 1.1s ease, opacity .1s}
+  #stage .draw.on{stroke-dashoffset:0;opacity:1}
+  #stage .glow{animation:glow 1.3s ease-in-out 3}
+  @keyframes glow{50%{filter:drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 20px rgba(255,255,255,.55))}}
+  #stage .stamp{transform-box:fill-box;transform-origin:center;transition:opacity .3s, transform .45s cubic-bezier(.2,1.5,.4,1)}
+  #stage .stamp.hid{transform:scale(1.9)}
+  #stage .ping{transform-box:fill-box;transform-origin:center;animation:ping 1.3s ease-out infinite}
+  @keyframes ping{from{transform:scale(1);opacity:1}to{transform:scale(3.4);opacity:0}}
+  #stage .tcursor{animation:tblink 1.1s steps(1) infinite}
+  @keyframes tblink{50%{opacity:0}}
+  #stage .mcur{transition:transform 1.1s cubic-bezier(.45,0,.2,1), opacity .4s}
+  #stage.instant *{transition:none!important;animation:none!important}
+
+  /* ---- 嵌入模式（被 iframe 嵌入，或網址帶 #embed）---- */
+  html.embed header.top, html.embed section.after, html.embed .hint{display:none}
+  html.embed .wrap{padding-block:4px 6px}
+  html.embed .subline{padding:6px 14px}
+  /* ---- 問小港側欄 ---- */
+  .askbtn{font:inherit;font-size:16px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
+  .askbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .askdrawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:#0e2133;border-left:1px solid var(--line);box-shadow:-10px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column;z-index:50;transform:translateX(105%);transition:transform .3s ease}
+  .askdrawer.open{transform:none}
+  .askhead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .askhead h3{margin:0;font-size:20px;font-weight:900;flex:1}
+  .askhead button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer}
+  .askwhere{font-size:14px;color:var(--gold);padding:8px 16px 0}
+  .asklog{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+  .askmsg{border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+  .askmsg.me{align-self:flex-end;background:var(--gold);color:#10263a;font-weight:700;max-width:85%}
+  .askmsg.bot{background:var(--card);border:1px solid var(--line)}
+  .askmsg.wait{color:var(--mut)}
+  .askjump{display:inline-block;margin:6px 6px 0 0;font:inherit;font-size:14px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:8px;padding:4px 10px;cursor:pointer;white-space:normal;text-align:left}
+  .askform{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line)}
+  .askform input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:#081522;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .askform button{font:inherit;font-weight:800;background:var(--gold);color:#10263a;border:0;border-radius:10px;padding:0 14px;cursor:pointer}
+  .askform input:focus-visible{outline:3px solid var(--teal)}
+  .asktips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px}
+  .asktips button{font:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+  @media (prefers-reduced-motion: reduce){
+    #stage *{transition-duration:.01s!important;animation:none!important}
+  }
+  /* 手機寬度：允許垂直捲動，但不出現水平捲軸 */
+  @media (max-width:640px){
+    .wrap{padding-inline:10px}
+    header.top{flex-wrap:wrap}
+    header.top h1{flex:1 1 100%;min-width:0;white-space:normal;font-size:19px}
+    header.top p{flex-basis:100%;white-space:normal;font-size:13px}
+    .steps{overflow-x:auto}
+    .steps button{flex:none;font-size:14px}
+    .chips button{font-size:14px}
+    .ctrl{width:100%;max-width:100%}
+    .ctrl button{padding:7px 10px;font-size:15px}
+    .ctrl select{max-width:100%}
+    .subline{padding:8px 12px}
+  }
+  @media (pointer:coarse){.hint{display:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>AI CRUD 工作坊 EASY 版　手把手教學動畫（跟著做版）</h1>
+    <p>Step 0～5 每一步都示範：點哪裡、貼哪一段、看到什麼就對了　·　小芸＋阿哲預錄配音（AI 語音）</p>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="課程步驟" hidden></nav>
+  <nav class="chips" id="chips" aria-label="章節"></nav>
+
+  <div class="player" id="player">
+  <div class="stagebox">
+    <svg id="stage" viewBox="0 0 1600 900" role="img" aria-label="AI CRUD 工作坊 EASY 版　手把手教學動畫（跟著做版）動畫畫面">
+      <defs id="defs"></defs>
+      <rect x="0" y="0" width="1600" height="900" fill="#10263a"></rect>
+      <g id="layer"></g>
+    </svg>
+    <button id="bStart" class="startbtn" type="button">▶ 開始播放（有中文語音）</button>
+  </div>
+
+  <div class="sub">
+    <div class="subline" id="subline" aria-live="polite"><small id="scenelabel">第 1 段</small><span id="who" class="who" hidden></span><span id="subtext">載入中…</span></div>
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="ctrl">
+      <button id="bPrevScene" type="button" title="上一段">⏮ 上一段</button>
+      <button id="bPrev" type="button" title="上一句（←）">◀ 上一句</button>
+      <button id="bPlay" type="button" class="main">▶ 播放</button>
+      <button id="bNext" type="button" title="下一句（→）">下一句 ▶</button>
+      <button id="bNextScene" type="button" title="下一段">下一段 ⏭</button>
+      <button id="bVoice" type="button" title="開關語音">🔊 語音：開</button>
+      <label for="voiceSel">聲音<select id="voiceSel"><option value="">預設中文</option></select></label>
+      <label for="speedSel">速度<select id="speedSel"><option value="0.75">0.75×（慢）</option><option value="1" selected>1×（正常）</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×（快）</option></select></label>
+      <button id="bAsk" type="button" class="askbtn" hidden>💬 問小港</button>
+      <button id="bFull" type="button" title="全螢幕（F）">⛶ 全螢幕</button>
+      <span class="pos" id="pos">1／0 段</span>
+    </div>
+    <p class="voicenote" id="voiceNote" hidden></p>
+    <p class="hint">空白鍵：暫停／播放　·　← →：上一句／下一句　·　F：全螢幕　·　上面的 Step 和章節可以直接跳　·　速度同時調整語音和字幕</p>
+  </div>
+  </div>
+
+<section class="after">
+  <h2>文字版速查</h2>
+  <p>這一支是<b>手把手版（跟著做）</b>：只講點哪裡、貼哪一段、看到什麼就對了。想知道為什麼這樣做，看<b>講課版</b>。建議左邊開動畫、右邊開 VS Code，看完一段就暫停、自己做一次。</p>
+  <p>動畫裡的畫面，都是 2026-10-04～07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：阿哲帶你一步一步操作，小芸講檢查點和卡住時怎麼辦。聲音全部是預錄好的 mp3 檔，播放時不用連 AI、不花 token，也不用瀏覽器內建的語音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
+  <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。文件有三份：<b>SRS</b>（這一版答應了什麼）、<b>設計文件 DESIGN</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
+  <div class="roles">
+    <div class="role" style="--c:#f4b942">
+      <h3>Step 0 準備環境</h3>
+      <ul>
+        <li>VS Code 選單「終端機」→「新增終端」（快捷鍵 Ctrl+`）</li>
+        <li><code>cd D:\</code></li>
+        <li><code>git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git</code></li>
+        <li>「檔案」→「開啟資料夾」→ 選 AI_CRUD_Workshop_Frontend_EASY → 信任作者</li>
+        <li><code>cd step0_course_intro</code>，再 <code>.\preflight.ps1</code>（一行貼一次、按 Enter）</li>
+        <li>出現「已停用指令碼執行」：<code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，問你要不要變更就打 <code>Y</code>、Enter，再重跑</li>
+      </ul>
+      <p class="out">看到「前置檢查全數通過，可以開課！」就過關</p>
+    </div>
+    <div class="role" style="--c:#ff8a5c">
+      <h3>Step 1 看兩個網頁</h3>
+      <ul>
+        <li><code>cd ..</code>（回到教材根目錄）</li>
+        <li><code>start step1_why_harness\demo\no-harness.html</code></li>
+        <li><code>start step1_why_harness\demo\with-harness.html</code></li>
+        <li>macOS 把 <code>start</code> 換成 <code>open</code></li>
+      </ul>
+      <p class="out">差的不是好不好看，是「這個決定是誰做的」</p>
+    </div>
+    <div class="role" style="--c:#39c0c8">
+      <h3>Step 2 玩範本</h3>
+      <ul>
+        <li>先回到教材根目錄：<code>cd ..</code>（開頭要是 <code>PS D:\AI_CRUD_Workshop_Frontend_EASY&gt;</code>）</li>
+        <li><code>cd step2_speedrun_kit/2.1_sample_app/sample-app</code></li>
+        <li><code>pnpm install</code> → <code>pnpm dev</code>（這個終端機不要關）</li>
+        <li>按住 Ctrl 點終端機印出的網址（預設 <code>http://localhost:3100/</code>，被占用時 Nuxt 會自己換一個埠並印出來）</li>
+        <li>五個檢查點：新增、編輯、刪除確認、篩選＋網址、匯出 CSV</li>
+        <li>要再打指令：終端機右上角「＋」開第二個</li>
+        <li>Design System：<code>start step2_speedrun_kit\2.2_design_system\DESIGN_SYSTEM.html</code></li>
+      </ul>
+      <p class="out">共用的 3 個核心檔不要動；四份規矩在 sample-app 最上層</p>
+    </div>
+    <div class="role" style="--c:#ef8fc6">
+      <h3>Step 3 用 SDD 叫 AI 做新模組</h3>
+      <ul>
+        <li>用瀏覽器開圖（在 my-equipment-app 的終端機）：<code>start DIAGRAMS-中心裝備物資.html</code>（AI 放在別的資料夾，就照它回報的路徑）</li>
+        <li>教材根目錄整段貼上手冊 step3 ⓪ 的複製指令，出現 <code>&gt;&gt;</code> 後再按 Enter</li>
+        <li>「檔案」→「開啟資料夾」→ my-equipment-app</li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b> → 貼起手 prompt（4 行）→ 送出</li>
+        <li>選擇題照課堂拍板：D1 補刪除＋確認視窗、D2 做 CSV 匯出、D3 簡化版編碼；PRD 沒寫清楚的題目，選它標「建議」的就好</li>
+        <li>AI 先交 SRS、DESIGN、DIAGRAMS、TASKS 四個檔，再列任務清單。圖用瀏覽器開 <code>DIAGRAMS-中心裝備物資.html</code></li>
+        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b>（有規矩和範本，寫程式不用最貴的模型）</li>
+        <li>驗收：打開 AI 印出的網址（例如 <code>http://localhost:3101/equipment/crud</code>）。有小落差就一次講一件，講「看到什麼、期望什麼」</li>
+      </ul>
+      <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
+    </div>
+    <div class="role" style="--c:#a996ff">
+      <h3>Step 4 讓 AI 修到全綠、分身挑錯</h3>
+      <ul>
+        <li>用瀏覽器開報告（教材根目錄）：<code>start step3_new_module\my-equipment-app\loop\LOOP-REPORT.html</code></li>
+        <li>測試報告：<code>start step4_loop_e2e\e2e\playwright-report\index.html</code></li>
+        <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
+        <li>開新的 Claude Code 對話（模型 Sonnet 5.5），貼手冊的 LOOP prompt（4 行；鐵律和產出都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>）</li>
+        <li>AI 自己啟動受測 App，3100 被占就自己換埠；跑 run-e2e 修到 7 條全綠；再開一個 Opus 5.5 的子代理，用 Playwright 開瀏覽器截圖做對抗審查</li>
+        <li>看三份東西：<code>my-equipment-app/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面、有截圖）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告）、SRS／DESIGN／DIAGRAMS 有沒有標「step4 LOOP 後」。<code>loop/LOOP-LOG.md</code> 是給機器看的流水帳，不用讀</li>
+        <li>要你裁決的，AI 用選擇題問；測試本身的問題它只列出來，不會自己改</li>
+      </ul>
+      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準；審的模型要比寫的高一級</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px">用 macOS／Linux 的對照</h2>
+  <div class="where">
+    <p>動畫只拍 Windows。macOS 的步驟一樣，只有指令不同（都在手冊 HANDBOOK.html 裡）：</p>
+    <ul>
+      <li>前置檢查：<code>bash preflight.sh</code>（Windows 是 <code>.\preflight.ps1</code>）</li>
+      <li>開網頁：<code>open HANDBOOK/HANDBOOK.html</code>（Windows 是 <code>start</code>）</li>
+      <li>複製範本：<code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是 robocopy）</li>
+      <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）；換埠用 <code>PORT=3101</code>（Windows 是 <code>$env:PORT='3101'</code>）</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">卡住時</h2>
+  <div class="where">
+    <ul>
+      <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
+      <li><b>preflight 出現 [FAIL]</b>：照修復提示做 → 關掉終端機重開再跑 → 還是紅，整段輸出（連 [PASS] 的行）貼給 AI。</li>
+      <li><b>網頁一打開就是 500、寫著 useColorMode is not defined</b>：舊的建置快取被複製過來了。在跑 pnpm dev 的終端機按 Ctrl+C 停掉，刪掉該專案的 .nuxt、.output 兩個資料夾再 <code>pnpm dev</code>。</li>
+      <li><b>pnpm 噴一大串紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
+      <li><b>網址打不開</b>：多半是網頁伺服器沒在跑。到要看的專案資料夾（範本是 sample-app、新模組是 my-equipment-app）執行 <code>pnpm dev</code>，看終端機印出的網址和埠號，那個終端機不要關。</li>
+      <li><b>pnpm dev 說 3100 被占用</b>：不用關掉別的程式，Nuxt 會自己換一個埠（例如 3101）印在終端機；LOOP 的 AI 也會自己換埠。</li>
+      <li><b>AI 要開 Chrome 或其他工具問你同不同意</b>：這門課用不到，選「No」，跟它說「不用開瀏覽器，繼續」。</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">檔案位置</h2>
+  <div class="where">
+    <p>這支動畫在教材的「HANDBOOK\animation」資料夾裡，檔名是 index.html（用瀏覽器打開）。</p>
+    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：講稿 script_v4.py（字幕和配音都從這裡來）、場景檔 scenes-v4.js、配音腳本 make_v4_audio.py、截圖腳本、座標檔 meta.json。</p>
+  </div>
+</section>
+
+</div>
+
+<aside class="askdrawer" id="askDrawer" aria-label="問小港" aria-hidden="true">
+  <div class="askhead"><h3>💬 問小港</h3><button type="button" id="askClose">關閉</button></div>
+  <div class="askwhere" id="askWhere"></div>
+  <div class="asklog" id="askLog" aria-live="polite"></div>
+  <div class="asktips" id="askTips"></div>
+  <form class="askform" id="askForm"><label for="askInput" class="sr" hidden>問題</label><input id="askInput" autocomplete="off" placeholder="看不懂的地方直接問，例如：五選一怎麼選？"><button type="submit">送出</button></form>
+</aside>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const C={bg:'#10263a',ink:'#eef3f7',mut:'#9db3c6',card:'#16324a',card2:'#1c3d59',line:'#2a4d6b',
+  gold:'#f4b942',teal:'#39c0c8',pink:'#ef8fc6',coral:'#ff8a5b',violet:'#a996ff',red:'#ff5d6c',green:'#5ad18a',grey:'#7f93a6',blue:'#9fb4ff'};
+const svg=document.getElementById('stage'), layer=document.getElementById('layer'), defs=document.getElementById('defs');
+let L=layer, instant=false, timers=[];
+
+/* ---------- 繪圖小工具 ---------- */
+function mk(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a){if(a[k]==null)continue;if(k==='text')e.textContent=a[k];else e.setAttribute(k,a[k]);}(p||L).appendChild(e);return e;}
+function grp(p,hidden=true,cls=''){return mk('g',{class:((hidden?'hid ':'')+cls).trim()||null},p);}
+function T(p,x,y,s,o={}){const size=o.size||34;const t=mk('text',{x,y,'font-size':size,fill:o.fill||C.ink,'text-anchor':o.anchor||'start','font-weight':o.weight||500,class:o.mono?'mono':null},p);String(s).split('\n').forEach((line,i)=>mk('tspan',{x,dy:i?size*1.3:0,text:line},t));return t;}
+function R(p,x,y,w,h,o={}){return mk('rect',{x,y,width:w,height:h,rx:o.rx??14,fill:o.fill||C.card,stroke:o.stroke||'none','stroke-width':o.sw||3,'stroke-dasharray':o.dash||null},p);}
+function P(p,d,color,o={}){return mk('path',{d,fill:'none',stroke:color,'stroke-width':o.w||6,'stroke-linecap':'round',pathLength:1,class:'draw'},p);}
+function box(p,x,y,w,h,label,o={}){const g=grp(p,o.hidden!==false);R(g,x,y,w,h,o);const n=String(label).split('\n').length;const size=o.size||30;T(g,x+w/2,y+h/2-(n-1)*size*0.65+size*0.36,label,{size,anchor:'middle',fill:o.color||C.ink,weight:o.weight||700,mono:o.mono});return g;}
+['gold','teal','pink','coral','violet','red','green','grey','mut','blue'].forEach(k=>{const m=mk('marker',{id:'ah-'+k,viewBox:'0 0 10 10',refX:6,refY:5,markerWidth:4,markerHeight:4,orient:'auto-start-reverse'},defs);mk('path',{d:'M0,0 L10,5 L0,10 z',fill:C[k]},m);});
+function arrow(p,d,ck,o={}){const g=grp(p,o.hidden!==false);const w=o.w||5;
+  if(o.dash)mk('path',{d,fill:'none',stroke:C[ck],'stroke-width':w,'stroke-dasharray':'12 10','stroke-linecap':'round'},g);else P(g,d,C[ck],{w});
+  mk('path',{d,fill:'none',stroke:C[ck],'stroke-opacity':0,'stroke-width':w,'marker-end':`url(#ah-${ck})`,class:'hid late'},g);return g;}
+function dot(p,x,y,color,label,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx:x,cy:y,r:o.r||16,fill:color,stroke:C.bg,'stroke-width':5},g);if(label)T(g,x,o.above?y-30:y+50,label,{size:o.size||22,anchor:'middle',fill:o.lf||C.mut,mono:o.mono!==false,weight:500});return g;}
+function check(p,x,y,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx:x,cy:y,r:22,fill:C.green},g);T(g,x,y+11,'✓',{size:30,anchor:'middle',weight:900,fill:C.bg});return g;}
+function stamp(p,cx,cy,text,color,o={}){const size=o.size||48;const g=grp(p,true,'stamp');const inner=mk('g',{transform:`rotate(${o.rot??-8} ${cx} ${cy})`},g);
+  const lines=String(text).split('\n');const w=o.w||Math.max(...lines.map(l=>l.length))*size+70;const h=o.h||lines.length*size*1.3+34;
+  R(inner,cx-w/2,cy-h/2,w,h,{fill:'rgba(5,13,22,.82)',stroke:color,sw:6,rx:10});T(inner,cx,cy-(lines.length-1)*size*0.65+size*0.36,text,{size,anchor:'middle',weight:900,fill:color});return g;}
+function laneLabel(p,x,y,name,sub,color,right){const t=mk('text',{x,y,'text-anchor':right?'end':'start'},p);mk('tspan',{text:name,fill:color,'font-size':34,'font-weight':900},t);if(sub)mk('tspan',{text:'　'+sub,fill:C.mut,'font-size':24,'font-weight':500},t);return t;}
+function lane(p,x1,x2,y,color,name,sub,o={}){const g=grp(p,o.hidden!==false);P(g,o.d||`M${x1},${y} H${x2}`,color,{w:10});if(name)laneLabel(g,o.right?x2:x1,y-28,name,sub,color,o.right);return g;}
+function sideLane(p,d,y,color,name,sub){const g=grp(p);P(g,d,color,{w:10});T(g,70,y+4,name,{size:38,weight:900,fill:color,mono:true});T(g,70,y+38,sub,{size:22,fill:C.mut});return g;}
+function head(eyebrow,title){T(L,70,78,eyebrow,{size:26,fill:C.coral,weight:700});T(L,70,134,title,{size:50,weight:900});}
+function person(p,cx,cy,color,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx,cy:cy-40,r:26,fill:color},g);mk('path',{d:`M${cx-46},${cy+42} q0,-54 46,-54 q46,0 46,54 z`,fill:color},g);return g;}
+function db(p,cx,cy,w,h,color){const g=grp(p,false);const rx=w/2,ry=w/7;mk('path',{d:`M${cx-rx},${cy-h/2} v${h} a${rx},${ry} 0 0 0 ${w},0 v${-h}`,fill:C.card2,stroke:color,'stroke-width':4},g);mk('ellipse',{cx,cy:cy-h/2,rx,ry,fill:C.card2,stroke:color,'stroke-width':4},g);mk('path',{d:`M${cx-rx},${cy} a${rx},${ry} 0 0 0 ${w},0`,fill:'none',stroke:color,'stroke-width':3},g);return g;}
+
+/* ---------- 動作 ---------- */
+/* later 的計時器可以暫停：暫停時記下剩多久，繼續播放時接著跑 */
+function later(ms,fn){if(instant){fn();return;}const t={fn,due:performance.now()+ms/speed};t.id=setTimeout(()=>{timers=timers.filter(x=>x!==t);fn();},ms/speed);timers.push(t);}
+let frozen=[];
+function pauseTimers(){const now=performance.now();timers.forEach(t=>{clearTimeout(t.id);t.left=Math.max(0,t.due-now);});svg.classList.add('paused');
+  try{frozen=(svg.getAnimations?svg.getAnimations({subtree:true}):document.getAnimations()).filter(a=>a.playState==='running');frozen.forEach(a=>a.pause());}catch(e){frozen=[];}}
+function resumeTimers(){const now=performance.now();timers.forEach(t=>{if(t.left==null)return;t.due=now+t.left;t.id=setTimeout(()=>{timers=timers.filter(x=>x!==t);t.fn();},t.left);t.left=null;});svg.classList.remove('paused');frozen.forEach(a=>{try{if(a.playState==='paused')a.play();}catch(e){}});frozen=[];}
+function show(x){if(!x)return;if(Array.isArray(x)){x.forEach(show);return;}x.classList.remove('hid');if(x.classList.contains('draw'))x.classList.add('on');x.querySelectorAll('.draw').forEach(d=>d.classList.add('on'));x.querySelectorAll('.late').forEach(d=>later(900,()=>d.classList.remove('hid')));}
+function hide(x){if(Array.isArray(x)){x.forEach(hide);return;}x&&x.classList.add('hid');}
+function dim(x,on=true){if(Array.isArray(x)){x.forEach(e=>dim(e,on));return;}x&&x.classList.toggle('dim',on);}
+function glow(x){if(Array.isArray(x)){x.forEach(glow);return;}if(!x||instant)return;x.classList.remove('glow');void x.getBBox();x.classList.add('glow');}
+function move(x,t){x.style.transform=t;}
+function stagger(list,gap,fn=show){list.forEach((e,i)=>later(i*gap,()=>fn(e)));}
+
+/* 截圖教學動畫共用小工具（由 build.py 放在場景檔之前）*/
+const scenes=[];
+function scene(title,build,steps){scenes.push({title,build,steps});}
+let uid=0;
+const META={"br01-handbook-top":{"w":1000,"h":519,"boxes":{"nav":[465,10,475,35],"hero":[60,90,880,210],"step0":[465,10,61,35],"anim":[94,220,413,42]}},"br02-handbook-step0":{"w":1000,"h":519,"boxes":{"head":[61,71,878,91],"goal":[89,188,822,166],"nav":[465,10,475,35]}},"br03-handbook-step3":{"w":1000,"h":519,"boxes":{"goal":[89,10059,822,166],"nav":[465,10,475,35]}},"br04-handbook-prompt":{"w":1000,"h":519,"boxes":{"pre":[89,11475,822,265]}},"br05-handbook-clone":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br06-handbook-copyblock":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,172]}},"br07-handbook-startprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"br08-handbook-loopprompt":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,288]}},"br09-handbook-check":{"w":1000,"h":519,"boxes":{"table":[89,70,822,443],"review":[89,265,822,74],"click":[89,339,822,74],"green":[89,413,822,100]}},"br10-noh":{"w":1000,"h":519,"boxes":{"h1":[146,24,246,30],"form":[109,146,782,75],"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38],"table":[109,355,782,34]}},"br11-noh-filled":{"w":1000,"h":519,"boxes":{"blood":[596,166,175,38],"phone":[352,166,234,36],"add":[781,183,110,38]}},"br12-noh-added":{"w":1000,"h":519,"boxes":{"table":[109,355,782,83],"row":[109,388,782,50],"blood":[596,166,175,38]}},"br13-wh":{"w":1000,"h":519,"boxes":{"h1":[36,24,928,45],"form":[61,192,878,151],"blood":[657,219,282,44],"phone":[359,219,282,44],"add":[841,299,98,44],"stars":[92,193,7,20]}},"br14-wh-empty-submit":{"w":1000,"h":519,"boxes":{"blood":[657,219,282,44],"bloodErr":[657,267,282,19],"nameErr":[61,267,282,19],"phoneErr":[359,267,282,19],"add":[841,302,98,44]}},"br15-wh-phone-blocked":{"w":1000,"h":519,"boxes":{"phone":[359,219,282,44],"phoneErr":[359,267,282,19],"bloodErr":[657,267,282,19]}},"br20-design-system":{"w":1000,"h":519,"boxes":{"h1":[268,111,684,38],"body":[0,0,1000,7655]}},"br30-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"filters":[0,65,223,122],"q":[273,195,288,47],"count":[248,297,68,27],"exp":[1094,290,122,40],"table":[273,379,918,525],"trash":[1151,425,28,28]}},"br31-new-empty":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"save":[1132,73,84,40]}},"br32-new-filled":{"w":1240,"h":644,"boxes":{"save":[1132,73,84,40],"name":[273,-237,295,47]}},"br33-saved":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"edit":[1119,39,28,28],"name":[273,371,78,49]}},"br34-edit":{"w":1240,"h":644,"boxes":{"note":[273,612,918,114],"save":[1132,73,84,40]}},"br35-validation":{"w":1240,"h":644,"boxes":{"name":[273,122,295,47],"err":[273,173,295,20],"save":[1132,73,84,40]}},"br36-edited":{"w":1240,"h":644,"boxes":{"edit":[1119,297,28,28]}},"br37-delete-confirm":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"msg":[380,275,480,86],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"br38-deleted":{"w":1240,"h":644,"boxes":{"toast":[880,552,336,68],"count":[248,297,68,27]}},"br39-filter-q":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br40-filter-status":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"status":[737,195,128,47],"count":[248,297,53,27],"table":[273,379,918,84]}},"br41-newtab":{"w":1240,"h":644,"boxes":{"q":[273,195,288,47],"count":[248,297,53,27]}},"br42-export":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[880,552,336,68]}},"br42b-export-all":{"w":1240,"h":644,"boxes":{"exp":[1094,290,122,40],"toast":[928,576,208,20],"count":[248,297,68,27],"pager":[252,972,176,32]}},"br42c-pager":{"w":1240,"h":644,"boxes":{"rows":[273,155,918,489],"foot":[656,715,36,27]}},"br43-mobile":{"w":390,"h":780,"boxes":{"first":[24,924,342,154]}},"cc-i1-activity":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34]}},"cc-i2-search":{"w":1068,"h":601,"boxes":{"ext":[12,212,34,34],"search":[57,67,249,25],"first":[53,106,256,70],"publisher":[118,151,72,17],"install":[266,151,34,18],"fake1":[53,178,256,70],"fake2":[53,250,256,70]}},"cc-i3-detail":{"w":1068,"h":601,"boxes":{"install":[516,198,34,23],"title":[514,82,298,34],"publisher":[513,118,174,23],"plan":[397,443,428,41],"id":[880,320,155,40]}},"cc00-statusbar":{"w":1068,"h":601,"boxes":{"status":[934,573,98,24],"claudeIcon":[8,254,36,36]}},"cc01-empty":{"w":1068,"h":601,"boxes":{"tab":[543,31,134,32],"status":[934,573,98,24],"input":[353,476,679,40],"send":[1001,521,26,26],"model":[420,525,86,18]}},"cc02-prompt-pasted":{"w":1068,"h":601,"boxes":{"input":[353,378,679,137],"send":[1001,521,26,26],"model":[420,525,86,18]}},"cc03-reading":{"w":1068,"h":601,"boxes":{}},"cc03-t12":{"w":1068,"h":601,"boxes":{}},"cc03-t120":{"w":1068,"h":601,"boxes":{}},"cc03-t150":{"w":1068,"h":601,"boxes":{}},"cc03-t18":{"w":1068,"h":601,"boxes":{}},"cc03-t24":{"w":1068,"h":601,"boxes":{}},"cc03-t30":{"w":1068,"h":601,"boxes":{}},"cc03-t36":{"w":1068,"h":601,"boxes":{}},"cc03-t42":{"w":1068,"h":601,"boxes":{}},"cc03-t48":{"w":1068,"h":601,"boxes":{}},"cc03-t54":{"w":1068,"h":601,"boxes":{}},"cc03-t6":{"w":1068,"h":601,"boxes":{}},"cc03-t60":{"w":1068,"h":601,"boxes":{}},"cc03-t90":{"w":1068,"h":601,"boxes":{}},"cc05-d2":{"w":1068,"h":601,"boxes":{"tab":[420,262,43,16],"q":[361,301,663,20],"rec":[361,330,663,61]}},"cc06-d3":{"w":1068,"h":601,"boxes":{"tab":[476,226,43,16],"q":[361,266,648,20],"rec":[361,294,648,61],"full":[361,450,648,44]}},"cc07-answered":{"w":1068,"h":601,"boxes":{"submit":[361,484,663,29]}},"cc08-submitted":{"w":1068,"h":601,"boxes":{}},"cc08-t6":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t120":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t180":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t240":{"w":1068,"h":601,"boxes":{}},"cc09-docs-t60":{"w":1068,"h":601,"boxes":{}},"cc09-tasks":{"w":1068,"h":601,"boxes":{}},"cc09a-docs4":{"w":1068,"h":601,"boxes":{"head":[371,163,655,37],"srs":[397,20887,632,39],"diag":[397,20887,632,39],"check":[371,306,119,17]}},"cc09a-tasklist":{"w":1068,"h":601,"boxes":{"head":[371,162,658,20],"t0":[371,231,581,24],"t1":[371,547,581,25],"t13":[371,547,581,25]}},"cc09b-q2-answered":{"w":1068,"h":601,"boxes":{"submit":[361,480,663,29]}},"cc09b-q2-edit":{"w":1068,"h":601,"boxes":{"tab":[413,275,49,16],"rec":[361,342,663,44]}},"cc09b-q2-phone":{"w":1068,"h":601,"boxes":{"tab":[476,222,49,16],"rec":[361,290,648,61]}},"cc09b-q2-row":{"w":1068,"h":601,"boxes":{"tab":[538,275,49,16],"rec":[361,342,663,44]}},"cc09b-q2-serial":{"w":1068,"h":601,"boxes":{"tabs":[363,258,36,16],"last":[538,258,49,16],"rec":[361,325,663,61],"submit":[361,480,663,29]}},"cc09b-q3-items":{"w":1068,"h":601,"boxes":{"tab":[425,258,49,16],"rec":[361,325,663,61]}},"cc09b-q3-sort":{"w":1068,"h":601,"boxes":{"tabs":[363,228,49,16],"last":[425,228,49,16],"rec":[361,296,663,44],"submit":[361,480,663,29]}},"cc09b-q4-id":{"w":1068,"h":601,"boxes":{"tab":[363,258,24,16],"q":[361,297,663,20],"rec":[361,325,663,61],"submit":[361,480,663,29]}},"cc09b-start-question":{"w":1068,"h":601,"boxes":{"tab":[363,279,49,16],"q":[361,318,663,20],"rec":[361,347,663,44],"no":[361,393,663,44],"submit":[361,484,663,29]}},"cc09c-decided":{"w":1068,"h":601,"boxes":{}},"cc09c-q2-submitted":{"w":1068,"h":601,"boxes":{}},"cc09c-q3-submitted":{"w":1068,"h":601,"boxes":{}},"cc09c-q4-submitted":{"w":1068,"h":601,"boxes":{}},"cc09d-go-selected":{"w":1068,"h":601,"boxes":{"rec":[361,347,663,44],"submit":[361,484,663,29]}},"cc09e-model-menu":{"w":1068,"h":601,"boxes":{"opus":[357,284,655,39],"sonnet":[357,366,655,39]}},"cc09f-go-typed":{"w":1068,"h":601,"boxes":{"input":[353,476,679,40],"model":[477,525,95,18],"send":[1001,521,26,26]}},"cc10-build-start":{"w":1068,"h":601,"boxes":{}},"cc11v2-t060":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc11v2-t1080":{"w":1068,"h":601,"boxes":{}},"cc11v2-t120":{"w":1068,"h":601,"boxes":{}},"cc11v2-t180":{"w":1068,"h":601,"boxes":{}},"cc11v2-t240":{"w":1068,"h":601,"boxes":{}},"cc11v2-t300":{"w":1068,"h":601,"boxes":{}},"cc11v2-t360":{"w":1068,"h":601,"boxes":{}},"cc11v2-t420":{"w":1068,"h":601,"boxes":{}},"cc11v2-t480":{"w":1068,"h":601,"boxes":{}},"cc11v2-t540":{"w":1068,"h":601,"boxes":{}},"cc11v2-t600":{"w":1068,"h":601,"boxes":{}},"cc11v2-t660":{"w":1068,"h":601,"boxes":{}},"cc11v2-t720":{"w":1068,"h":601,"boxes":{}},"cc11v2-t780":{"w":1068,"h":601,"boxes":{}},"cc11v2-t840":{"w":1068,"h":601,"boxes":{}},"cc11v2-t900":{"w":1068,"h":601,"boxes":{}},"cc11v2-t960":{"w":1068,"h":601,"boxes":{}},"cc11v4-port-msg":{"w":1068,"h":601,"boxes":{}},"cc11v4-question":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0180":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0240":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0300":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0360":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0420":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0480":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0540":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0600":{"w":1068,"h":601,"boxes":{}},"cc11v4-t0660":{"w":1068,"h":601,"boxes":{}},"cc12-done":{"w":1068,"h":601,"boxes":{"sum":[130,339,65,17],"docs":[130,359,39,17],"time":[130,437,39,17],"model":[344,521,95,18]}},"cc12a-other-answer":{"w":1068,"h":601,"boxes":{}},"cc12a-submitted":{"w":1068,"h":601,"boxes":{}},"cc12a-t13-question":{"w":1068,"h":601,"boxes":{"tab":[363,262,46,16],"q":[361,301,663,20],"rec":[361,330,663,61]}},"cc12b-next-question":{"w":1068,"h":601,"boxes":{"tab":[363,233,36,16],"rec":[361,301,663,44],"e2e":[361,393,663,44]}},"cc12v4-question":{"w":1068,"h":601,"boxes":{}},"cc12v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc12v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc13-fix1-ask":{"w":1068,"h":601,"boxes":{"msg":[353,456,679,59],"send":[1001,521,26,26]}},"cc13-fix1-done":{"w":1068,"h":601,"boxes":{"done":[371,250,52,17],"why":[371,272,39,17],"how":[371,294,39,17]}},"cc14-fix2-ask":{"w":1068,"h":601,"boxes":{"msg":[353,456,679,59],"send":[1001,521,26,26]}},"cc14-fix2-done":{"w":1068,"h":601,"boxes":{"done":[371,211,52,17],"ask":[371,296,658,20]}},"cc19-root-explorer":{"w":1068,"h":601,"boxes":{"status":[934,573,98,24]}},"cc20-loop-pasted":{"w":1068,"h":601,"boxes":{"input":[219,378,679,137],"send":[867,521,26,26],"model":[286,525,95,18]}},"cc21-loop-start":{"w":1068,"h":601,"boxes":{}},"cc21v4-port":{"w":1068,"h":601,"boxes":{"port":[104,212,925,20]}},"cc22-loop-t060":{"w":1068,"h":601,"boxes":{}},"cc22-loop-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t060":{"w":1068,"h":601,"boxes":{}},"cc22v2-t120":{"w":1068,"h":601,"boxes":{}},"cc22v2-t180":{"w":1068,"h":601,"boxes":{}},"cc23-loop-red":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent-now":{"w":1068,"h":601,"boxes":{}},"cc23v2-agent":{"w":1068,"h":601,"boxes":{"green":[371,228,658,39],"agent":[341,7784,688,35]}},"cc23v2-judge":{"w":1068,"h":601,"boxes":{"judge":[371,228,658,39]}},"cc23v2-red":{"w":1068,"h":601,"boxes":{"red":[371,227,658,39]}},"cc23v4-agent-now":{"w":1068,"h":601,"boxes":{"pill":[362,525,37,18]}},"cc23v4-agent":{"w":1068,"h":601,"boxes":{"agent":[104,213,925,20],"task":[100,250,890,100]}},"cc23v4-red":{"w":1068,"h":601,"boxes":{"red":[104,212,925,20],"why":[104,693,925,20]}},"cc23v4-shots":{"w":1068,"h":601,"boxes":{"pill":[362,525,37,18],"run":[141,400,644,13]}},"cc24-loop-done":{"w":1068,"h":601,"boxes":{}},"cc24-loop-green":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0060":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0120":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0180":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0240":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0300":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0360":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0420":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0480":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0540":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0600":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0660":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0720":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0780":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0840":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0900":{"w":1068,"h":601,"boxes":{}},"cc24v2-t0960":{"w":1068,"h":601,"boxes":{}},"cc24v2-t1020":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0060":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0120":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0180":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0240":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0300":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0360":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0420":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0480":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0540":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0600":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0660":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0720":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0780":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0840":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0900":{"w":1068,"h":601,"boxes":{}},"cc24v4-t0960":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1020":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1080":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1140":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1200":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1260":{"w":1068,"h":601,"boxes":{}},"cc24v4-t1320":{"w":1068,"h":601,"boxes":{}},"cc25-loop-report":{"w":1068,"h":601,"boxes":{}},"cc25b-loop-conclusion":{"w":1068,"h":601,"boxes":{}},"cc25v2-conclusion":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"sum":[371,273,658,39]}},"cc25v2-final":{"w":1068,"h":601,"boxes":{"head":[371,434,658,29],"pass":[379,491,326,33]}},"cc25v2-fixed":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"b1":[371,335,53,44]}},"cc25v2-rounds":{"w":1068,"h":601,"boxes":{"head":[371,227,658,29],"r1":[371,297,73,63],"r3":[371,384,73,44]}},"cc25v2-tests":{"w":1068,"h":601,"boxes":{"head":[371,228,658,29],"fake":[371,273,658,20]}},"cc25v4-conclusion":{"w":1068,"h":601,"boxes":{"head":[104,212,925,20],"report":[130,245,899,20],"url":[130,265,899,20]}},"cc25v4-fixed":{"w":1068,"h":601,"boxes":{"issue":[130,322,182,17],"focus":[156,341,873,20],"page":[156,360,873,20],"fixed":[156,380,873,20]}},"cc25v4-tests":{"w":1068,"h":601,"boxes":{"list":[104,162,925,20]}},"cc26-loop-rules":{"w":1068,"h":601,"boxes":{}},"cc26v2-question":{"w":1068,"h":601,"boxes":{}},"ea01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,1386],"status":[888,437,50,25],"code":[454,452,93,20],"exp":[1094,290,122,40]}},"ea02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"save":[1132,73,84,40]}},"ea03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"list":[274,305,295,386]}},"ea04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"list":[585,305,295,192]}},"ea05-code":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"title":[76,19,269,26]}},"ea06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,101],"qty":[273,336,295,101],"unit":[584,336,295,101],"spec":[273,510,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"ea07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"ea08-mobile":{"w":390,"h":780,"boxes":{}},"eq01-list":{"w":1240,"h":644,"boxes":{"title":[76,19,269,26],"add":[1100,73,116,40],"count":[248,297,68,27],"table":[273,379,918,2095],"status":[285,476,62,36],"code":[371,499,70,39],"exp":[1094,290,122,40]}},"eq02-new-empty":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"save":[1132,73,84,40]}},"eq03-cat-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"list":[274,305,295,386]}},"eq04-item-open":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"list":[585,305,295,239]}},"eq05-code":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,78],"name":[584,219,295,78],"code":[896,219,295,78],"title":[76,19,269,26]}},"eq06-validation":{"w":1240,"h":644,"boxes":{"cat":[273,219,295,101],"qty":[273,336,295,101],"unit":[584,336,295,101],"spec":[273,454,918,145],"toast":[928,576,208,20],"save":[1132,73,84,40]}},"eq07-delete":{"w":1240,"h":644,"boxes":{"dialog":[380,211,480,222],"title":[460,235,376,30],"ok":[780,369,56,40],"cancel":[716,369,56,40]}},"eq08-mobile":{"w":390,"h":780,"boxes":{}},"hb5-checklist":{"w":1000,"h":519,"boxes":{"h":[150,90,105,37]}},"hb5-step0-clone":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"hb5-step0-help":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,125]}},"hb5-step2-run":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,102]}},"hb5-step3-copy":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,195]}},"hb5-step3-rescue":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,79]}},"hb5-step3-start":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,148]}},"hb5-step4-loop":{"w":1000,"h":519,"boxes":{"pre":[89,110,822,172]}},"v3-loop-docedit":{"w":1068,"h":601,"boxes":{"diff1":[104,228,925,53],"head2":[100,309,560,18],"diff2":[104,354,925,53]}},"v3-loop-srsedit":{"w":1068,"h":601,"boxes":{"head":[100,196,560,16],"added":[576,272,452,64],"sddhead":[100,386,560,16]}},"v3-sdd-code":{"w":1068,"h":601,"boxes":{"h":[105,76,892,19],"h2":[105,-1076,892,28]}},"v3-sdd-evidence":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,154,892,554],"hex":[105,181,892,28],"log":[105,209,892,28],"shared":[105,492,892,63],"lines":[105,328,892,45]}},"v3-sdd-files":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,120,892,355],"shared":[105,340,892,45],"used":[669,120,327,28]}},"v3-sdd-loopnote":{"w":1068,"h":601,"boxes":{"lines":[105,223,892,45],"shared":[105,387,892,63]}},"v3-srs-accept":{"w":1068,"h":601,"boxes":{"h":[105,76,892,19],"note":[105,111,892,35],"table":[105,161,892,407]}},"v3-srs-decisions":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,120,892,278],"note":[105,407,892,17],"who":[950,120,47,45]}},"v3-srs-open":{"w":1068,"h":601,"boxes":{"file":[53,441,257,22],"title":[372,83,446,37],"sec1":[372,267,260,28]}},"v3-srs-risk":{"w":1068,"h":601,"boxes":{"h":[105,75,892,28],"qty":[180,292,785,20],"date":[180,310,600,20]}},"v3-srs-scope":{"w":1068,"h":601,"boxes":{"h":[105,76,892,28],"table":[105,378,892,185]}},"v3-srs-trace":{"w":1068,"h":601,"boxes":{"h2":[105,-28,892,28],"h":[105,76,892,19],"table":[105,110,892,484],"where":[309,110,364,45]}},"v4-design-after":{"w":1068,"h":601,"boxes":{"mark":[387,79,594,230],"tab":[507,31,217,32]}},"v4-design-code":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"list":[105,117,892,205]}},"v4-design-evidence":{"w":1068,"h":601,"boxes":{"h":[105,75,892,38],"table":[105,171,892,806],"hex":[105,356,892,62],"log":[105,417,892,62],"shared":[105,207,892,62],"lines":[105,479,892,62],"result":[661,171,336,36]}},"v4-design-files":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,178,1089,1476],"shared":[105,1239,1089,139],"used":[1044,178,149,61]}},"v4-design-open":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"tab":[263,31,240,32],"quote":[105,146,892,77]}},"v4-diag-class-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,129,1893,633]}},"v4-diag-class":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,167,1893,633]}},"v4-diag-copy5":{"w":1620,"h":455,"boxes":{}},"v4-diag-files-full":{"w":4950,"h":760,"boxes":{"h":[198,8,4554,58],"svg":[232,129,4487,458],"copy5":[232,128,1620,455],"shared3":[3688,378,1035,205]}},"v4-diag-files-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,167,4487,458]}},"v4-diag-files":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,166,4487,458]}},"v4-diag-other":{"w":1250,"h":250,"boxes":{}},"v4-diag-seq-create-wide":{"w":1900,"h":1000,"boxes":{"h":[76,8,1748,58],"svg":[76,130,1937,1413]}},"v4-diag-seq-create":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,130,1937,1413]}},"v4-diag-seq-del":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[50,129,1232,1065]}},"v4-diag-shared3":{"w":1035,"h":205,"boxes":{}},"v4-diag-top":{"w":1240,"h":644,"boxes":{"h1":[74,10,1091,75],"nav":[0,195,1240,98]}},"v4-diag-uc":{"w":1240,"h":644,"boxes":{"h":[50,8,1141,58],"svg":[63,129,1115,734]}},"v4-loop-docedit":{"w":1068,"h":601,"boxes":{"edit":[108,216,916,5336]}},"v4-loop-log":{"w":1068,"h":601,"boxes":{"body":[765,64,298,3562],"tab":[691,31,145,32]}},"v4-loop-report-a1":{"w":1240,"h":644,"boxes":{"h":[137,450,966,33],"why":[137,634,57,27],"fix":[137,721,76,27]}},"v4-loop-report-decide":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"q1":[138,121,964,33]}},"v4-loop-report-end":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"pass":[116,152,1008,95]}},"v4-loop-report-review":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"how":[116,100,1008,67],"stat":[116,185,1008,33]}},"v4-loop-report-rounds":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"table":[116,93,1008,489]}},"v4-loop-report-shots":{"w":1240,"h":644,"boxes":{"shot":[137,70,966,605]}},"v4-loop-report-sync":{"w":1240,"h":644,"boxes":{"h":[116,12,1008,69],"table":[116,154,1008,406]}},"v4-loop-report-top":{"w":1240,"h":644,"boxes":{"h1":[116,32,1008,52],"sum":[116,157,1008,186],"plain":[148,262,952,61]}},"v4-pw-report-open":{"w":1240,"h":644,"boxes":{}},"v4-pw-report":{"w":1240,"h":644,"boxes":{"pass":[704,22,43,19],"list":[108,0,1024,644]}},"v4-srs-accept":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"table":[105,117,892,453]}},"v4-srs-after":{"w":1068,"h":601,"boxes":{"mark":[387,79,594,230],"tab":[507,31,217,32]}},"v4-srs-decisions":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"h3":[105,137,892,25],"table":[105,178,892,298],"who":[940,178,57,61]}},"v4-srs-open":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"tab":[240,31,217,32]}},"v4-srs-q":{"w":1068,"h":601,"boxes":{"h":[105,76,892,25],"table":[105,117,892,570],"q7":[105,600,892,87]}},"v4-srs-risk":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,129,892,555]}},"v4-srs-scope":{"w":1068,"h":601,"boxes":{"h":[105,76,892,38],"table":[105,474,445,252],"h3":[105,433,892,25]}},"v4-srs-trace":{"w":1068,"h":601,"boxes":{"h2":[105,14,892,38],"h":[105,75,892,25],"table":[105,116,892,761],"where":[350,116,259,61],"done":[282,116,68,61]}},"v4-tasks":{"w":1068,"h":601,"boxes":{"h1":[105,80,892,50],"table":[105,213,892,1053],"t0":[105,274,892,62],"t13":[105,1205,892,61],"status":[952,213,44,61]}},"vs01-empty":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"menuFile":[35,0,56,30],"activity":[4,30,44,539]}},"vs02-menu-terminal":{"w":1068,"h":601,"boxes":{"menuTerm":[405,0,70,30],"newTerm":[405,31,295,24]}},"vs03-terminal":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"tabTerm":[232,105,59,32],"prompt":[73,145,196,19],"max":[1011,110,22,22]}},"vs03b-terminal-max":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"prompt":[73,71,196,19]}},"vs04-cd-d":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,71,240,19],"prompt":[73,90,79,19]}},"vs05-clone-typed":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,703,19]}},"vs06-clone-done":{"w":1068,"h":601,"boxes":{"panel":[52,30,1012,539],"cmd":[73,90,695,19],"cloning":[73,109,422,19],"done":[73,246,343,19],"prompt":[73,265,79,19]}},"vs07-menu-file":{"w":1068,"h":601,"boxes":{"menuFile":[35,0,56,30],"openFolder":[36,161,298,24]}},"vs08-open-folder-dialog":{"w":1686.0,"h":1000.0,"boxes":{"HANDBOOK":[347.0,273.0,1350,48],"step3_new_module":[347.0,497.0,1350,48],"ok":[1219.0,901.0,218,52],"cancel":[1461.0,901.0,176,52],"address":[285.0,68.0,825,70]}},"vs09-trust":{"w":1068,"h":601,"boxes":{"dialog":[310,153,449,295],"yes":[417,388,172,25]}},"vs10-explorer":{"w":1068,"h":601,"boxes":{"explorer":[48,30,267,539],"tree":[49,91,265,417],"root":[53,91,257,22],"handbook":[53,91,257,22],"step0":[53,113,257,22],"step1":[53,135,257,22],"step2":[53,157,257,22],"step3":[53,179,257,22],"step4":[53,201,257,22],"step6":[53,223,257,22],"readme":[53,289,257,22]}},"vs11-terminal-root":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"prompt":[340,145,343,19]}},"vs12-preflight-fail":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"fail":[340,207,405,19],"hint":[340,226,713,19],"summary":[340,440,572,19]}},"vs13-preflight-pass":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,90,634,19],"first":[340,148,713,19],"last":[340,362,379,19],"summary":[340,401,246,19]}},"vs14-start-handbook":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,590,19]}},"vs15-start-demo":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,440,713,19]}},"vs16-pnpm-install":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"done":[340,498,282,19]}},"vs17-pnpm-dev":{"w":1068,"h":601,"boxes":{"panel":[319,30,745,539],"cmd":[340,226,88,19],"local":[340,401,317,19],"url":[463,401,150,18]}},"vs18-link-hover":{"w":1068,"h":601,"boxes":{"url":[463,401,150,18]}},"vs19-readme-raw":{"w":1068,"h":601,"boxes":{"tab":[320,31,132,32],"editor":[319,30,745,539],"file":[53,245,257,22],"tree":[49,91,265,417]}},"vs20-readme-preview":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h2":[372,63,625,38],"table":[372,324,625,965]}},"vs20b-readme-table":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"table":[105,76,892,529],"r1":[105,112,892,62],"r5":[105,358,892,62],"r6":[105,420,892,62],"r8":[105,544,892,61]}},"vs21-harness-files":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"sampleApp":[53,135,257,22],"claude":[53,419,257,22],"rules":[53,441,257,22],"ds":[53,463,257,22],"guide":[53,331,257,22],"agents":[53,353,257,22],"pages":[53,221,257,22],"components":[53,133,257,22]}},"vs22-claude-md":{"w":1068,"h":601,"boxes":{"tab":[320,31,130,32],"editor":[319,30,745,539],"file":[53,419,257,22]}},"vs22b-claude-md-wide":{"w":1068,"h":601,"boxes":{"tab":[53,31,130,32],"editor":[52,30,1012,539]}},"vs23-plus":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"plus":[803,110,22,22],"trash":[951,110,22,22],"max":[1011,110,22,22]}},"vs24-start-ds":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"cmd":[73,145,853,19],"plus":[938,110,22,22],"tabs":[944,137,119,432]}},"vs25-paste-warning":{"w":1068,"h":601,"boxes":{}},"vs25-pasted":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"first":[73,145,800,19],"robocopy":[73,183,581,19],"copy":[73,203,484,19],"install":[73,261,141,19]}},"vs26-step3-prep":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"install":[73,261,132,19],"done":[73,436,281,19],"prompt":[73,456,642,19]}},"vs27-myapp-explorer":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"guide":[53,333,257,22],"claude":[53,421,257,22],"rules":[53,443,257,22],"ds":[53,465,257,22]}},"vs28-prd-top":{"w":1068,"h":601,"boxes":{"editor":[319,30,745,539],"h1":[372,80,625,50]}},"vs29-prd-fields":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,63,892,38],"table":[105,-117,536,144]}},"vs30-prd-decisions":{"w":1068,"h":601,"boxes":{"editor":[52,30,1012,539],"h2":[105,64,892,38]}},"vs31-git-diff":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,164,580,19],"prompt":[340,183,475,19],"tabs":[944,137,119,432]}},"vs32-select-string":{"w":1068,"h":601,"boxes":{"panel":[319,104,745,465],"cmd":[340,242,589,19],"hit":[336,337,580,42]}},"hb-step3-paradigm":{"w":1411,"h":761,"boxes":{}},"hb-step5-value":{"w":1375,"h":771,"boxes":{}},"hb-overview":{"w":1800,"h":1005,"boxes":{}}};
+let HC='#f4b942';  // 標註框預設色：深色截圖用金色；淺色系統畫面在場景檔第一行寫 HC='#ff8a1f';
+const FR={x:120,y:116,w:1360,h:765};          // 一般：整張截圖
+const FD={x:430,y:128,w:1130,h:636};          // 示範：左邊步驟、右邊截圖
+const FW={x:70,y:170,w:1460,h:616};           // 超寬 2560×1080
+const FA={x:150,y:116,w:1300,h:731};          // 下方留一行註記
+function tw(s,size){let w=0;for(const ch of String(s))w+=ch.charCodeAt(0)>0x2e7f?size:size*0.6;return w;}
+function mhead(eb,title){T(L,70,52,eb,{size:24,fill:C.coral,weight:700});T(L,70,100,title,{size:42,weight:900});}
+/* 一張系統畫面；回傳群組 g（g.inner 可放大，標註都放在 inner 裡跟著放大） */
+function scr(name,F=FR){const m=META[name]||{w:1920,h:1080,boxes:{}};const g=grp(L);
+  const id='cl'+(++uid);const cp=mk('clipPath',{id},defs);mk('rect',{x:F.x,y:F.y,width:F.w,height:F.h,rx:8},cp);
+  R(g,F.x-5,F.y-5,F.w+10,F.h+10,{fill:'#050d16',stroke:C.line,sw:4,rx:12});
+  const c=mk('g',{'clip-path':`url(#${id})`},g);const inner=mk('g',{},c);
+  mk('image',{href:'images/'+name+'.jpg',x:F.x,y:F.y,width:F.w,height:F.h,preserveAspectRatio:'none'},inner);
+  g.inner=inner;g.F=F;g.m=m;g.k=F.w/m.w;g.nm=name;return g;}
+/* 截圖座標（原始畫面像素）→ 舞台座標 */
+function rb(g,k,pad=0){const b=Array.isArray(k)?k:g.m.boxes[k];if(!b){console.warn('no box',g.nm,k);return{x:g.F.x,y:g.F.y,w:10,h:10};}
+  const s=g.k;return{x:g.F.x+b[0]*s-pad,y:g.F.y+b[1]*s-pad,w:b[2]*s+2*pad,h:b[3]*s+2*pad};}
+/* 標註框＋標籤 */
+function hl(r,g,k,label,o={}){const q=rb(g,k,o.pad??5);const col=o.col||HC;const h=grp(g.inner);
+  R(h,q.x,q.y,q.w,q.h,{fill:o.fill||'none',stroke:col,sw:o.sw||5,rx:10});
+  if(label){const size=o.size||26;const lw=tw(label,size)+30;const F=g.F;
+    let lx=o.right?(q.x+q.w-lw):q.x;if(o.lx!=null)lx=o.lx;lx=Math.min(Math.max(lx,F.x+6),F.x+F.w-lw-6);
+    let ly=o.below?(q.y+q.h+8):(q.y-size-24);if(o.inside)ly=q.y+8;
+    if(ly<F.y+4)ly=q.y+q.h+8;if(ly+size+18>F.y+F.h)ly=Math.max(F.y+4,q.y-size-24);
+    R(h,lx,ly,lw,size+18,{fill:col,rx:8});T(h,lx+lw/2,ly+size*0.95+3,label,{size,anchor:'middle',weight:900,fill:C.bg});}
+  (r.H=r.H||[]).push(h);return h;}
+/* 點擊示意：金色圓點＋擴散圈 */
+function ping(r,g,k){const q=rb(g,k,0);const cx=q.x+q.w/2,cy=q.y+q.h/2;const h=grp(g.inner);
+  mk('circle',{cx,cy,r:13,fill:C.gold,stroke:C.bg,'stroke-width':3},h);mk('circle',{cx,cy,r:13,fill:'none',stroke:C.gold,'stroke-width':5,class:'ping'},h);
+  (r.H=r.H||[]).push(h);return h;}
+/* 聚光：其他地方變暗 */
+function spot(r,g,k,pad=8){const q=rb(g,k,pad);const F=g.F;const h=grp(g.inner);
+  mk('path',{d:`M${F.x-3000},${F.y-3000}h${F.w+6000}v${F.h+6000}h${-(F.w+6000)}z M${q.x},${q.y}v${q.h}h${q.w}v${-q.h}z`,fill:'rgba(3,8,14,.6)','fill-rule':'evenodd'},h);
+  (r.H=r.H||[]).push(h);return h;}
+/* 只顯示指定的標註（其他收起來） */
+function only(r,...list){list=list.flat();(r.H||[]).forEach(h=>{if(!list.includes(h))hide(h);});list.forEach((h,i)=>later(i*350,()=>{show(h);glow(h);}));}
+/* 放大到某一塊 */
+function zoom(g,k,o={}){const q=rb(g,k,o.pad??40);const F=g.F;let z=Math.min(F.w/q.w,F.h/q.h,o.max||2);if(z<1)z=1;
+  const hw=F.w/2/z,hh=F.h/2/z;let cx=q.x+q.w/2,cy=q.y+q.h/2;cx=Math.min(Math.max(cx,F.x+hw),F.x+F.w-hw);cy=Math.min(Math.max(cy,F.y+hh),F.y+F.h-hh);
+  move(g.inner,`translate(${F.x+F.w/2-z*cx}px,${F.y+F.h/2-z*cy}px) scale(${z})`);}
+function unzoom(g){move(g.inner,'');}
+/* 換到另一張畫面（淡入，舊的稍後收起） */
+function to(r,g){show(g);(r.S||[]).forEach(o=>{if(o!==g)later(650,()=>hide(o));});}
+function shots(r,names,F){r.S=names.map(n=>scr(n,F));return r.S;}
+/* 示範用：左邊的步驟清單 */
+function stepList(labels,y0=150,gap=150){const g=grp(L,false);const items=labels.map((t,i)=>{const it=grp(g,false);const y=y0+i*gap;
+    const bx=R(it,40,y,350,104,{fill:C.card,stroke:C.line,sw:3});mk('circle',{cx:88,cy:y+52,r:28,fill:C.line},it);T(it,88,y+63,String(i+1),{size:30,anchor:'middle',weight:900,fill:C.ink});
+    T(it,130,y+64,t,{size:29,weight:800});if(i<labels.length-1)T(it,215,y+gap-10,'▼',{size:24,anchor:'middle',fill:C.mut});it._bx=bx;it._c=it.querySelector('circle');return it;});
+  g.set=n=>items.forEach((it,j)=>{it._bx.setAttribute('stroke',j===n?C.gold:C.line);it._bx.setAttribute('fill',j===n?'#2a2410':C.card);it._c.setAttribute('fill',j<=n?C.gold:C.line);dim(it,j>n);});
+  g.set(-1);return g;}
+function caseBar(text){return box(L,430,788,1130,76,text,{size:28,fill:'#2a2410',stroke:C.gold,sw:2,color:C.gold,hidden:false});}
+function note(text,y=900-18){return T(L,800,y,text,{size:20,anchor:'middle',fill:C.mut});}
+
+
+/* 依圖片比例放進指定區域 */
+function fitF(name,A={x:70,y:116,w:1460,h:765}){const m=META[name];const k=Math.min(A.w/m.w,A.h/m.h);const w=m.w*k,h=m.h*k;return{x:A.x+(A.w-w)/2,y:A.y+(A.h-h)/2,w,h};}
+function fshots(r,list){r.S=list.map(([n,A])=>scr(n,fitF(n,A)));return r.S;}
+function card(x,y,w,h,title,lines,col,o={}){const g=grp(L,o.hidden!==false);R(g,x,y,w,h,{fill:C.card,stroke:col,sw:3});T(g,x+22,y+44,title,{size:o.ts||30,weight:900,fill:col});
+  lines.forEach((t,i)=>T(g,x+26,y+88+i*(o.lh||40),t,{size:o.size||25}));return g;}
+
+/* ===== AI CRUD 工作坊動畫專用小工具（接在技能的 helpers.js 後面）=====
+   chapter()：章節（step0～step5）；term()：大字版終端機（逐字打指令、逐行出結果）；
+   bwin()：瀏覽器外框＋網址列；cursor()/clickAt()：滑鼠游標移過去點一下；keys()：按鍵圖示；codeCard()：大字指令卡。 */
+const CHAPS = [];
+function chapter(tag, title, color) { CHAPS.push({ tag, title, color: color || C.gold }); }
+function scene(title, build, steps) { scenes.push({ title, build, steps, chap: CHAPS.length - 1 }); }
+window.__chaps = CHAPS;
+
+const MONO = "'JetBrains Mono','Cascadia Mono',Consolas,'Noto Sans TC','Microsoft JhengHei',monospace";
+const TC = { bg: '#181818', bar: '#1f1f1f', line: '#3c3c3c', ink: '#d4d4d4', mut: '#8b949e', cmd: '#f2cc60', ok: '#23d18b', warn: '#f5f543', err: '#f14c4c', link: '#3b8eea', cyan: '#29b8db', flag: '#9da5b4' };
+
+/* 外框（截圖用）：不畫深色邊框的 scr，給瀏覽器外框裡面用 */
+function scrIn(name, F, parent) {
+  const m = META[name] || { w: 1600, h: 900, boxes: {} }; const g = grp(parent || L);
+  const id = 'cl' + (++uid); const cp = mk('clipPath', { id }, defs); mk('rect', { x: F.x, y: F.y, width: F.w, height: F.h }, cp);
+  const c = mk('g', { 'clip-path': `url(#${id})` }, g); const inner = mk('g', {}, c);
+  mk('image', { href: 'images/' + name + '.jpg', x: F.x, y: F.y, width: F.w, height: F.h, preserveAspectRatio: 'none' }, inner);
+  g.inner = inner; g.F = F; g.m = m; g.k = F.w / m.w; g.nm = name; return g;
+}
+
+/* 瀏覽器外框：上面一條網址列（大字），下面放截圖。回傳 {g, S:[截圖…], ut}；預設藏起來，用 show(bw.g) 顯示 */
+const BW = { x: 120, y: 112, w: 1360, h: 770, bar: 64 };
+function bwin(names, url, A = BW, o = {}) {
+  const g = grp(L, o.hidden !== false);
+  R(g, A.x - 4, A.y - 4, A.w + 8, A.h + 8, { fill: '#e8eaed', stroke: '#9aa0a6', sw: 3, rx: 14 });
+  [['#ff5f57', 0], ['#febc2e', 1], ['#28c840', 2]].forEach(([c, i]) => mk('circle', { cx: A.x + 26 + i * 26, cy: A.y + A.bar / 2, r: 8, fill: c }, g));
+  R(g, A.x + 112, A.y + 11, A.w - 136, A.bar - 22, { fill: '#ffffff', stroke: '#dadce0', sw: 2, rx: 21 });
+  T(g, A.x + 136, A.y + A.bar / 2 + 10, '🔒', { size: 22 });
+  const ut = T(g, A.x + 172, A.y + A.bar / 2 + 11, url || '', { size: 30, weight: 700, fill: '#202124' }); ut.classList.add('mono'); ut.style.fontFamily = MONO;
+  const F = { x: A.x, y: A.y + A.bar, w: A.w, h: A.h - A.bar };
+  const S = names.map(n => scrIn(n, F, g));
+  return { g, S, ut, F };
+}
+/* 在一組截圖裡換到另一張（淡入，其他稍後收起） */
+function swap(list, g) { show(g); list.forEach(o => { if (o !== g) later(650, () => hide(o)); }); }
+/* 換網址（typing=true 會一個字一個字打出來） */
+function burl(bw, text, typing) {
+  const ut = bw.ut;
+  if (!typing) { ut.textContent = text; return; }
+  ut.textContent = ''; [...text].forEach((ch, i) => later(i * 45, () => { ut.textContent = text.slice(0, i + 1); }));
+}
+
+/* 大字版終端機。o: {x,y,w,h,size,title,path}；回傳 api：
+   t.cmd(指令,{path,typing})：印提示字元並逐字打指令；t.out([行…],{gap})：逐行出結果；
+   t.mark(第幾行,標籤,顏色)：框住某一行；t.clear()：清空。行文字開頭是 [PASS]/[WARN]/[FAIL] 會自動上色。 */
+function term(o = {}) {
+  const x = o.x ?? 80, y = o.y ?? 120, w = o.w ?? 1440, h = o.h ?? 640, size = o.size ?? 30, lh = o.lh ?? Math.round(size * 1.55);
+  const g = grp(L, o.hidden !== false);
+  R(g, x, y, w, h, { fill: TC.bg, stroke: TC.line, sw: 3, rx: 16 });
+  R(g, x, y, w, 58, { fill: TC.bar, rx: 16 }); R(g, x, y + 40, w, 18, { fill: TC.bar, rx: 0 });
+  mk('line', { x1: x, y1: y + 58, x2: x + w, y2: y + 58, stroke: TC.line, 'stroke-width': 2 }, g);
+  T(g, x + 30, y + 39, o.title || '終端機', { size: 24, weight: 800, fill: '#ffffff' });
+  mk('rect', { x: x + 26, y: y + 50, width: 80, height: 4, fill: C.gold }, g);
+  T(g, x + w - 30, y + 39, o.shell || 'powershell', { size: 22, anchor: 'end', fill: TC.mut });
+  if (o.note) T(g, x + w / 2, y + 39, o.note, { size: 22, anchor: 'middle', fill: C.gold, weight: 700 });
+  const id = 'tc' + (++uid); const cp = mk('clipPath', { id }, defs); mk('rect', { x: x + 8, y: y + 70, width: w - 16, height: h - 78 }, cp);
+  const body = mk('g', { 'clip-path': `url(#${id})` }, g); const marks = mk('g', {}, body); const inner = mk('g', {}, body);
+  const cap = Math.floor((h - 84) / lh); let n = 0; const x0 = x + 30, y0 = y + 62 + 14 + size;
+  let path = o.path || 'D:\\AI_CRUD_Workshop_Frontend_EASY';
+  const cur = mk('rect', { x: x0, y: y0 - size, width: size * 0.55, height: size * 1.15, fill: '#ffffff', class: 'tcursor' }, inner);
+  const api = { g, lines: [], x, y, w, h, size, lh };
+  function scroll() { const over = Math.max(0, n - cap); const t = `translateY(${-over * lh}px)`; inner.style.transform = t; marks.style.transform = t; }
+  function color(s) { if (/^\[PASS\]/.test(s)) return TC.ok; if (/^\[WARN\]/.test(s)) return TC.warn; if (/^\[FAIL\]/.test(s)) return TC.err; if (/^\s*修復提示/.test(s)) return TC.err; return null; }
+  // 像真的終端機一樣：一行太長就折到下一行（中文字算 1 個字寬，英數算 0.6 個字寬）
+  const maxW = w - 60, cw = ch => /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/.test(ch) ? size : size * 0.6;
+  function split(parts, first = 0) {
+    const rows = [[]]; let used = first;
+    parts.forEach(([s, c, wt]) => { let buf = '';
+      [...s].forEach(ch => { const d = cw(ch); if (used + d > maxW && used > 0) { if (buf) rows[rows.length - 1].push([buf, c, wt]); rows.push([]); buf = ''; used = 0; } buf += ch; used += d; });
+      if (buf) rows[rows.length - 1].push([buf, c, wt]); });
+    return rows;
+  }
+  function addLine(parts) {
+    const t = mk('text', { x: x0, y: y0 + n * lh, 'font-size': size }, inner); t.style.fontFamily = MONO;
+    parts.forEach(([s, c, wt]) => mk('tspan', { text: s, fill: c || TC.ink, 'font-weight': wt || 500 }, t));
+    n++; api.lines.push(t); scroll(); return t;
+  }
+  // 一個邏輯行可能折成好幾列：第一列記住全部列（t._rows），框線時框住全部
+  function addRows(parts) { const rows = split(parts).map(addLine); rows[0]._rows = rows; return rows[0]; }
+  function park(t) { const bb = t.getBBox(); cur.setAttribute('x', bb.x + bb.width + 4); cur.setAttribute('y', +t.getAttribute('y') - size * 0.92); }
+  api.prompt = (p2) => { if (p2) path = p2; const t = addLine([[`PS ${path}> `, TC.ink]]); park(t); return t; };
+  api.cmd = (command, o2 = {}) => {
+    if (o2.path) path = o2.path;
+    const P = `PS ${path}> `; const t = addLine([[P, TC.ink]]);
+    const sp = command.indexOf(' '); const head = sp < 0 ? command : command.slice(0, sp); const rest = sp < 0 ? '' : command.slice(sp);
+    const all = head + rest; const chars = [...all];
+    // 算出每個字落在第幾列：第一列接在提示字元後面，放不下就換到新的一列
+    let used = [...P].reduce((s, ch) => s + cw(ch), 0); const rowOf = []; let row = 0;
+    chars.forEach(ch => { const d = cw(ch); if (used + d > maxW) { row++; used = 0; } rowOf.push(row); used += d; });
+    const els = [t]; for (let i = 1; i <= row; i++) els.push(addLine([]));
+    const spans = els.map(e => [mk('tspan', { text: '', fill: TC.cmd, 'font-weight': 700 }, e), mk('tspan', { text: '', fill: '#ffffff', 'font-weight': 600 }, e)]);
+    t._rows = els;
+    const paint = k => { const buf = els.map(() => ['', '']); chars.slice(0, k).forEach((ch, i) => { buf[rowOf[i]][i < head.length ? 0 : 1] += ch; });
+      spans.forEach(([a, b], i) => { a.textContent = buf[i][0]; b.textContent = buf[i][1]; }); park(els[k ? rowOf[k - 1] : 0]); };
+    const step = o2.cps ? 1000 / o2.cps : 55; const t0 = o2.delay ?? 300;
+    if (o2.typing === false) { paint(chars.length); return t; }
+    paint(0);
+    chars.forEach((ch, i) => later(t0 + i * step, () => paint(i + 1)));
+    return t;
+  };
+  api.out = (lines, o2 = {}) => {
+    const gap = o2.gap ?? 140, t0 = o2.delay ?? 0; const made = [];
+    lines.forEach((s, i) => {
+      const parts = Array.isArray(s) ? s : [[s, color(s) || o2.color, color(s) ? 700 : 500]];
+      const t = addRows(parts); made.push(t); t._rows.forEach(e => e.classList.add('hid'));
+      later(t0 + i * gap, () => { t._rows.forEach(e => e.classList.remove('hid')); park(t._rows[t._rows.length - 1]); });
+    });
+    return made;
+  };
+  api.mark = (t, label, col = C.gold, o2 = {}) => {
+    const hg = grp(marks, true); const bb = (t._rows || [t]).map(e => e.getBBox()).reduce((a, b) => {
+      const x1 = Math.min(a.x, b.x), y1 = Math.min(a.y, b.y); return { x: x1, y: y1, width: Math.max(a.x + a.width, b.x + b.width) - x1, height: Math.max(a.y + a.height, b.y + b.height) - y1 }; });
+    R(hg, bb.x - 12, bb.y - 6, Math.max(bb.width + 24, o2.minw || 0), bb.height + 12, { fill: 'rgba(244,185,66,.10)', stroke: col, sw: 4, rx: 10 });
+    if (label) { const lw = tw(label, 24) + 28; const bw2 = Math.max(bb.width + 24, o2.minw || 0);
+      // 標籤放在這一行的右邊（不壓到上下行）；右邊放不下就貼著終端機右緣
+      // 折成好幾列時，放在最後一列（通常比較短）的字後面
+      const rows = t._rows || [t]; const lb = rows.length > 1 ? rows[rows.length - 1].getBBox() : null;
+      let lx = lb ? lb.x + lb.width + 24 : bb.x - 12 + bw2 + 14; if (lx + lw > x + w - 14) lx = x + w - lw - 14;
+      const ly = lb ? lb.y + lb.height / 2 - 19 : bb.y + bb.height / 2 - 19;
+      R(hg, lx, ly, lw, 38, { fill: col, rx: 8 }); T(hg, lx + lw / 2, ly + 28, label, { size: 24, weight: 900, anchor: 'middle', fill: C.bg }); }
+    return hg;
+  };
+  api.clear = () => { [...inner.querySelectorAll('text')].forEach(e => e.remove()); [...marks.children].forEach(e => e.remove()); n = 0; api.lines = []; scroll(); };
+  api.hideCursor = () => cur.classList.add('hid');
+  return api;
+}
+
+/* 滑鼠游標：cursor(r) 建一個（放在最上層），clickAt(r, g, 鍵或[x,y,w,h]) 移過去並點一下 */
+function cursor(r) {
+  const g = grp(L, true, 'mcur'); g.style.transform = 'translate(1500px,820px)';
+  mk('path', { d: 'M0,0 L0,40 L11,30 L18,47 L25,44 L18,28 L32,28 Z', fill: '#ffffff', stroke: '#111111', 'stroke-width': 3, 'stroke-linejoin': 'round' }, g);
+  r.cur = g; return g;
+}
+/* 放大／還原：和 helpers.js 的版本一樣，另外記下放大的位移與倍率（g._zt），讓游標跟著換算 */
+function zoom(g, k, o = {}) {
+  const q = rb(g, k, o.pad ?? 40); const F = g.F; let z = Math.min(F.w / q.w, F.h / q.h, o.max || 2); if (z < 1) z = 1;
+  const hw = F.w / 2 / z, hh = F.h / 2 / z; let cx = q.x + q.w / 2, cy = q.y + q.h / 2;
+  cx = Math.min(Math.max(cx, F.x + hw), F.x + F.w - hw); cy = Math.min(Math.max(cy, F.y + hh), F.y + F.h - hh);
+  g._zt = { tx: F.x + F.w / 2 - z * cx, ty: F.y + F.h / 2 - z * cy, z };
+  move(g.inner, `translate(${g._zt.tx}px,${g._zt.ty}px) scale(${z})`);
+}
+function unzoom(g) { g._zt = null; move(g.inner, ''); }
+function clickAt(r, g, k, o = {}) {
+  const q = g ? rb(g, k, 0) : { x: k[0], y: k[1], w: k[2] || 0, h: k[3] || 0 };
+  let cx = q.x + q.w * (o.fx ?? 0.5), cy = q.y + q.h * (o.fy ?? 0.5);
+  // 截圖放大中：把截圖上的座標換成舞台座標
+  if (g && g._zt) { cx = g._zt.tx + g._zt.z * cx; cy = g._zt.ty + g._zt.z * cy; }
+  L.appendChild(r.cur); show(r.cur); later(30, () => { r.cur.style.transform = `translate(${cx}px,${cy}px)`; });
+  if (o.click !== false) later(1250, () => { const c = mk('circle', { cx, cy, r: 16, fill: 'none', stroke: C.gold, 'stroke-width': 6, class: 'ping' }, L); later(1800, () => c.remove()); });
+}
+
+/* 按鍵圖示：keys(x, y, ['Ctrl','`'])，回傳群組（預設藏起來） */
+function keys(x, y, list, o = {}) {
+  const g = grp(L, o.hidden !== false); const size = o.size || 34; let cx = x;
+  list.forEach((k, i) => {
+    if (i) { T(g, cx + 14, y + size * 1.05, '+', { size, weight: 900, fill: C.mut }); cx += 44; }
+    const w = Math.max(size * 1.6, tw(k, size) + 36);
+    R(g, cx, y, w, size * 1.6, { fill: '#f4f6f8', stroke: '#aab4be', sw: 3, rx: 10 }); R(g, cx, y + size * 1.6 - 8, w, 8, { fill: '#aab4be', rx: 4 });
+    T(g, cx + w / 2, y + size * 1.12, k, { size, weight: 900, anchor: 'middle', fill: '#1d2733' }); cx += w;
+  });
+  g.w = cx - x; return g;
+}
+
+/* 大字指令卡：要學員照打的指令 */
+function codeCard(x, y, w, lines, o = {}) {
+  const size = o.size || 30, lh = Math.round(size * 1.5), h = o.h || (lines.length * lh + 70);
+  const g = grp(L, o.hidden !== false);
+  R(g, x, y, w, h, { fill: '#0b1520', stroke: o.col || C.teal, sw: 3, rx: 14 });
+  T(g, x + 22, y + 36, o.title || '照著打', { size: 22, weight: 800, fill: o.col || C.teal });
+  lines.forEach((s, i) => { const t = T(g, x + 26, y + 50 + size + i * lh, s, { size, weight: 700, fill: /^#/.test(s) ? C.mut : '#ffffff' }); t.style.fontFamily = MONO; });
+  return g;
+}
+
+/* 一句話重點條（畫面下方） */
+function tip(text, o = {}) { return box(L, o.x ?? 120, o.y ?? 800, o.w ?? 1360, o.h ?? 76, text, { size: o.size || 30, fill: '#2a2410', stroke: o.col || C.gold, sw: 3, color: o.col || C.gold, weight: 800, hidden: o.hidden !== false }); }
+
+// 由 build_v3_data.py 產生：講稿與配音清單
+window.__script = [{"chap": "開場", "title": "這支怎麼用：邊看邊做", "who": "小芸", "lines": ["這一支是跟著做用的：點哪裡、貼哪一段、看到什麼就對了。想知道為什麼，看手冊最上面另一支講課版。", "建議開兩個視窗：左邊放這支動畫，右邊放 VS Code。看完一段，暫停，自己做一次，再按下一段。", "prompt 在手冊裡，指令在動畫下面的文字版速查。在黑底框裡反白、按 Ctrl+C 複製，不用照著打。", "每一段最後都有檢查點。畫面跟你的一樣，就往下走；不一樣，看那一段的卡住時。"]}, {"chap": "開場", "title": "今天會做出什麼", "who": "小芸", "lines": ["Step 0 把教材抓下來、跑前置檢查。Step 1 看有規矩、沒規矩的兩個網頁。", "Step 2 把範本跑起來，當使用者玩一輪，再認識四份規矩，也就是 harness。", "Step 3 是重頭戲：只給 AI 一份 PRD，也就是需求說明書。它問你選擇題、交文件，你說開工它才寫程式。", "Step 4 貼一個 prompt，AI 自己跑測試、自己修、再叫另一個 AI 挑錯。Step 5 收尾。"]}, {"chap": "Step 0", "title": "開終端機", "who": "阿哲", "lines": ["打開 VS Code。上面選單點「終端機」，再點「新增終端」。英文介面是 Terminal、New Terminal。", "下面會出現一個終端機。開頭寫 PS 加一個路徑，代表它在等你打指令。", "終端機太小，就按右上角這個最大化，看得比較清楚。"]}, {"chap": "Step 0", "title": "把教材抓下來", "who": "阿哲", "lines": ["先切到要放教材的磁碟。在終端機貼上第一行，按 Enter，開頭變成 D 槽。沒有 D 槽就用 C。", "再貼第二行 git clone，按 Enter，它會把教材從 GitHub 下載下來。說 git 不是內部或外部命令，就是還沒裝 Git，舉手找講師。", "看到 done，下載就完成了。資料夾叫 AI_CRUD_Workshop_Frontend_EASY。"]}, {"chap": "Step 0", "title": "用 VS Code 打開教材資料夾", "who": "阿哲", "lines": ["選單點「檔案」，再點「開啟資料夾」。", "點一下剛下載的 AI_CRUD_Workshop_Frontend_EASY，按「選取資料夾」。已經點進去了也沒關係，直接按。", "VS Code 會問你信不信任這個資料夾的作者。這是教材，選「是，我信任作者」。", "左邊看到 HANDBOOK 和 step0、1、2、3、4、6，就打開對了。沒有 step5 是正常的。"]}, {"chap": "Step 0", "title": "跑前置檢查", "who": "阿哲", "lines": ["再開一個終端機。這次開頭會是教材資料夾，代表位置對了。", "一行貼一次、按 Enter：先進 step0_course_intro，再跑 preflight。一跳紅字說「已停用指令碼執行」，看下一段最後一句。", "它會一項一項檢查，PASS 是通過，WARN 是提醒。", "最後一行寫「前置檢查全數通過，可以開課」，就過關了。有幾個 WARN 也沒關係。"]}, {"chap": "Step 0", "title": "卡住時：看到 FAIL", "who": "小芸", "lines": ["只有 FAIL 一定要處理。先照它印的修復提示做一次。", "做完把終端機關掉、重開一個再跑。剛裝好的工具，舊視窗抓不到，這是最常見的假紅燈。", "還是紅，就把整段輸出，連 PASS 的行一起，貼給 AI，用畫面上這段 prompt。", "一執行就說「已停用指令碼執行」：先貼畫面最下面那一行，它問要不要變更就打 Y、按 Enter，再重跑 preflight。"]}, {"chap": "Step 1", "title": "打開兩個網頁比一比", "who": "阿哲", "lines": ["Step 1 只要看。先打 cd 空格兩個點、按 Enter，回到教材根目錄，再一行一行貼畫面上的指令，打開兩個網頁。", "左邊是沒給規矩的 AI 做的，右邊是附了規矩的。兩邊都很好看，新增也都能用。", "先看左邊：主色是 AI 自己挑的橘色，公司的品牌紅一次都沒出現。"]}, {"chap": "Step 1", "title": "自己點一點：血型和電話", "who": "阿哲", "lines": ["左邊這版，血型一打開就選好 A。不改就送出，存進去的就是 A。", "右邊這版，什麼都不填就按「新增志工」，姓名、電話、血型都跳紅字，擋下來。", "電話打 (02) 1234-5678 試試，右邊會擋，因為規矩寫了只收 09 開頭。"]}, {"chap": "Step 1", "title": "檢查點：差在哪", "who": "小芸", "lines": ["看完你要說得出來：兩版差的不是好不好看，是每個決定有沒有出處。", "右邊的顏色、驗證，都查得到是哪一條規矩寫的；左邊全是 AI 當場自己決定的。"]}, {"chap": "Step 2", "title": "安裝並啟動範本", "who": "阿哲", "lines": ["Step 2 把範本跑起來。畫面上三行，一行貼一次、按 Enter。", "pnpm install 第一次要一點時間，它在下載套件。等它印出 Done，再貼 pnpm dev。", "pnpm dev 會印出一個 Local 網址。這個終端機要一直開著，關了網頁就打不開。", "按住 Ctrl，點 Local 後面那個藍色網址。3100 被占用也沒關係，它會自己換一個，照它印的網址開。"]}, {"chap": "Step 2", "title": "玩一輪：新增", "who": "阿哲", "lines": ["瀏覽器打開是人員管理的列表。右上角點「新增人員」。", "表單 label 在上面，有紅星號的每一格都要填，證號照灰字範例打。填好按右上角「儲存」。", "右下角跳出「已新增人員」，回到列表就看得到剛新增的那一筆。"]}, {"chap": "Step 2", "title": "玩一輪：編輯、驗證、刪除", "who": "阿哲", "lines": ["在列表找一筆，點最右邊的鉛筆圖示。改一下備註，按右上角儲存，列表就是新的值。", "加分題：編輯時把姓名清空再按儲存，欄位下方會出現紅字，不會讓你存。", "再點垃圾桶。它不會馬上刪，會先跳出「刪除人員」確認框，按紅色的「刪除」才真的刪。"]}, {"chap": "Step 2", "title": "玩一輪：篩選、新分頁、匯出", "who": "阿哲", "lines": ["關鍵字打「陳」，狀態選「在職」，表格馬上只剩符合的那幾筆。", "把網址列整段複製，開新分頁貼上，篩選條件會原樣還原。", "最後按「匯出 CSV」。它匯出的是符合條件的全部筆數，不是只有畫面上這一頁。", "加分題：把視窗縮到手機寬度，表格會自己變成一張一張的卡片。"]}, {"chap": "Step 2", "title": "檢查點：五件事都重現了嗎", "who": "小芸", "lines": ["五個檢查點：新增、編輯、刪除前先確認、篩選後開新分頁還原、匯出的是全量。", "都做出來了，範本就跑對了。網頁打不開，多半是 pnpm dev 那個終端機被關了：再進 sample-app 資料夾，重跑 pnpm dev。", "pnpm 噴一大串紅字，從你打的指令那行開始整段複製，貼給 AI，手冊有現成的 prompt。"]}, {"chap": "Step 2", "title": "看懂範本：8 個核心檔", "who": "阿哲", "lines": ["左邊檔案總管點開 Step 2 的資料夾，再點開 2.1_sample_app，打開 README 點 md。", "右上角按這個預覽，Markdown 會變成好讀的版面。往下捲到「8 個核心檔」這張表。", "最右邊一欄只有兩種：複製改名，或直接共用。這張表就是 Step 3 要叫 AI 照著做的事。"]}, {"chap": "Step 2", "title": "認識規矩：harness 四份", "who": "阿哲", "lines": ["再點開 sample-app。最上層這四份 md，就是規矩，檔名在畫面上。", "這四份就是 harness，給 AI 讀的規矩。你不用逐條讀懂，但要知道它們放在這裡。", "點開 CLAUDE.md，只有四十幾行。掃一遍，看得到鎖定技術棧、禁止寫死顏色這類鐵律。", "Step 3 複製範本時，這四份會跟著一起帶走，新模組直接繼承同一套規矩。"]}, {"chap": "Step 2", "title": "認識 token：Design System", "who": "阿哲", "lines": ["跑 pnpm dev 的終端機不要關。要打新指令，按終端機右上角的加號，開第二個。", "貼畫面上這一行，打開 Design System 的網頁。", "這裡是色票、間距、字級。每個顏色都有一個名字，叫 token。程式裡只准寫名字，不准寫死色碼。"]}, {"chap": "Step 3", "title": "準備工作區：複製範本", "who": "阿哲", "lines": ["Step 3 開始。按終端機右上角的加號，開一個新的。開頭是教材根目錄，位置就對了。", "打開手冊 Step 3 的「⓪ 準備工作區」。在黑底框裡從第一個字反白到最後一個字，按 Ctrl+C，貼進終端機。", "貼上後開頭會出現兩個大於符號，這時再按一次 Enter，它才會開始跑。", "它把範本複製成 my-equipment-app，把 PRD 和最小樣板放進去，再裝好套件。看到 Done 就好。"]}, {"chap": "Step 3", "title": "打開新專案、讀 PRD", "who": "阿哲", "lines": ["選單「檔案」、「開啟資料夾」，這次選 step3_new_module 裡的 my-equipment-app。視窗會整個重開，原本的終端機會關掉，這是正常的。", "左邊看得到四份規矩，跟範本一模一樣，一起被複製過來了。", "打開 PRD-中心裝備物資.md。PRD 就是需求說明書，也叫 SPEC，是你交給 AI 的需求。", "第 2 節是 12 個欄位，第 5 節留了三個決定給你拍板：刪除補不補、匯出做不做、編碼簡不簡化。"]}, {"chap": "Step 3", "title": "打開 Claude Code、選模型", "who": "阿哲", "lines": ["在這個視窗點右下角的「Claude Code」，打開對話。右下角沒有它，代表擴充還沒裝好或還沒登入，舉手找講師。", "點輸入框下面的模型名稱，選 Opus 5.5；同一個選單裡的 effort 拉到 High。effort 就是 AI 想多深。", "右下角的核准模式，課堂上切成 Auto。不然它每跑一個指令都會停下來問你。"]}, {"chap": "Step 3", "title": "貼起手 prompt", "who": "阿哲", "lines": ["打開手冊 Step 3 的「②」，把這段起手 prompt 反白複製，只有四行。", "貼進輸入框，按送出。第一行就說走 SDD，規格驅動開發：先文件，再程式。", "它會先讀 CLAUDE.md、CODE-RULES、使用說明和 PRD。畫面上這一串讀檔，就是它在讀規矩。"]}, {"chap": "Step 3", "title": "一題一題拍板", "who": "阿哲", "lines": ["讀完它不會寫程式，先出選擇題。每題都有標「建議」的選項，和一句理由。", "課堂拍板：D1 補刪除加確認彈窗，D2 做 CSV 匯出，D3 選標「建議」的那個。你的題目字句會不一樣，照意思選。", "PRD 沒寫清楚的，它還會多問幾題，像流水號、主鍵。看不懂就選它標建議的。", "一批答完，按最下面的 Submit answers，送出你的選擇。"]}, {"chap": "Step 3", "title": "卡住時：AI 沒問就開始寫", "who": "小芸", "lines": ["如果它沒問選擇題，直接開始建檔案、寫程式，不要讓它跑。", "按停止，貼畫面上這段救援 prompt：先停，先用選擇題問我，等我說開工。"]}, {"chap": "Step 3", "title": "先看文件，再說開工", "who": "阿哲", "lines": ["拍板之後，它先交四個檔：SRS、設計文件、圖，還有任務清單。它問要不要開 Chrome，選 No，跟它說圖你自己看。", "先別說開工。左邊點 SRS 那個 md，按右上角預覽。第 1 段是已拍板決策：你選了什麼、理由、誰拍板。", "第 2 段需求追溯，12 個欄位各做在哪；第 3 段範圍外，這一版不做什麼。這三段你一定要核。"]}, {"chap": "Step 3", "title": "看設計文件和圖", "who": "阿哲", "lines": ["再打開設計文件。第 1 段檔案責任：哪 5 個檔複製改名、哪 3 個檔直接共用。", "最後一段是遵守規矩的證據。現在還是空的，寫完程式它才會填上；畫面是做完後的樣子：寫死的色碼 0 筆。", "圖要用瀏覽器開：在終端機打 start 加 DIAGRAMS 那個檔名。至少四張：用例、檔案架構、資料模型、新增流程。", "看圖就懂它打算怎麼做。看不懂，就叫它重畫，不用讀程式。"]}, {"chap": "Step 3", "title": "換 Sonnet、說開工", "who": "阿哲", "lines": ["文件和任務順序都看過了，說開工之前，把模型換成 Sonnet 5.5。寫程式用便宜的就夠。", "它還有題目在問你，就先答完。再在輸入框打「開工」兩個字，送出。", "它會照任務清單一項一項做，每做完一項回報一行。實拍那次大約 17 分鐘，你可以去倒杯茶。", "做完它會停下來問你下一步，選「我先自己驗收」。驗完再請它用五行總結。"]}, {"chap": "Step 3", "title": "打開網頁驗收", "who": "阿哲", "lines": ["打開它給你的網址，埠號照它說的。列表有 24 筆，狀態標籤有綠、黃、紅。它沒給網址，就請它把網頁開起來、給你網址。", "按新增：先選分類，項目才會出現，而且只有那個分類的項目。選好後，標題馬上顯示自動編碼。", "什麼都不填直接儲存，四個欄位跳紅字，右下角提示要你修正，頁面不會跳走。", "刪除要先跳確認框；視窗拉窄，表格變卡片。最後拿 PRD 第 2 節，12 欄一欄一欄對。"]}, {"chap": "Step 3", "title": "有小落差：一次講一件", "who": "阿哲", "lines": ["驗收一定會有小落差。這次我看到，採購日期空白時顯示短橫，其他欄是長橫。", "一次只講一件：看到什麼、期望什麼。像這樣：我看到短橫，期望三欄一致都用長橫。", "它改好會告訴你改了哪個檔。你再看一次，對了再講下一件；全部沒問題，打「驗收通過」送出。", "同一件事講兩次還改不好，就換個說法重講，不要在同一串一直盧。"]}, {"chap": "Step 3", "title": "檢查點：Step 3 做完了嗎", "who": "小芸", "lines": ["Step 3 打勾：AI 先問選擇題、你拍板；交了 SRS、設計文件、圖和任務清單；你說開工它才寫。", "網頁五件事都重現：列表、連動下拉、新增編碼、刪除確認、手機卡片。", "一開頁就 500，是舊快取被帶過來。不用自己動手，跟 Claude Code 說：網頁 500，請停掉網頁伺服器、刪掉快取再重開。", "小修的那段來回很花時間。下一步，就是把這段來回交給 AI 自己跑。"]}, {"chap": "Step 4", "title": "回到教材根目錄、開新對話", "who": "阿哲", "lines": ["Step 4 在教材最外層跑。選單「檔案」、「開啟資料夾」，選回教材最外層的資料夾。", "打開 Claude Code，按右上角的加號開新對話。模型選 Sonnet 5.5，核准模式一樣是 Auto。"]}, {"chap": "Step 4", "title": "貼 LOOP prompt", "who": "阿哲", "lines": ["打開手冊 Step 4，把 LOOP prompt 反白複製，四行。", "第一行叫它照 step4_loop_e2e 的 LOOP-規矩.md 做，自己跑完、中途不要問你。", "鐵律、3100 被占怎麼辦、審查怎麼做、要交哪些檔，全寫在規矩檔裡，prompt 不用重講。", "貼上，送出。接下來你不用插手。"]}, {"chap": "Step 4", "title": "AI 自己起服務、自己跑測試", "who": "阿哲", "lines": ["它先把你的作品開起來。3100 如果被占，它會自己換成 3101，不會去關別人的程式。", "接著跑 7 條自動測試。第一輪通常有紅，很正常，這就是 LOOP 存在的原因。", "它會先判因：是 App 不符規格、環境問題，還是測試本身，再動手修，修完再跑。"]}, {"chap": "Step 4", "title": "全綠之後：子代理挑錯", "who": "阿哲", "lines": ["7 條全綠之後，它叫出一個子代理。子代理是 AI 的分身，專門挑錯，用高一級的 Opus 5.5。", "子代理用 Playwright，這是會自己開瀏覽器、自己點按鈕的工具。它一頁一頁截圖，對照 PRD 和 design system。", "App 的問題它修完再跑一次；測試本身的問題不准它改，只列出來給你裁決。", "實拍那次從貼上到交報告，大約 24 分鐘。電腦不要讓它睡眠；跳出要不要開 Chrome，選 No、跟它說繼續。"]}, {"chap": "Step 4", "title": "卡住時：兩種紅不一樣", "who": "小芸", "lines": ["先分清楚兩種紅。E1 到 E7 有幾條紅，是正常的，別插手，讓它自己修。", "腳本根本沒開始跑就掛了，像瀏覽器下載失敗、連不上 App，那是環境問題：開新對話，貼手冊 Step 4 的環境求救 prompt。", "它說同一個問題修兩次還沒好，自己停下來，那是規矩，代表該你介入了。"]}, {"chap": "Step 4", "title": "驗收：打開報告", "who": "阿哲", "lines": ["它交的東西都在作品的 loop 資料夾。先打開 LOOP 報告，指令在畫面上。", "結論在最前面：幾條全綠、審查挑到幾條、修了幾條。往下有子代理的截圖。", "最後一段是要你裁決的事。在同一個對話打，例如 Q1 選 1、Q2 選 1；看不懂就選建議的，寫著要講師處理的就舉手。"]}, {"chap": "Step 4", "title": "驗收：測試報告、紀錄、文件", "who": "阿哲", "lines": ["再打開測試報告，指令在畫面上。7 條都是綠的，點得開看細節。", "LOOP-LOG.md 是給機器看的流水帳，一輪一段。有紅燈的時候再翻。", "最後看 SRS 和設計文件：它修了程式，就回頭在文件標上「step4 LOOP 後」。程式改了，文件跟著改。", "照報告上的網址，自己再點一遍列表、新增、編輯、刪除。燈綠了，還是要你親眼驗。"]}, {"chap": "Step 4", "title": "檢查點：Step 4 做完了嗎", "who": "小芸", "lines": ["Step 4 打勾：7 條全綠，或停在紅燈、報告寫清楚原因。", "子代理挑過錯；報告、測試報告、流水紀錄都在；文件標了 step4 LOOP 後；你自己點過一遍。", "說得出兩條鐵律。第一條：同一問題修兩次沒好就停。第二條：不准改測試、不准放寬標準。"]}, {"chap": "Step 5", "title": "下一個新模組：只給 SPEC", "who": "小芸", "lines": ["學會之後，下一個新模組的做法只有一條路。第一步，寫一頁 SPEC，也就是 PRD，可以很簡陋。", "貼起手 prompt，AI 問選擇題，你拍板；它交文件和圖，你看過才說開工。", "寫完貼 LOOP prompt，AI 自己測、自己修、子代理挑錯。你可以去喝茶，回來看報告、自己點一遍。", "你只顧頭跟尾：頭是講清楚要什麼、拍板；尾是驗收。中間交給 AI。"]}, {"chap": "Step 5", "title": "回公司三步、完課檢核", "who": "小芸", "lines": ["回公司三步：把四份規矩帶進你的專案，改成公司的規則；挑最成熟的頁面整理成範本；新需求都走同一條路。", "最後打開手冊最下面的完課檢核表，一項一項打勾。全部打勾，就真的走完了。", "下一門後端課，會用同一套方法，把這個裝備物資模組接上真的資料庫。"]}];
+window.__audio = {"1-1": {"src": "audio/f5bb46adecb6.mp3", "sec": 9.52, "who": "小芸"}, "1-2": {"src": "audio/09373786cf46.mp3", "sec": 9.08, "who": "小芸"}, "1-3": {"src": "audio/832f3a6ce464.mp3", "sec": 10.0, "who": "小芸"}, "1-4": {"src": "audio/79353b3766bd.mp3", "sec": 7.64, "who": "小芸"}, "2-1": {"src": "audio/d71da511320e.mp3", "sec": 7.4, "who": "小芸"}, "2-2": {"src": "audio/0cf081895fad.mp3", "sec": 6.32, "who": "小芸"}, "2-3": {"src": "audio/a3acd30f2f50.mp3", "sec": 10.92, "who": "小芸"}, "2-4": {"src": "audio/18ee71910de1.mp3", "sec": 8.52, "who": "小芸"}, "3-1": {"src": "audio/35d27f41cc47.mp3", "sec": 9.88, "who": "阿哲"}, "3-2": {"src": "audio/5de503532d96.mp3", "sec": 8.16, "who": "阿哲"}, "3-3": {"src": "audio/dfa63b6933d9.mp3", "sec": 4.76, "who": "阿哲"}, "4-1": {"src": "audio/1a309e0b7e48.mp3", "sec": 9.56, "who": "阿哲"}, "4-2": {"src": "audio/ab81bfae28b7.mp3", "sec": 13.56, "who": "阿哲"}, "4-3": {"src": "audio/9099b387c6a0.mp3", "sec": 7.68, "who": "阿哲"}, "5-1": {"src": "audio/d034234c86fb.mp3", "sec": 3.52, "who": "阿哲"}, "5-2": {"src": "audio/a0f8c2226d58.mp3", "sec": 11.48, "who": "阿哲"}, "5-3": {"src": "audio/7b321e16f8be.mp3", "sec": 7.56, "who": "阿哲"}, "5-4": {"src": "audio/4b3d005c7cec.mp3", "sec": 8.8, "who": "阿哲"}, "6-1": {"src": "audio/da481743361c.mp3", "sec": 5.56, "who": "阿哲"}, "6-2": {"src": "audio/9c5f11a6a2f0.mp3", "sec": 11.08, "who": "阿哲"}, "6-3": {"src": "audio/5c922adfd3e4.mp3", "sec": 4.84, "who": "阿哲"}, "6-4": {"src": "audio/7cffa05d76dd.mp3", "sec": 8.2, "who": "阿哲"}, "7-1": {"src": "audio/4b3217a74c3b.mp3", "sec": 4.56, "who": "小芸"}, "7-2": {"src": "audio/df2afffdc4c6.mp3", "sec": 7.4, "who": "小芸"}, "7-3": {"src": "audio/5ffff503e867.mp3", "sec": 6.76, "who": "小芸"}, "7-4": {"src": "audio/efadc444ec0e.mp3", "sec": 9.76, "who": "小芸"}, "8-1": {"src": "audio/2f47f855611a.mp3", "sec": 12.24, "who": "阿哲"}, "8-2": {"src": "audio/15d283cda4d8.mp3", "sec": 7.64, "who": "阿哲"}, "8-3": {"src": "audio/0f81ce0ede56.mp3", "sec": 7.0, "who": "阿哲"}, "9-1": {"src": "audio/3ded4967016e.mp3", "sec": 6.68, "who": "阿哲"}, "9-2": {"src": "audio/5db920c4e75d.mp3", "sec": 8.28, "who": "阿哲"}, "9-3": {"src": "audio/55f808694c67.mp3", "sec": 9.08, "who": "阿哲"}, "10-1": {"src": "audio/d1b185a0397c.mp3", "sec": 6.56, "who": "小芸"}, "10-2": {"src": "audio/a717cea0e0c7.mp3", "sec": 7.64, "who": "小芸"}, "11-1": {"src": "audio/463758360914.mp3", "sec": 7.08, "who": "阿哲"}, "11-2": {"src": "audio/f87467f6ee1b.mp3", "sec": 10.96, "who": "阿哲"}, "11-3": {"src": "audio/5c16396753e3.mp3", "sec": 8.88, "who": "阿哲"}, "11-4": {"src": "audio/f65111b0a8b7.mp3", "sec": 9.44, "who": "阿哲"}, "12-1": {"src": "audio/bf9c4ca4d90a.mp3", "sec": 6.44, "who": "阿哲"}, "12-2": {"src": "audio/3f941225f11e.mp3", "sec": 10.24, "who": "阿哲"}, "12-3": {"src": "audio/0bc3fbe89666.mp3", "sec": 5.88, "who": "阿哲"}, "13-1": {"src": "audio/a05cbdd0ac6a.mp3", "sec": 11.4, "who": "阿哲"}, "13-2": {"src": "audio/3eae2b31b970.mp3", "sec": 7.92, "who": "阿哲"}, "13-3": {"src": "audio/e4936c9ce8a1.mp3", "sec": 10.24, "who": "阿哲"}, "14-1": {"src": "audio/468918b58c14.mp3", "sec": 6.24, "who": "阿哲"}, "14-2": {"src": "audio/87a6cc5e33bf.mp3", "sec": 7.4, "who": "阿哲"}, "14-3": {"src": "audio/8b36c407a017.mp3", "sec": 7.6, "who": "阿哲"}, "14-4": {"src": "audio/7331d4100b81.mp3", "sec": 6.56, "who": "阿哲"}, "15-1": {"src": "audio/d2786651f637.mp3", "sec": 9.8, "who": "小芸"}, "15-2": {"src": "audio/f301bb92f367.mp3", "sec": 12.36, "who": "小芸"}, "15-3": {"src": "audio/7e26ea3589b6.mp3", "sec": 7.84, "who": "小芸"}, "16-1": {"src": "audio/601cbacadc7f.mp3", "sec": 11.36, "who": "阿哲"}, "16-2": {"src": "audio/016db93866b0.mp3", "sec": 10.04, "who": "阿哲"}, "16-3": {"src": "audio/78293ea1cdbb.mp3", "sec": 9.28, "who": "阿哲"}, "17-1": {"src": "audio/cd149c54c8ff.mp3", "sec": 7.12, "who": "阿哲"}, "17-2": {"src": "audio/b7eff6774966.mp3", "sec": 7.76, "who": "阿哲"}, "17-3": {"src": "audio/b9cb0f2fca3c.mp3", "sec": 10.88, "who": "阿哲"}, "17-4": {"src": "audio/6690b94699cc.mp3", "sec": 8.48, "who": "阿哲"}, "18-1": {"src": "audio/fb64c67dbd22.mp3", "sec": 7.48, "who": "阿哲"}, "18-2": {"src": "audio/0f418902aa23.mp3", "sec": 4.32, "who": "阿哲"}, "18-3": {"src": "audio/8a954cdabcbc.mp3", "sec": 11.0, "who": "阿哲"}, "19-1": {"src": "audio/e07f85288e32.mp3", "sec": 9.72, "who": "阿哲"}, "19-2": {"src": "audio/c54f2d90a697.mp3", "sec": 11.84, "who": "阿哲"}, "19-3": {"src": "audio/8fbb544e7e60.mp3", "sec": 7.0, "who": "阿哲"}, "19-4": {"src": "audio/b69230c2cabf.mp3", "sec": 10.16, "who": "阿哲"}, "20-1": {"src": "audio/24fecb9c1781.mp3", "sec": 13.32, "who": "阿哲"}, "20-2": {"src": "audio/7cfaa2bdb738.mp3", "sec": 5.88, "who": "阿哲"}, "20-3": {"src": "audio/0c511d2aeaf5.mp3", "sec": 9.76, "who": "阿哲"}, "20-4": {"src": "audio/39a7af62aa7f.mp3", "sec": 10.04, "who": "阿哲"}, "21-1": {"src": "audio/8fee8775d055.mp3", "sec": 10.64, "who": "阿哲"}, "21-2": {"src": "audio/2e7af344b9d1.mp3", "sec": 11.64, "who": "阿哲"}, "21-3": {"src": "audio/be7dad40f09f.mp3", "sec": 6.84, "who": "阿哲"}, "22-1": {"src": "audio/f6d45aa0c2dc.mp3", "sec": 6.92, "who": "阿哲"}, "22-2": {"src": "audio/f85215c87a8d.mp3", "sec": 9.32, "who": "阿哲"}, "22-3": {"src": "audio/264ccad79411.mp3", "sec": 9.2, "who": "阿哲"}, "23-1": {"src": "audio/5be3f3e4a22e.mp3", "sec": 7.84, "who": "阿哲"}, "23-2": {"src": "audio/355d4f4012a7.mp3", "sec": 13.52, "who": "阿哲"}, "23-3": {"src": "audio/1740523b4028.mp3", "sec": 8.48, "who": "阿哲"}, "23-4": {"src": "audio/0f569d2477bb.mp3", "sec": 5.28, "who": "阿哲"}, "24-1": {"src": "audio/b9d242d94273.mp3", "sec": 5.08, "who": "小芸"}, "24-2": {"src": "audio/b4305ab52145.mp3", "sec": 7.16, "who": "小芸"}, "25-1": {"src": "audio/06075f831b10.mp3", "sec": 12.48, "who": "阿哲"}, "25-2": {"src": "audio/fa725500a58d.mp3", "sec": 11.72, "who": "阿哲"}, "25-3": {"src": "audio/cd88472abeef.mp3", "sec": 10.92, "who": "阿哲"}, "26-1": {"src": "audio/3e7a87ca4335.mp3", "sec": 8.8, "who": "阿哲"}, "26-2": {"src": "audio/0eeeba66033e.mp3", "sec": 11.0, "who": "阿哲"}, "26-3": {"src": "audio/29ed6857c880.mp3", "sec": 11.52, "who": "阿哲"}, "26-4": {"src": "audio/610a837d783f.mp3", "sec": 6.08, "who": "阿哲"}, "27-1": {"src": "audio/e4d5d83ff6d7.mp3", "sec": 10.88, "who": "阿哲"}, "27-2": {"src": "audio/a0bcd3032935.mp3", "sec": 6.4, "who": "阿哲"}, "27-3": {"src": "audio/dceeb5c0b16a.mp3", "sec": 9.68, "who": "阿哲"}, "27-4": {"src": "audio/b32daf435865.mp3", "sec": 7.88, "who": "阿哲"}, "28-1": {"src": "audio/a253dc5298bd.mp3", "sec": 15.0, "who": "阿哲"}, "28-2": {"src": "audio/0f2933587726.mp3", "sec": 10.08, "who": "阿哲"}, "28-3": {"src": "audio/d7540a7f52a2.mp3", "sec": 7.32, "who": "阿哲"}, "28-4": {"src": "audio/d56357d5f813.mp3", "sec": 12.56, "who": "阿哲"}, "29-1": {"src": "audio/a867f929d31d.mp3", "sec": 8.84, "who": "阿哲"}, "29-2": {"src": "audio/815dfec6c53b.mp3", "sec": 9.76, "who": "阿哲"}, "29-3": {"src": "audio/89409d38409a.mp3", "sec": 8.6, "who": "阿哲"}, "29-4": {"src": "audio/d72abfd81ee6.mp3", "sec": 6.2, "who": "阿哲"}, "30-1": {"src": "audio/27b9c1e1eb76.mp3", "sec": 10.28, "who": "小芸"}, "30-2": {"src": "audio/d4cdce86a55b.mp3", "sec": 8.52, "who": "小芸"}, "30-3": {"src": "audio/f1ce2a9a3021.mp3", "sec": 11.08, "who": "小芸"}, "30-4": {"src": "audio/da390baf2d88.mp3", "sec": 7.08, "who": "小芸"}, "31-1": {"src": "audio/ac1f08262c02.mp3", "sec": 9.88, "who": "阿哲"}, "31-2": {"src": "audio/3f4329255c60.mp3", "sec": 8.2, "who": "阿哲"}, "32-1": {"src": "audio/5316c9497620.mp3", "sec": 5.92, "who": "阿哲"}, "32-2": {"src": "audio/0ae388100792.mp3", "sec": 9.12, "who": "阿哲"}, "32-3": {"src": "audio/069da2e2df75.mp3", "sec": 9.8, "who": "阿哲"}, "32-4": {"src": "audio/3e990f9617cc.mp3", "sec": 4.12, "who": "阿哲"}, "33-1": {"src": "audio/30e65b7d9315.mp3", "sec": 9.2, "who": "阿哲"}, "33-2": {"src": "audio/67a2757d5bd7.mp3", "sec": 6.8, "who": "阿哲"}, "33-3": {"src": "audio/48bfd534fc1b.mp3", "sec": 7.84, "who": "阿哲"}, "34-1": {"src": "audio/79c32f0d51c1.mp3", "sec": 8.88, "who": "阿哲"}, "34-2": {"src": "audio/22d23038b11f.mp3", "sec": 10.92, "who": "阿哲"}, "34-3": {"src": "audio/d3c67176e998.mp3", "sec": 7.12, "who": "阿哲"}, "34-4": {"src": "audio/001ae62cc984.mp3", "sec": 10.88, "who": "阿哲"}, "35-1": {"src": "audio/042370111f3a.mp3", "sec": 7.4, "who": "小芸"}, "35-2": {"src": "audio/86f1bd026aca.mp3", "sec": 11.76, "who": "小芸"}, "35-3": {"src": "audio/86289bc8809f.mp3", "sec": 7.56, "who": "小芸"}, "36-1": {"src": "audio/754bebcac2c4.mp3", "sec": 7.2, "who": "阿哲"}, "36-2": {"src": "audio/88617b7c6fc0.mp3", "sec": 8.12, "who": "阿哲"}, "36-3": {"src": "audio/c5d829f5aabb.mp3", "sec": 13.12, "who": "阿哲"}, "37-1": {"src": "audio/7c4820b8e3f2.mp3", "sec": 7.48, "who": "阿哲"}, "37-2": {"src": "audio/e438fe30e465.mp3", "sec": 5.96, "who": "阿哲"}, "37-3": {"src": "audio/ce11d910d9a0.mp3", "sec": 10.96, "who": "阿哲"}, "37-4": {"src": "audio/8053d34b7a49.mp3", "sec": 10.24, "who": "阿哲"}, "38-1": {"src": "audio/ea0ba3878f4c.mp3", "sec": 6.36, "who": "小芸"}, "38-2": {"src": "audio/44986ec3bd1c.mp3", "sec": 9.08, "who": "小芸"}, "38-3": {"src": "audio/598ed2f94d9f.mp3", "sec": 9.92, "who": "小芸"}, "39-1": {"src": "audio/41e998494bd7.mp3", "sec": 8.76, "who": "小芸"}, "39-2": {"src": "audio/aa823193d2e7.mp3", "sec": 7.08, "who": "小芸"}, "39-3": {"src": "audio/97c57a5395d1.mp3", "sec": 8.68, "who": "小芸"}, "39-4": {"src": "audio/2a5d606db5b1.mp3", "sec": 7.0, "who": "小芸"}, "40-1": {"src": "audio/2d5f26f90740.mp3", "sec": 10.48, "who": "小芸"}, "40-2": {"src": "audio/5ff07c2b2cba.mp3", "sec": 8.48, "who": "小芸"}, "40-3": {"src": "audio/c0e08244e01a.mp3", "sec": 6.12, "who": "小芸"}};
+
+// ── 第三版：講稿（window.__script）驅動場景；字幕＝講稿＝配音，一字不差 ──
+// sc3(第幾段, 畫面, [每一句的動作…])：句數要跟講稿一樣，不一樣就在主控台警告
+function sc3(n, build, acts) {
+  const S = window.__script[n - 1];
+  if (!S) { console.warn('no script for scene', n); return; }
+  if (acts.length !== S.lines.length) console.warn('scene', n, S.title, 'acts', acts.length, '!= lines', S.lines.length);
+  const b = () => { const r = build() || {}; speakerBadge(S.who); return r; };
+  scenes.push({ title: S.title, who: S.who, build: b, steps: S.lines.map((t, k) => [t, acts[k] || (() => {})]), chap: CHAPS.length - 1 });
+}
+function hd(n, eb) { mhead(eb, window.__script[n - 1].title); }
+// 右上角：這一段誰講
+function speakerBadge(who) {
+  if (!who) return;
+  const col = who === '小芸' ? C.coral : C.teal, role = (window.__roles || {})[who] || (who === '小芸' ? '方法和觀念' : '實拍示範');
+  const w = Math.max(230, 66 + (who.length + 1 + role.length) * 21), x = 1530 - w;
+  const g = grp(L, false); R(g, x, 14, w, 40, { fill: '#0b1520', stroke: col, sw: 2, rx: 20 });
+  mk('circle', { cx: x + 22, cy: 34, r: 11, fill: col }, g);
+  T(g, x + 42, 42, who + '｜' + role, { size: 20, weight: 800, fill: col });
+}
+// 指令字卡：完整指令放在畫面上，聲音不逐字念
+function cmdCard(x, y, w, lines, title, o = {}) {
+  return codeCard(x, y, w, lines, { title: title || '照著打（手冊裡可以直接複製）', size: o.size || 26, col: o.col || C.gold });
+}
+// 一排流程方塊：[[字, 顏色]…]，回傳每一格（預設藏起來）
+function flowRow(y, items, o = {}) {
+  const w = o.w || 220, gap = o.gap || 25, h = o.h || 120, x0 = o.x ?? (800 - (items.length * w + (items.length - 1) * gap) / 2);
+  return items.map(([t, col], i) => {
+    const g = grp(L); const x = x0 + i * (w + gap);
+    R(g, x, y, w, h, { fill: C.card, stroke: col, sw: 4 });
+    T(g, x + w / 2, y + h / 2 - (t.split('\n').length - 1) * 18 + 12, t, { size: 30, anchor: 'middle', weight: 900, fill: col });
+    if (i) T(g, x - gap / 2, y + h / 2 + 12, '→', { size: 30, anchor: 'middle', fill: C.mut });
+    return g;
+  });
+}
+
+// ============================================================
+// AI CRUD 工作坊 EASY 版：手把手教學動畫（跟著做版）
+// 講稿：tts-audition/script_hands.py → window.__script；配音 → window.__audio（預錄 mp3）
+// 跟講課版分工：這一版只講「點哪裡、貼哪一段、看到什麼就對了」。阿哲＝操作示範；小芸＝檢查點與卡住時。
+// 畫面沿用 2026-10-04～07 的 Windows 11 實拍（VS Code 繁中＋Claude Code、PowerShell、Chrome）；手冊指令框於 2026-10-07 重拍（hb5-*）。
+// ============================================================
+const OR = '#ff6a00'
+const FV = FR
+function vsh(r, names, F = FV) { return shots(r, names, F) }
+const REPO = 'D:\\AI_CRUD_Workshop_Frontend_EASY'
+const HB = 'HANDBOOK.html'
+window.__roles = { '小芸': '檢查點・卡住時', '阿哲': '跟著做' }
+
+// ════════════════════════════ 開場 ════════════════════════════
+chapter('開場', '跟著做', C.teal)
+
+sc3(1, () => {
+  const r = {}; hd(1, '開場')
+  r.c = [['講課版', '講觀念：為什麼這樣做', C.mut], ['手把手版（這一支）', '點哪裡、貼哪一段、看到什麼就對了', C.gold]].map(([h, s, col], i) => card(70 + i * 745, 150, 715, 220, h, [s], col, { size: 32, ts: 42 }))
+  r.two = card(70, 400, 1460, 200, '開兩個視窗', ['左：這支動畫　·　右：VS Code', '看完一段 → 暫停 → 自己做一次 → 下一段'], C.teal, { size: 34, ts: 40, lh: 60 })
+  r.hb = box(L, 70, 630, 1460, 110, 'prompt 在手冊、指令在動畫下面的速查：反白 → Ctrl+C 複製', { size: 34, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 900 })
+  r.chk = tip('每段最後有檢查點：一樣就往下；不一樣，看「卡住時」', { y: 770, size: 32, col: C.green })
+  return r
+}, [
+  r => { stagger(r.c, 500) },
+  r => { show(r.two); glow(r.two) },
+  r => { show(r.hb); glow(r.hb) },
+  r => { show(r.chk); glow(r.chk) },
+])
+
+sc3(2, () => {
+  const r = {}; hd(2, '開場')
+  r.n = flowRow(170, [['Step 0\n準備', C.mut], ['Step 1\n看差別', C.coral], ['Step 2\n玩範本', C.teal], ['Step 3\n做新模組', C.pink], ['Step 4\nLOOP', C.violet], ['Step 5\n收尾', C.green]], { w: 220, gap: 25 })
+  r.s01 = card(70, 340, 1460, 110, 'Step 0、1', ['抓教材、跑前置檢查　·　看有規矩、沒規矩的兩個網頁'], C.coral, { size: 30, ts: 32 })
+  r.s2 = card(70, 470, 1460, 110, 'Step 2', ['範本跑起來、當使用者玩一輪　·　認識四份規矩（harness）'], C.teal, { size: 30, ts: 32 })
+  r.s3 = card(70, 600, 1460, 110, 'Step 3　重頭戲', ['只給 PRD → AI 問選擇題、交文件 → 你說「開工」它才寫程式'], C.pink, { size: 30, ts: 32 })
+  r.s4 = card(70, 730, 1460, 110, 'Step 4、5', ['貼一個 prompt：AI 自己測、自己修、另一個 AI 挑錯　·　收尾'], C.violet, { size: 30, ts: 32 })
+  return r
+}, [
+  r => { stagger(r.n.slice(0, 2), 300); later(700, () => show(r.s01)) },
+  r => { stagger(r.n.slice(2, 3), 300); later(400, () => show(r.s2)) },
+  r => { stagger(r.n.slice(3, 4), 300); later(400, () => { show(r.s3); glow(r.s3) }) },
+  r => { stagger(r.n.slice(4), 300); later(600, () => show(r.s4)) },
+])
+
+// ════════════════════════════ Step 0 ════════════════════════════
+chapter('Step 0', '準備環境', C.gold)
+
+sc3(3, () => {
+  const r = {}; hd(3, 'step0')
+  const [a, b, c] = vsh(r, ['vs01-empty', 'vs02-menu-terminal', 'vs03-terminal'])
+  r.a1 = hl(r, a, 'menuTerm', '① 點「終端機」', { col: C.gold, below: true, size: 30 })
+  r.b1 = hl(r, b, 'newTerm', '② 點「新增終端」', { col: C.gold, below: true, size: 30 })
+  r.c1 = hl(r, c, 'prompt', '出現 PS 開頭：在等你打指令', { col: C.green, below: true, size: 28 })
+  r.c2 = hl(r, c, 'max', '太小就最大化', { col: C.gold, below: true, right: true, size: 26 })
+  return r
+}, [
+  r => { show(r.S[0]); later(500, () => only(r, r.a1)); later(3000, () => { to(r, r.S[1]); only(r, r.b1) }) },
+  r => { to(r, r.S[2]); only(r, r.c1) },
+  r => { only(r, r.c2) },
+])
+
+sc3(4, () => {
+  const r = {}; hd(4, 'step0')
+  const [a, b, c] = vsh(r, ['vs04-cd-d', 'vs05-clone-typed', 'vs06-clone-done'])
+  r.k = cmdCard(120, 650, 1360, ['cd D:\\', 'git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git'], '一行貼一次、按 Enter（沒有 D 槽就用 C:\\）', { size: 28 })
+  r.a1 = hl(r, a, 'prompt', '開頭變成 D:\\', { col: C.green, below: true, size: 28 })
+  r.b1 = hl(r, b, 'cmd', 'git clone：把教材從 GitHub 抓下來', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'done', 'done：下載完成', { col: C.green, below: true, size: 30 })
+  return r
+}, [
+  r => { show([r.S[0], r.k]); later(500, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { hide(r.k); to(r, r.S[2]); only(r, r.c1) },
+])
+
+sc3(5, () => {
+  const r = {}; hd(5, 'step0')
+  const [a, , c, d] = vsh(r, ['vs07-menu-file', 'vs07-menu-file', 'vs09-trust', 'vs10-explorer'])
+  r.a1 = hl(r, a, 'openFolder', '「檔案」→「開啟資料夾」', { col: C.gold, below: true, size: 30 })
+  r.dlg = scr('vs08-open-folder-dialog', fitF('vs08-open-folder-dialog', { x: 120, y: 120, w: 1360, h: 640 }))
+  r.dlgT = tip('點 AI_CRUD_Workshop_Frontend_EASY → 按「選取資料夾」', { y: 790, size: 30, col: C.gold })
+  r.c1 = hl(r, c, 'yes', '教材：選「是，我信任作者」', { col: C.green, below: true, size: 28 })
+  r.d1 = hl(r, d, 'tree', 'step0～step6 都在：打開對了', { col: C.green, lx: 380, size: 28 })
+  return r
+}, [
+  r => { show(r.S[0]); later(500, () => only(r, r.a1)) },
+  r => { only(r); hide(r.S[0]); show([r.dlg, r.dlgT]) },
+  r => { hide([r.dlg, r.dlgT]); to(r, r.S[2]); only(r, r.c1) },
+  r => { to(r, r.S[3]); only(r, r.d1) },
+])
+
+sc3(6, () => {
+  const r = {}; hd(6, 'step0')
+  const [a, b] = vsh(r, ['vs11-terminal-root', 'vs13-preflight-pass'])
+  r.a1 = hl(r, a, 'prompt', '開頭是教材資料夾：位置對了', { col: C.green, below: true, size: 28 })
+  r.k = cmdCard(120, 650, 1360, ['cd step0_course_intro', '.\\preflight.ps1'], '在教材資料夾的終端機', { size: 30 })
+  r.b1 = hl(r, b, 'first', 'PASS＝通過', { col: C.green, right: true, size: 26 })
+  r.b2 = tip('WARN＝提醒，不擋你；只有 FAIL 一定要處理', { y: 806, size: 30, col: C.gold })
+  r.b3 = hl(r, b, 'summary', '「可以開課」：過關', { col: C.green, above: true, size: 30 })
+  return r
+}, [
+  r => { show(r.S[0]); later(500, () => only(r, r.a1)) },
+  r => { show(r.k); glow(r.k) },
+  r => { hide(r.k); to(r, r.S[1]); only(r, r.b1); show(r.b2) },
+  r => { hide(r.b2); only(r, r.b3) },
+])
+
+sc3(7, () => {
+  const r = {}; hd(7, 'step0 ・ 卡住時')
+  r.three = [['1　照修復提示做', '腳本印在 FAIL 下一行'], ['2　關掉終端機重開', '再跑一次 preflight'], ['3　還是紅：貼給 AI', '整段輸出，連 PASS 一起']].map(([h, s], i) => card(70 + i * 495, 140, 465, 200, h, [s], [C.gold, C.teal, C.coral][i], { size: 28, ts: 34 }))
+  r.fake = tip('剛裝好的工具，舊視窗抓不到：這是最常見的假紅燈', { y: 380, size: 30, col: C.teal })
+  r.bw = bwin(['hb5-step0-help'], HB + '#step0'); r.B = r.bw.S
+  r.p1 = hl(r, r.B[0], 'pre', '手冊 Step 0 的求救 prompt：整段複製', { col: OR, below: true, size: 26 })
+  r.ep = cmdCard(120, 640, 1360, ['Set-ExecutionPolicy -Scope CurrentUser RemoteSigned'], '出現「已停用指令碼執行」：先打這一行，問你要不要變更就打 Y、Enter，再重跑', { size: 30, col: C.coral })
+  return r
+}, [
+  r => { stagger(r.three, 400) },
+  r => { glow(r.three[1]); show(r.fake); glow(r.fake) },
+  r => { hide([r.fake, ...r.three]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.p1)) },
+  r => { only(r); hide(r.bw.g); show(r.ep); glow(r.ep) },
+])
+
+// ════════════════════════════ Step 1 ════════════════════════════
+chapter('Step 1', '看兩個網頁', C.coral)
+
+sc3(8, () => {
+  const r = {}; hd(8, 'step1')
+  const [a] = vsh(r, ['vs15-start-demo'])
+  r.a1 = hl(r, a, 'cmd', 'start：用瀏覽器打開', { col: C.gold, above: true, size: 28 })
+  r.k = cmdCard(120, 650, 1360, ['cd ..', 'start step1_why_harness\\demo\\no-harness.html', 'start step1_why_harness\\demo\\with-harness.html'], '一行貼一次、按 Enter（macOS 把 start 換成 open）', { size: 28 })
+  const A1 = { x: 40, y: 150, w: 750, h: 470, bar: 56 }, A2 = { x: 810, y: 150, w: 750, h: 470, bar: 56 }
+  r.b1 = bwin(['br10-noh'], 'no-harness.html', A1); r.b2 = bwin(['br13-wh'], 'with-harness.html', A2)
+  show(r.b1.S[0]); show(r.b2.S[0])
+  r.l1 = T(L, 415, 670, '沒給規矩', { size: 40, anchor: 'middle', weight: 900, fill: C.coral }); r.l1.classList.add('hid')
+  r.l2 = T(L, 1185, 670, '附了規矩', { size: 40, anchor: 'middle', weight: 900, fill: C.teal }); r.l2.classList.add('hid')
+  r.c1 = hl(r, r.b1.S[0], 'add', '主色橘：AI 自己挑的', { col: OR, below: true, size: 26 })
+  r.c2 = hl(r, r.b2.S[0], 'add', '品牌紅：規矩指定的', { col: OR, below: true, size: 26 })
+  return r
+}, [
+  r => { show([r.S[0], r.k]); later(500, () => only(r, r.a1)) },
+  r => { only(r); hide([r.S[0], r.k]); show([r.b1.g, r.b2.g, r.l1, r.l2]) },
+  r => { zoom(r.b1.S[0], 'add', { pad: 90, max: 2.4 }); zoom(r.b2.S[0], 'add', { pad: 90, max: 2.4 }); only(r, r.c1, r.c2) },
+])
+
+sc3(9, () => {
+  const r = {}; hd(9, 'step1')
+  r.bw = bwin(['br10-noh', 'br14-wh-empty-submit', 'br15-wh-phone-blocked'], 'no-harness.html'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'blood', '左：一打開就選好「A」', { col: C.red, below: true, size: 30 })
+  r.b1 = hl(r, r.B[1], 'bloodErr', '右：什麼都不填 → 姓名、電話、血型都擋下來', { col: OR, below: true, size: 30, pad: 6 })
+  r.b2 = hl(r, r.B[1], 'nameErr', '', { col: OR })
+  r.c1 = hl(r, r.B[2], 'phoneErr', '(02) 1234-5678 → 被擋：只收 09 開頭', { col: OR, below: true, size: 28 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], 'blood', { pad: 160, max: 1.8 }); only(r, r.a1) },
+  r => { unzoom(r.B[0]); burl(r.bw, 'with-harness.html'); swap(r.B, r.B[1]); only(r, r.b1, r.b2) },
+  r => { swap(r.B, r.B[2]); only(r, r.c1) },
+])
+
+sc3(10, () => {
+  const r = {}; hd(10, 'step1 ・ 檢查點')
+  r.q = box(L, 70, 180, 1460, 220, '差的不是好不好看\n是「這個決定是誰做的」', { size: 54, fill: C.card, stroke: C.gold, color: C.ink, weight: 900 })
+  r.two = [['附了規矩', '顏色、驗證都查得到出處', C.teal], ['沒給規矩', '全是 AI 當場自己決定', C.coral]].map(([h, s, col], i) => card(120 + i * 690, 460, 670, 180, h, [s], col, { size: 32, ts: 40 }))
+  return r
+}, [
+  r => { show(r.q); glow(r.q) },
+  r => { stagger(r.two, 500) },
+])
+
+// ════════════════════════════ Step 2 ════════════════════════════
+chapter('Step 2', '玩範本', C.teal)
+
+sc3(11, () => {
+  const r = {}; hd(11, 'step2')
+  const [a, b, c] = vsh(r, ['vs16-pnpm-install', 'vs17-pnpm-dev', 'vs18-link-hover'])
+  r.k = cmdCard(120, 640, 1360, ['cd step2_speedrun_kit/2.1_sample_app/sample-app', 'pnpm install', 'pnpm dev'], '一行貼一次、按 Enter；等 Done 再貼 pnpm dev', { size: 28 })
+  r.a1 = hl(r, a, 'done', 'Done：套件裝好了', { col: C.green, above: true, size: 28 })
+  r.b1 = hl(r, b, 'local', 'Local 網址：這個終端機要一直開著', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, b, 'url', '按住 Ctrl，點 Local 後面的藍色網址', { col: C.green, below: true, size: 28 })
+  r.port = tip('3100 被占用也沒關係：它會自己換一個埠，照它印的網址開', { y: 806, size: 28, col: C.teal })
+  return r
+}, [
+  r => { show([r.S[0], r.k]) },
+  r => { hide(r.k); only(r, r.a1) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { only(r, r.c1); show(r.port) },
+])
+
+sc3(12, () => {
+  const r = {}; hd(12, 'step2')
+  r.bw = bwin(['br30-list', 'br31-new-empty', 'br33-saved'], 'localhost:3100/template/crud'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'add', '① 點「新增人員」', { col: OR, below: true, right: true, size: 28 })
+  r.b1 = hl(r, r.B[1], [150, 120, 1060, 240], '新增表單：label 在上、必填有紅星', { col: OR, below: true, size: 28 })
+  r.b2 = hl(r, r.B[1], 'save', '② 紅星每格都填 → 按「儲存」', { col: OR, below: true, right: true, size: 26 })
+  r.c1 = hl(r, r.B[2], 'toast', '「已新增人員」', { col: C.green, above: true, right: true, size: 28 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1)) },
+  r => { burl(r.bw, 'localhost:3100/template/crud/new'); swap(r.B, r.B[1]); only(r, r.b1); later(3500, () => only(r, r.b2)) },
+  r => { burl(r.bw, 'localhost:3100/template/crud'); swap(r.B, r.B[2]); only(r, r.c1) },
+])
+
+sc3(13, () => {
+  const r = {}; hd(13, 'step2')
+  r.bw = bwin(['br34-edit', 'br35-validation', 'br37-delete-confirm'], 'localhost:3100/template/crud'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'note', '點鉛筆圖示進編輯 → 改一下備註', { col: OR, above: true, size: 28 })
+  r.a2 = hl(r, r.B[0], 'save', '儲存', { col: OR, below: true, right: true, size: 26 })
+  r.b1 = hl(r, r.B[1], 'err', '清空姓名 → 紅字，不讓你存', { col: C.red, below: true, size: 28 })
+  r.c1 = hl(r, r.B[2], 'ok', '「刪除人員」確認框 → 按紅色「刪除」才刪', { col: C.red, below: true, size: 28 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1, r.a2)) },
+  r => { swap(r.B, r.B[1]); only(r, r.b1) },
+  r => { swap(r.B, r.B[2]); only(r, r.c1) },
+])
+
+sc3(14, () => {
+  const r = {}; hd(14, 'step2')
+  r.bw = bwin(['br40-filter-status', 'br41-newtab', 'br42b-export-all'], 'localhost:3100/template/crud?q=陳&status=在職'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'q', '關鍵字「陳」', { col: OR, below: true, size: 26 })
+  r.a2 = hl(r, r.B[0], 'status', '狀態「在職」', { col: OR, below: true, size: 26 })
+  r.a3 = hl(r, r.B[0], 'count', '馬上只剩符合的', { col: C.green, below: true, size: 26 })
+  r.b1 = hl(r, r.B[1], 'q', '網址貼到新分頁：條件原樣還原', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, r.B[2], 'toast', '匯出：符合條件的全部，不是只有這頁', { col: C.green, above: true, right: true, size: 24 })
+  r.mob = scr('br43-mobile', fitF('br43-mobile', { x: 560, y: 120, w: 480, h: 700 }))
+  r.mobT = tip('縮到手機寬度：表格變卡片', { y: 830, size: 28, col: C.teal })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1, r.a2)); later(2500, () => only(r, r.a3)) },
+  r => { swap(r.B, r.B[1]); only(r, r.b1) },
+  r => { burl(r.bw, 'localhost:3100/template/crud'); swap(r.B, r.B[2]); only(r, r.c1) },
+  r => { only(r); hide(r.bw.g); show([r.mob, r.mobT]) },
+])
+
+sc3(15, () => {
+  const r = {}; hd(15, 'step2 ・ 檢查點')
+  const items = ['新增', '編輯', '刪除前先確認', '篩選後新分頁還原', '匯出全量']
+  r.c = items.map((t, i) => box(L, 70 + i * 296, 160, 276, 140, '☑ ' + t, { size: 30, fill: C.card, stroke: C.green, color: C.ink, weight: 900 }))
+  r.dev = card(70, 340, 1460, 170, '網頁打不開', ['多半是 pnpm dev 那個終端機被關了：再進 sample-app 資料夾，重跑 pnpm dev'], C.coral, { size: 30, ts: 36 })
+  r.red = card(70, 540, 1460, 170, 'pnpm 噴一大串紅字', ['從你打的指令那行開始整段複製，貼給 AI（手冊 Step 2 有現成 prompt）'], C.coral, { size: 30, ts: 36 })
+  return r
+}, [
+  r => { stagger(r.c, 300, e => { show(e); glow(e) }) },
+  r => { show(r.dev); glow(r.dev) },
+  r => { show(r.red); glow(r.red) },
+])
+
+sc3(16, () => {
+  const r = {}; hd(16, 'step2')
+  const [a, b, c] = vsh(r, ['vs19-readme-raw', 'vs20-readme-preview', 'vs20b-readme-table'])
+  r.a1 = hl(r, a, 'file', '2.1_sample_app/README.md', { col: C.gold, lx: 380, size: 26 })
+  r.b1 = hl(r, b, 'h2', '預覽：「8 個核心檔」', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'r1', '跟實體長相有關 → 複製改名', { col: C.teal, below: true, size: 26 })
+  r.c2 = hl(r, c, 'r6', '通用機制 → 直接共用', { col: C.gold, below: true, size: 26 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3000, () => only(r, r.c2)) },
+])
+
+sc3(17, () => {
+  const r = {}; hd(17, 'step2')
+  const [a, b] = vsh(r, ['vs21-harness-files', 'vs22b-claude-md-wide'])
+  r.a1 = hl(r, a, 'claude', '這四份 md ＝ 規矩（harness）', { lx: 560, col: C.gold, size: 30 })
+  r.a2 = hl(r, a, 'rules', '', { col: C.gold })
+  r.a3 = hl(r, a, 'ds', '', { col: C.gold })
+  r.a4 = hl(r, a, 'guide', '', { col: C.gold })
+  r.who = box(L, 120, 650, 1360, 120, '這四份＝harness：給 AI 讀的規矩\n你不用逐條讀懂，但要知道放在這裡', { size: 32, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  r.b1 = hl(r, b, 'editor', '四十幾行：鎖定技術棧、禁止寫死顏色…', { col: C.teal, below: true, size: 26 })
+  r.go = tip('Step 3 複製範本時，四份一起帶走：新模組直接繼承同一套規矩', { y: 806, size: 28, col: C.green })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1, r.a2, r.a3, r.a4)) },
+  r => { show(r.who); glow(r.who) },
+  r => { hide(r.who); to(r, r.S[1]); only(r, r.b1) },
+  r => { only(r); to(r, r.S[0]); show(r.go); glow(r.go) },
+])
+
+sc3(18, () => {
+  const r = {}; hd(18, 'step2')
+  const [a, b] = vsh(r, ['vs23-plus', 'vs24-start-ds'])
+  r.a1 = hl(r, a, 'plus', '加號：開第二個終端機', { col: C.gold, below: true, right: true, size: 28 })
+  r.k = cmdCard(120, 660, 1360, ['start step2_speedrun_kit\\2.2_design_system\\DESIGN_SYSTEM.html'], '第二個終端機（教材根目錄）', { size: 28 })
+  r.b1 = hl(r, b, 'cmd', '打開 Design System', { col: C.gold, above: true, size: 26 })
+  r.bw = bwin(['br20-design-system'], 'DESIGN_SYSTEM.html'); r.B = r.bw.S
+  r.c1 = hl(r, r.B[0], [268, 100, 690, 160], '每個顏色都有名字（token）：只准寫名字，不准寫死', { col: OR, size: 28, below: true })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); show(r.k); only(r, r.b1) },
+  r => { only(r); hide([r.S[1], r.k]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.c1)) },
+])
+
+// ════════════════════════════ Step 3 ════════════════════════════
+chapter('Step 3', '做新模組', C.pink)
+
+sc3(19, () => {
+  const r = {}; hd(19, 'step3')
+  const [a] = vsh(r, ['vs11-terminal-root'])
+  r.a1 = hl(r, a, 'prompt', '新的終端機：開頭是教材根目錄', { col: C.green, below: true, size: 28 })
+  r.bw = bwin(['hb5-step3-copy'], HB + '#step3'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'pre', '手冊「⓪ 準備工作區」：黑底框反白 → Ctrl+C', { col: OR, below: true, size: 26 })
+  const [, b, c] = vsh(r, ['vs11-terminal-root', 'vs25-pasted', 'vs26-step3-prep'])
+  r.b1 = hl(r, b, 'install', '出現 >> 時再按一次 Enter', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'done', 'Done：複製好、套件裝好', { col: C.green, above: true, size: 28 })
+  r.c2 = hl(r, c, 'prompt', '已經在 my-equipment-app 裡', { col: C.green, below: true, right: true, size: 26 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { only(r); hide(r.S[0]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) },
+  r => { only(r); hide(r.bw.g); show(r.S[1]); later(300, () => only(r, r.b1)) },
+  r => { to(r, r.S[2]); only(r, r.c1, r.c2) },
+])
+
+sc3(20, () => {
+  const r = {}; hd(20, 'step3')
+  const [a, b, c, d] = vsh(r, ['vs27-myapp-explorer', 'vs28-prd-top', 'vs29-prd-fields', 'vs30-prd-decisions'])
+  r.open = tip('「檔案」→「開啟資料夾」→ my-equipment-app（視窗會重開，終端機會關掉）', { y: 806, size: 28, col: C.gold })
+  r.a1 = hl(r, a, 'claude', '四份規矩跟著來了', { lx: 560, col: C.green, size: 26 })
+  r.a2 = hl(r, a, 'rules', '', { col: C.green }); r.a3 = hl(r, a, 'ds', '', { col: C.green }); r.a4 = hl(r, a, 'guide', '', { col: C.green })
+  r.b1 = hl(r, b, 'h1', 'PRD＝需求說明書（也叫 SPEC）', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'h2', '第 2 節：12 個欄位', { col: C.gold, below: true, size: 28 })
+  r.d1 = hl(r, d, 'h2', '第 5 節：三個決定留給你', { col: C.gold, below: true, size: 28 })
+  return r
+}, [
+  r => { show([r.S[0], r.open]) },
+  r => { hide(r.open); only(r, r.a1, r.a2, r.a3, r.a4) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3500, () => { to(r, r.S[3]); only(r, r.d1) }) },
+])
+
+sc3(21, () => {
+  const r = {}; hd(21, 'step3')
+  const [a, b] = vsh(r, ['cc00-statusbar', 'cc01-empty'])
+  r.a1 = hl(r, a, 'status', '右下角「Claude Code」', { col: C.gold, above: true, right: true, size: 28 })
+  r.b1 = hl(r, b, 'model', '選 Opus 5.5；effort 拉到 High', { col: C.gold, above: true, size: 28 })
+  r.b2 = hl(r, b, [930, 519, 62, 30], '核准模式：Auto', { col: C.green, above: true, right: true, size: 28 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); zoom(r.S[1], 'model', { pad: 200, max: 1.5 }); only(r, r.b1) },
+  r => { zoom(r.S[1], [930, 519, 62, 30], { pad: 200, max: 1.5 }); only(r, r.b2) },
+])
+
+sc3(22, () => {
+  const r = {}; hd(22, 'step3')
+  r.bw = bwin(['hb5-step3-start'], HB + '#step3'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'pre', '手冊「②」起手 prompt：四行，反白複製', { col: OR, below: true, size: 26 })
+  const [b, c] = vsh(r, ['cc02-prompt-pasted', 'cc03-reading'])
+  r.b1 = hl(r, b, 'input', '貼進輸入框 → 送出', { above: true, size: 28 })
+  r.c1 = hl(r, c, [350, 325, 645, 92], '一串讀檔：它在讀規矩和 PRD', { below: true, size: 28 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) },
+  r => { only(r); hide(r.bw.g); show(r.S[0]); later(300, () => only(r, r.b1)) },
+  r => { to(r, r.S[1]); zoom(r.S[1], [350, 325, 645, 92], { pad: 30, max: 1.6 }); later(400, () => only(r, r.c1)) },
+])
+
+sc3(23, () => {
+  const r = {}; hd(23, 'step3')
+  const [a, b, c, d] = vsh(r, ['cc05-d2', 'cc06-d3', 'cc09b-q2-serial', 'cc09b-q4-id'])
+  r.a1 = hl(r, a, 'rec', '「建議」＋一句理由', { col: C.green, below: true, size: 28 })
+  r.pick = tip('課堂拍板：D1 補刪除＋確認彈窗　·　D2 做 CSV 匯出　·　D3 選標「建議」的', { y: 806, size: 28, col: C.teal })
+  r.b1 = hl(r, b, 'rec', '點選項就好', { col: C.green, below: true, size: 28 })
+  r.c1 = hl(r, c, 'tabs', 'PRD 沒寫清楚的：它多問幾題', { col: C.gold, below: true, size: 26 })
+  r.c2 = hl(r, c, 'rec', '看不懂就選「建議」', { col: C.green, below: true, size: 26 })
+  r.d1 = hl(r, d, 'submit', '一批答完：Submit answers', { col: OR, above: true, size: 28 })
+  return r
+}, [
+  r => { show(r.S[0]); zoom(r.S[0], 'rec', { pad: 120, max: 1.6 }); later(400, () => only(r, r.a1)) },
+  r => { unzoom(r.S[0]); to(r, r.S[1]); only(r, r.b1); show(r.pick) },
+  r => { hide(r.pick); to(r, r.S[2]); only(r, r.c1); later(3000, () => only(r, r.c2)) },
+  r => { to(r, r.S[3]); only(r, r.d1) },
+])
+
+sc3(24, () => {
+  const r = {}; hd(24, 'step3 ・ 卡住時')
+  r.warn = box(L, 70, 140, 1460, 130, 'AI 沒問選擇題，直接開始建檔案、寫程式？\n不要讓它跑：先按停止', { size: 36, fill: '#3a1f1f', stroke: C.red, color: C.ink, weight: 900 })
+  r.bw = bwin(['hb5-step3-rescue'], HB + '#step3'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'pre', '救援 prompt：先停，先用選擇題問我', { col: OR, below: true, size: 26 })
+  return r
+}, [
+  r => { show(r.warn); glow(r.warn) },
+  r => { hide(r.warn); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) },
+])
+
+sc3(25, () => {
+  const r = {}; hd(25, 'step3')
+  const [a, b, c, d] = vsh(r, ['cc09a-docs4', 'v4-srs-decisions', 'v4-srs-trace', 'v4-srs-scope'])
+  r.a1 = hl(r, a, 'head', '先交 4 個檔：程式一行都還沒寫', { col: C.green, below: true, size: 28 })
+  r.b1 = hl(r, b, 'table', '第 1 段：已拍板決策', { col: C.violet, above: true, size: 28 })
+  r.b2 = hl(r, b, 'who', '誰拍板', { col: C.gold, below: true, right: true, size: 26 })
+  r.c1 = hl(r, c, 'table', '第 2 段：12 欄各做在哪', { col: C.violet, above: true, size: 28 })
+  r.d1 = hl(r, d, 'h', '第 3 段：這一版不做什麼', { col: C.violet, below: true, size: 28 })
+  r.must = tip('這三段你一定要核', { y: 806, size: 32, col: C.gold })
+  r.chrome = tip('問要不要開 Chrome：選 No，跟它說圖你自己看', { y: 806, size: 30, col: C.teal })
+  return r
+}, [
+  r => { show([r.S[0], r.chrome]); later(400, () => only(r, r.a1)) },
+  r => { hide(r.chrome); to(r, r.S[1]); only(r, r.b1, r.b2) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3500, () => { to(r, r.S[3]); only(r, r.d1); show(r.must) }) },
+])
+
+sc3(26, () => {
+  const r = {}; hd(26, 'step3')
+  const [a, b] = vsh(r, ['v4-design-files', 'v4-design-evidence'])
+  r.a1 = hl(r, a, 'h', '第 1 段：5 個複製改名、3 個直接共用', { col: C.violet, below: true, size: 28 })
+  r.a2 = hl(r, a, 'shared', '', { col: C.gold })
+  r.b1 = hl(r, b, 'hex', '做完後填：寫死的色碼 0 筆', { col: C.green, right: true, size: 26 })
+  r.b2 = hl(r, b, 'log', 'console.log：0 筆', { col: C.green, right: true, below: true, size: 26 })
+  r.bw = bwin(['v4-diag-uc', 'v4-diag-files-wide'], 'DIAGRAMS-中心裝備物資.html'); r.B = r.bw.S
+  r.d1 = hl(r, r.B[0], 'svg', '① 用例：誰能做哪些事', { col: OR, size: 26, above: true })
+  r.d2 = hl(r, r.B[1], 'h', '② 檔案架構：哪些複製改名、哪些共用', { col: OR, size: 26, below: true })
+  r.redo = tip('看圖就懂它打算怎麼做；看不懂就叫它重畫，不用讀程式', { y: 806, size: 28, col: C.gold })
+  r.dk = cmdCard(120, 660, 1360, ['start DIAGRAMS-中心裝備物資.html'], '在 my-equipment-app 的終端機：用瀏覽器打開圖', { size: 30 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1, r.a2)) },
+  r => { to(r, r.S[1]); only(r, r.b1, r.b2) },
+  r => { only(r); hide(r.S); show([r.bw.g, r.dk]); show(r.B[0]); later(300, () => only(r, r.d1)); later(4000, () => { hide(r.dk); swap(r.B, r.B[1]); only(r, r.d2) }) },
+  r => { show(r.redo); glow(r.redo) },
+])
+
+sc3(27, () => {
+  const r = {}; hd(27, 'step3')
+  const [a, b, c, d, e] = vsh(r, ['cc09a-tasklist', 'cc09e-model-menu', 'cc09f-go-typed', 'cc11v4-t0300', 'cc12-done'])
+  r.a1 = hl(r, a, 'head', '任務清單：順序看過了', { col: C.green, below: true, size: 26 })
+  r.b1 = hl(r, b, 'sonnet', '開工前：換 Sonnet 5.5', { col: C.gold, below: true, size: 28 })
+  r.c1 = hl(r, c, 'input', '還有題目就先答完 → 打「開工」→ 送出', { col: C.green, above: true, right: true, size: 28 })
+  r.d1 = hl(r, d, [350, 230, 680, 200], '一項一項做，每項回報一行', { above: true, size: 28 })
+  r.tea = box(L, 1080, 64, 400, 46, '實拍：約 17 分鐘，去倒杯茶', { size: 26, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.e1 = hl(r, e, 'sum', '驗收完，再請它五行總結', { col: C.green, above: true, size: 26 })
+  return r
+}, [
+  r => { show(r.S[0]); later(300, () => only(r, r.a1)); later(2500, () => { to(r, r.S[1]); only(r, r.b1) }) },
+  r => { to(r, r.S[2]); only(r, r.c1) },
+  r => { to(r, r.S[3]); only(r, r.d1); show(r.tea) },
+  r => { to(r, r.S[4]); only(r, r.e1) },
+])
+
+sc3(28, () => {
+  const r = {}; hd(28, 'step3 ・ 驗收')
+  r.bw = bwin(['ea01-list', 'ea04-item-open', 'ea05-code', 'ea06-validation', 'ea07-delete'], 'localhost:3101/equipment/crud'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'count', '共 24 筆', { col: C.green, below: true, size: 28 })
+  r.a2 = hl(r, r.B[0], 'status', '狀態：綠／黃／紅', { col: C.green, below: true, right: true, size: 26 })
+  r.b1 = hl(r, r.B[1], 'list', '先選分類，項目才出現', { col: OR, below: true, size: 26 })
+  r.b2 = hl(r, r.B[2], 'title', '標題馬上顯示編碼', { col: OR, below: true, size: 26 })
+  r.c1 = hl(r, r.B[3], 'toast', '空表單儲存：紅字＋提示，不跳走', { col: C.red, above: true, right: true, size: 26 })
+  r.d1 = hl(r, r.B[4], 'dialog', '刪除要先確認', { col: C.red, below: true, size: 28 })
+  r.mob = scr('ea08-mobile', fitF('ea08-mobile', { x: 560, y: 120, w: 480, h: 700 }))
+  r.prd = tip('視窗拉窄：表格變卡片　·　最後拿 PRD 第 2 節 12 欄一欄一欄對', { y: 830, size: 28, col: C.gold })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1, r.a2)) },
+  r => { burl(r.bw, 'localhost:3101/equipment/crud/new'); swap(r.B, r.B[1]); only(r, r.b1); later(3500, () => { swap(r.B, r.B[2]); only(r, r.b2) }) },
+  r => { swap(r.B, r.B[3]); only(r, r.c1) },
+  r => { burl(r.bw, 'localhost:3101/equipment/crud'); swap(r.B, r.B[4]); only(r, r.d1); later(2500, () => { only(r); hide(r.bw.g); show([r.mob, r.prd]) }) },
+])
+
+sc3(29, () => {
+  const r = {}; hd(29, 'step3')
+  const [a, b, c, d] = vsh(r, ['cc13-fix1-ask', 'cc13-fix1-done', 'cc14-fix2-ask', 'cc14-fix2-done'])
+  r.a1 = hl(r, a, 'msg', '看到短橫，期望三欄一致都用長橫', { col: C.gold, above: true, size: 26 })
+  r.how = tip('一次講一件：看到什麼 → 期望什麼', { y: 806, size: 32, col: C.teal })
+  r.b1 = hl(r, b, 'done', '改好會說改了哪個檔', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, c, 'msg', '對了再講下一件', { col: C.gold, above: true, size: 26 })
+  r.d1 = hl(r, d, 'done', '', { col: C.green })
+  r.twice = tip('同一件事講兩次還不好：換個說法重講', { y: 806, size: 30, col: C.coral })
+  r.pass = tip('全部沒問題：打「驗收通過」送出', { y: 806, size: 30, col: C.green })
+  return r
+}, [
+  r => { show([r.S[0], r.how]); later(300, () => only(r, r.a1)) },
+  r => { hide(r.how); to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3000, () => { to(r, r.S[3]); only(r, r.d1); show(r.pass) }) },
+  r => { hide(r.pass); show(r.twice); glow(r.twice) },
+])
+
+sc3(30, () => {
+  const r = {}; hd(30, 'step3 ・ 檢查點')
+  const items = ['AI 先問、你拍板', '交 4 個檔', '你說「開工」才寫', '網頁五件事', '小修講清楚']
+  r.c = items.map((t, i) => box(L, 70 + i * 296, 150, 276, 140, '☑ ' + t, { size: 28, fill: C.card, stroke: C.green, color: C.ink, weight: 900 }))
+  r.five = card(70, 320, 1460, 130, '網頁五件事', ['列表　·　連動下拉　·　新增編碼　·　刪除確認　·　手機卡片'], C.teal, { size: 30, ts: 34 })
+  r.err = card(70, 480, 1460, 170, '一開頁就 500：useColorMode is not defined', ['不用自己動手，跟 Claude Code 說：網頁 500，請停掉網頁伺服器、刪掉 .nuxt 和 .output 再重開'], C.coral, { size: 28, ts: 32 })
+  r.next = box(L, 70, 680, 1460, 110, '小修的來回很花時間 → 下一步：交給 AI 自己跑', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { stagger(r.c, 300, e => { show(e); glow(e) }) },
+  r => { show(r.five) },
+  r => { show(r.err); glow(r.err) },
+  r => { show(r.next); glow(r.next) },
+])
+
+// ════════════════════════════ Step 4 ════════════════════════════
+chapter('Step 4', 'LOOP＋對抗審查', C.violet)
+
+sc3(31, () => {
+  const r = {}; hd(31, 'step4')
+  const [a, b] = vsh(r, ['vs10-explorer', 'cc20-loop-pasted'])
+  r.a1 = hl(r, a, 'tree', '開回教材根目錄：step0～step6 都看得到', { col: C.gold, lx: 380, size: 28 })
+  r.b1 = hl(r, b, 'model', '右上角加號開新對話：Sonnet 5.5、Auto', { col: C.gold, above: true, size: 26 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+])
+
+sc3(32, () => {
+  const r = {}; hd(32, 'step4')
+  r.bw = bwin(['hb5-step4-loop'], HB + '#step4'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'pre', '手冊 Step 4 的 LOOP prompt：四行', { col: OR, below: true, size: 26 })
+  r.l1 = hl(r, r.B[0], [89, 110, 822, 30], '第一行：照 LOOP-規矩.md 做', { col: OR, below: true, size: 26 })
+  r.rule = card(120, 200, 1360, 400, 'step4_loop_e2e/LOOP-規矩.md（給 AI 讀）', ['鐵律：修兩次沒好就停、不准改測試', '埠：3100 被占就自己換', '審查：子代理用 Playwright 開瀏覽器截圖', '要交：LOOP-LOG、LOOP-REPORT、測試報告、文件同步'], C.violet, { size: 30, ts: 32, lh: 64 })
+  const [b] = vsh(r, ['cc20-loop-pasted'])
+  r.b1 = hl(r, b, 'send', '送出：接下來不用插手', { col: C.green, above: true, right: true, size: 28 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) },
+  r => { only(r, r.l1) },
+  r => { only(r); hide(r.bw.g); show(r.rule); glow(r.rule) },
+  r => { hide(r.rule); show(r.S[0]); later(300, () => only(r, r.b1)) },
+])
+
+sc3(33, () => {
+  const r = {}; hd(33, 'step4')
+  const [a, b] = vsh(r, ['cc21v4-port', 'cc23v4-red'])
+  r.a1 = hl(r, a, 'port', '3100 被占 → 自己換 3101，不關別人的程式', { col: C.green, below: true, size: 26 })
+  r.b1 = hl(r, b, 'red', '第 1 輪有紅：正常', { col: C.red, below: true, size: 28 })
+  r.b2 = hl(r, b, 'why', '先判因，再動手修', { col: C.gold, below: true, size: 28 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { only(r, r.b2) },
+])
+
+sc3(34, () => {
+  const r = {}; hd(34, 'step4')
+  const [a, b, c] = vsh(r, ['cc23v4-agent', 'cc23v4-shots', 'cc25v4-fixed'])
+  r.a1 = hl(r, a, 'agent', '子代理：AI 再開的分身，專門挑錯（Opus 5.5）', { col: C.gold, below: true, size: 26 })
+  r.b1 = hl(r, b, 'pill', 'Playwright 開瀏覽器，一頁一頁截圖', { col: C.teal, below: true, size: 26 })
+  r.c1 = hl(r, c, 'fixed', 'App 的問題：修完再跑', { col: C.green, below: true, size: 26 })
+  r.c2 = hl(r, c, 'issue', '測試的問題：只列給你', { col: C.gold, above: true, size: 26 })
+  r.tea = box(L, 1080, 64, 400, 46, '實拍：從貼上到報告約 24 分鐘', { size: 26, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3000, () => only(r, r.c2)) },
+  r => { show(r.tea); glow(r.tea) },
+])
+
+sc3(35, () => {
+  const r = {}; hd(35, 'step4 ・ 卡住時')
+  r.a = card(70, 150, 715, 300, 'E1～E7 有幾條紅', ['正常：這就是 LOOP 的用途', '別插手，讓它自己修'], C.green, { size: 30, ts: 38, lh: 60 })
+  r.b = card(815, 150, 715, 300, '腳本根本沒跑起來', ['瀏覽器下載失敗、連不上 App…', '環境問題：開新對話，貼手冊的環境求救 prompt'], C.coral, { size: 30, ts: 38, lh: 60 })
+  r.c = box(L, 70, 490, 1460, 150, '它自己停下來：同一個問題修兩次還沒好\n這是規矩，代表該你介入了', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.a); glow(r.a) },
+  r => { show(r.b); glow(r.b) },
+  r => { show(r.c); glow(r.c) },
+])
+
+sc3(36, () => {
+  const r = {}; hd(36, 'step4 ・ 驗收')
+  r.bw = bwin(['v4-loop-report-top', 'v4-loop-report-shots', 'v4-loop-report-decide'], 'my-equipment-app/loop/LOOP-REPORT.html'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'sum', '結論在最前面', { col: OR, below: true, size: 28 })
+  r.b1 = hl(r, r.B[1], 'shot', '子代理的截圖', { col: OR, above: true, size: 28 })
+  r.c1 = hl(r, r.B[2], 'h', '要你裁決的：在同一個對話打「Q1 選 1、Q2 選 1…」', { col: OR, below: true, size: 26 })
+  r.k = cmdCard(120, 680, 1360, ['start step3_new_module\\my-equipment-app\\loop\\LOOP-REPORT.html'], '教材根目錄的終端機：用瀏覽器打開報告', { size: 26 })
+  return r
+}, [
+  r => { show([r.bw.g, r.k]); show(r.B[0]); later(300, () => only(r, r.a1)) },
+  r => { hide(r.k); swap(r.B, r.B[1]); only(r, r.b1) },
+  r => { swap(r.B, r.B[2]); only(r, r.c1) },
+])
+
+sc3(37, () => {
+  const r = {}; hd(37, 'step4 ・ 驗收')
+  r.bw = bwin(['v4-pw-report'], 'step4_loop_e2e/e2e/playwright-report/index.html'); r.B = r.bw.S
+  r.p1 = hl(r, r.B[0], 'pass', '7 條都是綠的', { col: C.green, below: true, size: 28 })
+  r.k = cmdCard(120, 680, 1360, ['start step4_loop_e2e\\e2e\\playwright-report\\index.html'], '教材根目錄的終端機：用瀏覽器打開測試報告', { size: 26 })
+  const [a, b, c] = vsh(r, ['v4-loop-log', 'v4-srs-after', 'cc25v4-conclusion'])
+  r.a1 = hl(r, a, 'body', 'LOOP-LOG.md：流水帳，有紅燈時才翻', { col: C.teal, below: true, size: 26 })
+  r.b1 = hl(r, b, 'mark', '「step4 LOOP 後」：程式改了，文件跟著改', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, c, 'url', '照報告的網址，自己再點一遍', { col: C.gold, below: true, size: 28 })
+  return r
+}, [
+  r => { show([r.bw.g, r.k]); show(r.B[0]); later(300, () => only(r, r.p1)) },
+  r => { only(r); hide([r.bw.g, r.k]); show(r.S[0]); later(300, () => only(r, r.a1)) },
+  r => { to(r, r.S[1]); only(r, r.b1) },
+  r => { to(r, r.S[2]); only(r, r.c1) },
+])
+
+sc3(38, () => {
+  const r = {}; hd(38, 'step4 ・ 檢查點')
+  const items = ['7 條全綠（或報告寫清楚停在哪）', '子代理挑過錯', '報告、測試報告、流水紀錄', '文件標「step4 LOOP 後」', '自己點過一遍']
+  r.c = items.map((t, i) => box(L, 70, 140 + i * 92, 1460, 78, '☑ ' + t, { size: 30, fill: C.card, stroke: C.green, color: C.ink, weight: 800 }))
+  r.iron = [['鐵律 1', '同一問題修兩次沒好就停', C.red], ['鐵律 2', '不准改測試、不准放寬標準', C.red]].map(([h, s, col], i) => card(70 + i * 745, 620, 715, 160, h, [s], col, { size: 30, ts: 36 }))
+  return r
+}, [
+  r => { stagger(r.c.slice(0, 1), 100, e => { show(e); glow(e) }) },
+  r => { stagger(r.c.slice(1), 300, e => { show(e); glow(e) }) },
+  r => { stagger(r.iron, 500) },
+])
+
+// ════════════════════════════ Step 5 ════════════════════════════
+chapter('Step 5', '收尾', C.green)
+
+sc3(39, () => {
+  const r = {}; hd(39, 'step5')
+  r.n = flowRow(170, [['寫一頁\nSPEC', C.teal], ['起手\nprompt', C.gold], ['選擇題\n拍板', C.gold], ['看文件\n和圖', C.violet], ['說\n開工', C.pink], ['LOOP\nprompt', C.violet], ['驗收\n報告', C.green]], { w: 190, gap: 18 })
+  r.spec = tip('SPEC＝PRD，可以很簡陋', { y: 330, size: 30, col: C.teal })
+  r.tea = box(L, 70, 430, 1460, 140, 'LOOP 跑的時候，你可以去喝茶\n回來看報告、自己點一遍', { size: 38, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.two = [['頭', '講清楚要什麼、拍板', C.gold], ['尾', '驗收', C.green]].map(([h, s, col], i) => card(120 + i * 690, 610, 670, 160, h, [s], col, { size: 32, ts: 40 }))
+  return r
+}, [
+  r => { stagger(r.n.slice(0, 1), 300); later(500, () => show(r.spec)) },
+  r => { stagger(r.n.slice(1, 5), 300) },
+  r => { stagger(r.n.slice(5), 300); later(600, () => { show(r.tea); glow(r.tea) }) },
+  r => { stagger(r.two, 500) },
+])
+
+sc3(40, () => {
+  const r = {}; hd(40, 'step5')
+  r.three = [['1　帶走四份規矩', '改成公司的規則'], ['2　整理範本', '挑最成熟的頁面'], ['3　新需求都走', '同一條路']].map(([h, s], i) => card(70 + i * 495, 140, 465, 200, h, [s], [C.teal, C.gold, C.violet][i], { size: 28, ts: 34 }))
+  r.bw = bwin(['hb5-checklist'], HB + '#done'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], 'h', '手冊最下面：完課檢核表，全部打勾', { col: OR, below: true, size: 26 })
+  r.be = box(L, 70, 380, 1460, 160, '下一門：後端課\n同一套方法，把裝備物資接上真的資料庫', { size: 36, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 900 })
+  return r
+}, [
+  r => { stagger(r.three, 400) },
+  r => { hide(r.three); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)) },
+  r => { only(r); hide(r.bw.g); show(r.be); glow(r.be) },
+])
+
+/* ---------- 播放器 ---------- */
+let cur=0,stepI=0,refs={},playing=false,timer=null,speed=1,stepStart=0,stepDur=1,remain=0,ended=false;
+const $=id=>document.getElementById(id);
+window.__askTips=[];
+const ANIM_ID='anim', ASK_URL='';
+window.__animIndex=scenes.map((sc,i)=>({n:i+1,title:sc.title,steps:sc.steps.map(x=>x[0])}));
+const chips=$('chips');
+/* 兩層章節：有 chapter() 時，上排是 Step，下排只列目前 Step 的段落 */
+const CH=(window.__chaps||[]);const stepsNav=$('steps');let chipShown=-2;
+if(CH.length){stepsNav.hidden=false;CH.forEach((c,ci)=>{const b=document.createElement('button');b.type='button';b.style.setProperty('--c',c.color);
+  b.innerHTML=`<b>${c.tag}</b><span>${c.title}</span>`;b.title=`${c.tag}　${c.title}`;b.setAttribute('aria-label',b.title);b.addEventListener('click',()=>{const i=scenes.findIndex(s=>s.chap===ci);if(i>=0){$('bStart').hidden=true;goto(i,0);}});stepsNav.appendChild(b);});}
+scenes.forEach((s,i)=>{const b=document.createElement('button');b.type='button';
+  const k=CH.length?scenes.slice(0,i+1).filter(x=>x.chap===s.chap).length:0;b.textContent=CH.length?`${k}. ${s.title}`:(i+1)+'. '+s.title;b.dataset.chap=s.chap;
+  b.addEventListener('click',()=>{goto(i,0);});chips.appendChild(b);});
+function syncNav(){if(!CH.length)return;const c=scenes[cur].chap;[...stepsNav.children].forEach((b,i)=>b.setAttribute('aria-current',i===c?'true':'false'));
+  if(chipShown!==c){[...chips.children].forEach(b=>{b.hidden=+b.dataset.chap!==c;});chipShown=c;chips.scrollLeft=0;updateFade();}
+  try{centerIn(stepsNav,stepsNav.children[c]);}catch(e){}}
+/* 只捲「那一排自己」，不要用 scrollIntoView（會連整個頁面或外層網頁一起捲） */
+function centerIn(box,el){if(!box||!el||el.hidden||box.scrollWidth<=box.clientWidth+1)return;
+  const b=box.getBoundingClientRect(),r=el.getBoundingClientRect();box.scrollLeft=Math.max(0,box.scrollLeft+(r.left-b.left)-(b.width-r.width)/2);}
+$('bFull').addEventListener('click',()=>{const el=$('player');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});});
+function durOf(t){return Math.min(15000,Math.max(4200,t.length*250+1300))/speed;}
+/* ---------- 語音 ---------- */
+const synth=(!(window.__audio&&Object.keys(window.__audio).length)&&('speechSynthesis' in window))?window.speechSynthesis:null;/* 有預錄配音就只用預錄，不用瀏覽器語音 */let voiceOn=!!synth,voices=[],stepToken=0;
+const CIRC='①②③④⑤⑥⑦⑧⑨⑩';
+function spoken(t){(window.__spoken||[]).forEach(([re,s])=>{t=t.replace(re,s);});return t.replace(/[\u2460-\u2469]/g,c=>(CIRC.indexOf(c)+1)+' 號').replace(/!(\d+)/g,'$1 號').replace(/(\d+):(\d+)/g,'$1 比 $2').replace(/＝/g,'等於').replace(/・/g,' ').replace(/○○/g,'某某').replace(/～/g,'到').replace(/→/g,'到').replace(/＋/g,'加').replace(/／/g,'、').replace(/([A-Za-z0-9.\-]+)\/([A-Za-z0-9.\-]+)/g,'$1 $2').replace(/[「」（）]/g,' ');}
+let CLOUD=false,curAudio=null;const audioCache=new Map();
+/* 預錄配音：window.__audio = {'段-句': {src, sec, who}}；播完自動下一句，暫停會記住位置 */
+const REC=window.__audio||{};const HAS_REC=Object.keys(REC).length>0;let recResume=null;
+function isRec(){return HAS_REC&&$('voiceSel').value==='rec';}
+function recFor(i,k){return REC[(i+1)+'-'+(k+1)];}
+if(HAS_REC)voiceOn=true;
+const CLOUD_VOICES=[['zh-TW-HsiaoChenNeural','☁ 曉臻（女）'],['zh-TW-YunJheNeural','☁ 雲哲（男）'],['zh-TW-HsiaoYuNeural','☁ 曉雨（女）']];
+function addCloudOptions(sel){if(!CLOUD)return;CLOUD_VOICES.slice().reverse().forEach(([id,label])=>{if([...sel.options].some(o=>o.value==='cloud:'+id))return;const o=document.createElement('option');o.value='cloud:'+id;o.textContent=label;sel.insertBefore(o,sel.firstChild);});}
+function loadVoices(){if(!synth&&!HAS_REC)return;const zh=synth?synth.getVoices().filter(v=>/^(zh|cmn)/i.test(v.lang)):[];
+  const sc=v=>(/TW/i.test(v.lang)?100:/HK/i.test(v.lang)?30:50)+(/Natural|Online/i.test(v.name)?20:0)+(/Google/i.test(v.name)?5:0);zh.sort((a,b)=>sc(b)-sc(a));voices=zh;
+  const sel=$('voiceSel'),prev=sel.value;sel.innerHTML='';
+  if(!zh.length&&!HAS_REC){sel.innerHTML='<option value="">預設中文</option>';}
+  zh.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name.replace(/^Microsoft\s+/,'').replace(/\s*Online \(Natural\)/,'').replace(/\s*-\s*Chinese.*$/,'')+'（'+v.lang+'）';sel.appendChild(o);});
+  addCloudOptions(sel);
+  if(HAS_REC){const o=document.createElement('option');o.value='rec';o.textContent='🎙 預錄雙人配音（小芸／阿哲）';sel.insertBefore(o,sel.firstChild);}
+  sel.value=[...sel.options].some(o=>o.value===prev)?prev:(sel.options[0]?sel.options[0].value:'');
+  const note=$('voiceNote');if(!zh.length&&!HAS_REC){note.textContent='這個瀏覽器找不到中文語音，會用預設聲音念；念不出來時字幕照常播放。建議用 Edge 或 Chrome。';note.hidden=false;}else note.hidden=true;}
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices;}else if(HAS_REC){loadVoices();const sel=$('voiceSel');sel.innerHTML='<option value="rec">🎙 預錄雙人配音（小芸／阿哲）</option>';}else{$('voiceNote').textContent='這個瀏覽器不支援語音，字幕照常播放。';$('voiceNote').hidden=false;$('bVoice').disabled=true;voiceOn=false;$('bVoice').textContent='🔇 無語音';}
+function isCloud(){return CLOUD&&$('voiceSel').value.startsWith('cloud:');}
+function stopAudio(){if(curAudio){curAudio.onended=null;curAudio.onerror=null;curAudio.pause();curAudio=null;}}
+function ttsFetch(text,voice){const k=voice+'|'+text;if(audioCache.has(k))return audioCache.get(k);
+  const p=fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:spoken(text),voice,rate:'0%'})})
+    .then(r=>{if(!r.ok)throw new Error('tts '+r.status);return r.json();}).then(j=>'data:'+j.mime+';base64,'+j.audio);
+  audioCache.set(k,p);p.catch(()=>audioCache.delete(k));return p;}
+function nextText(){const sc=scenes[cur];if(stepI+1<sc.steps.length)return sc.steps[stepI+1][0];const n=scenes[cur+1];return n?n.steps[0][0]:null;}
+function cloudSpeak(text,tok){const voice=$('voiceSel').value.slice(6);
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  const fail=()=>next(Math.max(300,stepDur-(performance.now()-stepStart)));
+  ttsFetch(text,voice).then(src=>{if(tok!==stepToken||!playing)return;stopAudio();curAudio=new Audio(src);curAudio.playbackRate=speed;
+    curAudio.onended=()=>next(500/speed);curAudio.onerror=fail;curAudio.play().catch(fail);}).catch(fail);
+  const nx=nextText();if(nx)ttsFetch(nx,voice).catch(()=>{});}
+function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth){timer=setTimeout(()=>{if(tok===stepToken)advance();},durOf(text));return;}synth.cancel();const u=new SpeechSynthesisUtterance(spoken(text));u.lang='zh-TW';const v=voices.find(x=>x.name===$('voiceSel').value);if(v){u.voice=v;u.lang=v.lang;}u.rate=speed;
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  u.onend=()=>next(700/speed);
+  u.onerror=e=>{if(e.error==='interrupted'||e.error==='canceled')return;next(Math.max(300,stepDur-(performance.now()-stepStart)));};
+  setTimeout(()=>{if(tok===stepToken&&playing)synth.speak(u);},60);}
+/* 預先載入：接下來幾句的 mp3 先下載好，輪到時馬上出聲（線上版不用等下載） */
+const PRE=new Map();
+function preAudio(src){let a=PRE.get(src);if(!a){a=new Audio();a.preload='auto';a.src=src;try{a.load();}catch(e){}PRE.set(src,a);}return a;}
+function preloadAhead(i,k,n){let c=i,s=k;for(let m=0;m<n;m++){s++;if(!scenes[c]||s>=scenes[c].steps.length){c++;s=0;}if(!scenes[c])break;const q=recFor(c,s);if(q)preAudio(q.src);}}
+/* 背景預載：一次一個排隊（載好或 4 秒後才換下一個），不跟正在播的那句搶頻寬 */
+function bgPreload(list){let i=0;const next=()=>{if(i>=list.length)return;const a=preAudio(list[i++]);if(a.readyState>=4){setTimeout(next,50);return;}let done=false;const go=()=>{if(done)return;done=true;setTimeout(next,100);};a.addEventListener('canplaythrough',go,{once:true});a.addEventListener('error',go,{once:true});setTimeout(go,4000);};next();next();next();}
+function loadingNote(a){const n=$('voiceNote');if(!n)return;if(a.readyState>=3){if(n.dataset.loading){n.hidden=true;delete n.dataset.loading;}return;}n.textContent='聲音載入中…';n.hidden=false;n.dataset.loading='1';const off=()=>{if(n.dataset.loading){n.hidden=true;delete n.dataset.loading;}};a.addEventListener('playing',off,{once:true});a.addEventListener('error',off,{once:true});}
+function playRec(r,tok){stopAudio();const a=preAudio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;try{a.currentTime=0;}catch(e){}loadingNote(a);
+  preloadAhead(cur,stepI,4);
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  const fail=()=>{if(tok!==stepToken)return;stopAudio();speak(scenes[cur].steps[stepI][0],tok);};
+  if(recResume&&recResume.k===r.src){a.currentTime=recResume.t;}recResume=null;
+  a.onended=()=>next(600/speed);a.onerror=fail;a.play().catch(fail);}
+function startClock(){clearTimeout(timer);const tok=++stepToken;const r=voiceOn&&isRec()&&recFor(cur,stepI);
+  if(r){playRec(r,tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},(r.sec*1000)/speed+8000);}
+  else if(voiceOn&&(synth||isCloud())){speak(scenes[cur].steps[stepI][0],tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},stepDur*2.5+5000);}
+  else timer=setTimeout(()=>{if(tok===stepToken)advance();},Math.max(300,remain));}
+function stopVoice(){stepToken++;if(synth)synth.cancel();stopAudio();}
+function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textContent=ch?`${ch.tag}　${ch.title}　›　${s.title}`:`第 ${cur+1} 段　${s.title}`;$('subtext').textContent=s.steps[stepI][0];const wb=$('who');if(s.who){wb.hidden=false;wb.textContent=s.who;wb.className='who '+(s.who==='小芸'?'x':'z');}else wb.hidden=true;syncNav();
+  $('pos').textContent=`${cur+1}／${scenes.length} 段　·　${stepI+1}／${s.steps.length} 句`;
+  [...chips.children].forEach((b,i)=>b.setAttribute('aria-current',i===cur?'true':'false'));
+  try{centerIn(chips,chips.children[cur]);}catch(e){}
+  fitSubText();
+  try{history.replaceState(null,'','#s'+(cur+1)+'-'+(stepI+1));}catch(e){}
+  try{if(window.parent!==window)window.parent.postMessage({type:'anim:state',anim:ANIM_ID,scene:cur+1,step:stepI+1,title:s.title,text:s.steps[stepI][0],total:scenes.length},'*');}catch(e){}
+  const w=$('askWhere');if(w)w.textContent=`正在看：第 ${cur+1} 段　${s.title}`;}
+let gotoTok=0;
+function goto(i,s){clearTimeout(timer);if(HAS_REC){const q=recFor(i,s);if(q)preAudio(q.src);preloadAhead(i,s,3);}stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
+  instant=true;svg.classList.add('instant');layer.innerHTML='';L=layer;refs=scenes[i].build()||{};
+  for(let k=0;k<s;k++)scenes[i].steps[k][1](refs);
+  svg.getBoundingClientRect();
+  requestAnimationFrame(()=>{if(gt!==gotoTok)return;svg.classList.remove('instant');instant=false;runStep(s);});}
+function durNow(t){const r=voiceOn&&isRec()&&recFor(cur,stepI);return r?(r.sec*1000+600)/speed:durOf(t);}
+function runStep(s){stepI=s;recResume=null;const st=scenes[cur].steps[s];st[1](refs);setSub();stepDur=durNow(st[0]);remain=stepDur;stepStart=performance.now();if(playing)startClock();}
+function advance(){clearTimeout(timer);if(stepI+1<scenes[cur].steps.length)runStep(stepI+1);else if(cur+1<scenes.length)goto(cur+1,0);else{ended=true;setPlaying(false);$('bPlay').textContent='↺ 重播';}}
+function back(){if(stepI>0)goto(cur,stepI-1);else if(cur>0)goto(cur-1,scenes[cur-1].steps.length-1);}
+function setPlaying(p){clearTimeout(timer);if(p){$('bStart').hidden=true;}
+  if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&isRec()&&recFor(cur,stepI)){const done=recResume?recResume.t*1000/speed:0;remain=stepDur-done;}else if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
+  else if(!p&&playing){playing=false;if(curAudio&&curAudio._rec)recResume={k:curAudio._rec,t:curAudio.currentTime};stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
+window.__dbg=()=>({cur,stepI,playing,curAudio});
+setTimeout(()=>{if(HAS_REC){const q=recFor(cur,stepI);if(q)preAudio(q.src);preloadAhead(cur,stepI,4);setTimeout(()=>bgPreload(scenes.map((_,i)=>recFor(i,0)).filter(Boolean).map(q=>q.src)),2500);}},300);
+$('bPlay').addEventListener('click',()=>{if(ended){playing=true;$('bPlay').textContent='⏸ 暫停';goto(0,0);return;}setPlaying(!playing);});
+$('bStart').addEventListener('click',()=>{setPlaying(true);});
+['chips','bNext','bPrev','bNextScene','bPrevScene'].forEach(id=>$(id).addEventListener('click',()=>{$('bStart').hidden=true;}));
+function fwd(){if(stepI+1<scenes[cur].steps.length)goto(cur,stepI+1);else advance();}
+$('bNext').addEventListener('click',fwd);
+$('bPrev').addEventListener('click',back);
+$('bNextScene').addEventListener('click',()=>{if(cur+1<scenes.length)goto(cur+1,0);});
+$('bPrevScene').addEventListener('click',()=>{goto(stepI>0?cur:Math.max(0,cur-1),0);});
+function restartSentence(){if(!playing)return;recResume=null;stepDur=durNow(scenes[cur].steps[stepI][0]);remain=stepDur;stepStart=performance.now();startClock();}
+$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;goto(cur,stepI);});  // 暫停中也重設這一句，剩餘時間才會照新速度算
+$('voiceSel').addEventListener('change',()=>{stopVoice();recResume=null;goto(cur,stepI);});  // 換聲音：畫面和聲音一起從這一句開頭重來（跟換速度同一條路），不會畫面停在後半句
+$('bVoice').addEventListener('click',()=>{voiceOn=!voiceOn;$('bVoice').textContent=voiceOn?'🔊 語音：開':'🔇 語音：關';$('bVoice').classList.toggle('off',!voiceOn);stopVoice();goto(cur,stepI);});
+document.addEventListener('keydown',e=>{if(e.target&&/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key===' '){e.preventDefault();$('bPlay').click();}else if(e.key==='ArrowRight'){fwd();}else if(e.key==='ArrowLeft'){back();}else if(e.key==='f'||e.key==='F'){$('bFull').click();}});
+(function tick(){const f=playing?(performance.now()-stepStart)/stepDur:(stepDur-remain)/stepDur;$('barfill').style.width=Math.max(0,Math.min(1,f))*100+'%';requestAnimationFrame(tick);})();
+/* ---------- 深連結：#s5 或 #s5-3 直接跳到第 5 段第 3 句 ---------- */
+function parseHash(){const m=/^#s(\d+)(?:-(\d+))?/.exec(location.hash||'');if(!m)return null;
+  const sc=Math.min(scenes.length,Math.max(1,+m[1]))-1;const st=Math.max(0,Math.min(scenes[sc].steps.length-1,(+(m[2]||1))-1));return [sc,st];}
+const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})()||/embed/.test(location.hash);
+if(EMBED)document.documentElement.classList.add('embed');
+window.addEventListener('hashchange',()=>{const h=parseHash();if(h&&(h[0]!==cur||h[1]!==stepI))goto(h[0],h[1]);});
+window.addEventListener('message',e=>{const d=e.data||{};
+  if(d.type==='anim:goto'){const sc=Math.max(0,Math.min(scenes.length-1,(d.scene||1)-1));const st=Math.max(0,Math.min(scenes[sc].steps.length-1,(d.step||1)-1));goto(sc,st);if(d.play)setPlaying(true);}
+  else if(d.type==='anim:pause')setPlaying(false);});
+/* ---------- 放在小港網站上：雲端語音＋問小港 ---------- */
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function jumpLabel(id,sc,st){if(id!==ANIM_ID)return `▶ 另一支動畫：第 ${sc} 段`;const S=scenes[sc-1];return S?`▶ 跳到第 ${sc} 段${st?'・第 '+st+' 句':''}：${S.title}`:null;}
+function renderAnswer(text){const box=document.createElement('div');box.className='askmsg bot';
+  const jumps=[];const body=String(text).replace(/\[\[anim:([\w-]+):(\d+)(?:-(\d+))?\]\]/g,(m,id,sc,st)=>{jumps.push([id,+sc,st?+st:0]);return '';}).replace(/^\s*[*＊•-]\s*$/gm,'').replace(/^\s*(▶\s*)?看動畫[：:]\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+  box.innerHTML=esc(body).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*\*\s+/gm,'• ');
+  jumps.forEach(([id,sc,st])=>{const lab=jumpLabel(id,sc,st);if(!lab)return;const b=document.createElement('button');b.type='button';b.className='askjump';b.textContent=lab;
+    b.addEventListener('click',()=>{if(id===ANIM_ID){$('bStart').hidden=true;goto(sc-1,Math.max(0,Math.min(scenes[sc-1].steps.length-1,(st||1)-1)));}else location.href=`../${id}/index.html#s${sc}-${st||1}`;});box.appendChild(b);});
+  return box;}
+async function ask(q){const log=$('askLog');const me=document.createElement('div');me.className='askmsg me';me.textContent=q;log.appendChild(me);
+  const wait=document.createElement('div');wait.className='askmsg bot wait';wait.textContent='小港思考中…';log.appendChild(wait);log.scrollTop=log.scrollHeight;
+  try{const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,anim:ANIM_ID})});
+    const j=await r.json();wait.remove();if(!r.ok)throw new Error(j.message||('HTTP '+r.status));log.appendChild(renderAnswer(j.answer||''));}
+  catch(e){wait.textContent='這一題沒有問成功：'+(e.message||e)+'。請稍後再試。';wait.classList.remove('wait');}
+  log.scrollTop=log.scrollHeight;}
+function openAsk(open){const d=$('askDrawer');d.classList.toggle('open',open);d.setAttribute('aria-hidden',open?'false':'true');if(open){setPlaying(false);setTimeout(()=>$('askInput').focus(),300);}}
+$('askClose').addEventListener('click',()=>openAsk(false));
+$('askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('askInput').value.trim();if(!q)return;$('askInput').value='';ask(q);});
+const TIPS=(window.__askTips||[]);TIPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>ask(t));$('askTips').appendChild(b);});
+fetch('/api/config',{headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(j=>{if(!j)throw 0;
+  CLOUD=!HAS_REC;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
+  if(j.live&&!EMBED){const b=$('bAsk');b.hidden=false;b.addEventListener('click',()=>openAsk(!$('askDrawer').classList.contains('open')));}
+}).catch(()=>{if(ASK_URL&&!EMBED){const b=$('bAsk');const a=document.createElement('a');a.className='askbtn';a.href=ASK_URL;a.target='_blank';a.rel='noopener';a.textContent='💬 問小港（另開網頁）';a.style.textDecoration='none';b.replaceWith(a);}});
+/* ---------- 版面：把整個播放器（標題＋導覽＋舞台＋字幕＋控制列）塞進第一屏 ----------
+   做法：舞台寬度 = min(容器寬, 可用高度 × 16/9)。「可用高度」不是猜的，而是設一個寬度、量實際排出來的高度、
+   再修正寬度，重複幾次直到剛好貼齊可視區底部。視窗大小、全螢幕、字體載入、導覽列換行都會重算。
+   字幕：字級跟著舞台寬度（舞台寬 / 36，桌面 22～32px；全螢幕上限 40px；手機與嵌入模式最小 18px），框的高度固定為 --sub-n 行。
+   一行塞不下的長句，只有那一句會暫時縮字（最小 18px）。 */
+const RT=document.documentElement,SUB_FLOOR=18,SUB_LH=1.45,SUB_PAD=16;
+let fitting=false,fitQ=0,lastW=0,subBase=24,nBoost=0,mEl=null,mTxt=null;const mCache=new Map();
+const TEXTS=scenes.flatMap(sc=>sc.steps.map(x=>x[0]));
+/* 隱形的量尺：跟字幕框同樣的樣式，用來算「這個寬度、這個字級，最長的句子要幾行」 */
+function measurer(){if(mEl)return mEl;mEl=document.createElement('div');mEl.className='subline';mEl.setAttribute('aria-hidden','true');
+  mEl.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;height:auto;overflow:visible;width:100px';
+  mEl.innerHTML='<span class="who x">小芸</span><span></span>';mTxt=mEl.lastChild;$('subline').parentNode.appendChild(mEl);return mEl;}
+function maxLines(w,fs){const k=w+'|'+fs;if(mCache.has(k))return mCache.get(k);const m=measurer();m.style.width=w+'px';m.style.fontSize=fs+'px';
+  let n=1;for(const t of TEXTS){mTxt.textContent=t;n=Math.max(n,Math.round((m.offsetHeight-SUB_PAD)/(fs*SUB_LH)));}
+  if(mCache.size>300)mCache.clear();mCache.set(k,n);return n;}
+function fit(){
+  if(fitting)return;fitting=true;
+  try{
+    const pl=$('player'),sb=pl.querySelector('.stagebox'),sub=pl.querySelector('.sub');if(!pl||!sb||!sub)return;
+    const full=document.fullscreenElement===pl,embed=RT.classList.contains('embed'),cs=getComputedStyle(pl);
+    const pT=full?parseFloat(cs.paddingTop)||0:0,pB=full?parseFloat(cs.paddingBottom)||0:0,pX=full?(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0):0;
+    const maxW=Math.max(200,Math.floor(pl.clientWidth-pX)),minW=Math.min(maxW,400);   /* 矮到放不下時（例如手機橫放）寧可讓頁面捲動，也不要把舞台縮到看不清楚 */
+    const vh=full?pl.clientHeight:window.innerHeight,tail=full?pB:6;
+    const K=embed?44:36,fMin=(maxW<=640||embed)?18:22,fMax=full?40:(embed?26:32);
+    const apply=w=>{const fs=Math.round(Math.min(fMax,Math.max(fMin,w/K)));
+      RT.style.setProperty('--stage-w',w+'px');RT.style.setProperty('--sub-fs',fs+'px');
+      RT.style.setProperty('--sub-n',Math.max(2,maxLines(w,SUB_FLOOR))+nBoost);subBase=fs;};
+    const over=()=>{const a=sb.getBoundingClientRect(),b=sub.getBoundingClientRect();
+      return (full?pT:a.top+window.scrollY)+(a.bottom-a.top)+(b.bottom-a.bottom)+tail-vh;};
+    let w=Math.min(maxW,Math.max(minW,lastW||maxW)),o;
+    for(let i=0;i<8;i++){apply(w);o=over();const t=Math.min(maxW,Math.max(minW,w-o*16/9));if(Math.abs(t-w)<1.5)break;w=Math.round(t);}
+    for(let k=0;k<6&&o>0.5&&w>minW;k++){w=Math.max(minW,Math.floor(w-o*16/9)-1);apply(w);o=over();}   /* 保證不超出：寧可小一點點 */
+    lastW=w;fitSubText();updateFade();
+  }finally{fitting=false;}}
+/* 這一句字幕塞進固定高度的框；塞不下就一次縮 1px，最多縮到 18px */
+function fitSubText(){const sl=$('subline');if(!sl)return;let f=subBase;sl.style.setProperty('--sub-cur',f+'px');
+  for(let g=0;g<40&&sl.scrollHeight>sl.clientHeight+1&&f>SUB_FLOOR;g++){f-=1;sl.style.setProperty('--sub-cur',f+'px');}
+  if(sl.scrollHeight>sl.clientHeight+1&&nBoost<3){nBoost++;scheduleFit();}}   /* 量尺跟實際有落差時，多留一行 */
+function scheduleFit(){if(fitQ)return;fitQ=requestAnimationFrame(()=>{fitQ=0;fit();});}
+/* 章節膠囊太多放不下時：兩端淡出提示還有，滑鼠滾輪可以橫向滾 */
+function updateFade(){const o=chips.scrollWidth>chips.clientWidth+1;chips.style.setProperty('--fl',o&&chips.scrollLeft>2?'22px':'0px');
+  chips.style.setProperty('--fr',o&&chips.scrollLeft+chips.clientWidth<chips.scrollWidth-2?'22px':'0px');}
+chips.addEventListener('scroll',updateFade,{passive:true});
+chips.addEventListener('wheel',e=>{if(chips.scrollWidth<=chips.clientWidth+1||Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;e.preventDefault();chips.scrollLeft+=e.deltaY;},{passive:false});
+window.addEventListener('resize',()=>{nBoost=0;scheduleFit();});
+document.addEventListener('fullscreenchange',()=>{nBoost=0;lastW=0;scheduleFit();setTimeout(scheduleFit,150);});
+if(window.ResizeObserver){const ro=new ResizeObserver(scheduleFit);[document.querySelector('header.top'),$('steps'),$('chips'),document.querySelector('.sub')].forEach(e=>e&&ro.observe(e));}
+if(document.fonts){const refit=()=>{mCache.clear();scheduleFit();};if(document.fonts.ready)document.fonts.ready.then(refit);if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',refit);}
+fit();
+playing=false;{const h0=parseHash();goto(h0?h0[0]:0,h0?h0[1]:0);}
+})();
+</script>
+
+</html>
