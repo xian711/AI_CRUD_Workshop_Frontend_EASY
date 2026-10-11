@@ -79,7 +79,7 @@
   ol.do > li{margin:12px 0;}
   ol.do > li::marker{font-weight:800;color:var(--brand);}
 
-  pre{background:#1e1f26;color:#eceaf0;border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:"Cascadia Code",Consolas,monospace;font-size:16px;line-height:1.7;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
+  pre{background:#1e1f26;color:#eceaf0;border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:"Cascadia Code",Consolas,"Microsoft JhengHei","Noto Sans TC",monospace;font-size:16px;line-height:1.7;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
   pre code{background:none;color:inherit;padding:0;}
   .copy-tip{font-size:15px;color:var(--ink-soft);margin:-4px 0 12px;}
 
@@ -91,6 +91,16 @@
   figure img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);}
   figure.mid img{max-width:640px;margin:0 auto;}
   figure.narrow img{max-width:380px;margin:0 auto;}
+  /* 很寬的圖（流程圖、零件圖）：不縮到看不清楚，固定寬度，左右捲 */
+  figure.big{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  figure.big img{width:1400px;max-width:none;}
+  figure.big .swipe-note{display:block;}
+  /* 一張圖的講解：怎麼看、圖裡有什麼、看完要答得出來 */
+  .step-body h4{font-size:20px;margin:26px 0 6px;}
+  .diag{border:1px solid var(--line);border-radius:12px;padding:6px 18px 4px;margin:18px 0 26px;}
+  .diag h4{font-size:21px;margin:12px 0 4px;}
+  .diag .k{font-weight:700;}
+  .diag details{margin:6px 0 12px;}
   figcaption{margin-top:9px;font-size:16px;color:var(--ink-soft);text-align:center;}
   figure.overview{margin:0 0 22px;}
   /* 很寬的圖（狀態圖、一排欄位）：手機上不縮小，改左右滑 */
@@ -109,11 +119,10 @@
 
   @media (max-width:680px){
     body{font-size:17px;}
-    .topnav-inner{flex-wrap:nowrap;padding:8px 12px;}
+    .topnav-inner{padding:6px 10px;}
     .topnav .brand{display:none;}
-    .topnav nav{flex-wrap:nowrap;overflow-x:auto;margin-left:0;scrollbar-width:none;}
-    .topnav nav::-webkit-scrollbar{display:none;}
-    .topnav nav a{white-space:nowrap;font-size:14.5px;padding:4px 9px;}
+    .topnav nav{margin-left:0;gap:2px;}
+    .topnav nav a{white-space:nowrap;font-size:14px;padding:3px 8px;}
     figure.wide{overflow-x:auto;-webkit-overflow-scrolling:touch;}
     figure.wide img{width:900px;max-width:none;}
     figure.wide .swipe-note{display:block;}
@@ -580,19 +589,115 @@ PRD 沒寫清楚的地方，照 SRS-設計文件-最小樣板.md 的釐清規矩
       <figure class="wide"><img src="images/v5/s3-12-srs.jpg" alt="SRS 第 1 段：已拍板決策"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>SRS 第 1 段：你答過的每一題都在這裡，理由是你的還是 AI 建議的，也寫清楚。</figcaption></figure>
       <ol class="do" start="2">
         <li><strong>設計文件</strong>：第 1 段哪 5 個檔照範本複製改名、哪 3 個直接共用；2.3 寫了只有狀態帶預設值。</li>
-        <li><strong>五張圖</strong>：圖要用瀏覽器開。在 <code>my-equipment-app</code> 的終端機打 <code>start DIAGRAMS-中心裝備物資.html</code>。每張圖上面寫「怎麼看」，下面有一題「看完你要答得出來」：
-          <ol>
-            <li><strong>使用案例圖</strong>：管理人員能做哪 8 件事？</li>
-            <li><strong>零件圖</strong>：橘色照範本複製、綠色直接共用。</li>
-            <li><strong>資料圖</strong>：一筆裝備記哪 12 項資料、哪些一定要填？</li>
-            <li><strong>流程圖</strong>：新增一筆裝備，檢查沒過會怎樣？</li>
-            <li><strong>狀態圖</strong>：一筆裝備的狀態怎麼變？</li>
-          </ol>
-        </li>
+        <li><strong>五張圖</strong>：圖要用瀏覽器開。在 <code>my-equipment-app</code> 的終端機打 <code>start DIAGRAMS-中心裝備物資.html</code>。每張圖上面寫「怎麼看」，下面有一題「看完你要答得出來」。<strong>五張都要看懂</strong>，下面一張一張講。</li>
       </ol>
-      <figure class="wide"><img src="images/v5/s3-13-diag5.jpg" alt="狀態圖：正常、維修中、已報廢"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 5 張狀態圖：正常、維修中可以互換；已報廢沒有往回的箭頭，就是回不去。畫的是<strong>資料</strong>的狀態，不是畫面怎麼切換。</figcaption></figure>
+      <p style="font-size:16px;color:var(--ink-soft)">下面的圖是實拍那次的成品（Step 4 LOOP 之後的版本）。你的圖字句、排法會不一樣，看的方法一樣。圖太小就點圖開原圖。</p>
+
+      <div class="diag">
+        <h4>圖① 使用案例圖：誰能做哪些事</h4>
+        <p><span class="k">一句話：</span>裝備管理人員在這個模組裡，能做 8 件事。</p>
+        <p><span class="k">怎麼看：</span></p>
+        <ol>
+          <li>左邊的圓圈是使用者（裝備管理人員）。大框裡的每一個圓角框，是他能做的一件事。</li>
+          <li>實線箭頭：管理人員自己做這件事。</li>
+          <li>虛線箭頭「一定會做」，指向灰色方框：做這件事時，系統順便幫你做的事。灰色方框不是按鈕。</li>
+        </ol>
+        <figure><img src="images/v5/s3-d1-usecase.jpg" alt="使用案例圖：管理人員和 8 件事"></figure>
+        <p><span class="k">圖裡有什麼：</span></p>
+        <ol>
+          <li>8 件事：看清冊、找東西、換排序、看一筆的詳細資料、新增、修改、刪除、匯出 CSV。</li>
+          <li>每件事的第二行是規則。例如「修改：分類和項目不能改」「刪除：先跳出確認視窗」「匯出：篩選、排序後的全部筆數」。</li>
+          <li>系統順便做的 3 件：查詢條件記在網址上；新增時自動編品項編碼；新增、修改時，儲存前先檢查。</li>
+          <li>「網址傳給同事，看到的一樣」指的是<strong>篩選條件</strong>一樣。資料本身還是存在各自的瀏覽器裡（前端課還沒有後端），你新增的資料，同事看不到。</li>
+        </ol>
+        <p><span class="k">看完你要答得出來：</span>管理人員能做哪幾件事？哪一件做之前會先跳出確認視窗？修改時哪兩樣不能改？</p>
+        <details><summary>對答案</summary><p>8 件。刪除之前會跳確認視窗。修改時，分類和項目不能改。</p></details>
+      </div>
+      <p><strong>看圖抓到落差，就一句話叫它改。</strong>實拍那次，這張圖的說明原本寫「能做 7 件事」，圖上數到 8 個圓角框。一句話叫它改，它就改好了。看不懂的圖，一樣叫它重畫。</p>
+
+      <div class="diag">
+        <h4>圖② 零件圖：檔案怎麼分</h4>
+        <p><span class="k">一句話：</span>裝備模組有 5 個檔照人員範本複製改名；另外 3 個直接拿範本的來用，一行都不改。</p>
+        <p><span class="k">怎麼看：</span></p>
+        <ol>
+          <li>上排是 2 個畫面；中排是畫面用到的幫手；下排藍色大框，是專案原本就有的共用零件。</li>
+          <li>顏色：<strong>橘色</strong>＝照範本複製改名；<strong>綠色</strong>＝直接共用，沒修改；<strong>藍色</strong>＝原本就有，也不修改。</li>
+          <li>實線箭頭指向「被用到的零件」；虛線箭頭是以後才接的後端。括號裡是程式檔名，給工程師找檔案用。</li>
+        </ol>
+        <figure class="big"><img src="images/v5/s3-d2-parts.jpg" alt="零件圖：橘色 5 個、綠色 3 個、藍色共用"><p class="swipe-note">← 圖很寬，可以左右捲 →</p></figure>
+        <p><span class="k">圖裡有什麼：</span></p>
+        <ol>
+          <li>橘色 5 個：清冊頁、明細頁、狀態標籤、裝備資料、欄位外框。這 5 個跟「裝備長什麼樣」有關，所以要改名、改內容。</li>
+          <li>綠色 3 個：篩選與分頁小幫手、匯出小幫手、檢查規則。這 3 個不管哪種資料都通用，所以一行都不改。</li>
+          <li>虛線指向「未來的後端資料庫」：現在資料放在瀏覽器裡，後端課才接上。</li>
+        </ol>
+        <p><span class="k">看完你要答得出來：</span>哪 5 個檔是照範本改名的？哪 3 個是直接拿來用、沒有修改的？</p>
+        <details><summary>對答案</summary><p>改名的 5 個：清冊頁（index.vue）、明細頁（[id].vue）、狀態標籤（EquipmentStatusBadge）、裝備資料（useEquipmentItems）、欄位外框（EquipmentFormField）。直接用的 3 個：useTemplateListPage、templateCsv、templateValidation。</p></details>
+      </div>
+
+      <div class="diag">
+        <h4>圖③ 資料圖：一筆裝備記哪些資料</h4>
+        <p><span class="k">一句話：</span>一筆裝備記 12 項資料（另外加一個系統自己用的代碼）；哪些一定要填、哪些有固定選項、編碼怎麼編。</p>
+        <p><span class="k">怎麼看：</span></p>
+        <ol>
+          <li>每個框是一樣東西。框的最上面是名稱，下面每一行是它記的一項資料，或它會做的一件事。</li>
+          <li>「新增時空白」：新增時這一格是空的，要自己選，不會自動帶第一個選項。</li>
+          <li>實線箭頭：分類、狀態從固定選項挑；品項編碼照規則自動產生。虛線箭頭：拿裝備資料來用（檢查、匯出）。</li>
+        </ol>
+        <figure><img src="images/v5/s3-d3-data.jpg" alt="資料圖：裝備 13 行、分類、狀態、編碼規則"></figure>
+        <p><span class="k">圖裡有什麼：</span></p>
+        <ol>
+          <li>中間「裝備」框：每一行一項資料，後面寫必填還是選填、有什麼限制。例如「數量：必填，0 到 99999 的整數」「保管人電話：選填，手機或市話」。</li>
+          <li>「分類對照表」10 類，每類有代號，例如資通訊設備＝IT、供電及照明設備＝PW。</li>
+          <li>「狀態」3 種：正常（綠）、維修中（黃）、已報廢（紅）。</li>
+          <li>「品項編碼規則」：類別代號－項目三碼－流水號三位，例如 <code>PW-GEN-001</code>。同一個「分類＋項目」各自從 001 數起；刪掉的號碼不再用。</li>
+        </ol>
+        <p><span class="k">看完你要答得出來：</span>哪 6 項一定要填？新增時哪一個選項欄位有預設值？發電機目前發過 <code>PW-GEN-001</code>、<code>002</code>；刪掉 <code>002</code> 後，下一台編幾號？</p>
+        <details><summary>對答案</summary><p>必填 6 項：分類、項目、數量、單位、規格說明、狀態。選項欄位裡有預設值的只有狀態（先帶「正常」）；數量先填 0 是數字欄，不算選項欄位。下一台是 <code>PW-GEN-003</code>：刪掉的 002 不會再用。</p></details>
+      </div>
+
+      <div class="diag">
+        <h4>圖④ 流程圖：新增一筆裝備</h4>
+        <p><span class="k">一句話：</span>先選分類，再選項目，編碼馬上出現；按「儲存」後先過檢查，有錯就標紅字，全部通過才存進清冊。</p>
+        <p><span class="k">怎麼看：</span></p>
+        <ol>
+          <li>最上面一排是參與的角色：管理人員、新增畫面、裝備清冊、檢查規則、提示訊息。</li>
+          <li>從上往下是時間順序，圓圈數字是第幾步。實線箭頭是去做一件事；虛線箭頭是對方回覆結果。</li>
+          <li>淡紅底是「檢查沒過」，淡綠底是「全部通過」。兩種只會發生一種。</li>
+        </ol>
+        <figure class="big"><img src="images/v5/s3-d4-flow.jpg" alt="流程圖：新增一筆裝備的 19 步"><p class="swipe-note">← 圖很寬，可以左右捲 →</p></figure>
+        <p><span class="k">圖裡有什麼：</span></p>
+        <ol>
+          <li>開表單：分類、項目空著，項目先鎖住；數量先填 0；狀態先帶「正常」。</li>
+          <li>選分類，項目才解鎖，而且只列出這一類的項目。選好項目，新增畫面去問「下一個編碼是幾號」，馬上顯示 <code>PW-GEN-003</code>。這時只是問，還沒佔號。</li>
+          <li>按「儲存」，請檢查規則一格一格檢查。沒過：錯的欄位下方出現紅字，右下角提示「請修正 2 個欄位」，頁面不跳走。</li>
+          <li>全部通過：儲存鈕轉圈、變灰（這一步是 Step 4 LOOP 修好後加上去的），存成新的一筆，這時才正式發號，再回到清冊。</li>
+        </ol>
+        <p><span class="k">看完你要答得出來：</span>沒選分類時，項目能選嗎？編碼什麼時候出現？儲存時有一個必填欄位沒填（例如單位），畫面會怎樣？</p>
+        <details><summary>對答案</summary><p>不能，項目是鎖住的。選好分類和項目，編碼馬上出現。單位下方出現紅字，右下角提示「請修正 1 個欄位」，頁面不跳走，改好再按儲存。</p></details>
+      </div>
+
+      <div class="diag">
+        <h4>圖⑤ 狀態圖：一筆裝備的狀態怎麼變</h4>
+        <p><span class="k">一句話：</span>正常和維修中可以互相改；改成已報廢之後，狀態就鎖住，回不去。</p>
+        <p><span class="k">怎麼看：</span></p>
+        <ol>
+          <li>每個圓角框是一種狀態，顏色跟清冊上的標籤一樣：綠＝正常、黃＝維修中、紅＝已報廢。</li>
+          <li>黑色圓點是「新增一筆」。箭頭是可以怎麼改，箭頭上的字是什麼時候這樣改。<strong>沒有箭頭的方向，就是不能改。</strong></li>
+        </ol>
+        <figure class="big"><img src="images/v5/s3-d5-status.jpg" alt="狀態圖：正常、維修中、已報廢"><p class="swipe-note">← 圖很寬，可以左右捲 →</p></figure>
+        <p><span class="k">圖裡有什麼：</span></p>
+        <ol>
+          <li>新增時先帶「正常」，也可以直接選維修中或已報廢。</li>
+          <li>正常 → 維修中（壞了，送修）；維修中 → 正常（修好了）；兩個都能改成已報廢。</li>
+          <li>紅框沒有往外的箭頭。右邊的說明：已報廢的狀態鎖住，其他資料照常能改；點錯報廢，只能刪掉重新新增。</li>
+          <li>這張畫的是<strong>資料</strong>的狀態，不是畫面怎麼切換。</li>
+        </ol>
+        <p><strong>注意：實拍那次，「狀態怎麼變」是程式寫好之後才補問的</strong>，所以文件裡這張圖下面寫「程式還沒改（任務 T16）」，實拍的程式三種狀態還能互換。你照現在的規矩做，AI 開工前就會問這題，程式會一起做好。驗收時照下面 ⑦ 的表核：編輯一筆已報廢的，狀態改不了。</p>
+        <p><span class="k">看完你要答得出來：</span>已報廢可以改回正常嗎？點錯報廢了要怎麼辦？新增時可以直接登記成維修中嗎？</p>
+        <details><summary>對答案</summary><p>不行。點錯了只能刪掉、重新新增，編碼會換新號。可以，新增時三種狀態都能選。</p></details>
+      </div>
       <p style="font-size:16px;color:var(--ink-soft)">文件的最低門檻寫在 <code>SRS-設計文件-最小樣板.md</code>：SRS 四段、設計文件四段、圖五張，缺一樣就退回。想看填好的樣子，<code>step3_new_module/docs/</code> 有參考文件、<code>solution-app/</code> 有參考程式——先自己做，卡兩次再開。</p>
-      <p><strong>看圖抓到落差，就一句話叫它改。</strong>實拍那次，第 1 張的說明寫「能做 7 件事」，圖上數到 8 件，一句話它就改好了。看不懂的圖，一樣叫它重畫。</p>
       <ol class="do" start="4">
         <li><strong>看任務清單</strong>：打開 <code>TASKS.md</code>，每一項都小到能單獨驗收；你拍板的每一題，都對得到一項任務。</li>
         <li><strong>換模型、說開工</strong>：它還有題目在問，先答完。把模型換成 <strong>Sonnet 5.5</strong>（有規矩和範本，寫程式用便宜的就夠），在輸入框打「<strong>開工</strong>」送出。實拍這次大約 8 分鐘做完。</li>
@@ -709,8 +814,29 @@ PRD 沒寫清楚的地方，照 SRS-設計文件-最小樣板.md 的釐清規矩
       <figure><img src="images/v5/s4-3-agent.jpg" alt="1 agent：子代理在工作"><figcaption>下面出現「1 agent」，就是子代理正在工作。它用 Playwright（會自己開瀏覽器、自己點按鈕的工具）一頁一頁截圖，對照 PRD 和 design system 挑錯。</figcaption></figure>
       <p>子代理用比寫程式高一級的 <strong>Opus 5.5</strong>：寫程式的 AI 審自己，就像自己改自己的考卷。規矩檔寫好了，你不用自己切。</p>
 
-      <h3>⑤ 修好的：看修改前、修改後 <a class="watch" href="animation-hands/index.html#s46-1">▶ 看動畫</a></h3>
-      <figure><img src="images/v5/s4-4-fix.jpg" alt="報告：修改前、修改後兩張圖"><figcaption>報告裡每修好一條，都放兩張圖：左邊修改前、右邊修改後。這條是「在第 2 頁點排序」：修改前停在第 2 頁，修改後回到第 1 頁。</figcaption></figure>
+      <h3>⑤ 修好的：一條一條看修改前、修改後 <a class="watch" href="animation-hands/index.html#s46-1">▶ 看動畫</a></h3>
+      <p>實拍那次第 1 輪就 7 條全綠，沒有測試紅燈要修。下面 5 條，是分身挑到、修好的。報告裡每一條都有：一句白話、修改前和修改後兩張圖、改了哪個檔。下面的圖是從報告的截圖裁出重點、放大，<strong>上面修改前、下面修改後</strong>。</p>
+      <p>前 3 條它自己修了；第 4、5 條要動到全站共用的檔，是你在下面 ⑥ 的選擇題裁決「修」之後才修的（想照順序看，可以先看 ⑥ 再回來）。</p>
+      <p>前 4 條是<strong>邏輯</strong>的問題：畫面看得出「錯了」，看不出「為什麼錯」。所以每條再配一張示意圖：左邊是修改前怎麼走，右邊是修改後怎麼走，<strong>紅框是壞掉的那一步，綠框是改好的那一步</strong>。</p>
+
+      <h4>1. 在第 2 頁點「數量」標題，畫面不回第 1 頁</h4>
+      <figure><img src="images/v5/s4-fix1.jpg" alt="修改前、修改後：在第 2 頁點數量"><figcaption>修改前（上）：頁碼停在 2，寫「第 21 至 24 項」，只有 4 筆，第一列數量是 100。修改後（下）：第一列數量是 1（最少的），從第 1 頁、數量最少的開始排。</figcaption></figure>
+      <figure><img src="images/v5/s4-sch1.jpg" alt="示意圖：換排序時有沒有把頁碼清掉"><figcaption>差在一步：換排序時，有沒有把「第幾頁」清掉。規格寫「換排序要回第 1 頁」，測試卻從沒點過排序標題，所以一直亮綠燈。</figcaption></figure>
+
+      <h4>2. 「儲存」連按兩下，多出兩筆</h4>
+      <figure><img src="images/v5/s4-fix2.jpg" alt="修改前、修改後：儲存連按兩下"><figcaption>修改前（上）：搜「IT-TAB」共 3 筆：原有的 001，加上連按多出來的 002、003。修改後（下）：共 2 筆，只多了 002 一筆。</figcaption></figure>
+      <figure><img src="images/v5/s4-sch2.jpg" alt="示意圖：按下儲存後按鈕有沒有鎖住"><figcaption>差在按下儲存後，按鈕有沒有馬上鎖住，而且要等存好、換頁完成才解鎖。AI 第一次解鎖得太早，實測還是多兩筆；第二次才好，還在「修兩次」的鐵律內。</figcaption></figure>
+
+      <h4>3. 點「分類」標題，同一類裡的順序亂掉</h4>
+      <figure><img src="images/v5/s4-fix3.jpg" alt="修改前、修改後：點分類標題"><figcaption>修改前（上）：資通訊設備裡，平板（IT-TAB）跑到筆電前面。修改後（下）：筆電 LAP 在前、平板 TAB 在後，照 PRD 的清單順序。</figcaption></figure>
+      <figure><img src="images/v5/s4-sch3.jpg" alt="示意圖：先照預設順序排，再照點的排"><figcaption>差在排序前，有沒有先照預設順序排一次。</figcaption></figure>
+
+      <h4>4. 關鍵字框打字停一下，後面的字不見</h4>
+      <figure><img src="images/v5/s4-fix4.jpg" alt="修改前、修改後：關鍵字框"><figcaption>修改前（上）：打 IT、停一下、再打 -LAP，框裡只剩 IT。修改後（下）：框裡是完整的 IT-LAP，找到 2 筆。這條要動全站共用的檔，所以是你在 ⑥ 裁決「修」之後才修。</figcaption></figure>
+      <figure><img src="images/v5/s4-sch4.jpg" alt="示意圖：網址一變整頁重做"><figcaption>差在網址變了之後，整頁要不要丟掉重做。修好後的小代價寫在報告裡：同一頁按瀏覽器「上一頁」，不會再還原篩選條件。</figcaption></figure>
+
+      <h4>5. 手機寬度，頂部選單三顆字都斷成兩行</h4>
+      <figure class="mid"><img src="images/v5/s4-fix5.jpg" alt="修改前、修改後：手機選單"><figcaption>這條是版面問題，不是邏輯問題，看截圖就懂：修改前每顆斷成兩行，修改後一行。</figcaption></figure>
 
       <h3>⑥ 要你裁決的：先看畫面再回答 <a class="watch" href="animation-hands/index.html#s47-1">▶ 看動畫</a></h3>
       <p>要動到全站共用的檔，它不自己決定：跑完後出選擇題問你。選擇題框裡放不了圖，所以<strong>先打開報告的「要你裁決的事」，每一題都附了當下的畫面</strong>。在教材根目錄的終端機貼：</p>
