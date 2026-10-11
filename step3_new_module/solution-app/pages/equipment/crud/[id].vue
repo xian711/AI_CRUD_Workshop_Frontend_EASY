@@ -225,7 +225,7 @@ import {
   type EquipmentItem,
   type EquipmentItemInput,
 } from '~/composables/useEquipmentItems'
-import { validateFields, type FieldRules } from '~/utils/templateValidation'
+import { validateFields, PHONE_PATTERN, type FieldRules } from '~/utils/templateValidation'
 
 definePageMeta({ layout: 'template', pageTitle: '中心裝備物資' })
 
@@ -269,7 +269,7 @@ const isCustomName = computed(() => form.categoryKey === 'OTHER')
 const codePreview = computed(() => {
   if (!form.categoryKey || !form.name.trim()) return ''
   if (mode.value === 'edit' && record.value
-    && record.value.categoryKey === form.categoryKey && record.value.name === form.name) {
+    && record.value.categoryKey === form.categoryKey && record.value.name.trim() === form.name.trim()) {
     return record.value.code
   }
   return nextEquipmentCode(form.categoryKey, form.name)
@@ -285,6 +285,7 @@ function emptyForm(): EquipmentItemInput {
   return {
     categoryKey: '', name: '', qty: 0, unit: '', spec1: '',
     keeper: '', keeperPhone: '', locationName: '',
+    // 選項欄位只有狀態帶預設：釐清拍板「新增時狀態預設正常」（新買的東西一定是好的）；分類、項目一律空白
     status: 'normal', purchaseDate: '', specNote: '',
   }
 }
@@ -343,16 +344,14 @@ watch(() => route.params.id, (id) => { if (id) load() })
 watch(() => route.query.mode, () => { if (route.params.id) load() })
 
 // ── 驗證 ──
-/** 保管人電話：台灣手機（09 開頭 10 碼）或市話（區碼＋7~8 碼，可含一個連字號）；選填，填了才驗 */
-const KEEPER_PHONE_PATTERN = /^(09\d{8}|0\d{1,2}-?\d{6,8})$/
-
 function rulesFor(): FieldRules<EquipmentItemInput> {
   return {
     categoryKey: [{ required: true, message: '請選擇分類' }],
     name: [{ required: true, message: '請選擇或輸入項目' }],
     unit: [{ required: true, message: '請輸入單位' }],
     spec1: [{ required: true, message: '請輸入規格說明' }],
-    keeperPhone: [{ pattern: KEEPER_PHONE_PATTERN, message: '電話格式錯誤（手機 09xxxxxxxx 或市話 0X-XXXXXXXX）' }],
+    // 保管人電話：選填，填了才驗；一欄收手機和市話（釐清拍板：不拆兩欄），共用範本的 PHONE_PATTERN
+    keeperPhone: [{ pattern: PHONE_PATTERN, message: '電話格式錯誤（手機 09 開頭 10 碼，或市話含區碼，例：02-1234-5678）' }],
     status: [{ required: true, message: '請選擇狀態' }],
   }
 }
@@ -378,6 +377,8 @@ async function save() {
     errors.qty = '請輸入數量'
   } else if (form.qty < 0) {
     errors.qty = '數量不可小於 0'
+  } else if (!Number.isInteger(form.qty)) {
+    errors.qty = '數量要是整數'
   }
   if (form.purchaseDate && form.purchaseDate > today) {
     errors.purchaseDate = '採購日期不可晚於今天'

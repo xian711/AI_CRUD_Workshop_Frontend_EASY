@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UML 圖面 — 中心裝備物資</title>
+<title>圖解 — 中心裝備物資</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <style>
   :root {
@@ -12,6 +12,8 @@
     --accent: #0084d1;
     --line: #d9d9d9;
     --bg-soft: #f7f8fa;
+    --check-bg: #fff8e1;
+    --check-line: #f2a900;
   }
   * { box-sizing: border-box; }
   body {
@@ -27,7 +29,7 @@
     border-bottom: 3px solid var(--accent);
   }
   header h1 { font-size: 44px; margin: 0 0 8px; }
-  header p  { font-size: 22px; color: var(--sub); margin: 0; }
+  header p  { font-size: 22px; color: var(--sub); margin: 0 0 6px; }
   nav {
     padding: 16px 6vw;
     background: var(--bg-soft);
@@ -48,7 +50,26 @@
   section p.desc {
     font-size: 22px;
     color: var(--sub);
+    margin: 0 0 16px;
+  }
+  /* 怎麼看：讀圖的鑰匙 */
+  .how {
+    background: var(--bg-soft);
+    border-left: 6px solid var(--accent);
+    padding: 12px 20px;
     margin: 0 0 20px;
+    font-size: 21px;
+  }
+  .how b { display: block; margin-bottom: 4px; }
+  .how ul { margin: 0; padding-left: 1.4em; }
+  /* 看完你要答得出來 */
+  .check {
+    background: var(--check-bg);
+    border-left: 6px solid var(--check-line);
+    padding: 12px 20px;
+    margin: 16px 0 0;
+    font-size: 22px;
+    font-weight: 700;
   }
   /* 圖照原尺寸畫（字才夠大），比畫面寬就左右捲動，不縮小 */
   .mermaid {
@@ -58,6 +79,13 @@
     text-align: center;
   }
   .mermaid svg { max-width: none !important; height: auto; }
+  /* mermaid 把循序圖的編號圓點（12px）寫死成小字；這裡放大到跟其他字一樣 22px */
+  .mermaid .sequenceNumber { font-size: 22px; transform: translateY(4px); }
+  .mermaid marker#sequencenumber circle { r: 11px; }
+  .mermaid foreignObject { overflow: visible; }
+  /* 箭頭上的字加白底，線不會從字中間穿過去 */
+  .mermaid .edgeLabel, .mermaid .edgeLabel span, .mermaid .edgeLabel p, .mermaid .labelBkg { background-color: #fff !important; opacity: 1 !important; }
+  .mermaid .edgeLabel rect { fill: #fff !important; opacity: 1 !important; }
   footer {
     padding: 28px 6vw 60px;
     font-size: 18px;
@@ -69,190 +97,264 @@
 <body>
 
 <header>
-  <h1>UML 圖面 — 中心裝備物資（課堂版參考解）</h1>
-  <p>對應文件（同資料夾）：SRS-裝備物資.md（需求規格）、DESIGN-裝備物資.md（設計文件）｜ 展示路徑：/equipment/crud ｜ PM 看圖就好，不用看程式。</p>
+  <h1>圖解 — 中心裝備物資（課堂版參考解）</h1>
+  <p>不看程式，看這 5 張圖就懂：誰能做什麼、檔案怎麼分、一筆資料記什麼、新增怎麼跑、狀態怎麼換。</p>
+  <p>圖上的字都是中文。括號裡的英文是檔名或欄位英文名，給工程師對照用，你不用懂。</p>
+  <p>對應文件（同資料夾）：SRS-裝備物資.md（要做什麼）、DESIGN-裝備物資.md（怎麼做）｜ 網址：/equipment/crud</p>
 </header>
 
 <nav>
-  <a href="#uc">① 用例圖</a>
-  <a href="#arch">② 檔案架構圖</a>
-  <a href="#class">③ 資料模型類別圖</a>
-  <a href="#seq-create">④ 循序圖：新增品項＋編碼產生</a>
+  <a href="#uc">① 誰能做哪些事</a>
+  <a href="#parts">② 零件怎麼分</a>
+  <a href="#data">③ 一筆裝備記什麼</a>
+  <a href="#create">④ 新增一筆的流程</a>
+  <a href="#state">⑤ 狀態怎麼換</a>
 </nav>
 
+<!-- ① 用例圖 -->
 <section id="uc">
   <h2>① 用例圖：誰能做哪些事</h2>
-  <p class="desc">管理人員在列表頁與明細頁完成六件事；刪除（D1）和匯出（D2）是課堂拍板補上的，新增和編輯都會用到品項編碼自動產生（D3）。</p>
+  <p class="desc">管理人員在這個網頁上能做 9 件事；其中「刪除」是 PRD 沒寫、課堂拍板加的。</p>
+  <div class="how">
+    <b>怎麼看</b>
+    <ul>
+      <li>左邊的圓圈是「人」，右邊大框是「網頁」。箭頭指到的橢圓，就是這個人能做的事。</li>
+      <li>橘色粗框是課堂拍板加的（Q2）；括號裡的 Q 編號對到 SRS 第 1 段的拍板題。</li>
+      <li>虛線箭頭是「會用到」：新增和修改都會用到「自動編品項編碼」。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':60,'rankSpacing':70}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':28,'rankSpacing':90}}}%%
 flowchart LR
-  actor(("👤 裝備物資管理人員"))
-  subgraph SYS["中心裝備物資（/equipment/crud）"]
-    UC1(["UC-EQ-01 查詢瀏覽品項<br/>（關鍵字・分類・狀態・排序・分頁）"])
-    UC2(["UC-EQ-02 檢視品項明細"])
-    UC3(["UC-EQ-03 新增品項"])
-    UC4(["UC-EQ-04 編輯品項"])
-    UC5(["UC-EQ-05 刪除品項<br/>（二次確認｜D1）"])
-    UC6(["UC-EQ-06 匯出 CSV<br/>（篩選＋排序後全量｜D2）"])
-    CODE(["品項編碼自動產生<br/>（BR-EQ-01｜D3）"])
+  P(("管理人員<br/>（2～3 人）"))
+  subgraph SYS["中心裝備物資網頁"]
+    U1(["看清冊：一頁 20 筆"])
+    U2(["找東西：關鍵字、分類、狀態"])
+    U3(["點欄位標題換排序"])
+    U4(["把網址傳給同事"])
+    U5(["看一筆的明細"])
+    U6(["新增一筆"])
+    U7(["修改一筆"])
+    U8(["刪除一筆，先跳確認框（Q2）"])
+    U9(["匯出清冊 CSV，交給縣府（Q3）"])
+    CODE["系統自動編品項編碼（Q1）"]
   end
-  actor --> UC1
-  actor --> UC2
-  actor --> UC3
-  actor --> UC4
-  actor --> UC5
-  actor --> UC6
-  UC2 -. «extend» .-> UC4
-  UC3 -. «include» .-> CODE
-  UC4 -. «include» .-> CODE
+  P --> U1 & U2 & U3 & U4 & U5 & U6 & U7 & U8 & U9
+  U6 -. 會用到 .-> CODE
+  U7 -. 會用到 .-> CODE
+  classDef added fill:#fff1e0,stroke:#e67e22,stroke-width:4px
+  classDef auto fill:#eef2f7,stroke:#7a8699,stroke-dasharray:6 4
+  class U8 added
+  class CODE auto
   </pre>
+  <p class="check">看完你要答得出來：管理人員能做哪幾件事？</p>
 </section>
 
-<section id="arch">
-  <h2>② 檔案架構圖：複製改名 vs 直接共用</h2>
-  <p class="desc">橘色 5 個檔從範本複製改名（跟「品項長什麼樣」有關）；藍色是直接共用、沒有修改的通用零件；既有檔只動了一處導覽入口。</p>
+<!-- ② 零件圖 -->
+<section id="parts">
+  <h2>② 零件圖：哪些照範本改名、哪些直接共用</h2>
+  <p class="desc">新模組用了範本的 8 個檔：5 個複製一份改名字，3 個直接拿來用、一個字都沒改。</p>
+  <div class="how">
+    <b>怎麼看</b>
+    <ul>
+      <li>綠色框：照範本複製、改名（5 個）。跟「裝備長什麼樣」有關，所以要有自己的一份。</li>
+      <li>藍色框：直接共用、沒改（3 個）。哪個模組都一樣的通用工具。灰色是其他共用小零件，也沒改，不算在 8 個裡。</li>
+      <li>最上面是範本，箭頭上的字是範本的檔案怎麼處理：「複製一份、改名字」或「直接拿來用」。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':30,'rankSpacing':80}}}%%
-flowchart LR
-  LAYOUT["layouts/template.vue<br/>既有檔：只加<br/>一個導覽入口"]
-  subgraph COPY["複製改名（5 檔）"]
-    LIST["列表頁 index.vue<br/>pages/equipment/crud/<br/>篩選・排序・分頁・匯出・刪除"]
-    DETAIL["明細頁 [id].vue<br/>pages/equipment/crud/<br/>檢視／編輯／新增 三合一"]
-    ITEMS["資料層 useEquipmentItems.ts<br/>composables/<br/>型別・查表・種子・CRUD・編碼"]
-    FF["EquipmentFormField.vue<br/>components/equipment/<br/>label＋紅星＋錯誤紅字"]
-    SB["EquipmentStatusBadge.vue<br/>components/equipment/<br/>狀態 → 綠／黃／紅"]
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':50,'rankSpacing':90,'subGraphTitleMargin':{'top':12,'bottom':18}}}}%%
+flowchart TB
+  TPL(["範本：人員 CRUD<br/>（step2 發的那一套）"])
+  subgraph COPY["照範本複製、改名（5 個）"]
+    direction LR
+    LIST["清冊畫面<br/>（index.vue）"]
+    DETAIL["新增／編輯／檢視畫面<br/>（[id].vue）"]
+    DATA["裝備資料<br/>（useEquipmentItems.ts）"]
+    FF["欄位外框<br/>（EquipmentFormField.vue）"]
+    SB["狀態標籤<br/>（EquipmentStatusBadge.vue）"]
   end
-  subgraph SHARE["直接共用（3 檔，未修改）"]
-    LISTPAGE["useTemplateListPage.ts<br/>篩選＋分頁＋URL 同步"]
-    VAL["templateValidation.ts<br/>驗證純函式"]
-    CSV["templateCsv.ts<br/>CSV 匯出（含 BOM）"]
+  subgraph SHARE["直接共用、沒改（3 個）"]
+    direction LR
+    LP["篩選、分頁、網址同步<br/>（useTemplateListPage.ts）"]
+    VAL["檢查規則<br/>（templateValidation.ts）"]
+    CSV["匯出 CSV<br/>（templateCsv.ts）"]
   end
-  APPC["其他共用零件（不修改）<br/>AppConfirmModal・AppSortHeader<br/>AppTableFooter・AppSafeTeleport<br/>useTableSort"]
-  API[("未來後端 API")]
-  LAYOUT -. 入口 .-> LIST
-  LIST --> ITEMS
-  LIST --> SB
-  DETAIL --> ITEMS
-  DETAIL --> FF
-  LIST --> LISTPAGE
-  LIST --> CSV
-  DETAIL --> VAL
-  LIST --> APPC
-  DETAIL --> APPC
-  ITEMS -. useFetch .-> API
-  style COPY fill:#fff4e0,stroke:#e6a23c
-  style SHARE fill:#e8f4fb,stroke:#0084d1
-  style APPC fill:#e8f4fb,stroke:#0084d1
-  style API fill:#f7f8fa,stroke:#999,stroke-dasharray: 5 5
+  OTHER["其他共用小零件（也沒改）<br/>確認框、排序標題、分頁列"]
+  TPL -- 複製一份、改名字 --> COPY
+  TPL -- 直接拿來用 --> SHARE
+  TPL -. 也直接拿來用 .-> OTHER
+  style COPY fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+  style SHARE fill:#e3f2fd,stroke:#0277bd,stroke-width:2px
+  classDef copy fill:#ffffff,stroke:#2e7d32,stroke-width:3px
+  classDef share fill:#ffffff,stroke:#0277bd,stroke-width:3px
+  classDef other fill:#f2f2f2,stroke:#999999,stroke-dasharray:6 4
+  class LIST,DETAIL,DATA,FF,SB copy
+  class LP,VAL,CSV share
+  class OTHER other
   </pre>
+  <p class="check">看完你要答得出來：哪 3 個檔是直接共用、一個字都沒改的？</p>
 </section>
 
-<section id="class">
-  <h2>③ 資料模型類別圖：一筆品項長什麼樣</h2>
-  <p class="desc">一筆品項（EquipmentItem）有 12 個業務欄位＋系統流水 id；欄位名就是未來後端 API 的介面。編碼由分類的 2 碼＋項目的 3 碼＋流水 3 碼組成。</p>
+<!-- ③ 資料圖 -->
+<section id="data">
+  <h2>③ 資料圖：一筆裝備記哪些資料</h2>
+  <p class="desc">一筆裝備記 12 項資料；分類和狀態只能從固定的選項裡選，品項編碼由系統自己組。</p>
+  <div class="how">
+    <b>怎麼看</b>
+    <ul>
+      <li>左邊大框是「一筆裝備」，一行一項資料。有 ★ 的一定要填。</li>
+      <li>右邊三個框是固定的東西：分類只有 10 類、狀態只有 3 種、編碼照固定規則組。</li>
+      <li>箭頭上的字說明兩邊的關係。項目清單跟著分類變，太長不畫，見 PRD 第 4 節。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
 classDiagram
-  class EquipmentItem {
-    +string id  「E-001」系統流水
-    +string code  「IT-LAP-001」系統產生
-    +string categoryKey  分類
-    +string name  項目
-    +number qty  數量，≥ 0
-    +string unit  單位
-    +string spec1  規格說明
-    +string keeper  保管人
-    +string keeperPhone  保管人電話
-    +string locationName  存放地點
-    +EquipmentStatus status  狀態
-    +string purchaseDate  採購日期 YYYY-MM-DD
-    +string specNote  備註
+  direction LR
+  class Item["一筆裝備（12 項資料）"] {
+    ★ 分類
+    ★ 項目
+    品項編碼（系統自己編）
+    ★ 數量（0 以上的整數，新增時是 0）
+    ★ 單位
+    ★ 規格說明（可寫好幾行）
+    保管人
+    保管人電話（手機、市話都收）
+    存放地點
+    ★ 狀態（新增時預設正常）
+    採購日期（最晚到今天）
+    備註（可寫好幾行）
   }
-  class EquipmentStatus {
-    &lt;&lt;enumeration&gt;&gt;
-    normal 正常・綠
-    maintenance 維修中・黃
-    scrapped 已報廢・紅
+  class Category["分類（固定 10 類）"] {
+    &lt;&lt;固定選項&gt;&gt;
+    資通訊設備　IT
+    供電及照明設備　PW
+    儲物設備　ST
+    事務用品　OF
+    個人防護裝備　PP
+    支援避難收容設施　SH
+    自用緊急物資　EF
+    醫療及衛生用品　MD
+    清消及過濾設備　DC
+    其他　OT（自己打品名）
   }
-  class EQUIPMENT_CATEGORIES {
-    &lt;&lt;lookup table&gt;&gt;
-    value 例：ICT
-    code 類別 2 碼，例：IT
-    label 中文，例：資通訊設備
-    items 該分類的標準項目
+  class Status["狀態（固定 3 種）"] {
+    &lt;&lt;固定選項&gt;&gt;
+    正常　綠色
+    維修中　黃色
+    已報廢　紅色
   }
-  class ITEM_CODE_MAP {
-    &lt;&lt;lookup table&gt;&gt;
-    項目名 → 項目 3 碼
-    例：筆記型電腦 → LAP
-    查無或「其他」分類 → OTH
+  class Code["品項編碼怎麼組"] {
+    類別代號 2 碼
+    項目 3 碼（「其他」類一律 OTH）
+    流水號 3 碼（刪掉的號碼不再發）
+    改了分類或項目，就換新編碼
+    例：PW-GEN-001
   }
-  class useEquipmentItems {
-    +records: Readonly Ref~EquipmentItem[]~
-    +getById(id) Promise~EquipmentItem?~ 深拷貝
-    +create(input) Promise~EquipmentItem~
-    +update(id, input) Promise~EquipmentItem~
-    +remove(id) Promise~void~
-  }
-  class nextEquipmentCode {
-    &lt;&lt;function&gt;&gt;
-    +nextEquipmentCode(categoryKey, name) string
-  }
-  useEquipmentItems --> EquipmentItem : 管理多筆（module 單例）
-  EquipmentItem --> EquipmentStatus : status
-  EquipmentItem ..> EQUIPMENT_CATEGORIES : categoryKey 查表
-  useEquipmentItems ..> nextEquipmentCode : create／update 時呼叫
-  nextEquipmentCode ..> EQUIPMENT_CATEGORIES : 類別 2 碼
-  nextEquipmentCode ..> ITEM_CODE_MAP : 項目 3 碼
+  Item --> Category : 分類從這 10 類選
+  Item --> Status : 狀態從這 3 種選
+  Item ..> Code : 編碼照這個規則組
   </pre>
+  <p class="check">看完你要答得出來：一筆裝備有幾項資料？哪幾項一定要填？</p>
 </section>
 
-<section id="seq-create">
-  <h2>④ 循序圖：新增品項＋編碼產生</h2>
-  <p class="desc">選定分類和項目後，編碼馬上算出來給你看；按儲存先驗證，有錯就紅字並停在表單頁，全對才寫入，寫入時再算一次編碼，保證不重複。</p>
+<!-- ④ 新增流程 -->
+<section id="create">
+  <h2>④ 流程圖：新增一筆裝備</h2>
+  <p class="desc">選好分類和項目，編碼馬上出現；按儲存先檢查，沒過就停在原頁面標紅字，通過才存進清冊。</p>
+  <div class="how">
+    <b>怎麼看</b>
+    <ul>
+      <li>上面四個方框是「角色」：管理人員、新增畫面、檢查規則、裝備清冊。</li>
+      <li>從上往下是時間順序，圓圈裡的數字是第幾步。實線箭頭是「去做」，虛線箭頭是「回覆」。</li>
+      <li>「如果」框分成上下兩半：上半是檢查沒過，下半是檢查通過，兩種只會發生一種。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':200,'actorMargin':40}}}%%
 sequenceDiagram
+  autonumber
   actor U as 管理人員
-  participant D as [id].vue（明細頁）
-  participant M as useEquipmentItems
-  participant V as templateValidation
-  participant T as useToast
-
-  U->>D: 進入 /equipment/crud/new
-  D->>D: 新增模式・空白表單（狀態預設「正常」）
-  U->>D: 選分類「資通訊設備」
-  D->>D: 項目下拉只列這個分類的標準項目
-  U->>D: 選項目「筆記型電腦」
-  D->>M: nextEquipmentCode('ICT', '筆記型電腦')
-  M-->>D: IT-LAP-003（同前綴最大流水 ＋1）
-  D->>D: 標題區即時顯示編碼（唯讀）
-  U->>D: 填數量、單位、規格說明，按「儲存」
-  D->>V: validateFields(form, rulesFor())
-  V-->>D: 錯誤清單（必填、電話格式）
-  D->>D: 另外檢查：數量 ≥ 0、採購日期不晚於今天
-  alt 有錯誤
-    D->>D: 欄位下方紅字＋聚焦第一個錯誤欄位
-    D->>T: 「請修正 N 個欄位」，停在表單頁
-  else 全部通過
-    D->>M: create(payload)
-    M->>M: 產生 id（E-025）＋再算一次 code，保證不重複
-    M-->>D: 新品項（深拷貝）
-    D->>T: 「已新增品項」（綠色）
-    D->>D: 返回列表，總筆數 ＋1
+  participant F as 新增畫面
+  participant C as 檢查規則
+  participant L as 裝備清冊
+  U->>F: 按「新增品項」
+  F-->>U: 空白表單：分類、項目「請選擇」，狀態預設正常
+  U->>F: 選分類「供電及照明設備」
+  F-->>U: 項目只列這一類的 5 項
+  U->>F: 選項目「發電機」
+  F->>L: 發電機發過的最大號是幾號？（刪掉的也算）
+  L-->>F: 最大是 PW-GEN-002
+  F-->>U: 馬上顯示編碼 PW-GEN-003
+  U->>F: 填數量、單位、規格說明，按「儲存」
+  F->>C: 必填、電話、數量、日期都對嗎？
+  alt 檢查沒過
+    C-->>F: 哪幾格錯、錯在哪
+    F-->>U: 錯的那一格下面出現紅字
+    F-->>U: 右下角提示「請修正 N 個欄位」，頁面不跳走
+  else 檢查通過
+    C-->>F: 全部通過
+    F->>L: 存進去（存檔這一刻再算一次編碼）
+    L-->>F: 存好了
+    F-->>U: 回到清冊，總筆數多 1 筆
   end
   </pre>
+  <p class="check">看完你要答得出來：一定要填的沒填就按儲存，畫面會怎樣？</p>
+</section>
+
+<!-- ⑤ 狀態圖 -->
+<section id="state">
+  <h2>⑤ 狀態圖：正常、維修中、已報廢怎麼換</h2>
+  <p class="desc">新增時狀態預設「正常」（Q5）；東西壞了送修、修好了改回來、不能用了就報廢。</p>
+  <div class="how">
+    <b>怎麼看</b>
+    <ul>
+      <li>黑色圓點是起點：新增一筆時從這裡開始。框的顏色就是清冊上狀態標籤的顏色。</li>
+      <li>箭頭上的字是「平常什麼時候改」。</li>
+      <li>系統沒有鎖住順序：在編輯畫面，三種狀態隨時都能互換，例如選錯了改回來。</li>
+    </ul>
+  </div>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
+stateDiagram-v2
+  direction TB
+  state "正常（綠）" as Normal
+  state "維修中（黃）" as Repair
+  state "已報廢（紅）" as Scrap
+  [*] --> Normal : 新增時預設
+  Normal --> Repair : 壞了，送修
+  Repair --> Normal : 修好了
+  Normal --> Scrap : 不能用了
+  Repair --> Scrap : 修不好
+  classDef ok fill:#e6f4ea,stroke:#2e7d32,stroke-width:3px
+  classDef warn fill:#fff8e1,stroke:#f9a825,stroke-width:3px
+  classDef bad fill:#fdecea,stroke:#c62828,stroke-width:3px
+  class Normal ok
+  class Repair warn
+  class Scrap bad
+  </pre>
+  <p class="check">看完你要答得出來：新增一筆時，狀態一開始是什麼？</p>
 </section>
 
 <footer>
-  <p>圖面基準：同資料夾 DESIGN-裝備物資.md、SRS-裝備物資.md（課堂版 v1.0）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
+  <p>圖面基準：同資料夾 SRS-裝備物資.md、DESIGN-裝備物資.md（課堂版參考解）。圖的內容跟這兩份一致：零件圖的「直接共用」3 個檔，就是 DESIGN 第 1 段那張表的 3 個。</p>
+  <p>step4 LOOP 之後：程式改了，圖要跟著改，改到的圖在標題後面標「step4 LOOP 後」。目前還沒有，step4 跑完之前保持原樣。</p>
+  <p>本頁是獨立 HTML，要連網路載入 Mermaid（畫圖工具，jsDelivr CDN）。圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
 </footer>
 
 <script>
   mermaid.initialize({
-    startOnLoad: true, theme: 'neutral', securityLevel: 'loose',
+    startOnLoad: false, theme: 'neutral', securityLevel: 'loose',
     // 不縮小到畫面寬：照原尺寸畫，字級才是真的 22px
-    flowchart: { useMaxWidth: false }, sequence: { useMaxWidth: false }, class: { useMaxWidth: false },
+    flowchart: { useMaxWidth: false }, sequence: { useMaxWidth: false },
+    class: { useMaxWidth: false }, state: { useMaxWidth: false },
+  });
+  mermaid.run({ querySelector: '.mermaid' }).then(() => {
+    // 循序圖「二選一」框的角落標籤，mermaid 固定寫英文 alt；換成中文「如果」
+    document.querySelectorAll('.mermaid svg .labelText').forEach((t) => {
+      if (t.textContent.trim() === 'alt') t.textContent = '如果';
+    });
   });
 </script>
 </body>

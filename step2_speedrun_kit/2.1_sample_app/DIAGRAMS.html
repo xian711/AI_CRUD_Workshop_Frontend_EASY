@@ -9,6 +9,7 @@
   :root {
     --ink: #1a1a1a;
     --sub: #555;
+    --faint: #888;
     --accent: #0084d1;
     --line: #d9d9d9;
     --bg-soft: #f7f8fa;
@@ -27,7 +28,7 @@
     border-bottom: 3px solid var(--accent);
   }
   header h1 { font-size: 44px; margin: 0 0 8px; }
-  header p  { font-size: 22px; color: var(--sub); margin: 0; }
+  header p  { font-size: 22px; color: var(--sub); margin: 0 0 6px; }
   nav {
     padding: 16px 6vw;
     background: var(--bg-soft);
@@ -48,7 +49,28 @@
   section p.desc {
     font-size: 22px;
     color: var(--sub);
+    margin: 0 0 12px;
+  }
+  /* 「怎麼看」：2～3 點白話，講框、箭頭、顏色代表什麼 */
+  .howto {
     margin: 0 0 20px;
+    padding: 10px 20px;
+    background: var(--bg-soft);
+    border-left: 4px solid var(--accent);
+    font-size: 20px;
+  }
+  .howto ul { margin: 2px 0 0; padding-left: 1.4em; }
+  /* 「看完你要答得出來」：圖下方一個問題 */
+  p.ask {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 16px 0 4px;
+  }
+  /* 給工程師對照的規格編號：小灰字，學員可以略過 */
+  p.refs {
+    font-size: 16px;
+    color: var(--faint);
+    margin: 0 0 8px;
   }
   /* 圖照原尺寸畫（字才夠大），比畫面寬就左右捲動，不縮小 */
   .mermaid {
@@ -60,7 +82,7 @@
   .mermaid svg { max-width: none !important; height: auto; }
   /* mermaid 把循序圖的編號圓點（12px）和類別圖的 1／*（11px）寫死成小字；這裡放大到跟其他字一樣 22px */
   .mermaid .sequenceNumber { font-size: 22px; transform: translateY(4px); }
-  .mermaid marker#sequencenumber circle { r: 11px; }
+  .mermaid marker#sequencenumber circle { r: 14px; }
   .mermaid foreignObject { overflow: visible; }
   .mermaid .edgeTerminals .edgeLabel { font-size: 22px; }
   footer {
@@ -74,34 +96,45 @@
 <body>
 
 <header>
-  <h1>UML 圖面 — CRUD 標準範本</h1>
-  <p>對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、DESIGN-CRUD標準範本-v1.1.md（設計文件）｜ 展示路徑：/template/crud</p>
+  <h1>UML 圖面 — CRUD 標準範本（人員管理）</h1>
+  <p>CRUD 是「新增、查詢、修改、刪除」四件事的英文縮寫。這個範本用「人員」當例子，把四件事做成一個標準模組。</p>
+  <p>不用看程式，看這 7 張圖就懂。對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、DESIGN-CRUD標準範本-v1.1.md（設計文件）｜ 畫面網址：/template/crud</p>
 </header>
 
 <nav>
-  <a href="#uc">① 用例圖</a>
-  <a href="#arch">② 檔案架構圖</a>
-  <a href="#class">③ 類別圖（資料層）</a>
-  <a href="#state">④ 頁面模式狀態圖</a>
-  <a href="#seq-list">⑤ 循序圖：查詢與 URL 同步</a>
-  <a href="#seq-save">⑥ 循序圖：新增／編輯儲存</a>
-  <a href="#seq-del">⑦ 循序圖：刪除</a>
+  <a href="#uc">① 用例圖：誰能做哪些事</a>
+  <a href="#arch">② 零件圖：檔案怎麼分</a>
+  <a href="#class">③ 資料圖：一筆人員記哪些資料</a>
+  <a href="#state">④ 狀態圖：明細頁的三種模式</a>
+  <a href="#seq-list">⑤ 流程圖：查詢與網址同步</a>
+  <a href="#seq-save">⑥ 流程圖：新增／編輯後儲存</a>
+  <a href="#seq-del">⑦ 流程圖：刪除</a>
 </nav>
 
 <section id="uc">
-  <h2>① 用例圖（UC-T-01 ～ UC-T-06）</h2>
-  <p class="desc">承辦人員透過列表頁與明細頁完成六個核心用例；全部條件狀態同步於 URL，可分享與還原。</p>
+  <h2>① 用例圖：誰能做哪些事</h2>
+  <p class="desc">這張圖在說什麼：承辦人員在人員管理模組裡，能做 6 件事。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>左邊的人是使用者；大框裡的每一個圓角框，是他能做的一件事。</li>
+      <li>實線箭頭：承辦人員可以直接做這件事。</li>
+      <li>虛線箭頭：做這件事時會順便帶到的事。灰色框不是按鈕，是系統自動幫你做的事。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':60,'rankSpacing':70}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':50,'rankSpacing':70}}}%%
 flowchart LR
   actor(("👤 承辦人員"))
-  subgraph SYS["CRUD 標準範本（/template/crud）"]
-    UC1(["UC-T-01 查詢瀏覽人員清單<br/>（篩選・排序・分頁）"])
-    UC2(["UC-T-02 檢視人員明細"])
-    UC3(["UC-T-03 新增人員"])
-    UC4(["UC-T-04 編輯人員"])
-    UC5(["UC-T-05 刪除人員<br/>（二次確認）"])
-    UC6(["UC-T-06 匯出 CSV<br/>（篩選＋排序後全量）"])
+  subgraph SYS["人員管理模組"]
+    UC1(["查詢人員清單<br/>（篩選・排序・分頁）"])
+    UC2(["看一個人的詳細資料"])
+    UC3(["新增人員"])
+    UC4(["編輯人員資料"])
+    UC5(["刪除人員<br/>（先跳出確認框）"])
+    UC6(["匯出表格檔（CSV）<br/>（篩選、排序後的全部筆數）"])
+    URL["查詢條件記在網址上<br/>重新整理、分享連結都還在"]
+    CHK["儲存前檢查資料<br/>必填、電話、證號格式"]
   end
   actor --> UC1
   actor --> UC2
@@ -109,241 +142,317 @@ flowchart LR
   actor --> UC4
   actor --> UC5
   actor --> UC6
-  UC1 -. «include» URL 狀態同步 .-> UC1
-  UC2 -. «extend» .-> UC4
+  UC1 -. 一定會做 .-> URL
+  UC2 -. 看完可以接著做 .-> UC4
+  UC3 -. 一定會做 .-> CHK
+  UC4 -. 一定會做 .-> CHK
+  style URL fill:#f2f2f2,stroke:#999
+  style CHK fill:#f2f2f2,stroke:#999
   </pre>
+  <p class="ask">看完你要答得出來：承辦人員能做哪 6 件事？哪一件做之前會先跳出確認框？</p>
+  <p class="refs">給工程師對照：UC-T-01～UC-T-06；網址同步 FR-T-601；儲存前檢查 FR-T-303、BR-T-01～03、BR-T-07。</p>
 </section>
 
 <section id="arch">
-  <h2>② 檔案架構圖（8 個新檔 + 共用資產）</h2>
-  <p class="desc">頁面薄、邏輯下沉：狀態工廠與純函式可被任何新模組複製重用；共用元件直接取用既有資產（藍色）。</p>
+  <h2>② 零件圖：檔案怎麼分</h2>
+  <p class="desc">這張圖在說什麼：範本有 8 個自己的檔案；以後開新模組時，5 個要複製改名，3 個直接拿來用，再加上專案原本就有的共用零件。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>上排是 2 個畫面；中排是畫面用到的幫手；下排藍色大框是專案原本就有的共用零件，框裡寫著哪一頁用到。</li>
+      <li>顏色代表「開新模組時怎麼處理」：橘色 5 個要複製改名（跟「人員長什麼樣」有關）；綠色 3 個直接共用，不用改；藍色也不修改。</li>
+      <li>實線箭頭指向「被用到的零件」；虛線箭頭是以後才接的後端。括號內是程式檔名，給工程師找檔案用。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
-%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':40,'rankSpacing':60}}}%%
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':30,'rankSpacing':80}}}%%
 flowchart TB
-  subgraph PAGES["pages/template/crud/"]
-    LIST["index.vue<br/>列表頁：篩選・排序・分頁・匯出・刪除"]
-    DETAIL["[id].vue<br/>明細頁：檢視／編輯／新增 三合一"]
+  LIST["列表頁<br/>（index.vue）<br/>篩選・排序・分頁・匯出・刪除"]
+  DETAIL["明細頁<br/>（[id].vue）<br/>檢視／編輯／新增 三合一"]
+  LISTPAGE["篩選與分頁小幫手<br/>（useTemplateListPage）<br/>記住查詢條件、寫進網址"]
+  CSV["匯出小幫手<br/>（templateCsv）<br/>存成表格檔"]
+  SB["狀態標籤<br/>（TemplateStatusBadge）<br/>在職綠色、停用灰色"]
+  MEMBERS["人員資料<br/>（useTemplateMembers）<br/>24 筆練習資料"]
+  FF["欄位外框<br/>（TemplateFormField）<br/>欄位名稱＋紅字錯誤"]
+  VAL["檢查規則<br/>（templateValidation）<br/>必填、電話、證號"]
+  subgraph OLD["專案原本就有的共用零件（不修改）"]
+    S1["分頁列<br/>（AppTableFooter）<br/>列表頁用"]
+    S2["可排序的表頭<br/>（AppSortHeader）<br/>列表頁用"]
+    S3["刪除確認框<br/>（AppConfirmModal）<br/>列表頁用"]
+    S7["縣市鄉鎮清單<br/>（taiwanAddress）<br/>列表頁用"]
+    S4["地址選擇器<br/>（AppAddressPicker）<br/>明細頁用"]
+    S6["卡片外框<br/>（CardOutlined）<br/>兩頁都用"]
   end
-  subgraph TPLCOMP["components/template/"]
-    FF["TemplateFormField.vue<br/>label＋錯誤紅字＋data-field 錨點"]
-    SB["TemplateStatusBadge.vue<br/>狀態→樣式查表"]
-  end
-  subgraph COMPOSABLES["composables/"]
-    MEMBERS["useTemplateMembers.ts<br/>型別＋種子＋async CRUD API"]
-    LISTPAGE["useTemplateListPage.ts<br/>篩選＋分頁＋URL 同步工廠"]
-  end
-  subgraph UTILS["utils/（純函式）"]
-    VAL["templateValidation.ts<br/>validateFields＋格式常數"]
-    CSV["templateCsv.ts<br/>exportCsv（RFC 4180＋BOM）"]
-  end
-  subgraph SHARED["既有共用資產（不修改）"]
-    direction LR
-    S1["AppTableFooter"]
-    S2["AppSortHeader<br/>+ useTableSort"]
-    S3["AppConfirmModal"]
-    S4["AppAddressPicker"]
-    S5["AppDatePicker"]
-    S6["CardOutlined / ViewField"]
-    S7["taiwanAddress.ts"]
-  end
+  API[("未來的後端資料庫<br/>（現在還沒有）")]
   LIST --> LISTPAGE
-  LIST --> MEMBERS
   LIST --> CSV
   LIST --> SB
-  LIST --> S1 & S2 & S3 & S6 & S7
+  LIST --> MEMBERS
   DETAIL --> MEMBERS
-  DETAIL --> VAL
   DETAIL --> FF
-  DETAIL --> S4 & S5 & S6
-  MEMBERS -. 後端接軌縫：useFetch('/api/template/members') .-> API[("未來後端 API")]
-  style SHARED fill:#e8f4fb,stroke:#0084d1
-  style API fill:#fff4e0,stroke:#e6a23c,stroke-dasharray: 5 5
+  DETAIL --> VAL
+  CSV ~~~ S3
+  SB ~~~ S4
+  MEMBERS -. 以後才接 .-> API
+  classDef copy fill:#fff4e0,stroke:#e6a23c,stroke-width:2px
+  classDef share fill:#e9f7ec,stroke:#3a9a5b,stroke-width:2px
+  classDef old fill:#ffffff,stroke:#0084d1
+  class LIST,DETAIL,SB,MEMBERS,FF copy
+  class LISTPAGE,CSV,VAL share
+  class S1,S2,S3,S4,S6,S7 old
+  style OLD fill:#e8f4fb,stroke:#0084d1
+  style API fill:#f7f8fa,stroke:#999,stroke-dasharray: 5 5
   </pre>
+  <p class="ask">看完你要答得出來：開一個新模組時，哪 5 個檔要複製改名？哪 3 個直接拿來用？</p>
+  <p class="refs">給工程師對照：檔案在 sample-app/ 底下的 pages/template/crud/、components/template/、composables/、utils/。生日欄改用瀏覽器內建的日期欄，不再用日期挑選器（AppDatePicker），見 DESIGN 勘誤 #4。</p>
 </section>
 
 <section id="class">
-  <h2>③ 類別圖（資料模型與模組介面）</h2>
-  <p class="desc">TemplateMember 17 欄涵蓋教學代表型態；CRUD API 全非同步（Promise），未來換後端不動呼叫端。</p>
+  <h2>③ 資料圖：一筆人員記哪些資料</h2>
+  <p class="desc">這張圖在說什麼：一筆人員記 17 項資料，哪些一定要填、哪些有固定選項；旁邊是管理這些資料的幫手。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>每個框是一樣東西：框的最上面是名稱，下面每一行是它記的一項資料，或它會做的一件事。</li>
+      <li>「新增時空白」：新增人員時這一格是空的（例：顯示「請選擇性別」），要自己選，不會自動帶第一個選項。只有狀態預設「在職」。</li>
+      <li>實線箭頭：直接管理或直接查表；虛線箭頭：拿人員資料來用（篩選、檢查、匯出）。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
 classDiagram
-  class TemplateMember {
-    +string id  「M-001」
-    +string name
-    +'男'|'女' gender
-    +string birthDate  YYYY-MM-DD
-    +TemplateIdType idType
-    +string nationalId
-    +string phone
-    +string email
-    +string residenceCounty
-    +string residenceTownship
-    +string residenceAddress
-    +string groupName
-    +TemplatePositionCode positionCode
-    +string[] qualifications
-    +'在職'|'停用' status
-    +string note
-    +string updatedAt  系統寫入
+  class Person["人員（一筆資料）"] {
+    代碼（id）：系統自動給，例 M-001
+    姓名（name）：文字，必填
+    性別（gender）：男／女，必填，新增時空白
+    生日（birthDate）：日期，必填
+    證件類別（idType）：身分證／居留證／護照，必填，新增時空白
+    證號（nationalId）：必填，格式看證件類別
+    電話（phone）：必填，手機或市話都收
+    電子郵件（email）：選填，填了就要格式正確
+    居住縣市（residenceCounty）：必填
+    居住鄉鎮區（residenceTownship）：必填
+    居住地址（residenceAddress）：必填
+    編組（groupName）：6 組選 1，必填，新增時空白
+    職務（positionCode）：必填，新增時空白
+    資格（qualifications）：4 種證照，可複選，選填
+    狀態（status）：在職／停用，必填，預設「在職」
+    備註（note）：選填
+    更新日期（updatedAt）：系統自動寫，不能改
   }
-  class useTemplateMembers {
-    +records: Readonly Ref~TemplateMember[]~
-    +getById(id) Promise~TemplateMember?~ 深拷貝
-    +create(input) Promise~TemplateMember~
-    +update(id, input) Promise~TemplateMember~
-    +remove(id) Promise~void~
+  class Position["職務對照表"] {
+    &lt;&lt;固定選項&gt;&gt;
+    主任（director）：列表排第 1
+    副主任（deputy）：列表排第 2
+    組長（leader）：列表排第 3
+    組員（member）：列表排第 4
   }
-  class useTemplateListPage {
-    +filters: reactive~F~
-    +page / pageSize: Ref~number~
-    +showAdvanced: Ref~boolean~
-    +advancedActiveCount: Computed~number~
-    +resetFilters() void
-    +buildReturnQuery() string
-    -writeQuery() 僅寫非預設值・debounce・卸載清理
+  class Store["人員資料（useTemplateMembers）"] {
+    全部人員清單（records）
+    找一個人（getById）：拿到的是複本
+    新增一筆（create）
+    編輯一筆（update）
+    刪除一筆（remove）
   }
-  class templateValidation {
-    &lt;&lt;pure functions&gt;&gt;
-    +validateFields(form, rules) errors
-    +PHONE_PATTERN / TW_ID_PATTERN / EMAIL_PATTERN
+  class ListPage["篩選與分頁小幫手（useTemplateListPage）"] {
+    查詢條件、目前頁碼、每頁筆數
+    進階條件有幾個在用
+    清除條件
+    寫進網址：只寫改過的，停手 0.3 秒才寫
   }
-  class templateCsv {
-    &lt;&lt;pure functions&gt;&gt;
-    +exportCsv(filename, columns, rows) void
+  class Validation["檢查規則（templateValidation）"] {
+    必填有沒有填
+    電話：手機 09 開頭 10 碼，或市話含區碼
+    身分證：1 個英文字母＋9 個數字
+    電子郵件：要有 @ 和網域
   }
-  class TEMPLATE_POSITION_META {
-    &lt;&lt;lookup table&gt;&gt;
-    director: 主任 w1
-    deputy: 副主任 w2
-    leader: 組長 w3
-    member: 組員 w4
+  class Csv["匯出小幫手（templateCsv）"] {
+    匯出篩選、排序後的全部筆數
+    用 Excel 打開中文不亂碼
   }
-  useTemplateMembers "1" --> "*" TemplateMember : 管理（module 單例）
-  useTemplateMembers ..> TEMPLATE_POSITION_META : positionTitleOf()
-  useTemplateListPage ..> TemplateMember : 泛型過濾對象
-  templateValidation ..> TemplateMember : 驗證 BR-T-01~03
-  templateCsv ..> TemplateMember : 匯出 FR-T-501
+  Store --> Person : 管理很多筆
+  Person --> Position : 職務從這裡選
+  ListPage ..> Person : 篩選
+  Validation ..> Person : 儲存前檢查
+  Csv ..> Person : 匯出
   </pre>
+  <p class="ask">看完你要答得出來：新增一個人時，哪幾個選項欄位一開始是空白的？哪一個有預設值？</p>
+  <p class="refs">給工程師對照：型別 TemplateMember（17 欄）；必填 BR-T-01、證號 BR-T-02、電話 BR-T-03、職務導出 BR-T-05、更新日期 BR-T-06、選項不預設 BR-T-07；職務代碼表 TEMPLATE_POSITION_META。</p>
 </section>
 
 <section id="state">
-  <h2>④ 頁面模式狀態圖（/template/crud/[id]）</h2>
-  <p class="desc">一條路由三種模式：以 id==='new' 與 ?mode=edit 判定（FR-T-301），return query 全程攜帶以還原列表狀態（FR-T-602）。</p>
+  <h2>④ 狀態圖：明細頁的三種模式</h2>
+  <p class="desc">這張圖在說什麼：明細頁只有一頁，但有檢視、編輯、新增三種模式；按不同的鈕，會換到不同的模式。回到列表頁時，原本的篩選和頁碼都還在。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>每個圓角框是一種模式（畫面當下的樣子）；黑色圓點是起點；深灰色框是補充說明。</li>
+      <li>箭頭是「按了什麼，就換到哪個模式」，箭頭上的字就是你按的鈕或發生的事。</li>
+      <li>繞回自己的箭頭：檢查沒過，欄位下方出現紅字，留在原本的模式讓你改。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
 stateDiagram-v2
   direction LR
   [*] --> 列表頁
-  列表頁 --> 檢視模式 : 點列／檢視鈕<br/>（攜帶 return）
-  列表頁 --> 新增模式 : 「新增人員」<br/>id = 'new'
-  列表頁 --> 編輯模式 : 列上編輯鈕<br/>?mode=edit
-  檢視模式 --> 編輯模式 : 「編輯」<br/>router.replace 加 mode=edit
-  編輯模式 --> 列表頁 : 儲存成功／取消<br/>navigateBack(return)
-  新增模式 --> 列表頁 : 儲存成功／取消
-  檢視模式 --> 列表頁 : 「返回」
-  編輯模式 --> 編輯模式 : 驗證失敗<br/>欄位紅字＋聚焦第一錯誤
-  新增模式 --> 新增模式 : 驗證失敗
-  note right of 檢視模式 : 查無 id → 「查無資料」空狀態＋返回鈕（不白屏）
+  列表頁 --> 檢視模式 : 點一列或按「檢視」
+  列表頁 --> 新增模式 : 按「新增人員」
+  列表頁 --> 編輯模式 : 按該列的「編輯」
+  檢視模式 --> 編輯模式 : 按「編輯」
+  編輯模式 --> 列表頁 : 儲存成功或取消
+  新增模式 --> 列表頁 : 儲存成功或取消
+  檢視模式 --> 列表頁 : 按「返回」
+  編輯模式 --> 編輯模式 : 檢查沒過
+  新增模式 --> 新增模式 : 檢查沒過
+  note right of 檢視模式
+    找不到這個人：顯示「查無此人員」＋返回鈕
+    不會整頁空白
+  end note
+  note right of 新增模式
+    表單一開始是空白的：
+    性別、證件類別、編組、職務要自己選
+    只有狀態先帶「在職」
+  end note
   </pre>
+  <p class="ask">看完你要答得出來：在檢視模式按「編輯」會到哪個模式？儲存成功後回到哪裡，原本的篩選還在嗎？</p>
+  <p class="refs">給工程師對照：網址最後是 new＝新增；網址帶 mode=edit＝編輯；其他＝檢視（FR-T-301）。回列表靠 return 參數還原狀態（FR-T-602）。</p>
 </section>
 
 <section id="seq-list">
-  <h2>⑤ 循序圖：查詢與 URL 狀態同步（FR-T-101~105・601）</h2>
-  <p class="desc">篩選變更即時過濾並重設頁碼；URL 僅寫入非預設值（debounce 300ms），卸載時清理排程防止跨頁污染（審查發現的必修項）。</p>
+  <h2>⑤ 流程圖：查詢與網址同步</h2>
+  <p class="desc">這張圖在說什麼：你改查詢條件，清單馬上跟著變，條件也會寫進網址；所以把網址傳給同事，他打開看到的結果跟你一樣。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>最上面一排是參與的角色；從上往下是時間順序，圓圈數字是第幾步。</li>
+      <li>實線箭頭：去做一件事，或請對方做事；虛線箭頭：對方回覆結果。</li>
+      <li>深灰色長條：補充說明，不是一個步驟。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
-  participant P as index.vue（列表頁）
-  participant LP as useTemplateListPage
-  participant M as useTemplateMembers
-  participant R as vue-router（URL）
+  participant P as 列表頁
+  participant LP as 篩選與分頁小幫手
+  participant M as 人員資料
+  participant R as 網址列
 
-  U->>P: 進入 /template/crud?county=臺東縣&page=2
-  P->>LP: 建構（defaultFilters, advancedKeys）
-  LP->>R: 讀取 query 還原 filters/page/size
-  LP-->>P: filters（進階條件有值 → 自動展開進階區）
-  P->>M: records（響應式清單）
-  P->>P: filtered → sorted（useTableSort）→ paged（computed 鏈）
-  U->>P: 輸入關鍵字「王」
-  P->>LP: filters.q = '王'
-  LP->>LP: page 重設為 1（FR-T-104）
-  Note over LP,R: debounce 300ms 後僅寫入非預設值（FR-T-601）
-  LP->>R: router.replace({ q:'王', county:'臺東縣' })
-  U->>P: 點「匯出 CSV」
-  P->>P: exportCsv（sortedRows 全量・BOM・RFC 4180）
-  Note over P,LP: 元件卸載 → onScopeDispose 清除 debounce 排程<br/>＋路徑守衛（防止把列表 query 寫到明細頁 URL）
+  U->>P: 打開同事傳來的連結<br/>（網址裡有：臺東縣、第 2 頁）
+  P->>LP: 請它準備查詢條件
+  LP->>R: 讀網址裡的條件
+  LP-->>P: 還原：臺東縣、第 2 頁<br/>（進階條件有值，就自動展開進階區）
+  P->>M: 拿全部人員
+  P->>P: 依序做：篩選 → 排序 → 切出這一頁
+  U->>P: 在關鍵字打「王」
+  P->>LP: 關鍵字＝王
+  LP->>LP: 頁碼回到第 1 頁
+  Note over LP,R: 停手 0.3 秒才寫網址；只寫有改過的條件
+  LP->>R: 網址改成：關鍵字＝王、縣市＝臺東縣
+  U->>P: 按「匯出 CSV」鈕（存成表格檔）
+  P->>P: 把篩選、排序後的全部筆數存成表格檔<br/>（不是只有這一頁）
+  Note over P,LP: 離開列表頁時，取消還沒寫的網址<br/>（避免把列表的條件寫到別的頁面）
   </pre>
+  <p class="ask">看完你要答得出來：為什麼把網址傳給同事，同事打開會看到一樣的篩選結果？</p>
+  <p class="refs">給工程師對照：FR-T-101～105、FR-T-601；匯出 FR-T-501（含 UTF-8 BOM）；卸載清理靠 onScopeDispose＋路徑檢查。</p>
 </section>
 
 <section id="seq-save">
-  <h2>⑥ 循序圖：新增／編輯儲存（FR-T-301~305・BR-T-01~03）</h2>
-  <p class="desc">驗證是純函式：規則資料化、與 UI 分離；錯誤顯示於欄位下方紅字並聚焦第一個錯誤欄位，不是只有 toast。</p>
+  <h2>⑥ 流程圖：新增／編輯後儲存</h2>
+  <p class="desc">這張圖在說什麼：按「儲存」後，先過檢查規則；有錯就在欄位下方標紅字，全部通過才存進人員資料。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>最上面一排是參與的角色；從上往下是時間順序，圓圈數字是第幾步。</li>
+      <li>實線箭頭：去做一件事，或請對方做事；虛線箭頭：對方回覆結果。</li>
+      <li>淡紅底：檢查沒過的情況；淡綠底：全部通過的情況。兩種只會發生一種。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
-  participant D as [id].vue（明細頁）
-  participant V as templateValidation（純函式）
-  participant M as useTemplateMembers
-  participant T as useToast
+  participant D as 明細頁
+  participant V as 檢查規則
+  participant M as 人員資料
+  participant T as 提示訊息
 
-  U->>D: 進入 /template/crud/new?return=…
-  D->>D: mode = create・空白表單（reactive 深拷貝）
-  U->>D: 填寫欄位、按「儲存」（Teleport 麵包屑動作列）
-  D->>D: payload = trim 正規化後的表單
-  D->>V: validateFields(payload, rulesFor(payload))
-  alt 有錯誤（例：電話格式不符 BR-T-03）
-    V-->>D: { phone: '請輸入 09 開頭的 10 碼手機號碼', … }
-    D->>D: 欄位下方紅字（TemplateFormField error）
-    D->>D: 聚焦第一個錯誤欄位（data-field → .focus()）
-    D->>T: 「請修正 N 個欄位」
-    U->>D: 修正該欄位 → 只清除該欄位錯誤
-  else 全部通過
-    V-->>D: {}（空物件）
-    D->>M: create(payload)
-    M->>M: 產生 id（M-025）＋ updatedAt（本地時區）
-    M-->>D: 新 TemplateMember（深拷貝）
-    D->>T: 「已新增人員（綠色）」
-    D->>D: navigateBack(return) → 列表狀態完整還原
+  U->>D: 按「新增人員」，進到新增模式
+  D->>D: 準備空白表單：性別、證件類別、編組、職務都空著<br/>（例：顯示「請選擇性別」，要自己選）<br/>只有狀態先帶「在職」
+  U->>D: 填資料，按「儲存」
+  D->>D: 把每一格前後多打的空白去掉
+  D->>V: 請它一格一格檢查
+  rect rgb(255, 236, 236)
+    Note over D,T: 情況一：檢查沒過（例：職務沒選、電話格式不對）
+    V-->>D: 錯誤清單（例：電話要手機 09 開頭 10 碼，<br/>或市話含區碼，例 02-1234-5678）
+    D->>D: 錯的欄位下方出現紅字
+    D->>D: 游標跳到第一個錯的欄位
+    D->>T: 「請修正 2 個欄位」（紅色）
+    U->>D: 改好一格，那一格的紅字就消失
   end
+  rect rgb(233, 247, 237)
+    Note over D,T: 情況二：全部通過
+    V-->>D: 沒有錯
+    D->>M: 存成新的一筆
+    M->>M: 自動給代碼（例 M-025）和今天的更新日期
+    M-->>D: 存好了
+    D->>T: 「已新增人員」（綠色）
+    D->>D: 回到列表頁，原本的篩選和頁碼都還在
+  end
+  Note over U,T: 編輯也走同一條路：表單先帶入原本的資料，存好時顯示「已儲存變更」
   </pre>
+  <p class="ask">看完你要答得出來：按「儲存」時有一格電話打錯，畫面會出現哪三種提醒？</p>
+  <p class="refs">給工程師對照：FR-T-301～305；BR-T-01～03（必填、證號、電話）、BR-T-07（選項欄位新增時空白、狀態預設在職）；驗證是純函式 validateFields。</p>
 </section>
 
 <section id="seq-del">
-  <h2>⑦ 循序圖：刪除（UC-T-05・FR-T-401~402・BR-T-04）</h2>
-  <p class="desc">刪除必經二次確認且文案含姓名；當頁因刪除變空時自動退回前一頁。</p>
+  <h2>⑦ 流程圖：刪除</h2>
+  <p class="desc">這張圖在說什麼：刪除一定先跳出確認框，框裡寫出這個人的姓名；確定了才刪，這一頁刪空了會自動退回前一頁。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>最上面一排是參與的角色；從上往下是時間順序，圓圈數字是第幾步。</li>
+      <li>實線箭頭：去做一件事，或請對方做事；虛線箭頭：對方回覆結果。</li>
+      <li>淡灰底：按取消、不刪了；淡紅底：確定刪除。兩種只會發生一種。</li>
+    </ul>
+  </div>
   <pre class="mermaid">
 %%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
 sequenceDiagram
   autonumber
   actor U as 承辦人員
-  participant P as index.vue（列表頁）
-  participant C as AppConfirmModal（danger）
-  participant M as useTemplateMembers
-  participant T as useToast
+  participant P as 列表頁
+  participant C as 刪除確認框
+  participant M as 人員資料
+  participant T as 提示訊息
 
-  U->>P: 點列上「刪除」（@click.stop 不觸發檢視）
-  P->>C: 開啟確認框「確定刪除【王小明】？」
-  alt 取消
-    U->>C: 「取消」／Esc／點遮罩
-    C-->>P: 關閉，不動資料
-  else 確認
-    U->>C: 「確認」
-    C-->>P: confirm 事件（不自動關閉）
-    P->>M: remove(id)
-    M-->>P: 完成
-    P->>P: 自行關閉 modal（v-model = false）
-    P->>T: 「已刪除（綠色）」
-    P->>P: 當頁清空 → page 退回前一頁（FR-T-402）
+  U->>P: 按某一列的「刪除」<br/>（只開確認框，不會進到明細頁）
+  P->>C: 打開確認框：<br/>「確定要刪除「王小明」這筆人員資料嗎？<br/>此動作無法復原。」
+  rect rgb(240, 240, 240)
+    Note over U,T: 情況一：不刪了
+    U->>C: 按「取消」、按鍵盤 Esc 鍵，或點框外面
+    C-->>P: 關掉確認框，資料不動
+  end
+  rect rgb(255, 236, 236)
+    Note over U,T: 情況二：確定刪除
+    U->>C: 按「刪除」
+    C-->>P: 通知：使用者確定要刪
+    P->>M: 刪掉這一筆
+    M-->>P: 刪好了
+    P->>C: 刪好了才關掉確認框
+    P->>T: 「已刪除 王小明」（綠色）
+    P->>P: 這一頁如果刪空了，自動退回前一頁
   end
   </pre>
+  <p class="ask">看完你要答得出來：刪除前會先發生什麼事？按「取消」的話，資料會不會變？</p>
+  <p class="refs">給工程師對照：UC-T-05、FR-T-401～402、BR-T-04；確認框是 AppConfirmModal（danger），按確認後不自動關閉。</p>
 </section>
 
 <footer>
-  <p>圖面基準：DESIGN-CRUD標準範本-v1.1（含實作階段勘誤）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
+  <p>圖面基準：DESIGN-CRUD標準範本-v1.1（含實作階段勘誤）、SPEC-範例-人員CRUD.md（含 BR-T-07 選項欄位不預設）。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
 </footer>
 
 <script>

@@ -11,17 +11,18 @@
  * div 位置）都寫死成斷言。學員照 PRD 做出功能正確的模組，照樣會被判紅。
  * v2 改成四條原則：
  *   1. 能用語意就用語意：按鈕用 role + 可及名稱，不綁 placeholder 與逐字文案。
- *   2. 只驗 PRD 承諾過的事。PRD 沒寫的一律不驗——
- *      編碼的「格式」不驗（PRD D3 說格式由學員拍板，只承諾即時產生＋不重複）；
- *      新增／刪除／編輯的「成功提示」不驗（PRD 只規定驗證失敗要有 toast），
+ *   2. 只驗講明過的事：PRD（業務白話需求）、技術約定（資訊單位的約定）、
+ *      和釐清時拍板的事（課堂拍板見手冊 step3 ③）。都沒寫的一律不驗——
+ *      編碼的「格式」不驗（格式是釐清時學員拍板的，測試只驗即時產生＋不重複）；
+ *      新增／刪除／編輯的「成功提示」不驗（只有驗證失敗的提示是 harness 規定的），
  *      改用 URL、總筆數、資料內容這三種「結果」當證據。
- *   3. 數字看 PRD 有沒有定：PRD 2.1.1 定死種子 24 筆、第 4 節定死每頁 20 筆，
+ *   3. 數字看有沒有講明：技術約定 4 節定死示範資料 24 筆、PRD 5 節定死一頁 20 筆，
  *      這兩個就驗死（不驗死等於放過「分頁失效」這種假綠）；
  *      其餘筆數變化一律動態讀基準再比對，不寫死。
- *   4. 真的沒有語意可用時，才用 data-testid——而且那幾個掛載點寫進 PRD 第 2.1 節，
+ *   4. 真的沒有語意可用時，才用 data-testid——而且那幾個掛載點寫進技術約定第 5 節，
  *      是「講明的約定」，不是藏在測試裡的暗號。沒有掛載點時本檔一律有語意退路。
  *
- * data-testid 掛載點（PRD 2.1 節有列，沒掛也能跑，只是定位比較脆）：
+ * data-testid 掛載點（技術約定 5 節有列，沒掛也能跑，只是定位比較脆）：
  *   equipment-keyword ─ 關鍵字搜尋框的外框
  *   equipment-total   ─ 顯示總筆數的元素
  *   equipment-row     ─ 桌機表格的資料列
@@ -31,9 +32,9 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
 
 const LIST = '/equipment/crud'
 const TEMPLATE_LIST = '/template/crud'
-/** PRD 4 節：預設每頁 20 筆 */
+/** PRD 5 節：一頁看 20 筆 */
 const PAGE_SIZE = 20
-/** PRD 2.1.1 節：種子資料約定為 24 筆（>20，才驗得到分頁） */
+/** 技術約定 4 節：示範資料約定為 24 筆（>20，才驗得到分頁） */
 const SEED_TOTAL = 24
 
 // ── 定位工具：語意優先，data-testid 為輔 ─────────────────────
@@ -103,18 +104,18 @@ function fieldError(page: Page, name: string): Locator {
 test('E1 列表載入：種子 24 筆、桌機表格、第一頁恰好 20 列', async ({ page }) => {
   await page.goto(LIST)
 
-  // PRD 2.1.1：種子恰為 24 筆。
+  // 技術約定 4 節：示範資料恰為 24 筆。
   // 為什麼要驗死 24 而不是「> 0」：只驗 > 0 的話，種子被改成 10 筆、第一頁也剛好 10 列，
   // 「min(總筆數, 20)」那種寫法會照樣亮綠——分頁根本沒被驗到。
   const total = await readTotal(page)
-  expect(total, 'PRD 2.1.1：種子資料約定為 24 筆').toBe(SEED_TOTAL)
+  expect(total, '技術約定 4 節：示範資料約定為 24 筆').toBe(SEED_TOTAL)
   expect(total, '種子筆數必須多於一頁，分頁才驗得到').toBeGreaterThan(PAGE_SIZE)
 
   await expect(page.locator('table')).toBeVisible()
 
-  // PRD 4 節：預設每頁 20 筆。第一頁的列數必須「恰好」20——
+  // PRD 5 節：一頁看 20 筆。第一頁的列數必須「恰好」20——
   // 分頁若整個失效（24 筆一次全倒進表格），這一條就會紅。
-  await expect(rows(page), 'PRD 4 節：預設每頁 20 筆，第一頁應恰好 20 列').toHaveCount(PAGE_SIZE)
+  await expect(rows(page), 'PRD 5 節：一頁 20 筆，第一頁應恰好 20 列').toHaveCount(PAGE_SIZE)
 
   // 每一列都要有品項編碼（代表資料真的渲染出來，不是空殼表格）
   expect(await firstRowCode(page), '第一列讀不到品項編碼').not.toBe('')
@@ -135,7 +136,7 @@ test('E2 關鍵字篩選：用編碼與品名都能縮小、不分大小寫、�
   await expectTotal(page, 1)
   await expect(firstRow(page)).toContainText(code)
 
-  // 2) 不分大小寫：同一個編碼轉小寫，結果要一樣（PRD 4 節）
+  // 2) 不分大小寫：同一個編碼轉小寫，結果要一樣（PRD 5 節）
   await keywordInput(page).fill(code.toLowerCase())
   await expectTotal(page, 1)
 
@@ -162,17 +163,17 @@ test('E3 新增品項：連動下拉、編碼即時產生且不重複、儲存�
   await page.getByRole('button', { name: /新增/ }).click()
   await expect(page).toHaveURL(/\/equipment\/crud\/new/)
 
-  // 分類 → 項目（連動）。這兩個名稱來自 PRD 第 3 節的分類與標準項目表，屬於規格。
+  // 分類 → 項目（連動）。這兩個名稱來自 PRD 第 4 節的分類與項目表，屬於規格。
   await pickOption(page, page.locator('[data-field="categoryKey"]'), '供電及照明設備')
   await pickOption(page, page.locator('[data-field="name"]'), '發電機')
 
-  // 編碼：PRD 第 5 節 D3 只承諾兩件事——「選定分類＋項目後即時算得出來」與「同一份清冊不重複」。
-  // 格式（幾碼、要不要項目碼、用不用連字號、是不是 ASCII）由學員拍板，這裡一個字都不驗。
+  // 編碼：只驗兩件事——「選定分類＋項目後即時算得出來」（PRD 5 節）與「同一份清冊不重複」（技術約定 4 節）。
+  // 格式（幾碼、要不要項目碼、用不用連字號、是不是 ASCII）是釐清時學員拍板的，這裡一個字都不驗。
   // 連「長度 ≥ 3」「只能英數」都不驗——那會讓合法的「裝備-1」被判紅。
   const codeInput = page.locator('[data-field="code"] input')
-  await expect(codeInput, 'PRD D3：選定分類＋項目後應即時算出編碼').not.toHaveValue('')
+  await expect(codeInput, 'PRD 5 節：選好分類和項目，應馬上看到編碼').not.toHaveValue('')
   const newCode = (await codeInput.inputValue()).trim()
-  expect(newCode, 'PRD D3：編碼不可為空白').not.toBe('')
+  expect(newCode, '編碼不可為空白').not.toBe('')
 
   // 必填其餘欄位
   await page.locator('[data-field="qty"] input').fill('5')
@@ -182,8 +183,8 @@ test('E3 新增品項：連動下拉、編碼即時產生且不重複、儲存�
   await page.getByRole('button', { name: /儲存/ }).click()
 
   // 用「結果」驗成功，不驗成功提示的文字。
-  // PRD 只規定「驗證失敗」要有 toast（第 4 節）；新增成功要不要跳 toast、跳什麼字，PRD 沒承諾。
-  // 所以這裡只看三件 PRD 真的要求的事：回到列表（第 6 節第 6 條）、筆數 +1、查得回那一筆。
+  // 只有「驗證失敗」的提示是 harness 規定的；新增成功要不要跳 toast、跳什麼字，沒人承諾過。
+  // 所以這裡只看三件真的講明的事：回到清冊（PRD 7 節第 6 條）、筆數 +1、查得回那一筆。
   await expect(page).toHaveURL(/\/equipment\/crud(\?|$)/)
   await expectTotal(page, before + 1)
 
@@ -195,7 +196,7 @@ test('E3 新增品項：連動下拉、編碼即時產生且不重複、儲存�
 
 // ── E4 表單驗證 ─────────────────────────────────────────────
 // 觀念：Validation（欄位級驗證，錯誤不離頁）。
-// PRD 第 2 節共有六個必填欄位，但它們的「驗法」分成兩種，這件事必須講清楚：
+// PRD 第 3 節共有六個必填欄位，但它們的「驗法」分成兩種，這件事必須講清楚：
 //   A. 五個欄位（分類／項目／單位／規格說明／數量）使用者進得了不合法狀態
 //      → 用「弄成不合法 → 看得到欄位級錯誤訊息」來驗。
 //   B. 狀態（status）使用者進不了空值：單選下拉、預設就有值、沒有清除鈕、選項全是合法值
@@ -208,12 +209,12 @@ test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯
   await page.goto(`${LIST}/new`)
 
   // ── (0) 兩個「有預設值」的必填欄位，預設值本身必須合法 ───────────────
-  // PRD 第 2 節：數量必填、≥ 0；狀態必填、預設「正常」。
+  // PRD 3 節：數量必填、新增時先填 0；狀態必填，釐清拍板「新增時預設正常」（手冊 step3 ③ 課堂拍板）。
   // 注意：這裡用 toHaveValue('0') 精確比對。
   // 曾經寫成 /^0*$/ 是個假綠——`*` 是「零個以上」，空字串也會通過，
   // 等於「數量預設值壞成空白」這種缺陷會被放行。
-  await expect(qtyInput, 'PRD 2 節：數量預設值應為 0').toHaveValue('0')
-  await expect(page.locator('[data-field="status"]'), 'PRD 2 節：狀態預設「正常」').toContainText(/正常/)
+  await expect(qtyInput, 'PRD 3 節：數量新增時先填 0').toHaveValue('0')
+  await expect(page.locator('[data-field="status"]'), '釐清拍板：新增時狀態預設「正常」').toContainText(/正常/)
 
   // ── (1) 空表單直接儲存 → 沒有預設值的四個必填欄位各自報錯 ─────────────
   await save()
@@ -223,8 +224,8 @@ test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯
   }
   // 分類的訊息要看得出是在講「分類」這件事（模糊比對，不綁逐字）
   await expect(fieldError(page, 'categoryKey')).toHaveText(/分類/)
-  await expect(page.getByText(/請修正\s*\d+\s*個欄位/), 'PRD 4 節：驗證失敗要有 toast').toBeVisible()
-  await expect(page, 'PRD 4 節：驗證失敗不離頁').toHaveURL(/\/equipment\/crud\/new/)
+  await expect(page.getByText(/請修正\s*\d+\s*個欄位/), 'harness 規矩：驗證失敗要有「請修正 N 個欄位」提示').toBeVisible()
+  await expect(page, 'PRD 5 節：驗證失敗不跳走').toHaveURL(/\/equipment\/crud\/new/)
 
   // ── (2) 把「進得了不合法狀態」的欄位一一弄壞再存，逐欄確認真的有守門 ──────
   // 為什麼要做這一段：只靠 (1) 的空表單，證明的是「初始狀態會報錯」，
@@ -246,13 +247,13 @@ test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯
   // 只驗 toBeVisible 的話，萬一那個 <p> 是別的東西渲染出來的，這條就白驗了。
   await qtyInput.fill('')
   await save()
-  await expect(fieldError(page, 'qty'), 'PRD 2 節：數量必填，清空應被擋下').toBeVisible()
+  await expect(fieldError(page, 'qty'), 'PRD 3 節：數量一定要填，清空應被擋下').toBeVisible()
   await expect(fieldError(page, 'qty')).toHaveText(/數量/)
 
   // 數量：負數 → 「≥ 0」要擋
   await qtyInput.fill('-1')
   await save()
-  await expect(fieldError(page, 'qty'), 'PRD 2 節：數量 ≥ 0，負數應被擋下').toBeVisible()
+  await expect(fieldError(page, 'qty'), '數量不能是負數，負數應被擋下').toBeVisible()
   await expect(fieldError(page, 'qty')).toHaveText(/數量/)
 
   // ── (3) 狀態：沒有「弄成不合法」這條路，改驗 invariant ─────────────────
@@ -261,7 +262,7 @@ test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯
   // 使用者根本走不到「空值」，所以不會有錯誤訊息可以驗。
   // 這時候正確的驗法不是硬湊一條 fieldError，而是驗「不可能變成不合法」這件事本身：
   //   3-1 只有一顆觸發鈕，沒有清除／叉叉
-  //   3-2 選項全集恰好是 PRD 的三個合法值，沒有空白哨兵
+  //   3-2 選項全集恰好是 PRD 3 節的三個合法值，沒有空白哨兵
   //   3-3 再點一次目前選中的那個，也不會被取消成空值
   // 若哪天 UI 改成可以清空（多了清除鈕或空白選項），3-1／3-2 就會紅——
   // 那時候就該回來改成「清空 → 斷言 fieldError(page, 'status')」。
@@ -270,7 +271,7 @@ test('E4 表單驗證：五個必填逐欄驗錯 ＋ 狀態進不了空值，錯
 
   await statusHost.locator('button').first().click()
   const statusOptions = page.getByRole('option')
-  await expect(statusOptions, 'PRD 2／3 節：狀態選項恰為三個').toHaveCount(3)
+  await expect(statusOptions, 'PRD 3 節：狀態只有正常、維修中、已報廢三種').toHaveCount(3)
   await expect(statusOptions, '選項全集必須都是合法值，不得有空白哨兵').toHaveText([/正常/, /維修中/, /已報廢/])
 
   await statusOptions.first().click()
@@ -294,7 +295,7 @@ test('E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'
   await firstRow(page).getByRole('button', { name: /刪除/ }).click()
   const dialog = page.getByRole('alertdialog')
   await expect(dialog).toBeVisible()
-  // 確認框要「寫明動作」（PRD 第 6 節第 8 條）——模糊比對，不綁「刪除品項」四個字
+  // 確認框要「寫明動作」（釐清拍板：刪之前跳確認框）——模糊比對，不綁「刪除品項」四個字
   await expect(dialog).toContainText(/刪除/)
 
   // 取消 → 筆數不變、編碼仍在
@@ -307,7 +308,7 @@ test('E5 刪除確認：取消不變、確認後 -1 且該編碼從表格消失'
   await firstRow(page).getByRole('button', { name: /刪除/ }).click()
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: /^刪除/ }).click()
-  // 一樣用「結果」驗成功：PRD 第 6 節第 8 條只要求「經二次確認才生效」，
+  // 一樣用「結果」驗成功：釐清拍板只要求「經二次確認才生效」，
   // 沒有承諾刪除成功要跳 toast、更沒有規定文案。所以只驗筆數 -1、那筆真的不見了。
   await expectTotal(page, total - 1)
   await expect(page.locator('table').getByText(code, { exact: true })).toHaveCount(0)
@@ -358,7 +359,7 @@ test('E7 編輯品項：改第一列數量與存放地點，儲存後新值生�
 
   await page.getByRole('button', { name: /儲存/ }).click()
 
-  // 回列表（PRD 第 4 節「編輯」：儲存寫回並返回列表）。
+  // 回清冊（PRD 5 節第 6 條「修改」：存了就生效，回到清冊馬上看得到）。
   // 一樣不驗成功提示的文字——PRD 沒承諾編輯成功要跳 toast，用資料生效當證據就夠了。
   await expect(page).toHaveURL(/\/equipment\/crud(\?|$)/)
 

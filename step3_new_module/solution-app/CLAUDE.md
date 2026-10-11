@@ -20,7 +20,7 @@
 - **直接共用**（與實體無關，禁複製、禁亂改）：`composables/useTemplateListPage.ts`、`composables/useTableSort.ts`、`utils/templateValidation.ts`、`utils/templateCsv.ts`、`utils/taiwanAddress.ts`、所有 `components/App*.vue`。
 - 判準：與「這個實體長什麼樣子」有關 → 複製；通用機制 → 共用。
 
-## 程式規則精華（10 條）
+## 程式規則精華（11 條）
 
 1. 元件一律 `<script setup lang="ts">`；無 `any` 滲漏，enum/狀態值嚴格照 SPEC。
 2. 命名空間隔離：範本模組一律 `Template`/`template` 前綴，複製時整組改名，別污染別的模組。
@@ -32,6 +32,7 @@
 8. CSV 用現成 `exportCsv(filename, columns, rows)`（RFC 4180 + UTF-8 BOM）；匯出篩選＋排序後全量，非只當頁。
 9. 單檔 ≤ 500 行（列表頁 ≤ 420、明細頁 ≤ 550 為明訂例外）；無 magic literal、**禁 `console.log`**、無死碼。
 10. 主要動作一律 `Teleport to="#breadcrumb-actions"`，且保留 `v-if="teleportReady"`（hard-load 才不會崩）。
+11. **選項欄位（下拉、單選）新增時一律空白＋「請選擇○○」，禁止預設帶第一個選項**；必填沒選就擋。只有 SPEC 明文寫了預設值和理由的欄位才可帶預設（範本只有「狀態＝在職」）；SPEC 沒寫，就在釐清時用選擇題問。理由：帶了預設，使用者沒改就存，存進去的是錯的資料，當場也不會報錯（例：血型帶 A、性別帶男）。
 
 ## Design System
 

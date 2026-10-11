@@ -1,83 +1,275 @@
-# 設計文件 — 中心裝備物資（課堂版 v1.0）
+# 設計文件 — 中心裝備物資（課堂版參考解）
 
-> 設計文件（DESIGN）：「怎麼做」的紀錄。實作方式＝複製 CRUD 標準範本八檔中的五檔改名，三個通用檔直接共用。
-> **圖在同資料夾 `DIAGRAMS-裝備物資.html`（用瀏覽器開）**：用例圖、檔案架構圖、資料模型類別圖、新增品項＋編碼產生的循序圖。PM 看圖就好，不用看程式。
+> **設計文件（DESIGN）：「怎麼做、動了哪些檔」的紀錄。**
+>
+> 1. 做法：CRUD 範本的 8 個檔裡，5 個照範本複製改名，3 個直接共用、一個字都不改。
+> 2. 「要做什麼」寫在同資料夾的 `SRS-裝備物資.md`。這份的 Q1～Q6 就是 SRS 第 1 段的拍板題。
+> 3. **圖在同資料夾的 `DIAGRAMS-裝備物資.html`（用瀏覽器開）。不寫程式的人看圖就好。**
+> 4. 骨架照 `SRS-設計文件-最小樣板.md` 的設計文件四段。內容以 `solution-app/` 的程式為準。
 
-## 1. 檔案清單
+---
 
-### 新增五檔（複製範本改名）
+## 1. 檔案責任 ★可以核
 
-| 新檔 | 複製來源 | 說明 |
-|------|---------|------|
-| `pages/equipment/crud/index.vue` | `pages/template/crud/index.vue` | 列表頁：篩選＋排序＋分頁＋URL 同步＋匯出＋刪除確認 |
-| `pages/equipment/crud/[id].vue` | `pages/template/crud/[id].vue` | 明細頁：檢視／編輯／新增三合一＋欄位級驗證＋編碼預覽 |
-| `composables/useEquipmentItems.ts` | `composables/useTemplateMembers.ts` | 資料層：型別＋分類/項目查表＋24 筆種子＋async CRUD＋編碼產生 |
-| `components/equipment/EquipmentFormField.vue` | `TemplateFormField.vue` | 表單欄位容器（label＋必填星號＋錯誤紅字＋聚焦錨點） |
-| `components/equipment/EquipmentStatusBadge.vue` | `TemplateStatusBadge.vue` | 狀態徽章（查表配色） |
+### 1.1 八個檔的處置
 
-### 直接共用（不複製、不改）
+| # | 檔案 | 白話 | 處置 | 為什麼 |
+|---|---|---|---|---|
+| 1 | `pages/equipment/crud/index.vue` | 清冊畫面 | 複製改名 | 欄位、篩選條件跟「裝備長什麼樣」有關 |
+| 2 | `pages/equipment/crud/[id].vue` | 新增／編輯／檢視畫面 | 複製改名 | 表單欄位、檢查規則跟裝備有關 |
+| 3 | `composables/useEquipmentItems.ts` | 裝備資料 | 複製改名 | 12 個欄位、分類表、示範資料、編碼規則都是裝備專用 |
+| 4 | `components/equipment/EquipmentFormField.vue` | 欄位外框（標題＋紅星＋紅字） | 複製改名 | 命名空間隔離：每個模組用自己的一份，改了不會影響別的模組 |
+| 5 | `components/equipment/EquipmentStatusBadge.vue` | 狀態標籤（綠、黃、紅） | 複製改名 | 狀態種類和顏色是裝備專用 |
+| 6 | `composables/useTemplateListPage.ts` | 篩選、分頁、網址同步 | **直接共用，未修改** | 通用機制，哪個清冊都一樣 |
+| 7 | `utils/templateValidation.ts` | 檢查規則（必填、格式） | **直接共用，未修改** | 通用機制；電話規則也直接用它的 |
+| 8 | `utils/templateCsv.ts` | 匯出 CSV | **直接共用，未修改** | 通用機制 |
 
-`composables/useTemplateListPage.ts`、`composables/useTableSort.ts`、`utils/templateValidation.ts`、`utils/templateCsv.ts`、所有 `components/App*.vue`。
+複製來源：1、2 來自 `pages/template/crud/`；3 來自 `composables/useTemplateMembers.ts`；4、5 來自 `components/template/Template*.vue`。
 
-### 既有檔異動一處
+### 1.2 「直接共用」三個檔：沒改，而且真的有在用
 
-| 檔 | 異動 |
-|----|------|
-| `layouts/template.vue` | `navLinks` 新增「裝備物資 → /equipment/crud」入口一項（範本人員 CRUD 兩項不動） |
+試教時有學員為了讓測試變綠，把共用的列表工具拆掉自己重寫一套。共用檔本身沒動，雜湊照樣相同，**但心法已經破功**。所以兩件事都要證明。
+
+**第一件：跟範本原檔完全相同。** 用檔案雜湊（檔案的指紋，內容差一個字，指紋就不同）比對 `step2_speedrun_kit/2.1_sample_app/sample-app/` 的原檔：
+
+| 檔案 | 參考解 SHA-256 前 12 碼 | 範本原檔 | 結果 |
+|---|---|---|:---:|
+| `useTemplateListPage.ts` | `d61e7877e8b3` | `d61e7877e8b3` | 相同 |
+| `templateValidation.ts` | `c6397286db28` | `c6397286db28` | 相同 |
+| `templateCsv.ts` | `0a61fade46dd` | `0a61fade46dd` | 相同 |
+
+自己比的方法（PowerShell）：`Get-FileHash utils\templateCsv.ts`，兩邊各跑一次，看 Hash 是否一樣。
+
+**第二件：真的有在用，沒有另外重寫一套。**
+
+| 共用檔 | 誰在用 | 怎麼用 |
+|---|---|---|
+| `useTemplateListPage.ts` | 清冊畫面 | 呼叫 `useTemplateListPage({ defaultFilters: { q, category, status }, defaultPageSize: 20 })`，篩選、頁碼、每頁筆數、網址同步都交給它 |
+| `templateValidation.ts` | 新增／編輯畫面 | 必填和電話格式用 `validateFields(form, rulesFor())` 檢查；電話直接匯入共用的 `PHONE_PATTERN` |
+| `templateCsv.ts` | 清冊畫面 | 「匯出 CSV」呼叫 `exportCsv(檔名, 12 欄, sortedRows)` |
+
+### 1.3 8 個檔以外
+
+1. **其他共用零件，也沒改**：`composables/useTableSort.ts`（點標題排序）、`components/App*.vue`（確認框、排序標題、表尾分頁、`AppSafeTeleport`）、`CardOutlined.vue`、`ViewField.vue`。
+2. **既有檔只改一處**：`layouts/template.vue` 的左側選單加一項「裝備物資 → `/equipment/crud`」。範本人員 CRUD 的兩項不動，`/template/crud` 照樣能用。
+
+---
 
 ## 2. 資料模型
+
+### 2.1 一筆裝備的型別
+
+**欄位英文名照技術約定第 2 節，就是未來後端 API 的介面，定了就不改。**
 
 ```ts
 export type EquipmentStatus = 'normal' | 'maintenance' | 'scrapped'
 
 export interface EquipmentItem {
-  id: string            // 'E-001'（系統流水）
-  code: string          // 'IT-LAP-001'（系統依分類+項目產生）
-  categoryKey: string   // 分類 value（見 EQUIPMENT_CATEGORIES）
-  name: string          // 項目
-  qty: number
-  unit: string
-  spec1: string         // 規格說明
-  keeper: string
-  keeperPhone: string
-  locationName: string  // 存放地點（單一文字欄）
-  status: EquipmentStatus
-  purchaseDate: string  // YYYY-MM-DD，可空
-  specNote: string      // 備註
+  id: string            // 系統流水號，例 'E-001'。網址用它，跟品項編碼分開；畫面不顯示
+  code: string          // 品項編碼，系統產生，例 'PW-GEN-001'
+  categoryKey: string   // 分類（10 個分類代碼之一，例 'POWER'）  必填
+  name: string          // 項目                                    必填
+  qty: number           // 數量，0 以上的整數                      必填
+  unit: string          // 單位                                    必填
+  spec1: string         // 規格說明（可多行）                      必填
+  keeper: string        // 保管人
+  keeperPhone: string   // 保管人電話（一欄，手機或市話）
+  locationName: string  // 存放地點
+  status: EquipmentStatus // 狀態                                  必填
+  purchaseDate: string  // 採購日期 YYYY-MM-DD，沒填是空字串
+  specNote: string      // 備註（可多行）
 }
 
-export type EquipmentItemInput = Omit<EquipmentItem, 'id' | 'code'>
+export type EquipmentItemInput = Omit<EquipmentItem, 'id' | 'code'> // 表單送出的內容：id、code 由系統給
 ```
 
-查表：`EQUIPMENT_CATEGORIES`（value／code／label／items）、`ITEM_CODE_MAP`（項目名→3 碼）、`EQUIPMENT_STATUS_META`（狀態→中文）。
+三張查表，都在 `useEquipmentItems.ts`：
 
-## 3. 品項編碼產生演算法（BR-EQ-01）
+| 查表 | 內容 |
+|---|---|
+| `EQUIPMENT_CATEGORIES` | 10 個分類：代碼、類別代號、中文名、這一類的項目清單。陣列順序就是清冊的排序順序 |
+| `ITEM_CODE_MAP` | 項目中文名 → 項目三碼，例「發電機」→ `GEN` |
+| `EQUIPMENT_STATUS_META` | 狀態代碼 → 中文，例 `maintenance` → 維修中 |
+
+### 2.2 示範資料：24 筆，對照技術約定第 4 節
+
+| 技術約定 | 參考解 | 結果 |
+|---|---|:---:|
+| 24 筆 | 24 筆 | ✅ |
+| 10 個分類，每個至少 1 筆 | 資通訊 5、供電 3、事務 3、個人防護 3、儲物 2、收容 2、緊急物資 2、醫療 2、清消 1、其他 1 | ✅ |
+| 三種狀態都要有 | 正常 19、維修中 3、已報廢 2 | ✅ |
+| 至少一個品名有 2 筆以上 | 筆記型電腦 2 筆、發電機 2 筆 | ✅ |
+| 編碼不重複 | 24 個編碼都不一樣 | ✅ |
+
+示範資料是虛構的：品名取自真實裝備清單，數量、保管人、電話、地點都是編的。
+
+### 2.3 品項編碼規則（Q1）
+
+格式：`類別代號 - 項目三碼 - 流水號三碼`，例 `PW-GEN-001`。
 
 ```
-輸入：categoryKey、name
-1. cat2  = EQUIPMENT_CATEGORIES 內該 value 的 code（查無→'OT'）
-2. item3 = ITEM_CODE_MAP[name]（查無或「其他」分類→'OTH'）
-3. prefix = `${cat2}-${item3}-`
-4. maxSeq = store 內 code 以 prefix 開頭者，取尾 3 碼數字最大值（無則 0）
-5. code   = prefix + zeroPad(maxSeq + 1, 3)
+輸入：分類代碼、項目
+1. 類別代號 = 分類表裡這一類的兩碼（例 POWER → PW）
+2. 項目三碼 = 「其他」類一律 OTH；其他分類查 ITEM_CODE_MAP[項目]，查不到也用 OTH
+3. 前綴     = 類別代號-項目三碼-（例 PW-GEN-）
+4. 最大號   = 下面兩個取比較大的（都沒有就是 0）：
+             a. 目前資料裡，編碼以這個前綴開頭的最大流水號
+             b. 這個前綴「發過的最大號」（issuedMax，刪掉的也算）
+5. 編碼     = 前綴 + (最大號 + 1)，補零到三位（例 PW-GEN-003）
 ```
 
-- 頁面即時預覽：`codePreview` 為 computed，讀 store 反應性；分類或項目為空回空字串。
-- 編輯時：分類＋項目未變則保留原 `code`；變更則於新前綴取下一流水（避免重複佔號）。
-- 課堂簡化：允許同分類＋項目建立多筆，每筆流水號遞增、編碼仍唯一，不做同碼累加數量。
+「發過的最大號」（`issuedMax`）是資料層裡的一張小表：每個前綴記一個數字。種子載入、新增、修改換號時都會更新。
 
-## 4. 關鍵設計決策
+怎麼保證不重複、刪掉的號碼不再發：每次都拿「目前最大號」和「發過的最大號」比較大的那個＋1。所以就算刪掉最大號，下一筆也不會拿回同一個號碼。
 
-| # | 決策 | 理由 |
-|---|------|------|
-| D1 | **mock 欄位＝未來 API interface**：`EquipmentItem` 12 欄一次定稿，接後端時欄位名不再改 | 針對介面而非實作寫程式；`useEquipmentItems` 內每個 CRUD 旁留 `// 後端接軌：… [SD 待定]` 接縫，改 `useFetch` 即可，頁面零改動 |
-| D2 | 分類／狀態排序用 accessor 取「定義順序／數值」，非中文 `localeCompare` | 分類要照 `EQUIPMENT_CATEGORIES` 語意順序、數量要照數值大小 |
-| D3 | 分類→項目連動；「其他」分類切文字輸入 | 標準項目走下拉可控；其他類無標準品名，需自由輸入。切換分類時以「現值是否屬新分類」判斷是否清空（時序無關，不會誤清載入值） |
-| D4 | 保管人電話用頁面層本地 `KEEPER_PHONE_PATTERN`，不改共用驗證引擎 | 引擎保持無狀態純函式；手機／市話規則屬本實體特有，於 `rulesFor` 帶入 |
-| D5 | 數量（≥0）與採購日期（不晚於今天）於引擎外另行檢查 | 兩者非「required／pattern／maxLength」可表達，且不得改共用 `templateValidation.ts` |
+### 2.4 選項欄位的預設值
 
-## 5. 待辦（正式環境）
+harness `CLAUDE.md` 第 11 條：選項欄位新增時一律空白＋「請選擇○○」，只有拍板過的欄位可以帶預設。
 
-- 後端 API contract 由 SD 定案後，把 `useEquipmentItems` 內部 mock 換 `useFetch`（端點 `/api/equipment/items`）。
-- 刪除改軟刪除（狀態報廢）之取捨（SCOPE D1 正式環境建議）。
-- 機關前綴、權限（`useAuth`）。
+| 欄位 | 新增時長什麼樣 | 依據 |
+|---|---|---|
+| 分類 | 空白，提示「請選擇分類」 | harness 第 11 條；Q5 |
+| 項目 | 空白，沒選分類前鎖住，提示「請先選分類再選項目」；「其他」類改文字框，提示「請輸入品名」 | harness 第 11 條；Q5 |
+| 狀態 | **預設「正常」** | **Q5 拍板**（新買的東西是好的） |
+| 數量（不是選項欄位） | 0 | PRD 第 3 節「新增時先填 0」 |
+| 清冊的分類、狀態篩選 | 「全部」 | harness 第 6 條：用「全部」哨兵（代表「不篩選」的特殊值），不用空字串 |
+
+---
+
+## 3. 關鍵決策的實作方式
+
+拍板的 6 題都會影響程式，一題一段。
+
+### Q1 品項編碼
+
+**怎麼做的：**
+
+1. 編碼由資料層的 `nextEquipmentCode(分類, 項目)` 算，規則見 2.3。
+2. 新增畫面的編碼欄是 `computed`（跟著分類、項目自動重算的值）：選好分類和項目，馬上看到編碼。
+3. 按儲存時，資料層 `create()` 再算一次，以存檔那一刻為準，並記進「發過的最大號」。
+4. 編輯時，`update()` 看分類和品名（去掉前後空白）有沒有變：都沒變就保留原編碼；有一個變了，就換新編碼。畫面預覽用的是同一條規則，所以預覽看到什麼，存進去就是什麼。
+5. 「其他」類一律用 `OTH`：在「其他」類打「發電機」，編碼也是 `OT-OTH-…`，不會借用標準項目的 `GEN`。
+
+**實測結果：**
+
+1. 刪掉 `PW-GEN-002`，再新增一台發電機，拿到 `PW-GEN-003`。刪掉的號碼不再發。
+2. 「其他」類把品名從「柴油儲油桶」改掉：預覽 `OT-OTH-002`，存檔後也是 `OT-OTH-002`。
+
+**為什麼不用別的做法：**
+
+1. 不用「全部共用一個流水號」（例 `00025`）：看不出是什麼東西，盤點時對不上標籤。
+2. 不以畫面算出的號碼為準：兩個人同時新增會撞號。以存檔那一刻資料層算的為準；接後端後，改由後端給號。
+3. 不只看「目前資料的最大號」：最大號被刪掉時，同一個號碼會再發一次，舊標籤就會對到新東西。所以另外記「發過的最大號」。
+4. 不用「看前綴有沒有變」決定換不換號：「其他」類的品名都是 `OTH`，改品名前綴不變，會漏掉換號。改成直接比分類和品名。
+
+**限制：** 資料放在瀏覽器裡，重新整理後回到示範資料，「發過的最大號」也一起重來。接後端後，要由後端記住。
+
+### Q2 刪除
+
+**怎麼做的：**
+
+1. 清冊每一列（桌機表格、手機卡片都有）右邊有垃圾桶按鈕。
+2. 按下去先跳共用的確認框 `AppConfirmModal`（紅色危險樣式），內容寫「確定要刪除「發電機」（PW-GEN-002）這筆品項嗎？此動作無法復原。」
+3. 按「刪除」才呼叫 `remove(id)`，從資料裡拿掉（硬刪除）。右下角提示「已刪除 ○○」。
+
+**為什麼不用別的做法：**
+
+1. 不用瀏覽器內建的 `confirm()` 小視窗：樣式跟系統不一致，也不能把按鈕寫成「刪除」。
+2. 不用軟刪除：這一輪拍板硬刪除。軟刪除要多一個「已刪除」欄位，會跟技術約定的 12 欄不一樣。
+
+### Q3 匯出 CSV
+
+**怎麼做的：**
+
+1. 清冊的「匯出 CSV」按鈕呼叫共用的 `exportCsv()`。
+2. 交出去的資料是 `sortedRows`：目前篩選＋排序後的**全部筆數**。不是 `pagedRows`（只有當頁）。
+3. 12 欄，標題用中文；分類、狀態匯出中文名，不匯出代碼。
+4. 共用檔在最前面加 UTF-8 BOM（檔案開頭的隱形記號，讓 Excel 認得這是中文編碼），並照 RFC 4180 處理逗號、引號、換行。
+5. 檔名「裝備物資清單-YYYYMMDD.csv」，日期用本地時區。匯出後提示「已匯出 N 筆」。
+
+**為什麼不用別的做法：** 不做 .xlsx：要多裝套件，違反 harness「不准擅自加任何新套件」；CSV 用 Excel 就打得開。
+
+### Q4 保管人電話
+
+**怎麼做的：**
+
+1. 一個欄位 `keeperPhone`，跟技術約定一樣。
+2. 檢查規則直接用共用的 `PHONE_PATTERN`（從 `templateValidation.ts` 匯入）。選填：有填才檢查。
+3. 規則：
+   - 手機：09 開頭共 10 碼，中間可加空白或減號。例：`0912345678`、`0912-345-678`、`0912 345 678`。
+   - 市話：區碼開頭，連區碼共 9～10 碼；區碼可加括號，中間可加空白或減號。例：`02-1234-5678`、`(02) 1234-5678`、`089-123456`。
+   - 不收：國碼（`+886…`）、全形數字、分機（`02-1234-5678#12`）。
+4. 打錯時，那一格下面出現「電話格式錯誤（手機 09 開頭 10 碼，或市話含區碼，例：02-1234-5678）」。
+
+**為什麼不用別的做法：** 不在畫面自己另寫一條電話規則：範本已經有一條收手機和市話的共用規則。用同一條，全系統的電話規則才不會兩邊不一樣。
+
+### Q5 選項預設值
+
+**怎麼做的：**
+
+1. `emptyForm()`（新增時的空白表單）只有狀態帶 `'normal'`，分類、項目都是空字串。
+2. 狀態下拉沒有清除鈕，選項只有三種，所以存不進空值。
+3. 分類、項目沒選就按儲存，那一格下面出現「請選擇分類」「請選擇或輸入項目」。
+
+**為什麼不用別的做法：** 不把分類也預設成第一類：使用者沒改就存，存進去的是錯的資料，當場也不會報錯（harness 第 11 條）。狀態有拍板理由，才例外。
+
+### Q6 採購日期
+
+**怎麼做的：** 兩道關卡。
+
+1. 日期欄設 `max=今天`：瀏覽器的日曆選不到明天以後。
+2. 按儲存時再比一次：晚於今天，那一格下面出現「採購日期不可晚於今天」。
+3. 「今天」用本地時區算（`equipmentTodayString()`）。不用 `toISOString()`：它是國際標準時間，台灣早上 8 點前會差一天。
+
+**為什麼要兩道：** 用鍵盤直接打日期，可以繞過第一道。
+
+### 其他實作重點（不是拍板題，但寫程式時踩過）
+
+1. **分類換了，項目要清掉**：只在「目前的項目不屬於新分類」時清。不用「分類一變就清」，因為打開舊資料時，載入分類也算「變了」，會把剛載入的項目誤清。
+2. **分類照 PRD 順序排，不照筆劃**：排序時分類取「在分類表的第幾個」，數量取數字大小。用預設的文字比較，分類會照筆劃排、數量會變成 10 排在 9 前面。
+3. **數量和採購日期的檢查放在畫面**：共用檢查規則只會「必填、格式、長度」。數量（要有值、不能小於 0、要是整數）和採購日期（不能晚於今天）在 `save()` 裡另外檢查，再跟共用規則的結果合在一起。共用檔不改。
+4. **篩選下拉用中文當值**：共用的列表工具只吃文字，所以分類、狀態篩選直接用中文名（例「資通訊設備」），網址上看到的也是中文。
+5. **換排序就回第 1 頁**（PRD 第 7 節第 4 條）：清冊監看排序規則，一變就把頁碼設回 1，並從網址拿掉 `page`。舊頁碼在新的順序下沒有意義。
+
+---
+
+## 4. 遵守 harness 的證據
+
+檢查範圍：第 1 段 5 個「複製改名」的新檔。
+
+| 規則 | 怎麼證明 | 結果 |
+|---|---|:---:|
+| 禁止硬編碼色碼 | 搜尋 `#[0-9a-fA-F]{3,8}`：0 命中。紅字顏色用 token 變數 `var(--ui-sys-color-error)` | ✅ |
+| 禁止硬編碼 px | 搜尋 `\d+px`：0 命中（`px-3` 這類 Tailwind 間距 class 不算，它走 token） | ✅ |
+| 禁止 `console.log` | 搜尋：0 命中 | ✅ |
+| 單檔行數 | 清冊 348 ≤ 420；明細 432 ≤ 550；資料層 248、欄位外框 41、狀態標籤 27，都 ≤ 500 | ✅ |
+| 下拉用「全部」哨兵 | 清冊 `const ALL = '全部'`，分類、狀態篩選預設 `ALL`，不用空字串 | ✅ |
+| 選項欄位不預設 | 新增表單：分類「請選擇分類」、項目「請先選分類再選項目」都空白；只有狀態預設「正常」（Q5 拍板） | ✅ |
+| 日期欄用原生 date input | 採購日期是 `UInput type="date"`；`package.json` 沒有日曆套件 | ✅ |
+| 共用三檔未修改 | 雜湊跟範本原檔相同（見 1.2） | ✅ |
+| 驗證失敗提示 | 右下角「請修正 N 個欄位」，並把游標移到第一個錯的欄位（`design-system-summary.md` 規定） | ✅ |
+| 技術約定的測試掛點（第 5 節） | 1. 表單每一欄外框有 `data-field="欄位英文名"`，品項編碼也是：`data-field="code"` 裡面是唯讀的輸入框。<br>2. 規格說明、備註用多行文字框（`UTextarea`）。<br>3. 桌機表格第 1 欄分類、第 2 欄項目，品項編碼放在項目那一格的第二行。<br>4. 清冊有 `equipment-keyword`、`equipment-total`、`equipment-row`、`equipment-code` 四個 `data-testid`。 | ✅ |
+
+---
+
+## 5. 圖
+
+圖另外放在同資料夾的 `DIAGRAMS-裝備物資.html`，用瀏覽器開。五張：
+
+1. 用例圖：管理人員能做哪些事
+2. 零件圖：5 個照範本改名、3 個直接共用
+3. 資料圖：一筆裝備記哪 12 項資料
+4. 流程圖：新增一筆裝備
+5. 狀態圖：正常、維修中、已報廢怎麼換
+
+---
+
+## step4 LOOP 之後的異動
+
+**目前是空的。**
+
+1. step4 的 LOOP 改了程式，這份文件和圖要跟著改。
+2. 改到的地方標「**step4 LOOP 後**」，例如：「（step4 LOOP 後）換排序後回到第 1 頁」。
+3. step4 跑完之前，這一段保持空白。
+
+*文件結束。*

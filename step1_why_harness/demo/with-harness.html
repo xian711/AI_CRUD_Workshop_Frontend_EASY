@@ -415,7 +415,7 @@
           </div>
           <div class="field">
             <label for="phone-input">電話 <span class="required-mark" aria-hidden="true">*</span></label>
-            <input type="tel" id="phone-input" name="phone" autocomplete="off" placeholder="0912345678" aria-required="true" aria-describedby="phone-error">
+            <input type="tel" id="phone-input" name="phone" autocomplete="off" placeholder="0912345678 或 02-1234-5678" aria-required="true" aria-describedby="phone-error">
             <p class="field-error" id="phone-error" role="alert"></p>
           </div>
           <div class="field">
@@ -472,7 +472,8 @@
     'use strict';
 
     /* ===== 具名常數（避免魔術數字 / 散落字串） ===== */
-    var PHONE_PATTERN = /^09\d{8}$/;
+    /* 手機 09 開頭 10 碼；市話要含區碼，連區碼共 9～10 碼，區碼可加括號（02-1234-5678、(02) 1234-5678、089-123456）；中間可加空白或減號 */
+    var PHONE_PATTERN = /^(09\d{2}[\s-]?\d{3}[\s-]?\d{3}|(?=(?:\D*\d){9,10}\D*$)(\(0[2-8]\d{0,2}\)|0[2-8]\d{0,2})[\s-]?\d{2,4}[\s-]?\d{3,4})$/;
     var BLOOD_TYPES = ['A', 'B', 'AB', 'O'];
     var STORAGE_KEY = 'disaster-volunteer-roster-v1';
     var SUBMIT_PROCESSING_DELAY_MS = 400;
@@ -480,7 +481,7 @@
     var FIELD_ERROR_MESSAGES = {
       nameRequired: '請輸入姓名',
       phoneRequired: '請輸入電話',
-      phoneInvalid: '電話格式錯誤，請輸入 09 開頭的 10 碼手機號碼',
+      phoneInvalid: '電話格式錯誤：手機請輸入 09 開頭 10 碼，市話請加區碼（例：02-1234-5678）',
       bloodTypeRequired: '請選擇血型'
     };
 

@@ -15,8 +15,9 @@
 | 樣式 | 依 design token 三層（COMP→SYS→REF）與同資料夾 `design-system-summary.md`（token 實檔見工作坊 `step2_speedrun_kit/2.2_design_system/`）；**禁止**硬編碼 hex/px<br>（講清楚免得誤會：禁的是**寫死在 CSS 裡的數值**，例如 `color: #C8232C`、`margin: 12px`；Tailwind 的間距類別如 `px-3`、`gap-md`、`p-lg` 是 **token 化的工具類別，可以用**——名字裡有 px 兩個字不代表它是硬編碼）、禁止引用 REF、禁止 `<style scoped>` 蓋 Nuxt UI（改 `app.config.ts` 的 `ui`）、禁止 `!important` |
 | Token 別名 | 用 Tailwind 別名等同語意引用：`bg-primary`、`text-on-surface`、`border-outline-variant`、`p-lg`、`gap-md`、`rounded-lg`。有 COMP token 者用 `[var(--ui-comp-*)]` |
 | 表單互動 | 依 design-system-summary 之 Form/Table Rules：Label 在上、必填 `*`、欄位級錯誤紅字、危險操作二次確認且確認鈕寫明動作、送出防重複、分頁 props 給預設值、`focus-visible` 不可拿掉 |
+| 選項欄位預設值 | 下拉、單選在**新增時一律空白**，`placeholder` 寫「請選擇○○」，**禁止預設帶第一個選項**；必填沒選就擋，錯誤訊息「請選擇○○」。表單型別讓選項欄位可以是 `''`。只有 SPEC 明文寫了預設值和理由的欄位才可帶預設（範本只有狀態「在職」）；SPEC 沒寫，釐清時用選擇題問 |
 | 主要動作 | 一律 `Teleport to="#breadcrumb-actions"`（返回/次要用 `-left`），內容區不重複渲染；動作列按鈕統一 `size="md"` |
-| 驗證 | 純函式 `validateFields(form, rules)`（`utils/templateValidation.ts`），rules 資料化；具名常數 `PHONE_PATTERN` `TW_ID_PATTERN` `EMAIL_PATTERN`；相依規則以 `rulesFor(form)` 於頁面層產生 |
+| 驗證 | 純函式 `validateFields(form, rules)`（`utils/templateValidation.ts`），rules 資料化；具名常數 `PHONE_PATTERN`（手機、市話都收）`TW_ID_PATTERN` `EMAIL_PATTERN`；相依規則以 `rulesFor(form)` 於頁面層產生 |
 | URL 同步 | 用 `useTemplateListPage` 工廠（篩選+分頁+URL 同步+返回還原）；僅寫入非預設值；debounce 具名常數 `SYNC_DEBOUNCE_MS`（300ms），dispose 時清理、寫回前確認仍在原路由 |
 | 下拉哨兵 | 篩選下拉 options 一律 `['全部', ...實值]` 純字串 + `'全部'` 哨兵，`value !== '全部'` 才過濾；勿用空字串 option |
 | CSV | `exportCsv(filename, columns, rows)`（`utils/templateCsv.ts`）：RFC 4180 跳脫 + UTF-8 BOM；匯出全量（篩選+排序後），非僅當頁 |

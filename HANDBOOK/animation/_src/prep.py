@@ -22,6 +22,12 @@ FIX = {
     # LOOP 對話裡 Bash 輸出印了本機暫存路徑（含 Windows 帳號），整行蓋掉
     'cc21v4-port': [('fill', 1105, 591, 1845, 618, (36, 37, 38))],
 }
+# 第五版：檔案總管左邊導覽窗格有使用者自己釘選的資料夾名稱，整塊蓋掉
+for _n in ['v5-ex1-reveal', 'v5-ex2-all', 'v5-ex3-deselect', 'v5-ex4-newfolder', 'v5-ex5-pasted', 'v5-ex6-three', 'v5-ex7-done']:
+    FIX[_n] = [('fill', 66, 282, 472, 392, (255, 255, 255))]
+# 第五版 LOOP 對話：Read 的路徑含 Windows 帳號，換成不含帳號的寫法
+FIX['v5-cc31-t0720'] = [('fill', 730, 568, 1880, 600, (25, 26, 27)),
+                        ('retext', 733, 570, 1233, 598, r'~\.claude\memory\no-chrome-for-diagram-check.md', (25, 26, 27), (79, 193, 255))]
 used = []
 for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
     name = os.path.splitext(os.path.basename(f))[0]

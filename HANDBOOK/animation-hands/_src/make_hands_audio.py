@@ -20,6 +20,8 @@ SPOKEN = [  # 念法：字幕不變，只改念出來的字
     # 第四版：模型版本、檔名、編碼的念法
     (r'Opus 5\.5', 'Opus 五點五'), (r'Sonnet 5\.5', 'Sonnet 五點五'), (r'PW-GEN-003', 'P W G E N 零零三'),
     (r'LOOP-LOG(\.md)?', 'LOOP LOG'), (r'LOOP-REPORT(\.html)?', 'LOOP REPORT'), (r'E2E', 'E 2 E'),
+    # 第五版 Step 4：埠號、檔名、打字示範
+    (r'3101', '三一零一'), (r'app\.vue', 'app 點 vue'), (r'IT-LAP', 'I T 減 L A P'), (r'-LAP', '減號 L A P'), (r'\bIT\b', 'I T'),
 ]
 
 
@@ -69,12 +71,17 @@ for i, (chap, title, who, visual, lines) in enumerate(SCENES, 1):
         jobs.append((f'{i}-{k}', who, sub, say, key))
 
 
+BYFILE = {r['file']: r for r in old.values() if r and r.get('file')}   # 段落順序改了，用內容雜湊找回舊錄音
+
+
 def work(job):
     sk, who, sub, say, key = job
     mp3 = os.path.join(OUT, key + '.mp3')
     prev = old.get(sk)
+    if not (prev and prev.get('file') == key + '.mp3'):
+        prev = BYFILE.get(key + '.mp3')
     if prev and prev.get('file') == key + '.mp3' and os.path.exists(mp3):
-        return sk, prev, 0
+        return sk, {**prev, 'sub': sub}, 0
     best, tokens = None, 0
     for attempt in range(3):
         try:

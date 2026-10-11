@@ -50,6 +50,7 @@
 - 欄位級錯誤：`TemplateFormField` 於欄位下方渲染紅字（`text-[var(--ui-sys-color-error)] text-label-small`），並以 `aria-describedby` 關聯。
 - 儲存有錯 → 聚焦第一個錯誤欄位（`data-field` 定位 + `.focus()`），並 toast「請修正 N 個欄位」；不得只用 toast 帶過。
 - 送出中顯示 loading 並防重複送出；危險操作二次確認，確認鈕文字寫明動作（「刪除人員」非「確認」）。
+- **選項欄位不預設**：下拉、單選新增時一律空白，`placeholder` 寫「請選擇○○」，**禁止預設帶第一個選項**；必填沒選就擋。只有 SPEC 明文寫了預設值和理由的欄位才可帶預設（範本只有狀態「在職」）。
 
 ## Table Rules
 
@@ -63,7 +64,7 @@
 
 - 驗證用純函式 `validateFields(form, rules)`（`utils/templateValidation.ts`），無 UI 依賴；回傳 `{ 欄位名: 第一條未通過訊息 }`。
 - 空值且非 required → 跳過 pattern（Email 選填但填了須合法）。
-- 具名常數 pattern：`PHONE_PATTERN = /^09\d{8}$/`、`TW_ID_PATTERN = /^[A-Z][12]\d{8}$/`、`EMAIL_PATTERN`。
+- 具名常數 pattern：`PHONE_PATTERN`（手機 09 開頭 10 碼，或市話含區碼，例 `02-1234-5678`）、`TW_ID_PATTERN = /^[A-Z][12]\d{8}$/`、`EMAIL_PATTERN`。
 - 相依規則（證號依 idType）在頁面層以 `rulesFor(form)` 產生，引擎保持無狀態。
 
 ## Token Check（產出後必跑）

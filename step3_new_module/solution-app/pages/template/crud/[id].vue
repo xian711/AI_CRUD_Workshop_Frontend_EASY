@@ -126,7 +126,7 @@
                 </TemplateFormField>
                 <TemplateFormField label="性別" name="gender" required :error="fieldErrors.gender">
                   <!-- USelectMenu 的 attrs 會 fallthrough 到觸發按鈕，aria-describedby 可正確關聯（NFR-T-02） -->
-                  <USelectMenu v-model="form.gender" :options="genderOptions" class="w-full"
+                  <USelectMenu v-model="form.gender" :options="genderOptions" placeholder="請選擇性別" class="w-full"
                     :aria-describedby="fieldErrors.gender ? 'gender-error' : undefined" />
                 </TemplateFormField>
                 <TemplateFormField label="生日" name="birthDate" required :error="fieldErrors.birthDate">
@@ -142,7 +142,7 @@
                   />
                 </TemplateFormField>
                 <TemplateFormField label="證件類別" name="idType" required :error="fieldErrors.idType">
-                  <USelectMenu v-model="form.idType" :options="idTypeOptions" class="w-full"
+                  <USelectMenu v-model="form.idType" :options="idTypeOptions" placeholder="請選擇證件類別" class="w-full"
                     :aria-describedby="fieldErrors.idType ? 'idType-error' : undefined" />
                 </TemplateFormField>
                 <TemplateFormField label="證號" name="nationalId" required :error="fieldErrors.nationalId">
@@ -163,7 +163,7 @@
                   <UInput
                     v-model="form.phone"
                     type="tel"
-                    placeholder="09xxxxxxxx"
+                    placeholder="例：0912345678 或 02-1234-5678"
                     class="w-full font-mono"
                     :aria-describedby="fieldErrors.phone ? 'phone-error' : undefined"
                   />
@@ -198,7 +198,7 @@
                     :aria-describedby="fieldErrors.groupName ? 'groupName-error' : undefined" />
                 </TemplateFormField>
                 <TemplateFormField label="職務" name="positionCode" required :error="fieldErrors.positionCode">
-                  <USelectMenu v-model="form.positionCode" :options="positionOptions" value-attribute="value" option-attribute="label" class="w-full"
+                  <USelectMenu v-model="form.positionCode" :options="positionOptions" value-attribute="value" option-attribute="label" placeholder="請選擇職務" class="w-full"
                     :aria-describedby="fieldErrors.positionCode ? 'positionCode-error' : undefined" />
                 </TemplateFormField>
               </div>
@@ -320,14 +320,22 @@ const fieldErrors = reactive<Record<string, string>>({})
 // 避免「儲存→再編輯→再儲存」造成路名重複疊加。
 const residenceRoad = ref('')
 
-function emptyForm(): TemplateMemberInput {
+// 表單型別：選項欄位新增時是空白（''），使用者自己選了才有值。
+// 規則：選項欄位不准預設帶第一個選項（CLAUDE.md 程式規則 11）；帶了預設，使用者沒改就存，存進去的就是錯的資料。
+type MemberForm = Omit<TemplateMemberInput, 'gender' | 'idType' | 'positionCode'> & {
+  gender: TemplateMemberInput['gender'] | ''
+  idType: TemplateMemberInput['idType'] | ''
+  positionCode: TemplateMemberInput['positionCode'] | ''
+}
+function emptyForm(): MemberForm {
   return {
-    name: '', gender: '男', birthDate: '', idType: '身分證', nationalId: '',
+    name: '', gender: '', birthDate: '', idType: '', nationalId: '',
     phone: '', email: '', residenceCounty: '', residenceTownship: '', residenceAddress: '',
-    groupName: '', positionCode: 'member', qualifications: [], status: '在職', note: '',
+    // 狀態是唯一有預設值的選項欄位：SPEC BR-T-07 明定「新增人員預設在職」（新加入的人一定在職）
+    groupName: '', positionCode: '', qualifications: [], status: '在職', note: '',
   }
 }
-function toInput(member: TemplateMember): TemplateMemberInput {
+function toInput(member: TemplateMember): MemberForm {
   return {
     name: member.name, gender: member.gender, birthDate: member.birthDate,
     idType: member.idType, nationalId: member.nationalId, phone: member.phone,
@@ -337,7 +345,7 @@ function toInput(member: TemplateMember): TemplateMemberInput {
     qualifications: [...member.qualifications], status: member.status, note: member.note,
   }
 }
-const form = reactive<TemplateMemberInput>(emptyForm())
+const form = reactive<MemberForm>(emptyForm())
 
 // ── 錯誤清除：只清「被變更的欄位」的錯誤，未修正的欄位錯誤保留（FR-T-303） ──
 function clearErrors() {
@@ -347,7 +355,7 @@ function clearErrors() {
 watch(
   () => ({ ...form }),
   (next, prev) => {
-    for (const key of Object.keys(next) as (keyof TemplateMemberInput)[]) {
+    for (const key of Object.keys(next) as (keyof MemberForm)[]) {
       if (next[key] !== prev[key]) delete fieldErrors[key]
     }
   },
@@ -397,7 +405,7 @@ function toggleQualification(qual: string) {
 /** 居留證／護照證號長度上限（BR-T-02：非身分證僅檢查非空與長度） */
 const ID_NUMBER_MAX_LENGTH = 20
 
-function rulesFor(current: TemplateMemberInput): FieldRules<TemplateMemberInput> {
+function rulesFor(current: MemberForm): FieldRules<MemberForm> {
   const idRules: FieldRule[] = current.idType === '身分證'
     ? [{ required: true, message: '請輸入證號' }, { pattern: TW_ID_PATTERN, message: '身分證格式錯誤（例：A123456789）' }]
     : [{ required: true, message: '請輸入證號' }, { maxLength: ID_NUMBER_MAX_LENGTH, message: `證號長度不可超過 ${ID_NUMBER_MAX_LENGTH} 字` }]
@@ -407,7 +415,7 @@ function rulesFor(current: TemplateMemberInput): FieldRules<TemplateMemberInput>
     birthDate: [{ required: true, message: '請選擇生日' }],
     idType: [{ required: true, message: '請選擇證件類別' }],
     nationalId: idRules,
-    phone: [{ required: true, message: '請輸入電話' }, { pattern: PHONE_PATTERN, message: '行動電話格式錯誤（09 開頭共 10 碼）' }],
+    phone: [{ required: true, message: '請輸入電話' }, { pattern: PHONE_PATTERN, message: '電話格式錯誤（手機 09 開頭 10 碼，或市話含區碼，例：02-1234-5678）' }],
     email: [{ pattern: EMAIL_PATTERN, message: 'Email 格式錯誤' }],
     residenceCounty: [{ required: true, message: '請選擇居住縣市' }],
     residenceTownship: [{ required: true, message: '請選擇居住鄉鎮區' }],
@@ -449,12 +457,13 @@ async function save() {
   const road = residenceRoad.value.trim()
   const detail = form.residenceAddress.trim()
   const mergedAddress = road && !detail.startsWith(road) ? `${road}${detail}` : detail
-  // 儲存前正規化：字串欄位一律 trim，與驗證（已 trim 比對）及入庫格式保持一致
+  // 儲存前正規化：字串欄位一律 trim，與驗證（已 trim 比對）及入庫格式保持一致。
+  // 選項欄位的 as：上面的必填驗證已擋下空白，這裡只是告訴型別系統「已經選了」。
   const payload: TemplateMemberInput = {
     name: form.name.trim(),
-    gender: form.gender,
+    gender: form.gender as TemplateMemberInput['gender'],
     birthDate: form.birthDate,
-    idType: form.idType,
+    idType: form.idType as TemplateMemberInput['idType'],
     nationalId: form.nationalId.trim(),
     phone: form.phone.trim(),
     email: form.email.trim(),
@@ -462,7 +471,7 @@ async function save() {
     residenceTownship: form.residenceTownship,
     residenceAddress: mergedAddress,
     groupName: form.groupName,
-    positionCode: form.positionCode,
+    positionCode: form.positionCode as TemplateMemberInput['positionCode'],
     qualifications: [...form.qualifications],
     status: form.status,
     note: form.note.trim(),

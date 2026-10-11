@@ -142,10 +142,11 @@ FR-T 需求以 Given / When / Then 表述；優先級用 MoSCoW。
 |---|---|---|
 | BR-T-01 | 必填見 Fields 表；Email 選填，填了必須合法 | 驗證 |
 | BR-T-02 | 證號依 idType：身分證 `^[A-Z][12]\d{8}$`；居留證/護照僅檢查非空與長度上限 | nationalId 驗證 |
-| BR-T-03 | 行動電話 `^09\d{8}$` | phone 驗證 |
+| BR-T-03 | 電話手機、市話都收（`PHONE_PATTERN`）：手機 09 開頭 10 碼，中間可加空白或減號；市話含區碼（例 `02-1234-5678`、`(089)123456`），區碼可加括號，中間可加空白或減號，連區碼共 9～10 碼。不收國碼 +886 和分機。手機、市話**不拆兩欄**（業務拍板：一人留一支聯絡電話就好） | phone 驗證 |
 | BR-T-04 | 刪除須二次確認，確認文案含該筆識別資訊（姓名） | 刪除流程 |
 | BR-T-05 | positionTitle 由 positionCode 導出，不可獨立編輯 | 表單/顯示 |
 | BR-T-06 | updatedAt 由系統於新增/編輯時寫入（本地時區），表單不可編輯 | 稽核欄位 |
+| BR-T-07 | 選項欄位（性別、證件類別、編組、職務）新增時**一律空白**，顯示「請選擇○○」，沒選就擋；**不准預設帶第一個選項**（帶了預設，使用者沒改就存，存進去的就是錯的資料，當場也不會報錯）。唯一例外：狀態預設「在職」——停用的人不會從「新增」進來，只會在編輯時改成停用，所以新增時帶在職不會存錯 | 新增表單 |
 
 ## 範圍外（本版不做）
 
@@ -184,7 +185,7 @@ Response envelope、驗證錯誤碼、權限中介層 → `[SD 待定]`（後端
 
 - normal：全部 6 編組、4 職務（主任/副主任各 1 隸屬協作中心）。
 - boundary：至少 3 筆「停用」、至少 8 筆含 1~3 個資格；updatedAt 分佈 2026-05~2026-07 供排序示範；分頁預設 10 筆恰 3 頁。
-- validation error（表單層）：電話非 09 開頭、身分證格式錯、Email 格式錯、必填留空。
+- validation error（表單層）：電話格式錯（不是手機也不是含區碼的市話）、身分證格式錯、Email 格式錯、必填留空、選項欄位沒選。
 - empty：篩選出空集合 → 空狀態。
 - permission denied：`[SA 確認]`（本版無權限控制，見下方 Permissions）。
 
@@ -225,19 +226,19 @@ Fields（17 欄，對照上方「示範實體」＋同資料夾設計文件（DE
 |---|---|---:|---|---|---|
 | id | string | 系統 | —（不可編輯） | — | 主鍵 `M-001`，create 由系統產生 |
 | name | string | yes | UInput | required | 一般文字 |
-| gender | enum 男/女 | yes | USelectMenu | required | 生產頁無 URadioGroup 先例，故用 select |
+| gender | enum 男/女 | yes | USelectMenu | required | 生產頁無 URadioGroup 先例，故用 select；新增時空白（BR-T-07） |
 | birthDate | date | yes | AppDatePicker | required | v-model `YYYY-MM-DD` 字串 |
-| idType | enum 身分證/居留證/護照 | yes | USelectMenu | required | 影響 nationalId 規則（相依 enum）|
+| idType | enum 身分證/居留證/護照 | yes | USelectMenu | required | 影響 nationalId 規則（相依 enum）；新增時空白（BR-T-07）|
 | nationalId | string | yes | UInput | required + 依 idType：TW_ID_PATTERN / 非空+長度上限 | BR-T-02 |
 | phone | string | yes | UInput | required + PHONE_PATTERN | BR-T-03 |
 | email | string | no | UInput | 選填，填了須 EMAIL_PATTERN | BR-T-01 |
 | residenceCounty / residenceTownship | string | yes | AppAddressPicker（county/township，相依）| required | 縣市→鄉鎮相依下拉 |
 | residenceAddress | string | yes | AppAddressPicker（detail）| required | 詳細地址 |
-| groupName | string | yes | USelectMenu | required | TEMPLATE_GROUP_OPTIONS（6 編組）|
-| positionCode | enum director/deputy/leader/member | yes | USelectMenu | required | 含排序權重 |
+| groupName | string | yes | USelectMenu | required | TEMPLATE_GROUP_OPTIONS（6 編組）；新增時空白（BR-T-07）|
+| positionCode | enum director/deputy/leader/member | yes | USelectMenu | required | 含排序權重；新增時空白（BR-T-07） |
 | positionTitle | string | 系統 | —（唯讀導出）| — | BR-T-05 由 code 導出 |
 | qualifications | string[] | no | UCheckbox 橫向群組 | — | 4 選項多值 |
-| status | enum 在職/停用 | yes | USelectMenu | required | TemplateStatusBadge 顯示 |
+| status | enum 在職/停用 | yes | USelectMenu | required | TemplateStatusBadge 顯示；新增時預設「在職」（BR-T-07 唯一例外） |
 | note | string | no | UTextarea | — | 長文字 |
 | updatedAt | date | 系統 | —（唯讀）| — | BR-T-06 系統本地時區寫入 |
 

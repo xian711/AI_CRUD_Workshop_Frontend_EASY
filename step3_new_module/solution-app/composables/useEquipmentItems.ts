@@ -135,6 +135,12 @@ const SEED: SeedItem[] = [
 // ── 單例 state ────────────────────────────────────────────────
 const store = ref<EquipmentItem[]>([])
 let seeded = false
+/** 每個編碼前綴「發過的最大流水號」：刪掉的號碼不再發（課堂拍板 Q1：刪掉的號碼不重用） */
+const issuedMax = new Map<string, number>()
+function rememberIssued(code: string): void {
+  const match = code.match(/^(.*-)(\d+)$/)
+  if (match) issuedMax.set(match[1], Math.max(issuedMax.get(match[1]) ?? 0, Number(match[2])))
+}
 
 function ensureSeeded(): void {
   if (seeded) return
@@ -142,6 +148,7 @@ function ensureSeeded(): void {
     id: `E-${String(index + 1).padStart(3, '0')}`,
     ...seed,
   }))
+  for (const item of store.value) rememberIssued(item.code)
   seeded = true
 }
 
@@ -173,7 +180,8 @@ function nextId(): string {
 /** 類別碼-項目碼前綴，如 IT-LAP-（BR-EQ-04；「其他」分類與查無項目皆用 OTH） */
 function codePrefixOf(categoryKey: string, name: string): string {
   const cat2 = EQUIPMENT_CATEGORIES.find(c => c.value === categoryKey)?.code ?? 'OT'
-  const item3 = ITEM_CODE_MAP[name] ?? 'OTH'
+  // 「其他」分類一律 OTH：自己打的品名就算剛好跟標準項目同名，也不借用別類的項目碼
+  const item3 = categoryKey === 'OTHER' ? 'OTH' : (ITEM_CODE_MAP[name] ?? 'OTH')
   return `${cat2}-${item3}-`
 }
 
@@ -189,7 +197,7 @@ export function nextEquipmentCode(categoryKey: string, name: string): string {
     if (!item.code.startsWith(prefix)) return max
     const seq = Number(item.code.slice(prefix.length))
     return Number.isFinite(seq) ? Math.max(max, seq) : max
-  }, 0)
+  }, issuedMax.get(prefix) ?? 0)
   return `${prefix}${String(maxSeq + 1).padStart(3, '0')}`
 }
 
@@ -209,22 +217,24 @@ export function useEquipmentItems() {
   // 後端接軌：POST /api/equipment/items（id / code 一律以後端回傳為準）— [SD 待定]
   async function create(input: EquipmentItemInput): Promise<EquipmentItem> {
     const created: EquipmentItem = { ...input, id: nextId(), code: nextEquipmentCode(input.categoryKey, input.name) }
+    rememberIssued(created.code)
     store.value = [created, ...store.value]
     return cloneItem(created)
   }
 
   // 後端接軌：PUT /api/equipment/items/{id} — [SD 待定]
-  // 編輯時保留原 code；分類/項目改動則重算（在「類別+項目」新前綴內取下一流水）。
+  // 編輯時保留原 code；分類或項目有改就換新編碼（課堂拍板 Q1；跟明細頁的即時預覽同一條規則）。
   async function update(id: string, input: EquipmentItemInput): Promise<EquipmentItem> {
     const index = store.value.findIndex(item => item.id === id)
     if (index < 0) throw new Error(`找不到品項 ${id}`)
     const original = store.value[index]
-    const keepCode = original.code.startsWith(codePrefixOf(input.categoryKey, input.name.trim()))
+    const keepCode = original.categoryKey === input.categoryKey && original.name.trim() === input.name.trim()
     const updated: EquipmentItem = {
       ...input,
       id,
       code: keepCode ? original.code : nextEquipmentCode(input.categoryKey, input.name),
     }
+    rememberIssued(updated.code)
     store.value = store.value.map((item, i) => (i === index ? updated : item))
     return cloneItem(updated)
   }

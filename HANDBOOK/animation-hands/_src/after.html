@@ -1,6 +1,6 @@
 <section class="after">
   <h2>文字版速查</h2>
-  <p>動畫裡的畫面，都是 2026-10-04～07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>動畫裡的畫面，都是 2026-10-04～11 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
   <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。聲音全部是預錄好的 mp3 檔，播放時不用連 AI、不花 token，也不用瀏覽器內建的語音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
   <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。文件有三份：<b>SRS</b>（這一版答應了什麼）、<b>設計文件 DESIGN</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
   <div class="roles">
@@ -30,13 +30,16 @@
     <div class="role" style="--c:#ef8fc6">
       <h3>Step 3 用 SDD 叫 AI 做新模組</h3>
       <ul>
-        <li>教材根目錄整段貼上手冊 step3 ⓪ 的複製指令，出現 <code>&gt;&gt;</code> 後再按 Enter</li>
-        <li>「檔案」→「開啟資料夾」→ my-equipment-app</li>
-        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b> → 貼起手 prompt（4 行）→ 送出</li>
-        <li>選擇題照課堂拍板：D1 補刪除＋確認視窗、D2 做 CSV 匯出、D3 簡化版編碼；PRD 沒寫清楚的題目，選它標「建議」的就好</li>
-        <li>AI 先交 SRS、DESIGN、DIAGRAMS、TASKS 四個檔，再列任務清單。圖用瀏覽器開 <code>DIAGRAMS-中心裝備物資.html</code></li>
-        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b>（有規矩和範本，寫程式不用最貴的模型）</li>
-        <li>驗收：打開 AI 印出的網址（例如 <code>http://localhost:3101/equipment/crud</code>）。有小落差就一次講一件，講「看到什麼、期望什麼」</li>
+        <li>複製範本（檔案總管）：VS Code 左邊對 sample-app 按右鍵 →「在檔案總管中顯示」→ 按兩下進去 → Ctrl+A 全選 → 按住 Ctrl 點掉 node_modules、.nuxt（有 .output 也點掉）→ Ctrl+C</li>
+        <li>按左上角的向上箭頭「↑」三次 → 進 step3_new_module → Ctrl+Shift+N 新增資料夾 my-equipment-app → 點進去 Ctrl+V</li>
+        <li>回到 step3_new_module，按住 Ctrl 選三份文件：PRD、技術約定、最小樣板 → 複製 → 貼進 my-equipment-app（會用終端機的，手冊 ⓪ 有一段指令，效果一樣）</li>
+        <li>「檔案」→「開啟資料夾」→ my-equipment-app → 終端機 <code>pnpm install</code></li>
+        <li>PRD 是白話寫的：沒有英文欄位名、沒有選擇題。技術約定是給 AI 的，你不用讀</li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b>、核准模式 Auto → 貼手冊 ② 的起手 prompt（4 行）→ 送出</li>
+        <li>AI 自己找 PRD 的缺口出選擇題。照手冊 ③ 的課堂拍板表選（編碼 PW-GEN-001 要選 Other 自己打）；表上沒有的選「建議」</li>
+        <li>AI 交 SRS、DESIGN、DIAGRAMS、TASKS 四個檔。圖用瀏覽器開（在 my-equipment-app 的終端機）：<code>start DIAGRAMS-中心裝備物資.html</code>，每張圖看「怎麼看」和「看完你要答得出來」</li>
+        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b></li>
+        <li>驗收：<code>pnpm dev --port 3101</code>，開 <code>http://localhost:3101/equipment/crud</code>。有小落差就附畫面：Win+Shift+S 框起來 → 輸入框 Ctrl+V → 一句話講「看到什麼、期望什麼」，一次講一件</li>
       </ul>
       <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
     </div>
@@ -46,8 +49,10 @@
         <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
         <li>開新的 Claude Code 對話（模型 Sonnet 5.5），貼手冊的 LOOP prompt（4 行；鐵律和產出都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>）</li>
         <li>AI 自己啟動受測 App，3100 被占就自己換埠；跑 run-e2e 修到 7 條全綠；再開一個 Opus 5.5 的子代理，用 Playwright 開瀏覽器截圖做對抗審查</li>
-        <li>看三份東西：<code>my-equipment-app/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面、有截圖）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告）、SRS／DESIGN／DIAGRAMS 有沒有標「step4 LOOP 後」。<code>loop/LOOP-LOG.md</code> 是給機器看的流水帳，不用讀</li>
-        <li>要你裁決的，AI 用選擇題問；測試本身的問題它只列出來，不會自己改</li>
+        <li>修好的每一條，報告都放「修改前」「修改後」兩張圖</li>
+        <li>要動到共用檔的，AI 停下來用選擇題問你。選擇題框裡放不了圖：先看報告「要你裁決的事」每一題附的畫面，再回答。建議的不一定要選，寫著「會動到共用元件」的，想清楚影響範圍</li>
+        <li>測試本身的問題它只列出來，不會自己改；寫著「講測試」的題目找講師</li>
+        <li>看三份東西：<code>my-equipment-app/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告）、SRS／DESIGN／DIAGRAMS 有沒有標「step4 LOOP 後」。<code>loop/LOOP-LOG.md</code> 是流水帳，你的裁決也記在裡面，有紅燈時再翻</li>
       </ul>
       <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準；審的模型要比寫的高一級</p>
     </div>
@@ -59,7 +64,7 @@
     <ul>
       <li>前置檢查：<code>bash preflight.sh</code>（Windows 是 <code>.\preflight.ps1</code>）</li>
       <li>開網頁：<code>open HANDBOOK/HANDBOOK.html</code>（Windows 是 <code>start</code>）</li>
-      <li>複製範本：<code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是 robocopy）</li>
+      <li>複製範本：用 Finder 照樣複製（不要帶 node_modules、.nuxt、.output），或手冊的 <code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output …</code>（Windows 是檔案總管或 robocopy）</li>
       <li>E2E：<code>bash step4_loop_e2e/run-e2e.sh</code>（Windows 是 run-e2e.ps1）；換埠用 <code>PORT=3101</code>（Windows 是 <code>$env:PORT='3101'</code>）</li>
     </ul>
   </div>
@@ -68,6 +73,7 @@
   <div class="where">
     <ul>
       <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
+      <li><b>截圖貼不進 Claude Code</b>：macOS 用 Shift+Cmd+Ctrl+4 框起來（直接存到剪貼簿），再到輸入框 Cmd+V。</li>
       <li><b>preflight 出現 [FAIL]</b>：照修復提示做 → 關掉終端機重開再跑 → 還是紅，整段輸出（連 [PASS] 的行）貼給 AI。</li>
       <li><b>網頁一打開就是 500、寫著 useColorMode is not defined</b>：舊的建置快取被複製過來了。在跑 pnpm dev 的終端機按 Ctrl+C 停掉，刪掉該專案的 .nuxt、.output 兩個資料夾再 <code>pnpm dev</code>。</li>
       <li><b>pnpm 噴一大串紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
@@ -80,6 +86,6 @@
   <h2 style="margin-top:28px">檔案位置</h2>
   <div class="where">
     <p>這支動畫在教材的「HANDBOOK\animation」資料夾裡，檔名是 index.html（用瀏覽器打開）。</p>
-    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：講稿 script_v4.py（字幕和配音都從這裡來）、場景檔 scenes-v4.js、配音腳本 make_v4_audio.py、截圖腳本、座標檔 meta.json。</p>
+    <p>改字幕或重拍用的原始檔，在「HANDBOOK\animation\_src」資料夾裡：講稿 script_v5.py（字幕和配音都從這裡來）、場景檔 scenes-v5.js、配音腳本 make_v5_audio.py、截圖腳本、座標檔 meta.json。</p>
   </div>
 </section>

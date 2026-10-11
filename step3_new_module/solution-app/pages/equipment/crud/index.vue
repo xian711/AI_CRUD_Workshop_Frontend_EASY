@@ -250,7 +250,10 @@ watch(sortRules, () => {
   const desired = currentSortParam()
   const current = typeof route.query.sort === 'string' ? route.query.sort : ''
   if (desired === current) return
+  // 換排序就回第 1 頁（PRD 7 節第 4 條）：舊頁碼在新的順序下沒有意義
+  page.value = 1
   const next = { ...route.query }
+  delete next.page
   if (desired) next.sort = desired
   else delete next.sort
   router.replace({ query: next })

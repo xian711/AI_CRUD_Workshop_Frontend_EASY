@@ -5,12 +5,14 @@ import os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = sys.argv[1] if len(sys.argv) > 1 else r'D:\AIWORK\_AICLASS\AI_CRUD_Workshop_Frontend_EASY'
 DST = os.path.join(REPO, 'HANDBOOK', 'animation')
-OUT = os.path.join(HERE, 'out4')   # 第四版
+OUT = os.path.join(HERE, 'out5')   # 第五版（2026-10-11）
 
 # 只放場景真的用到的截圖
-src = open(os.path.join(HERE, 'scenes-v4.js'), encoding='utf-8').read()
+src = open(os.path.join(HERE, 'scenes-v5.js'), encoding='utf-8').read()
 imgs = [f[:-4] for f in os.listdir(os.path.join(OUT, 'images')) if f.endswith('.jpg')]
 used = sorted(n for n in imgs if re.search(r"['\"]" + re.escape(n) + r"['\"]", src))
+# 圖的名字是用變數拼的（'v5-diag-' + k + '-svg'），上面的比對抓不到，另外補
+used = sorted(set(used) | {n for n in imgs if re.match(r'v5-diagn?-\d-(svg|head)$', n)})
 
 if os.path.exists(DST):
     shutil.rmtree(DST)
@@ -23,7 +25,7 @@ for n in used:
 shutil.copytree(os.path.join(OUT, 'audio'), os.path.join(DST, 'audio'))
 
 # 原始檔：場景、繪圖工具、播放器、組裝與截圖腳本（不含實拍原圖 raw/，也不含本機專用的腳本）
-SRC_FILES = ['scenes-v4.js', 'mk-v4.sh', 'build_v4_data.py', 'mk-c8.py', 'cap-eq.mjs', 'cap-page.mjs', 'build-wait.sh', 'v4-plan.md',
+SRC_FILES = ['scenes-v5.js', 'scenes-v5-lec-body.js', 'mk-lec5.py', 'mk-v5.sh', 'build_v5_data.py', 'v5-data.js', 'scenes-v4.js', 'mk-v4.sh', 'build_v4_data.py', 'mk-c8.py', 'cap-eq.mjs', 'cap-page.mjs', 'build-wait.sh', 'v4-plan.md',
              'scenes-v3.js', 'v3-helpers.js', 'v3-data.js', 'engine-v3.html', 'mk-v3.sh', 'build_v3_data.py', 't-v3.mjs', 't-v3-play.mjs', 't-v3-rwd.mjs', 'mk-c7.py',
              'scenes.js', 'scenes-b.js', 'scenes-c.js', 'scenes-d.js', 'scenes-e.js', 'scenes-f.js', 'scenes-g.js', 'scenes-all.js',
              'helpers.js', 'helpers-crud.js', 'engine-crud.html', 'after.html',
@@ -39,7 +41,7 @@ shutil.copy(os.path.join(OUT, 'meta.json'), os.path.join(DST, '_src', 'meta.json
 shutil.copy(os.path.join(HERE, 'raw', 'meta-extra.json'), os.path.join(DST, '_src', 'meta-extra.json'))
 shutil.copy(os.path.join(HERE, 'SRC-README.md'), os.path.join(DST, '_src', 'README.md'))
 TTS = os.path.join(os.path.dirname(HERE), 'tts-audition')
-for f in ['script_v4.py', 'make_v4_audio.py', 'script_v3.py', 'make_v3_audio.py', 'tts.py', '講稿風格卡.md']:
+for f in ['script_v5.py', 'make_v5_audio.py', 'script_v4.py', 'make_v4_audio.py', 'script_v3.py', 'make_v3_audio.py', 'tts.py', '講稿風格卡.md']:
     if os.path.exists(os.path.join(TTS, f)):
         shutil.copy(os.path.join(TTS, f), os.path.join(DST, '_src', f))
 shutil.copy(os.path.join(HERE, 'audio-v3', 'manifest.json'), os.path.join(DST, '_src', 'audio-manifest.json'))

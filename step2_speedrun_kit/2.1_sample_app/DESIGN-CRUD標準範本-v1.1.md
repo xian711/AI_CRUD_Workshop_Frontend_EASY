@@ -163,7 +163,7 @@ export function validateFields<T extends Record<string, unknown>>(
 ```
 
 - 空值且非 required → 跳過 pattern 檢查（BR-T-01 Email 行為）。
-- 常數 regex 集中 export：`PHONE_PATTERN = /^09\d{8}$/`、`TW_ID_PATTERN = /^[A-Z][12]\d{8}$/`、`EMAIL_PATTERN`。
+- 常數 regex 集中 export：`PHONE_PATTERN`（手機 09 開頭 10 碼，或市話含區碼，BR-T-03）、`TW_ID_PATTERN = /^[A-Z][12]\d{8}$/`、`EMAIL_PATTERN`。
 - 相依規則（BR-T-02 證號依 idType）在頁面層以函式產生 rules（`rulesFor(form)`），引擎本身保持無狀態。
 
 ---
@@ -253,6 +253,7 @@ const mode = computed<PageMode>(() =>
 - 表單模式：同分組，改用 `TemplateFormField`（label + required 星號 + 錯誤紅字）包輸入元件：
   - 文字欄 `UInput`；長文字 `UTextarea`。
   - **enum 欄一律 `USelectMenu`**（審查修訂：含性別——專案生產頁無 URadioGroup 先例，遵循「最成熟做法」原則）。
+  - **選項欄位新增時一律空白＋「請選擇○○」，不准預設帶第一個選項**（BR-T-07）；表單型別讓選項欄位可以是 `''`，儲存前由必填驗證擋下。唯一有預設的是狀態「在職」。
   - 日期 `AppDatePicker`（v-model 為 YYYY-MM-DD 字串，審查已驗證相容）。
   - **地址（審查修訂）**：直接複用 `components/AppAddressPicker.vue`（`v-model:county` / `v-model:township` / `v-model:road` / `v-model:detail` 四個必填綁定，stacked 版面；先例：`equipment-center/[id].vue`）。`road` 為該元件必填 prop，本實體僅有單一 residenceAddress → 以獨立暫存 ref 承接、儲存時條件合併（詳見實作註解），不自行拼裝縣市/鄉鎮下拉。
   - 資格多選：`UCheckbox` 橫向 wrap 群組（選項僅 4 個，checkbox 比 multi-select 直觀；`UCheckbox` 先例：ext-orgs）。
