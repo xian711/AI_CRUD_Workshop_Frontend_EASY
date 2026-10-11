@@ -32,11 +32,11 @@
       <ul>
         <li>複製範本（檔案總管）：VS Code 左邊對 sample-app 按右鍵 →「在檔案總管中顯示」→ 按兩下進去 → Ctrl+A 全選 → 按住 Ctrl 點掉 node_modules、.nuxt（有 .output 也點掉）→ Ctrl+C</li>
         <li>按左上角的向上箭頭「↑」三次 → 進 step3_new_module → Ctrl+Shift+N 新增資料夾 my-equipment-app → 點進去 Ctrl+V</li>
-        <li>回到 step3_new_module，按住 Ctrl 選三份文件：PRD、技術約定、最小樣板 → 複製 → 貼進 my-equipment-app（會用終端機的，手冊 ⓪ 有一段指令，效果一樣）</li>
+        <li>回到 step3_new_module，按住 Ctrl 選三份文件：PRD、技術約定、最小樣板 → 複製 → 貼進 my-equipment-app（會用終端機的，手冊「用檔案總管複製範本」下面有一段指令，效果一樣）</li>
         <li>「檔案」→「開啟資料夾」→ my-equipment-app → 終端機 <code>pnpm install</code></li>
         <li>PRD 是白話寫的：沒有英文欄位名、沒有選擇題。技術約定是給 AI 的，你不用讀</li>
-        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b>、核准模式 Auto → 貼手冊 ② 的起手 prompt（4 行）→ 送出</li>
-        <li>AI 自己找 PRD 的缺口出選擇題。照手冊 ③ 的課堂拍板表選（編碼 PW-GEN-001 要選 Other 自己打）；表上沒有的選「建議」</li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b>、核准模式 Auto → 貼手冊「貼起手 prompt」那段（4 行）→ 送出</li>
+        <li>AI 自己找 PRD 的缺口出選擇題。照手冊「AI 找缺口出題，你拍板」的課堂拍板表選（編碼 PW-GEN-001 要選 Other 自己打）；表上沒有的選「建議」</li>
         <li>AI 交 SRS、DESIGN、DIAGRAMS、TASKS 四個檔。圖用瀏覽器開（在 my-equipment-app 的終端機）：<code>start DIAGRAMS-中心裝備物資.html</code>，每張圖看「怎麼看」和「看完你要答得出來」</li>
         <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b></li>
         <li>驗收：<code>pnpm dev --port 3101</code>，開 <code>http://localhost:3101/equipment/crud</code>。有小落差就附畫面：Win+Shift+S 框起來 → 輸入框 Ctrl+V → 一句話講「看到什麼、期望什麼」，一次講一件</li>

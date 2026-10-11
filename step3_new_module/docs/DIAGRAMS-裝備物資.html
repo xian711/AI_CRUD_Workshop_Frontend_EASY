@@ -111,9 +111,9 @@
   <a href="#state">⑤ 狀態怎麼換</a>
 </nav>
 
-<!-- ① 用例圖 -->
+<!-- ① 使用案例圖 -->
 <section id="uc">
-  <h2>① 用例圖：誰能做哪些事</h2>
+  <h2>① 使用案例圖：誰能做哪些事</h2>
   <p class="desc">管理人員在這個網頁上能做 9 件事；其中「刪除」是 PRD 沒寫、課堂拍板加的。</p>
   <div class="how">
     <b>怎麼看</b>
@@ -305,14 +305,14 @@ sequenceDiagram
 
 <!-- ⑤ 狀態圖 -->
 <section id="state">
-  <h2>⑤ 狀態圖：正常、維修中、已報廢怎麼換</h2>
-  <p class="desc">新增時狀態預設「正常」（Q5）；東西壞了送修、修好了改回來、不能用了就報廢。</p>
+  <h2>⑤ 狀態圖：正常、維修中、已報廢怎麼變</h2>
+  <p class="desc">新增時狀態預設「正常」（Q5）；東西壞了送修、修好了改回來、不能用了就報廢。<b>已報廢就回不去</b>（Q7）。</p>
   <div class="how">
     <b>怎麼看</b>
     <ul>
       <li>黑色圓點是起點：新增一筆時從這裡開始。框的顏色就是清冊上狀態標籤的顏色。</li>
       <li>箭頭上的字是「平常什麼時候改」。</li>
-      <li>系統沒有鎖住順序：在編輯畫面，三種狀態隨時都能互換，例如選錯了改回來。</li>
+      <li>已報廢沒有往外的箭頭：報廢了就回不去，編輯時狀態鎖住。登記錯了，刪掉重新新增（Q7）。</li>
     </ul>
   </div>
   <pre class="mermaid">
@@ -327,6 +327,7 @@ stateDiagram-v2
   Repair --> Normal : 修好了
   Normal --> Scrap : 不能用了
   Repair --> Scrap : 修不好
+  note right of Scrap : 回不去（Q7）
   classDef ok fill:#e6f4ea,stroke:#2e7d32,stroke-width:3px
   classDef warn fill:#fff8e1,stroke:#f9a825,stroke-width:3px
   classDef bad fill:#fdecea,stroke:#c62828,stroke-width:3px
@@ -334,7 +335,7 @@ stateDiagram-v2
   class Repair warn
   class Scrap bad
   </pre>
-  <p class="check">看完你要答得出來：新增一筆時，狀態一開始是什麼？</p>
+  <p class="check">看完你要答得出來：新增一筆時，狀態一開始是什麼？已報廢的裝備，還能改回正常嗎？</p>
 </section>
 
 <footer>

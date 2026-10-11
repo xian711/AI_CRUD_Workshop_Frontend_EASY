@@ -132,7 +132,7 @@ sc3(13, () => {
 
 sc3(14, () => {
   const r = {}; hd(14, 'step3 ・ 實拍')
-  const [a, b, c, d] = vsh(r, ['v5-cc06-q-first', 'v5-cc07a-q1-ans', 'v5-cc07b-q2', 'v5-cc07c-q1'])
+  const [a, b, c, d, SQ] = vsh(r, ['v5-cc06-q-first', 'v5-cc07a-q1-ans', 'v5-cc07b-q2', 'v5-cc07c-q1', 'v5-cc43-q1-ans'])
   r.a0 = hl(r, a, [361, 228, 203, 18], '白話選擇題：都是 PRD 沒寫清楚的', { col: C.gold, below: true, size: 26 })
   r.a1 = hl(r, a, [361, 294, 647, 59], '標「建議」＋一句理由', { col: C.green, below: true, size: 26 })
   r.b1 = hl(r, b, 'other', '建議不是你要的：選 Other，自己打 PW-GEN-001', { col: OR, above: true, size: 26 })
@@ -141,12 +141,15 @@ sc3(14, () => {
   r.d1 = hl(r, d, [361, 264, 211, 17], '保管人電話收哪些格式？', { col: OR, below: true, size: 26 })
   r.d2 = hl(r, d, [361, 433, 647, 28], '選項裡有「拆成手機、市話兩欄」', { col: C.gold, above: true, size: 26 })
   r.n = tip('交文件前一共 13 題：都是 PRD 沒寫、它自己找出來的缺口', { y: 806, size: 28, col: C.teal })
+  r.sq1 = hl(r, SQ, [361, 267, 230, 20], 'Q15：狀態可以怎麼改？', { col: OR, below: true, size: 26 })
+  r.sq2 = hl(r, SQ, [361, 294, 647, 60], '選建議的：報廢了就回不去', { col: C.green, below: true, size: 26 })
   return r
 }, [
   r => { show(r.S[0]); later(300, () => only(r, r.a0)); later(2800, () => { zoom(r.S[0], [361, 294, 647, 59], { pad: 120, max: 1.6 }); only(r, r.a1) }) },
   r => { unzoom(r.S[0]); to(r, r.S[1]); zoom(r.S[1], 'other', { pad: 120, max: 1.6 }); only(r, r.b1) },
   r => { unzoom(r.S[1]); to(r, r.S[2]); zoom(r.S[2], [361, 316, 606, 70], { pad: 80, max: 1.6 }); only(r, r.c1); later(3000, () => only(r, r.c2)) },
   r => { unzoom(r.S[2]); to(r, r.S[3]); only(r, r.d1); later(2600, () => only(r, r.d2)); later(5200, () => { show(r.n); glow(r.n) }) },
+  r => { hide(r.n); to(r, r.S[4]); only(r, r.sq1); later(2800, () => { zoom(r.S[4], [361, 267, 647, 90], { pad: 60, max: 1.6 }); only(r, r.sq2) }) },
 ])
 
 sc3(15, () => {
@@ -197,30 +200,57 @@ sc3(18, () => {
   const r = {}; hd(18, 'step3 ・ 五張圖')
   r.bw = bwHead('v5-diagn-1-head', 'DIAGRAMS-中心裝備物資.html'); r.B = r.bw.S
   r.h0 = hl(r, r.B[0], [52, 120, 1140, 160], '每張圖上面都有「怎麼看」，下面一題「看完你要答得出來」', { col: OR, below: true, size: 26 })
-  r.h1 = hl(r, r.B[0], [50, 80, 590, 24], '說明寫「7 件事」', { col: C.red, below: true, size: 28 })
-  r.D = [1, 2, 3, 4, 5].map(k => scr('v5-diag-' + k + '-svg', fitF('v5-diag-' + k + '-svg', { x: 70, y: 116, w: 1460, h: 680 })))
-  r.p1 = hl(r, r.D[0], [296, 40, 412, 1036], '① 用例圖：管理人員能做的 8 件事', { col: OR, right: true, size: 26 })
+  r.D = ['v5-diag-1-svg', 'v5-diag-2-svg', 'v5-diag-3-svg', 'v5-diag-4-svg', 'v5-diag6-5-svg'].map(n => scr(n, fitF(n, { x: 70, y: 116, w: 1460, h: 680 })))   // ⑤ 改成裝備狀態圖後重拍
+  r.p1 = hl(r, r.D[0], [296, 40, 412, 1036], '① 使用案例圖：管理人員能做的 8 件事', { col: OR, right: true, size: 26 })
   r.p2 = hl(r, r.D[1], [751, 213, 1094, 128], '② 零件圖：橘色照範本複製', { col: OR, below: true, right: true, size: 26 })
   r.p3 = hl(r, r.D[1], [245, 213, 474, 128], '綠色直接共用', { col: C.green, below: true, size: 26 })
   r.p4 = hl(r, r.D[2], [339, 337, 682, 614], '③ 資料圖：一筆裝備記 12 項', { col: OR, right: true, size: 26 })
   r.p5 = hl(r, r.D[2], [339, 442, 682, 70], '分類、項目：新增時空白', { col: C.gold, right: true, size: 24 })
   r.p6 = hl(r, r.D[3], [143, 977, 1653, 385], '④ 流程圖：淡紅＝檢查沒過，留在原頁', { col: C.red, above: true, size: 26 })
   r.p7 = hl(r, r.D[3], [459, 1373, 1337, 644], '淡綠＝全部通過，才存', { col: C.green, above: true, size: 26 })
-  r.p8 = hl(r, r.D[4], [886, 316, 646, 96], '⑤ 狀態圖：編輯時分類、項目、編碼鎖住', { col: OR, above: true, right: true, size: 26 })
-  const [f] = vsh(r, ['v5-cc13-diagfix-done'])
-  r.f1 = hl(r, f, [340, 330, 700, 130], '一句話叫它改：改好了，還說原因', { col: C.green, below: true, size: 26 })
-  r.t = tip('看圖就抓得到錯，不用讀程式', { y: 806, size: 32, col: C.gold })
+  r.p8 = hl(r, r.D[4], [863, 78, 150, 55], '已報廢：回不去', { col: C.red, size: 26 })
+  r.p9 = hl(r, r.D[4], [225, 168, 433, 84], '正常 ↔ 維修中：可以互換', { col: C.green, below: true, size: 26 })
   return r
 }, [
   r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h0)) },
   r => { only(r); hide(r.bw.g); show(r.D[0]); later(300, () => only(r, r.p1)); later(3600, () => { to({ S: r.D }, r.D[1]); only(r, r.p2, r.p3) }) },
   r => { to({ S: r.D }, r.D[2]); only(r, r.p4, r.p5); later(4600, () => { to({ S: r.D }, r.D[3]); only(r, r.p6, r.p7) }) },
-  r => { to({ S: r.D }, r.D[4]); only(r, r.p8) },
-  r => { only(r); hide(r.D); show(r.bw.g); later(300, () => only(r, r.h1)); later(3600, () => { only(r); hide(r.bw.g); show(r.S[0]); later(300, () => only(r, r.f1)); later(2600, () => { show(r.t); glow(r.t) }) }) },
+  r => { to({ S: r.D }, r.D[4]); only(r, r.p9); later(3000, () => only(r, r.p8)) },
 ])
 
+// 圖 ① 的 8 個圓角框：在框的右邊依序蓋 1～8 號（v5-diag-1-svg 的座標）
+const UC8 = [[700, 88], [715, 228], [748, 366], [642, 488], [622, 590], [645, 750], [637, 890], [681, 1030]]
+function numBadges(g, pts, o = {}) {
+  const R = o.r || 34, size = (o.size || 44) * g.k
+  return pts.map(([x, y], i) => {
+    const q = rb(g, [x - R, y - R, 2 * R, 2 * R]); const h = grp(g.inner)
+    mk('circle', { cx: q.x + q.w / 2, cy: q.y + q.h / 2, r: q.w / 2, fill: C.gold, stroke: C.bg, 'stroke-width': 4 }, h)
+    T(h, q.x + q.w / 2, q.y + q.h / 2 + size * 0.36, String(i + 1), { size, anchor: 'middle', weight: 900, fill: C.bg })
+    return h
+  })
+}
+
 sc3(19, () => {
-  const r = {}; hd(19, 'step3 ・ 實拍')
+  const r = {}; hd(19, 'step3 ・ 看圖抓到落差')
+  r.bw = bwHead('v5-diagn-1-head', 'DIAGRAMS-中心裝備物資.html#uc'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], [50, 80, 590, 24], '說明寫：能做 7 件事', { col: C.red, below: true, size: 16 })
+  r.svg = scr('v5-diag-1-svg', fitF('v5-diag-1-svg', { x: 70, y: 116, w: 1460, h: 680 }))
+  r.nb = numBadges(r.svg, UC8)
+  r.cnt = tip('圖上數到 8 件　·　說明寫 7 件　→　對不起來', { y: 806, size: 32, col: C.red })
+  const [a, b] = vsh(r, ['v5-cc13-diagfix-ask', 'v5-cc13-diagfix-done'])
+  r.a1 = hl(r, a, 'input', '一句話：看到什麼、期望什麼', { col: OR, above: true, size: 26 })
+  r.b1 = hl(r, b, [340, 330, 700, 130], '一句話叫它改：改好了，還說原因', { col: C.green, below: true, size: 26 })
+  r.t = tip('這就是圖的用處：看圖就抓得到錯，不用讀程式', { y: 806, size: 30, col: C.gold })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); zoom(r.B[0], [50, 70, 600, 44], { pad: 30, max: 2.2 }); later(400, () => only(r, r.h1)) },
+  r => { only(r); unzoom(r.B[0]); hide(r.bw.g); show(r.svg); later(3000, () => stagger(r.nb, 1100, e => { show(e); glow(e) })); later(3000 + 1100 * 8, () => { show(r.cnt); glow(r.cnt) }) },
+  r => { hide([r.svg, r.cnt]); show(r.S[0]); later(300, () => only(r, r.a1)); later(3800, () => { to(r, r.S[1]); only(r, r.b1) }) },
+  r => { only(r); show(r.t); glow(r.t) },
+])
+
+sc3(20, () => {
+  const r = {}; hd(20, 'step3 ・ 實拍')
   const [b, c, d, e] = vsh(r, ['v5-cc15-model-menu', 'v5-cc15-go-typed', 'v5-cc16-build-start', 'v5-cc18-q1'])
   r.b1 = hl(r, b, 'sonnet', '開工前：換 Sonnet 5.5', { col: C.gold, below: true, size: 28 })
   r.c1 = hl(r, c, 'input', '打「開工」→ 送出', { col: C.green, above: true, size: 28 })
@@ -233,8 +263,8 @@ sc3(19, () => {
   r => { to(r, r.S[3]); only(r, r.e1) },
 ])
 
-sc3(20, () => {
-  const r = {}; hd(20, 'step3 ・ 驗收')
+sc3(21, () => {
+  const r = {}; hd(21, 'step3 ・ 驗收')
   const [a] = vsh(r, ['v5-vs-dev3101'])
   r.a1 = hl(r, a, 'local', 'pnpm dev --port 3101 → 開它給的網址', { col: C.gold, below: true, size: 26 })
   r.bw = bwin(['v5-ea01-list', 'v5-ea04-item-open', 'v5-ea05-code', 'v5-ea06-validation', 'v5-ea07-delete'], 'localhost:3101/equipment/crud'); r.B = r.bw.S
@@ -252,8 +282,8 @@ sc3(20, () => {
   r => { swap(r.B, r.B[3]); only(r, r.d1); later(2600, () => { burl(r.bw, 'localhost:3101/equipment/crud'); swap(r.B, r.B[4]); only(r, r.e1) }); later(5000, () => { only(r); hide(r.bw.g); show([r.mob, r.mt]) }) },
 ])
 
-sc3(21, () => {
-  const r = {}; hd(21, 'step3 ・ 小落差附畫面')
+sc3(22, () => {
+  const r = {}; hd(22, 'step3 ・ 小落差附畫面')
   r.bw = bwin(['v5-gap-before-wrap', 'v5-gap-after-wrap', 'v5-gap2-before-dash'], 'localhost:3101/equipment/crud'); r.B = r.bw.S
   r.a1 = hl(r, r.B[0], 'keeper', '名字被拆成兩行', { col: C.red, below: true, size: 26 })
   r.a2 = hl(r, r.B[0], 'date', '日期也斷行', { col: C.red, above: true, right: true, size: 24 })
@@ -292,12 +322,12 @@ function fixShow(r, g, p, o = {}) {
   later(o.t2 ?? 5600, () => zoom(g, o.za || 'after', { pad: 12, max: 2 }))
 }
 
-//@V4 21 22
+//@V4 21 23
 
-//@V4 22 23
+//@V4 22 24
 
-sc3(24, () => {
-  const r = {}; hd(24, 'step4')
+sc3(25, () => {
+  const r = {}; hd(25, 'step4')
   const [a, b] = vsh(r, ['v5-cc30-loop-pasted', 'v5-loop-log'])
   r.a1 = hl(r, a, 'input', 'LOOP prompt：4 行，第一行就說照規矩檔做', { col: C.violet, above: true, size: 26 })
   r.a2 = hl(r, a, 'model', 'Sonnet 5.5：寫程式用便宜的', { col: C.gold, below: true, size: 24 })
@@ -312,8 +342,8 @@ sc3(24, () => {
   r => { hide(r.hands); only(r, r.b2); later(2600, () => { show(r.red); glow(r.red) }) },
 ])
 
-sc3(25, () => {
-  const r = {}; hd(25, 'step4')
+sc3(26, () => {
+  const r = {}; hd(26, 'step4')
   const [a, b] = vsh(r, ['v5-cc31-t0300', 'v5-cc31-t0540'])
   r.a0 = hl(r, a, [477, 524, 64, 21], '1 agent：審查的 AI（Opus 5.5）正在工作', { col: C.violet, above: true, size: 26 })
   r.a1 = hl(r, a, [365, 205, 665, 117], '截圖腳本：Playwright 逐頁截圖、實際點按鈕（只看，不改 App）', { col: C.teal, below: true, size: 24 })
@@ -328,8 +358,8 @@ sc3(25, () => {
   r => { only(r); hide(r.S); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.c1)); show(r.min) },
 ])
 
-sc3(26, () => {
-  const r = {}; hd(26, 'step4 ・ 修改前後')
+sc3(27, () => {
+  const r = {}; hd(27, 'step4 ・ 修改前後')
   r.bw = bwin(['v5-rep-review', 'v5-rep-fix1', 'v5-rep-fix2'], REP + '#review'); r.B = r.bw.S
   r.c1 = hl(r, r.B[0], [86, 88, 1066, 58], 'App 7 條、測試 5 條', { col: OR, below: true, size: 28 })
   r.p1 = fixPair(r, r.B[1], '修改前：停在第 2 頁　→　修改後：回到第 1 頁')
@@ -343,8 +373,8 @@ sc3(26, () => {
   r => { unzoom(r.B[2]); hide(r.p2.t); only(r); hide(r.bw.g); show(r.exam); glow(r.exam) },
 ])
 
-sc3(27, () => {
-  const r = {}; hd(27, 'step4 ・ 裁決附畫面')
+sc3(28, () => {
+  const r = {}; hd(28, 'step4 ・ 裁決附畫面')
   const [a, b] = vsh(r, ['v5-cc35-loop-done', 'v5-cc37-q2-ans'])
   r.a1 = hl(r, a, [355, 225, 675, 240], '要動全站共用的檔：停下來出選擇題', { col: C.gold, above: true, size: 26 })
   r.bw = bwin(['v5-rep-decide', 'v5-rep-q1', 'v5-rep-q3', 'v5-rep-fix4'], REP + '#decide'); r.B = r.bw.S
@@ -365,8 +395,8 @@ sc3(27, () => {
   r => { only(r); hide(r.S); show(r.adv); glow(r.adv); later(4200, () => { hide(r.adv); show(r.bw.g); burl(r.bw, REP + '#fixed'); swap(r.B, r.B[3]); fixShow(r, r.B[3], r.p4, { t1: 1800, t2: 4000 }) }) },
 ])
 
-sc3(28, () => {
-  const r = {}; hd(28, 'step4 ・ 四樣產出')
+sc3(29, () => {
+  const r = {}; hd(29, 'step4 ・ 四樣產出')
   const [a] = vsh(r, ['v5-loop-log2'])
   r.a1 = hl(r, a, [100, 85, 940, 105], 'LOOP-LOG.md：每一輪做了什麼，你的裁決也記在裡面', { col: C.teal, below: true, size: 26 })
   r.bw = bwin(['v5-rep-top', 'v5-pw-report', 'v5-rep2-q5'], REP); r.B = r.bw.S
@@ -383,8 +413,8 @@ sc3(28, () => {
   r => { burl(r.bw, REP); swap(r.B, r.B[2]); only(r, r.d1, r.d2); later(3600, () => { show(r.only); glow(r.only) }) },
 ])
 
-sc3(29, () => {
-  const r = {}; hd(29, 'step4 ・ 文件同步')
+sc3(30, () => {
+  const r = {}; hd(30, 'step4 ・ 文件同步')
   r.q = box(L, 120, 330, 1360, 200, '程式改了，文件有沒有跟著改？', { size: 56, fill: C.card, stroke: C.violet, color: C.ink, weight: 900 })
   const [b, c] = vsh(r, ['v5-srs-loopmark', 'v5-design-loopmark'])
   r.bw = bwin(['v5-rep-docs'], REP); r.B = r.bw.S
@@ -399,8 +429,8 @@ sc3(29, () => {
   r => { only(r); hide(r.S); show(r.dish); glow(r.dish) },
 ])
 
-sc3(30, () => {
-  const r = {}; hd(30, 'step4 ・ 下次怎麼做')
+sc3(31, () => {
+  const r = {}; hd(31, 'step4 ・ 下次怎麼做')
   r.nodes = flowRow(200, [['你寫\n白話 PRD', C.teal], ['AI 找缺口\n你拍板', C.gold], ['SRS・設計\n文件・圖', C.violet], ['你核過', C.gold], ['備好測試\nLOOP 測修＋審查', C.coral], ['看報告\n拍板驗收', C.green]], { w: 225, gap: 20, h: 130 })
   r.tea = box(L, 120, 400, 1360, 200, '你不用坐在電腦前面陪它\n去泡杯茶，回來看報告、拍板、驗收', { size: 44, fill: '#173a2a', stroke: C.green, color: C.green, weight: 900 })
   r.p2 = card(70, 640, 1460, 200, '備案：找別家 AI（例如 Codex）再審一次', ['工具不能開子代理時，或想要第二意見時', '貼手冊 step4 的備案 prompt'], C.teal, { size: 28, ts: 34 })
@@ -415,5 +445,5 @@ sc3(30, () => {
 // ════════════════════════════ Step 5 ════════════════════════════
 chapter('Step 5', '回公司怎麼用', C.green)
 
-//@V4 29 31
-//@V4 30 32
+//@V4 29 32
+//@V4 30 33

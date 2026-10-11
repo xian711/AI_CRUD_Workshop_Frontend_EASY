@@ -26,7 +26,7 @@ for (let sc = 1; sc <= n; sc++) {
   const steps = await p.$eval('#pos', e => +e.textContent.match(/(\d+)／(\d+) 句/)[2])
   for (let k = 0; k < steps; k++) {
     if (k) await p.click('#bNext')
-    await p.waitForTimeout(3000)
+    await p.waitForTimeout(+(process.env.WAIT || 3000))   // WAIT＝每句等幾毫秒再截圖（看句子後段的畫面）
     await p.locator('.stagebox').screenshot({ path: `${out}/s${String(sc).padStart(2, '0')}-${k + 1}.png` })
   }
 }

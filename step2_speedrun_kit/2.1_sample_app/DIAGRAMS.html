@@ -98,21 +98,22 @@
 <header>
   <h1>UML 圖面 — CRUD 標準範本（人員管理）</h1>
   <p>CRUD 是「新增、查詢、修改、刪除」四件事的英文縮寫。這個範本用「人員」當例子，把四件事做成一個標準模組。</p>
-  <p>不用看程式，看這 7 張圖就懂。對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、DESIGN-CRUD標準範本-v1.1.md（設計文件）｜ 畫面網址：/template/crud</p>
+  <p>不用看程式，看這 8 張圖就懂。對應文件（同資料夾）：SPEC-範例-人員CRUD.md（需求規格）、DESIGN-CRUD標準範本-v1.1.md（設計文件）｜ 畫面網址：/template/crud</p>
 </header>
 
 <nav>
-  <a href="#uc">① 用例圖：誰能做哪些事</a>
+  <a href="#uc">① 使用案例圖：誰能做哪些事</a>
   <a href="#arch">② 零件圖：檔案怎麼分</a>
   <a href="#class">③ 資料圖：一筆人員記哪些資料</a>
-  <a href="#state">④ 狀態圖：明細頁的三種模式</a>
+  <a href="#state">④ 畫面切換圖：明細頁的三種模式</a>
   <a href="#seq-list">⑤ 流程圖：查詢與網址同步</a>
   <a href="#seq-save">⑥ 流程圖：新增／編輯後儲存</a>
   <a href="#seq-del">⑦ 流程圖：刪除</a>
+  <a href="#status">⑧ 狀態圖：人員的在職、停用怎麼變</a>
 </nav>
 
 <section id="uc">
-  <h2>① 用例圖：誰能做哪些事</h2>
+  <h2>① 使用案例圖：誰能做哪些事</h2>
   <p class="desc">這張圖在說什麼：承辦人員在人員管理模組裡，能做 6 件事。</p>
   <div class="howto">
     <b>怎麼看</b>
@@ -281,8 +282,8 @@ classDiagram
 </section>
 
 <section id="state">
-  <h2>④ 狀態圖：明細頁的三種模式</h2>
-  <p class="desc">這張圖在說什麼：明細頁只有一頁，但有檢視、編輯、新增三種模式；按不同的鈕，會換到不同的模式。回到列表頁時，原本的篩選和頁碼都還在。</p>
+  <h2>④ 畫面切換圖：明細頁的三種模式</h2>
+  <p class="desc">這張圖在說什麼：明細頁只有一頁，但有檢視、編輯、新增三種模式；按不同的鈕，會換到不同的模式。回到列表頁時，原本的篩選和頁碼都還在。注意：這張畫的是<b>畫面</b>怎麼切換，不是<b>資料</b>的狀態；資料的狀態看最後一張 ⑧。</p>
   <div class="howto">
     <b>怎麼看</b>
     <ul>
@@ -449,6 +450,35 @@ sequenceDiagram
   </pre>
   <p class="ask">看完你要答得出來：刪除前會先發生什麼事？按「取消」的話，資料會不會變？</p>
   <p class="refs">給工程師對照：UC-T-05、FR-T-401～402、BR-T-04；確認框是 AppConfirmModal（danger），按確認後不自動關閉。</p>
+</section>
+
+<section id="status">
+  <h2>⑧ 狀態圖：人員的在職、停用怎麼變</h2>
+  <p class="desc">這張圖在說什麼：一位人員的狀態怎麼變。新增時先帶「在職」；人離開了改成「停用」，回來了可以改回「在職」。</p>
+  <div class="howto">
+    <b>怎麼看</b>
+    <ul>
+      <li>黑色圓點是起點：新增一位人員時從這裡開始。每個圓角框是一種狀態，就是列表上的狀態標籤（在職綠色、停用灰色）。</li>
+      <li>箭頭是「平常什麼時候改」。這個範本兩個方向都能改。</li>
+      <li>如果你們的資料有「改了就回不去」的狀態（例如裝備「已報廢」），要先在 SPEC 寫清楚；圖上就不會有往回的箭頭。</li>
+    </ul>
+  </div>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'}}}%%
+stateDiagram-v2
+  direction LR
+  state "在職（綠）" as Active
+  state "停用（灰）" as Inactive
+  [*] --> Active : 新增時預設
+  Active --> Inactive : 人離開了
+  Inactive --> Active : 回來了
+  classDef ok fill:#e6f4ea,stroke:#2e7d32,stroke-width:3px
+  classDef off fill:#eeeeee,stroke:#757575,stroke-width:3px
+  class Active ok
+  class Inactive off
+  </pre>
+  <p class="ask">看完你要答得出來：停用的人，可以改回在職嗎？新增一位人員時，狀態一開始是什麼？</p>
+  <p class="refs">給工程師對照：status 只有 在職／停用；新增預設在職（BR-T-07）；顏色見 TemplateStatusBadge；SPEC 的狀態圖同一份規則。</p>
 </section>
 
 <footer>

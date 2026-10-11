@@ -182,7 +182,9 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
                 <EquipmentFormField label="狀態" name="status" required :error="fieldErrors.status">
                   <USelectMenu v-model="form.status" :options="statusOptions" value-attribute="value" option-attribute="label" class="w-full"
-                    :aria-describedby="fieldErrors.status ? 'status-error' : undefined" />
+                    :disabled="statusLocked" data-testid="equipment-status-select"
+                    :aria-describedby="fieldErrors.status ? 'status-error' : statusLocked ? 'status-locked' : undefined" />
+                  <p v-if="statusLocked" id="status-locked" class="mt-xs text-body-medium text-on-surface-variant">已報廢就回不去：狀態不能改。登記錯了，請刪掉重新新增。</p>
                 </EquipmentFormField>
                 <EquipmentFormField label="採購日期" name="purchaseDate" :error="fieldErrors.purchaseDate">
                   <UInput
@@ -280,6 +282,8 @@ const record = ref<EquipmentItem | null>(null) // 檢視模式的唯讀來源
 const notFound = ref(false)
 const isSubmitting = ref(false) // 送出中旗標：防重複送出（連點儲存只會入庫一次）
 const fieldErrors = reactive<Record<string, string>>({})
+// 狀態怎麼變（釐清 Q7 拍板）：正常、維修中可以互換，都能改成已報廢；已報廢就回不去，編輯時鎖住狀態
+const statusLocked = computed(() => mode.value === 'edit' && record.value?.status === 'scrapped')
 
 function emptyForm(): EquipmentItemInput {
   return {

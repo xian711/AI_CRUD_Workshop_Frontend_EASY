@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI CRUD 工作坊 EASY 版 — Step-by-Step 學習手冊</title>
+<title>AI CRUD 工作坊 EASY 版 — 跟著做手冊</title>
 <style>
   :root{
     --brand:#C8232C;
     --brand-dark:#9E1B22;
     --brand-soft:#FBEDED;
     --ink:#1c1d21;
-    --ink-soft:#54565e;
+    --ink-soft:#4b4d55;
     --line:#e7e3e3;
     --bg:#f6f4f3;
     --card:#ffffff;
@@ -18,159 +18,126 @@
     --warn:#b8860b;
     --radius:14px;
     --shadow:0 2px 10px rgba(30,20,20,.06),0 10px 30px rgba(30,20,20,.05);
-    --maxw:920px;
+    --maxw:960px;
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-    color:var(--ink);background:var(--bg);line-height:1.75;font-size:16px;
+    color:var(--ink);background:var(--bg);line-height:1.8;font-size:18px;
     -webkit-font-smoothing:antialiased;
   }
 
-  /* ── top progress nav ── */
-  header.topnav{
-    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
-    backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--line);
-  }
-  .topnav-inner{
-    max-width:var(--maxw);margin:0 auto;padding:10px 20px;
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  }
-  .topnav .brand{font-weight:800;color:var(--brand);letter-spacing:.3px;white-space:nowrap;font-size:15px;}
-  .topnav nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
-  .topnav nav a{
-    text-decoration:none;color:var(--ink-soft);font-size:13px;font-weight:600;
-    padding:5px 11px;border-radius:999px;border:1px solid transparent;transition:.15s;
-  }
+  /* ── 上方導覽 ── */
+  header.topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--line);}
+  .topnav-inner{max-width:var(--maxw);margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .topnav .brand{font-weight:800;color:var(--brand);white-space:nowrap;font-size:16px;}
+  .topnav nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;}
+  .topnav nav a{text-decoration:none;color:var(--ink-soft);font-size:15px;font-weight:700;padding:5px 11px;border-radius:999px;}
   .topnav nav a:hover{color:var(--brand);background:var(--brand-soft);}
 
-  /* ── hero ── */
-  .hero{
-    max-width:var(--maxw);margin:34px auto 10px;padding:0 20px;
-  }
-  .hero-card{
-    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);
-    color:#fff;border-radius:20px;padding:38px 34px;box-shadow:var(--shadow);
-  }
-  .hero-card h1{margin:0;font-size:30px;line-height:1.3;font-weight:800;}
-  .hero-card .anim-link{display:inline-block;margin-top:14px;padding:8px 18px;border-radius:999px;background:#fff;color:var(--brand-dark);font-weight:800;font-size:15px;text-decoration:none;}
+  /* ── 封面 ── */
+  .hero{max-width:var(--maxw);margin:30px auto 10px;padding:0 16px;}
+  .hero-card{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);color:#fff;border-radius:20px;padding:34px 30px;box-shadow:var(--shadow);}
+  .hero-card h1{margin:0 0 6px;font-size:32px;line-height:1.3;font-weight:800;}
+  .hero-card p{margin:6px 0 0;font-size:18px;opacity:.95;}
+  .hero-card .anim-link{display:inline-block;margin:14px 10px 0 0;padding:10px 20px;border-radius:999px;background:#fff;color:var(--brand-dark);font-weight:800;font-size:17px;text-decoration:none;}
   .hero-card .anim-link:hover{background:var(--brand-soft);}
 
-  main{max-width:var(--maxw);margin:0 auto;padding:0 20px 80px;}
+  main{max-width:var(--maxw);margin:0 auto;padding:0 16px 80px;}
 
-  /* ── outline table ── */
-  .outline{margin:26px 0;}
-  .outline h2{font-size:18px;margin:0 0 12px;color:var(--ink);}
-
-  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
-  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;}
+  /* ── 表格 ── */
+  table{width:100%;border-collapse:collapse;font-size:16.5px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:16px 0;}
   th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
-  th{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;white-space:nowrap;}
+  th{background:var(--brand-soft);color:var(--brand-dark);font-weight:800;white-space:nowrap;}
   tr:last-child td{border-bottom:none;}
-  td.grp{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;font-size:13.5px;}
-  td code,p code,li code{background:#f0edec;color:var(--brand-dark);padding:1.5px 6px;border-radius:5px;font-size:.9em;font-family:"Cascadia Code",Consolas,monospace;}
+  td code,p code,li code,figcaption code{background:#f0edec;color:var(--brand-dark);padding:1.5px 6px;border-radius:5px;font-size:.9em;font-family:"Cascadia Code",Consolas,monospace;overflow-wrap:anywhere;}
 
-  /* ── step cards ── */
-  section.step{
-    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
-    margin:26px 0;padding:0;overflow:hidden;scroll-margin-top:70px;border:1px solid var(--line);
-  }
-  .step-head{
-    display:flex;align-items:center;gap:15px;padding:22px 28px;
-    border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--brand-soft),transparent);
-  }
-  .step-num{
-    flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--brand);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:0 4px 10px rgba(200,35,44,.3);
-  }
-  .step-head h2{margin:0;font-size:21px;font-weight:800;}
-  .star{display:inline-block;background:var(--brand);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
-  .step-body{padding:8px 28px 26px;}
+  /* ── 每一步的卡片 ── */
+  section.step{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin:28px 0;overflow:hidden;scroll-margin-top:70px;border:1px solid var(--line);}
+  .step-head{display:flex;align-items:center;gap:15px;padding:22px 26px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--brand-soft),transparent);flex-wrap:wrap;}
+  .step-num{flex:0 0 auto;width:50px;height:50px;border-radius:12px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;}
+  .step-head h2{margin:0;font-size:25px;font-weight:800;flex:1;min-width:200px;}
+  .watch{display:inline-block;font-size:15px;font-weight:800;color:#fff;background:var(--brand);border-radius:999px;padding:5px 14px;text-decoration:none;white-space:nowrap;}
+  .watch:hover{background:var(--brand-dark);}
+  .step-body a.watch,.step-head a.watch{color:#fff;}
+  .step-body{padding:6px 26px 26px;}
 
-  /* ── labelled blocks ── */
-  .block-title{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;margin:0 0 6px;}
-  .block-title .ico{font-size:19px;}
-  .goal{background:var(--brand-soft);border-left:4px solid var(--brand);border-radius:8px;padding:14px 18px;margin:18px 0;}
-  .goal ol,.goal ul{margin:6px 0 0;padding-left:22px;}
-  .why{background:#f3f6f4;border-left:4px solid var(--ok);border-radius:8px;padding:14px 18px;margin:18px 0;}
-  .why .block-title{color:#166b3c;}
-
-  h3{font-size:16px;margin:22px 0 8px;color:var(--brand-dark);}
-  .step-body a{color:var(--brand-dark);font-weight:600;word-break:break-all;}
+  h3{font-size:21px;margin:34px 0 8px;color:var(--brand-dark);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+  h3 .watch{font-size:13.5px;padding:3px 11px;}
+  .goal{background:var(--brand-soft);border-left:5px solid var(--brand);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .goal b.t,.why b.t,.help b.t{display:block;font-size:18px;margin-bottom:4px;}
+  .goal ol,.goal ul{margin:4px 0 0;padding-left:24px;}
+  .why{background:#f1f6f2;border-left:5px solid var(--ok);border-radius:8px;padding:14px 18px;margin:20px 0;}
+  .help{background:#fff8e6;border-left:5px solid var(--warn);border-radius:8px;padding:14px 18px;margin:20px 0;}
+  .ok-see{background:#eef6fb;border-left:5px solid #2b7bb9;border-radius:8px;padding:10px 16px;margin:12px 0;font-weight:700;}
+  .step-body a{color:var(--brand-dark);font-weight:700;}
   p{margin:10px 0;}
-  ol,ul{padding-left:24px;margin:10px 0;}
-  li{margin:5px 0;}
+  ol,ul{padding-left:26px;margin:10px 0;}
+  li{margin:6px 0;}
+  ol.do > li{margin:12px 0;}
+  ol.do > li::marker{font-weight:800;color:var(--brand);}
 
-  blockquote{
-    margin:16px 0;padding:12px 18px;background:#fbf9f8;border-left:4px solid var(--brand);
-    border-radius:8px;color:var(--ink-soft);font-size:14.5px;
-  }
-  blockquote strong{color:var(--brand-dark);}
-
-  pre{
-    background:#1e1f26;color:#e6e6ea;border-radius:10px;padding:16px 18px;overflow-x:auto;
-    font-family:"Cascadia Code",Consolas,monospace;font-size:13.5px;line-height:1.65;margin:14px 0;
-    white-space:pre-wrap;overflow-wrap:anywhere;
-  }
+  pre{background:#1e1f26;color:#eceaf0;border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:"Cascadia Code",Consolas,monospace;font-size:16px;line-height:1.7;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
   pre code{background:none;color:inherit;padding:0;}
+  .copy-tip{font-size:15px;color:var(--ink-soft);margin:-4px 0 12px;}
 
-  /* ── figures ── */
-  figure{margin:20px 0;}
-  figure img{
-    width:100%;max-width:100%;height:auto;display:block;border-radius:12px;
-    box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);
-  }
-  figcaption{margin-top:9px;font-size:13.5px;color:var(--ink-soft);text-align:center;font-style:italic;}
-  figure.overview{margin:0 0 26px;}
-  .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0;}
-  .fig-grid figure{margin:0;}
+  details{margin:14px 0;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:#fbfaf9;}
+  details summary{cursor:pointer;font-weight:800;color:var(--brand-dark);}
 
-  .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:16px 0;white-space:pre;}
-  .flow b{color:#ffb3b8;}
+  /* ── 圖：一律單欄、大圖；手機截圖和窄圖另外限寬 ── */
+  figure{margin:16px 0 22px;}
+  figure img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);}
+  figure.mid img{max-width:640px;margin:0 auto;}
+  figure.narrow img{max-width:380px;margin:0 auto;}
+  figcaption{margin-top:9px;font-size:16px;color:var(--ink-soft);text-align:center;}
+  figure.overview{margin:0 0 22px;}
+  /* 很寬的圖（狀態圖、一排欄位）：手機上不縮小，改左右滑 */
+  .swipe-note{display:none;font-size:14px;color:var(--ink-soft);text-align:center;margin:4px 0 0;}
 
-  /* ── checklist ── */
+  /* ── 名詞小卡 ── */
+  .terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:18px 0;}
+  .terms div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:16.5px;}
+  .terms b{color:var(--brand-dark);}
+
   .checklist{list-style:none;padding:0;margin:14px 0;}
-  .checklist li{position:relative;padding:9px 12px 9px 40px;border-bottom:1px dashed var(--line);}
-  .checklist li::before{
-    content:"";position:absolute;left:10px;top:12px;width:19px;height:19px;border:2px solid var(--brand);border-radius:5px;
-  }
+  .checklist li{position:relative;padding:10px 12px 10px 42px;border-bottom:1px dashed var(--line);}
+  .checklist li::before{content:"";position:absolute;left:10px;top:14px;width:20px;height:20px;border:2px solid var(--brand);border-radius:5px;}
 
-  .footer{max-width:var(--maxw);margin:0 auto;padding:26px 20px 50px;color:var(--ink-soft);font-size:13.5px;text-align:center;}
+  .footer{max-width:var(--maxw);margin:0 auto;padding:26px 16px 50px;color:var(--ink-soft);font-size:15px;text-align:center;}
 
   @media (max-width:680px){
-    body{font-size:15px;}
-    .hero-card{padding:26px 22px;}
-    .hero-card h1{font-size:23px;}
-    .step-body{padding:6px 18px 22px;}
-    .step-head{padding:18px 18px;}
-    .step-head h2{font-size:18px;}
-    .fig-grid{grid-template-columns:1fr;}
-    .topnav .brand{font-size:13px;}
-    th,td{padding:9px 10px;font-size:13.5px;}
+    body{font-size:17px;}
+    .topnav-inner{flex-wrap:nowrap;padding:8px 12px;}
+    .topnav .brand{display:none;}
+    .topnav nav{flex-wrap:nowrap;overflow-x:auto;margin-left:0;scrollbar-width:none;}
+    .topnav nav::-webkit-scrollbar{display:none;}
+    .topnav nav a{white-space:nowrap;font-size:14.5px;padding:4px 9px;}
+    figure.wide{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    figure.wide img{width:900px;max-width:none;}
+    figure.wide .swipe-note{display:block;}
+    .hero-card{padding:24px 20px;}
+    .hero-card h1{font-size:24px;}
+    .step-body{padding:4px 16px 20px;}
+    .step-head{padding:16px;}
+    .step-head h2{font-size:21px;}
+    h3{font-size:19px;}
+    pre{font-size:14.5px;white-space:pre;overflow-wrap:normal;}
+    th,td{padding:9px 10px;font-size:15.5px;}
   }
 
-  /* ── dark theme ── */
+  /* ── 深色主題 ── */
   @media (prefers-color-scheme:dark){
-    :root{
-      --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
-      --brand-soft:#2b1f20;--shadow:0 2px 10px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
-    }
-    header.topnav{background:rgba(28,24,23,.92);}
-    .topnav nav a:hover{color:#ff9ba1;}
-    td code,p code,li code{background:#2c2827;color:#ff9ba1;}
-    blockquote{background:#241f1e;}
-    .why{background:#1b241d;}
-    .goal{background:#2b1f20;}
+    :root{--ink:#e9e7e6;--ink-soft:#b3b0ae;--line:#33302f;--bg:#151312;--card:#201d1c;--brand-soft:#2b1f20;--shadow:0 2px 10px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);}
+    header.topnav{background:rgba(28,24,23,.94);}
+    td code,p code,li code,figcaption code{background:#2c2827;color:#ff9ba1;}
+    .why{background:#1b241d;} .goal{background:#2b1f20;} .help{background:#2a2414;} .ok-see{background:#16222c;}
+    details{background:#1c1918;}
     figure img{border-color:#33302f;}
   }
-  :root[data-theme="dark"]{
-    --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
-    --brand-soft:#2b1f20;
-  }
-  :root[data-theme="light"]{
-    --ink:#1c1d21;--ink-soft:#54565e;--line:#e7e3e3;--bg:#f6f4f3;--card:#ffffff;--brand-soft:#FBEDED;
-  }
+  :root[data-theme="dark"]{--ink:#e9e7e6;--ink-soft:#b3b0ae;--line:#33302f;--bg:#151312;--card:#201d1c;--brand-soft:#2b1f20;}
+  :root[data-theme="light"]{--ink:#1c1d21;--ink-soft:#4b4d55;--line:#e7e3e3;--bg:#f6f4f3;--card:#ffffff;--brand-soft:#FBEDED;}
 </style>
 </head>
 <body>
@@ -192,70 +159,116 @@
 
 <div class="hero">
   <div class="hero-card">
-    <h1>用「範本 + harness + AI」<br>讓新 CRUD 模組的骨架快速交付</h1>
-    <a class="anim-link" href="animation/index.html">▶ 教學動畫（講課版）：harness・SDD・LOOP・對抗審查，全程實拍</a>
-    <a class="anim-link" href="animation-hands/index.html">▶ 手把手版（跟著做）：Step 0～5 每一步都示範</a>
+    <h1>用「範本＋規矩＋AI」<br>做出一個新的資料管理頁面</h1>
+    <p>這份手冊照著動畫的順序寫：一步一張圖，跟著做就好。</p>
+    <a class="anim-link" href="animation-hands/index.html">▶ 手把手版動畫（跟著做）</a>
+    <a class="anim-link" href="animation/index.html">▶ 講課版動畫（講觀念）</a>
   </div>
 </div>
 
 <main>
 
   <figure class="overview">
-    <img src="images/overview_metaphor.jpg" alt="用滷味比喻整套方法：harness 是滷包、範本是配方、SDD（規格驅動開發）是先寫料理紀錄再下鍋、改了配方紀錄跟著改、知識累積是老滷汁">
-    <figcaption>一張圖看完整套方法：<strong>harness 是滷包</strong>（給 AI 的規矩）、<strong>範本是配方</strong>（AI 照著填的骨架）、<strong>SDD 是照料理紀錄做菜</strong>（<strong>SDD＝規格驅動開發：先文件、再程式；程式改了，文件跟著改</strong>）、<strong>知識累積是老滷汁</strong>（越熬越香）。</figcaption>
+    <img src="images/overview_metaphor.jpg" alt="用滷味比喻整套方法：規矩是滷包、範本是配方、先寫料理紀錄再下鍋">
+    <figcaption>一張圖看完整套方法：<strong>規矩（harness）是滷包</strong>、<strong>範本是配方</strong>、<strong>先寫好料理紀錄再下鍋</strong>（先文件、再程式）。</figcaption>
   </figure>
 
-  <div class="outline">
-    <div class="table-scroll">
-    <table>
-      <thead><tr><th>Step</th><th>這一章在做什麼</th></tr></thead>
-      <tbody>
-        <tr><td><b>step0</b></td><td>課程說明、前置檢查</td></tr>
-        <tr><td><b>step1</b></td><td>為什麼要 harness（有／沒有 harness 產出對比）</td></tr>
-        <tr><td><b>step2</b></td><td>CRUD 快速完工秘笈（跑範本 → 玩一輪 → 8 核心檔 → harness 四件 → Design System）</td></tr>
-        <tr><td><b>step3</b></td><td>複製範本開發新模組（PRD → AI 生成 → 反覆修正）<span class="star">重頭戲</span></td></tr>
-        <tr><td><b>step4</b></td><td>LOOP 工程（改→驗→再改）＋ E2E 功能驗證<span class="note">（自動化瀏覽器測試）</span>＋失敗截圖診斷 ＋ 雙 AI 對抗審查</td></tr>
-        <tr><td><b>step5</b></td><td>課程總結、回去怎麼用</td></tr>
-      </tbody>
-    </table>
-    </div>
+  <div class="help">
+    <b class="t">📺 怎麼用這份手冊</b>
+    <ol>
+      <li>開兩個視窗：左邊放動畫，右邊放 VS Code。</li>
+      <li>每個小標題旁邊有「▶ 看動畫」，點下去就跳到那一段。看完一段，暫停，照手冊做一次。</li>
+      <li>黑底框裡的指令和 prompt：反白、Ctrl+C 複製，貼上就好，不用照著打。</li>
+      <li>圖太小看不清楚，<strong>點一下圖</strong>，會開一個新分頁看原圖。</li>
+    </ol>
+  </div>
+
+  <h2 style="font-size:22px;margin:26px 0 6px">先認得這幾個詞</h2>
+  <div class="terms">
+    <div><b>CRUD</b>：新增、查詢、修改、刪除，資料的四件事。</div>
+    <div><b>harness（規矩）</b>：寫給 AI 讀的公司規則，像滷包。</div>
+    <div><b>範本</b>：已經做好、驗過的示範頁面，AI 照著做，像配方。</div>
+    <div><b>PRD</b>：你用白話寫的需求：要記什麼、要能做什麼。</div>
+    <div><b>SRS</b>：AI 整理、你拍板後，「這一版答應做什麼」。</div>
+    <div><b>設計文件＋圖</b>：「打算怎麼做」。看圖就懂，不用看程式。</div>
+    <div><b>SDD（規格驅動開發）</b>：先文件、再程式；程式改了，文件跟著改。</div>
+    <div><b>LOOP</b>：AI 自己「改程式 → 跑測試 → 再改」，直到全部通過。</div>
+    <div><b>子代理</b>：AI 叫出來的分身，專門挑錯。</div>
+    <div><b>token</b>：顏色、間距的代號，例如「品牌紅」，不寫死色碼。</div>
+  </div>
+
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Step</th><th>這一章做什麼</th></tr></thead>
+    <tbody>
+      <tr><td><b>Step 0</b></td><td>下載教材、跑前置檢查</td></tr>
+      <tr><td><b>Step 1</b></td><td>看兩個網頁：有規矩、沒規矩，差在哪</td></tr>
+      <tr><td><b>Step 2</b></td><td>把範本跑起來、當使用者玩一輪、認識四份規矩</td></tr>
+      <tr><td><b>Step 3 ★</b></td><td>只給白話 PRD → AI 找缺口出選擇題 → 你拍板 → 看文件和圖 → 說「開工」→ 驗收</td></tr>
+      <tr><td><b>Step 4</b></td><td>貼一個 prompt：AI 自己測、自己修，再叫分身挑錯，最後交報告</td></tr>
+      <tr><td><b>Step 5</b></td><td>回公司怎麼用</td></tr>
+    </tbody>
+  </table>
   </div>
 
   <!-- ═══════════ STEP 0 ═══════════ -->
   <section class="step" id="step0">
     <div class="step-head">
       <div class="step-num">0</div>
-      <h2>課程說明與前置檢查</h2>
+      <h2>下載教材、跑前置檢查</h2>
+      <a class="watch" href="animation-hands/index.html#s3-1">▶ 看動畫 第 3～7 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <b class="t">🎯 做完這一步</b>
         <ol>
-          <li>知道這門課要教什麼、怎麼進行。</li>
-          <li>確認機器準備好了（腳本會逐項印出 10 項檢查結果）。</li>
-          <li>紅燈（<code>[FAIL]</code>）時，知道怎麼讓 AI 幫你把環境修好，而不是卡在那裡等人。</li>
+          <li>教材下載到電腦，用 VS Code 打開。</li>
+          <li>前置檢查最後寫「可以開課」。</li>
         </ol>
       </div>
+      <p><strong>課前要先裝好：</strong>VS Code、Git、Node.js、pnpm，還有 VS Code 裡的 AI 助手 <strong>Claude Code</strong>（要登入）。沒裝好的，課前找講師。</p>
 
-      <figure><img src="images/step0_start.jpg" alt="實戰起手式：取得專案庫、啟動終端機、環境檢查、啟動服務">
-        <figcaption>開課前的四步。本課到「環境檢查」為止；<code>pnpm install</code> 與 <code>pnpm dev</code> 是 step2 才做。不熟終端機也沒關係：把 AI 當助教，直接跟它說「幫我打開這個資料夾並執行這支腳本」。</figcaption></figure>
-      <p>本案教材在：<a href="https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY">https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY</a><br>請先把教材整包抓下來，再跑前置檢查：</p>
-      <pre><code># Windows（PowerShell）｜先切到你要放教材的資料夾，例如 cd D:\
-git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
-cd AI_CRUD_Workshop_Frontend_EASY\step0_course_intro
+      <h3>① 打開終端機</h3>
+      <p>先打開 VS Code：按鍵盤的 Windows 鍵，打 <code>Visual Studio Code</code>，點開。</p>
+      <p>終端機就是打指令的視窗。VS Code 選單「<strong>終端機</strong>」→「<strong>新增終端</strong>」。下面出現 <code>PS</code> 開頭的一行，就是在等你打指令。</p>
+      <figure><img src="images/v5/s0-1-terminal.jpg" alt="VS Code 選單：終端機 → 新增終端"><figcaption>選單「終端機」→「新增終端」</figcaption></figure>
+
+      <h3>② 下載教材</h3>
+      <p>一行貼一次、按 Enter。沒有 D 槽，就把第一行換成 <code>cd C:\</code>。</p>
+      <pre><code>cd D:\
+git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git</code></pre>
+      <figure><img src="images/v5/s0-2-clone.jpg" alt="git clone 下載完成，最後一行 done"><figcaption>看到 <code>done</code>，就是下載完成。</figcaption></figure>
+
+      <h3>③ 用 VS Code 打開教材資料夾</h3>
+      <ol class="do">
+        <li>選單「<strong>檔案</strong>」→「<strong>開啟資料夾</strong>」，選剛下載的 <code>AI_CRUD_Workshop_Frontend_EASY</code>，按「選取資料夾」。</li>
+        <li>問你信不信任作者，選「<strong>是，我信任作者</strong>」。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s0-3-trust.jpg" alt="信任作者對話框"><figcaption>選「是，我信任作者」。</figcaption></figure>
+      <figure class="narrow"><img src="images/v5/s0-4-explorer.jpg" alt="左邊看到 HANDBOOK 和 step0～step6"><figcaption>左邊看到 HANDBOOK 和 step0～step6，就打開對了。</figcaption></figure>
+
+      <h3>④ 跑前置檢查</h3>
+      <p>再開一個終端機（選單「終端機」→「新增終端」），一行貼一次、按 Enter：</p>
+      <pre><code>cd step0_course_intro
 .\preflight.ps1</code></pre>
-      <pre><code># macOS／Linux（終端機）｜先切到你要放教材的資料夾，例如 cd ~/
-git clone https://github.com/xian711/AI_CRUD_Workshop_Frontend_EASY.git
-cd AI_CRUD_Workshop_Frontend_EASY/step0_course_intro
-bash preflight.sh</code></pre>
-      <p>看到「前置檢查全數通過，可以開課！」再進 step1。若結尾是「前置檢查全數通過（含 N 項警告），可以開課！」也一樣可以開課——<code>[WARN]</code> 不擋開課（乾淨機器最常見的是 Playwright Chromium 尚未快取）。只有 <code>[FAIL]</code> 一定要處理掉，做法看下面「看到 [FAIL] 紅燈怎麼辦」。</p>
+      <details><summary>macOS 的指令</summary><pre><code>cd step0_course_intro
+bash preflight.sh</code></pre></details>
+      <figure><img src="images/v5/s0-5-preflight.jpg" alt="前置檢查全數通過，可以開課"><figcaption>最後寫「可以開課」就過關。黃色 <code>[WARN]</code> 只是提醒，不擋你；只有紅色 <code>[FAIL]</code> 一定要處理。</figcaption></figure>
 
-      <div class="block-title"><span class="ico">🚑</span>看到 [FAIL] 紅燈怎麼辦</div>
-      <p>三步走：<strong>照腳本印的「修復提示」做一次 → 關掉終端機重開一個再跑 preflight</strong>（剛裝好的 Node／pnpm／git 在舊視窗抓不到，這是最常見的假紅燈）<strong>→ 還是紅，把整份輸出貼給 AI Agent</strong>（連 <code>[PASS]</code> 的行一起貼）：</p>
-      <pre><code>這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。
+      <div class="help">
+        <b class="t">🚑 卡住時</b>
+        <ol>
+          <li><strong>一執行就跳「已停用指令碼執行」</strong>：先貼這一行，問你要不要變更就打 <code>Y</code>、Enter，再重跑 <code>.\preflight.ps1</code>。公司電腦不准改，找 IT 或講師。
+            <pre><code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code></pre></li>
+          <li><strong>看到 [FAIL]</strong>：照 FAIL 下一行的修復提示做一次。</li>
+          <li>還是紅：<strong>關掉終端機、重開一個再跑</strong>。剛裝好的工具，舊視窗抓不到，這是最常見的假紅燈。</li>
+          <li>還是紅：把整段輸出（連 [PASS] 的行）貼給 AI：
+            <pre><code>這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。
 請說明每個 [FAIL] 的原因，給我可複製的修復指令；不要改工作坊的檔案。
 
-（把整份 preflight 輸出貼在這裡）</code></pre>
+（把整份 preflight 輸出貼在這裡）</code></pre></li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -263,87 +276,76 @@ bash preflight.sh</code></pre>
   <section class="step" id="step1">
     <div class="step-head">
       <div class="step-num">1</div>
-      <h2>為什麼要有 harness？</h2>
+      <h2>為什麼要給 AI 規矩</h2>
+      <a class="watch" href="animation-hands/index.html#s8-1">▶ 看動畫 第 8～11 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <b class="t">🎯 做完這一步</b>
         <ol>
-          <li>用「同一句需求、只差有沒有附規矩」的兩個產出，親眼看出差別。</li>
-          <li>知道差別<strong>不在美醜</strong>，在「每個決定有沒有出處」。</li>
-          <li>知道 harness 管得住什麼、管不住什麼。</li>
+          <li>親手點過兩個網頁：同一句需求，一個沒給規矩、一個有給規矩。</li>
+          <li>說得出差別：<strong>不在好不好看，在「這個決定是誰做的」</strong>。</li>
+          <li>找得到「下拉選單不准預設帶第一個」這條規矩寫在哪。</li>
         </ol>
       </div>
 
-      <div class="block-title"><span class="ico">👀</span>兩版差在哪</div>
-      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES）＋設計系統（色票、間距）＋標準範本</strong>。沒有它，AI 每次都會自己決定；有了它，AI 照你們的決定做。<strong>注意：現在的 AI 不給規矩也寫得出漂亮頁面</strong>——所以這一步不是在比誰好看。</p>
-      <p>下面兩張圖，是拿<strong>同一句需求</strong>、只差有沒有附規矩，各跑一次的產出。<strong>兩版都很好看，新增與刪除也都能用</strong>——這就是最重要的體會：<strong>左邊那版甚至可能比右邊更討喜</strong>（它自己配了色、加了圖示）。重點在別的地方：<strong>右邊每一個決定都有出處，左邊全是 AI 自己決定的。</strong>兩版核心功能相同，但欄位選項與驗證規則已經不一樣了（血型幾個選項、血型會不會替你先選好、亂打的電話收不收），<strong>而這正是「這個決定是誰做的」的結果</strong>。</p>
-      <div class="fig-grid">
-        <figure>
-          <img src="images/step1_no_harness.png" alt="沒 harness：好看但全是 AI 自己決定">
-          <figcaption>沒 harness：<strong>一點都不醜</strong>。但主色是它自己挑的警示橘，品牌紅一次沒出現；必填沒標星號；血型多一個「不明」。</figcaption>
-        </figure>
-        <figure>
-          <img src="images/step1_with_harness.png" alt="有 harness：品牌紅完整驗證頁">
-          <figcaption>有 harness：品牌紅 <code>#C8232C</code>、必填標紅星、血型固定四選一而且不替你先選、電話手機和市話都收但要照格式——<strong>每個決定都查得到出處</strong>。</figcaption>
-        </figure>
-      </div>
+      <h3>① 打開兩個網頁 <a class="watch" href="animation-hands/index.html#s8-1">▶ 看動畫</a></h3>
+      <p>在終端機一行貼一次（第一行是回到教材資料夾）：</p>
+      <pre><code>cd ..
+start step1_why_harness\demo\no-harness.html
+start step1_why_harness\demo\with-harness.html</code></pre>
+      <details><summary>macOS 的指令</summary><pre><code>cd ..
+open step1_why_harness/demo/no-harness.html
+open step1_why_harness/demo/with-harness.html</code></pre></details>
+      <figure><img src="images/v5/s1-1-start.jpg" alt="start 指令用瀏覽器打開網頁"><figcaption><code>start</code>＝用瀏覽器打開。兩個網頁都很好看，新增、刪除也都能用。</figcaption></figure>
+
+      <h3>② 自己點一點：血型和電話 <a class="watch" href="animation-hands/index.html#s9-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li><strong>沒給規矩那版</strong>：一打開，血型已經替你選好「A」。不改就送出，存進去的就是錯的血型。</li>
+      </ol>
+      <figure><img src="images/v5/s1-2-noh.jpg" alt="沒規矩版：血型預設 A"><figcaption>沒規矩版：血型一打開就是「A」，而且完全不檢查。</figcaption></figure>
+      <ol class="do" start="2">
+        <li><strong>有規矩那版</strong>：什麼都不填，直接按「新增志工」。姓名、電話、血型都擋下來。</li>
+      </ol>
+      <figure class="wide"><img src="images/v5/s1-3-empty.jpg" alt="有規矩版：空白送出，三格紅字"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>有規矩版：血型預設「請選擇血型」，沒選就擋。</figcaption></figure>
+      <ol class="do" start="3">
+        <li>姓名填「王小明」、血型隨便選一個。電話打 <code>322-1234</code>（市話忘了區碼），按「新增志工」：被擋。改打 <code>(02) 1234-5678</code>，再按一次：收進去了，市話也是電話。</li>
+      </ol>
+      <figure class="wide"><img src="images/v5/s1-4-phone.jpg" alt="322-1234 被擋"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>市話忘了區碼，被擋下來。</figcaption></figure>
+      <figure><img src="images/v5/s1-5-landline.jpg" alt="(02) 1234-5678 收進去"><figcaption>含區碼的市話，收進清單了。手機 <code>0912345678</code> 也收。</figcaption></figure>
+
       <div class="table-scroll">
       <table>
-        <thead><tr><th>觀察點</th><th>沒 harness</th><th>有 harness</th></tr></thead>
+        <thead><tr><th>看哪裡</th><th>沒給規矩</th><th>有給規矩</th></tr></thead>
         <tbody>
-          <tr><td class="grp" colspan="3">顏色｜它自己那套是對的實務，但合不進你們的系統</td></tr>
-          <tr><td>主色</td><td>橘色 <code>#e8590c</code>，AI 自己挑的</td><td>紅色 <code>#C8232C</code>，規則指定的</td></tr>
-          <tr><td>色票名稱</td><td>自己發明一套</td><td>照你們給的那套</td></tr>
-          <tr><td>品牌紅有沒有用到</td><td><strong>一次都沒有</strong></td><td>有</td></tr>
-          <tr><td>沒走色票、直接寫死的顏色</td><td><strong>5 處</strong></td><td><strong>0 處</strong></td></tr>
-          <tr><td class="grp" colspan="3">業務規則｜顏色錯了看得出來，驗證規則錯了要等資料髒掉才發現</td></tr>
-          <tr><td>電話怎麼驗</td><td>6～15 個字，數字、括號、空白都收</td><td>手機 09 開頭 10 碼；市話要含區碼</td></tr>
-          <tr><td>輸入 <code>(02) 1234-5678</code>（市話）</td><td>會過</td><td>會過（市話也是電話）</td></tr>
-          <tr><td>輸入 <code>322-1234</code>（市話忘了打區碼）</td><td><strong>會過</strong>，存進去也打不通</td><td>被擋，提示要加區碼</td></tr>
-          <tr><td>血型選項</td><td>5 個，多一個「不明」</td><td>4 個</td></tr>
-          <tr><td><strong>血型預設值</strong></td><td><strong>一打開就已經選好「A」</strong>，不改就送出</td><td>預設是「請選擇血型」，沒選會被擋下來（出處：規矩【表單互動】最後一條，見下方）</td></tr>
-          <tr><td>血型有沒有驗</td><td><strong>完全沒驗</strong>，任何情況都不會擋</td><td>沒選就跳「請選擇血型」</td></tr>
+          <tr><td>主色</td><td>橘色，AI 自己挑的</td><td>品牌紅 <code>#C8232C</code>，規矩指定的</td></tr>
+          <tr><td>寫死的顏色</td><td>5 處</td><td>0 處（全部用 token）</td></tr>
+          <tr><td>血型預設值</td><td><strong>一打開就是「A」</strong></td><td>「請選擇血型」，沒選就擋</td></tr>
+          <tr><td>血型有沒有檢查</td><td><strong>完全沒檢查</strong></td><td>沒選就跳紅字</td></tr>
+          <tr><td>電話 <code>322-1234</code></td><td><strong>收進去</strong>，存了也打不通</td><td>擋下來，要加區碼</td></tr>
           <tr><td>必填星號</td><td>沒有</td><td>4 個必填欄都有</td></tr>
-          <tr><td class="grp" colspan="3">多做的｜兩邊都自己加東西——harness 管得住「怎麼寫」，管不住「做多少」</td></tr>
-          <tr><td>關掉再開，資料還在嗎</td><td>在（自己加的）</td><td>在（自己加的）</td></tr>
-          <tr><td>清單空的時候</td><td>有一句提示（自己加的）</td><td>有一句提示</td></tr>
-          <tr><td>刪除確認</td><td>瀏覽器內建的小視窗</td><td>頁面自己做的彈窗</td></tr>
-          <tr><td>表格欄位</td><td>多一個流水號欄</td><td>照需求</td></tr>
-          <tr><td class="grp" colspan="3">無障礙網頁｜多出來的行數，一半花在這裡</td></tr>
-          <tr><td>哪一欄填錯，唸不唸得出來</td><td>唸不出來</td><td>4 個欄位都綁好了</td></tr>
-          <tr><td>畫面變動會不會自動唸</td><td>不會</td><td>會</td></tr>
-          <tr><td>表頭有沒有標明是欄標題</td><td>沒有</td><td>4 欄都有</td></tr>
-          <tr><td>彈窗的鍵盤操作</td><td>交給瀏覽器內建視窗</td><td>自己處理 Esc 關閉與游標歸位</td></tr>
-          <tr><td class="grp" colspan="3">RWD 手機版｜同一頁用手機開，還能不能用</td></tr>
-          <tr><td>有沒有給手機看的那行設定</td><td><strong>沒有</strong>，真的用手機開會整頁縮成一小張</td><td>有</td></tr>
-          <tr><td>表格到手機</td><td>還是寬表格，要左右拖</td><td>自動變成一張一張卡片</td></tr>
-          <tr><td>表單到手機</td><td>會變單欄</td><td>會變單欄</td></tr>
-          <tr><td>按鈕到手機</td><td>照原寬</td><td>撐滿整列，好按</td></tr>
-          <tr><td class="grp" colspan="3">規模｜行數多一倍不是囉嗦，是多做了上面那些</td></tr>
-          <tr><td>檔案行數</td><td>312 行</td><td>752 行</td></tr>
-          <tr><td>程式裡的名字</td><td><code>volForm</code>、<code>blood</code>，隨手取</td><td><code>volunteer-form</code>、<code>blood-type-select</code>，完整</td></tr>
         </tbody>
       </table>
       </div>
+      <details><summary>想多看：兩版的其他差別（手機版、無障礙、程式行數）</summary>
+        <ul>
+          <li>兩邊都自己多做了東西（關掉再開資料還在、清單空的時候有提示）：規矩管得住「怎麼寫」，管不住「做多少」。</li>
+          <li>有規矩那版多做了手機版（表格變卡片）和無障礙（螢幕報讀唸得出哪一欄填錯），所以程式行數多一倍（312 行 → 752 行）。</li>
+        </ul>
+      </details>
 
-      <div class="block-title"><span class="ico">📌</span>「血型不能預設帶第一個」寫在哪</div>
-      <p>規矩要<strong>白紙黑字寫出來</strong>，AI 才有出處。這一條在教材裡寫在下面這幾份檔案，內容一樣：</p>
+      <h3>③ 這條規矩寫在哪 <a class="watch" href="animation-hands/index.html#s10-1">▶ 看動畫</a></h3>
+      <p>規矩要<strong>白紙黑字寫出來</strong>，AI 才有出處。「下拉不准預設帶第一個」寫在這三個地方，內容一樣：</p>
       <ol>
-        <li>step1 有規矩那版的需求：<code>step1_why_harness/demo/PROMPT.md</code> 版本 B 的【表單互動】最後一條。</li>
-        <li>step2 範本的專案憲法：<code>sample-app/CLAUDE.md</code>「程式規則精華」第 11 條。</li>
-        <li>step2 範本的細則：<code>CODE-RULES-ui-本專案.md</code>「選項欄位預設值」那一列，和 <code>design-system-summary.md</code> 的 Form Rules。</li>
+        <li>Step 1 有規矩那版的需求：<code>step1_why_harness/demo/PROMPT.md</code> 版本 B【表單互動】。</li>
+        <li>Step 2 範本的總綱：<code>sample-app/CLAUDE.md</code> 第 11 條。</li>
+        <li>Step 2 範本的細則：<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>。</li>
       </ol>
-      <pre><code>選項欄位（下拉選單、單選）新增時一律空白，顯示「請選擇○○」，不准自動帶第一個選項。
-必填的沒選就擋下。
-只有規格明文寫了預設值、也寫了理由的欄位，才可以帶預設值。
-規格沒寫的，釐清時要用選擇題問。</code></pre>
-      <p>理由只有一句：<strong>帶了預設值，使用者沒改就送出，存進去的就是錯的資料，而且當場不會報錯。</strong>step2 你會看到範本的「性別」也照這條：新增時是空白，要自己選。</p>
-      <p>電話也一樣是業務決定：<strong>市話當然是電話</strong>，所以有規矩那版手機、市話都收，只擋格式不對的。電話要不要拆成手機、市話兩欄，規矩沒有替你決定——step3 的 AI 會用選擇題問你。</p>
+      <figure><img src="images/v5/s1-6-rule11.jpg" alt="CLAUDE.md 第 11 條"><figcaption><code>CLAUDE.md</code> 第 11 條：選項欄位新增時一律空白，不准預設帶第一個。</figcaption></figure>
 
       <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        把 harness 想成韁繩／馬具：<strong>不是限制馬跑，是讓馬跑得直。</strong> 馬（AI）的力氣一樣大，差別在有沒有方向。AI 越強，這件事越重要——因為它自己決定的東西會越來越合理、越來越好看，<strong>你越不容易發現它其實沒照你們的規矩走</strong>。<br><br>上面那張表最該記住的是<strong>血型預設值</strong>那一列：左邊那版一打開就替使用者選好「A」，志工沒改到，存進去的就是一筆錯的血型；而且它<strong>完全沒驗這一欄</strong>，錯了不會當場報錯，<strong>要等到真的要輸血才會知道</strong>。AI 不是不會寫驗證——是<strong>沒有人告訴它哪些欄位錯不起</strong>。這正是 harness 要寫下來的東西。一句話結論：<strong>同一句需求，差的不是 AI 的能力，是你有沒有把決定權拿回來。</strong>
+        <b class="t">💡 為什麼</b>
+        帶了預設值，使用者沒改就送出，存進去的就是錯的資料，<strong>而且當場不會報錯</strong>——要等到真的要輸血才發現。AI 不是不會寫檢查，是沒人告訴它哪些欄位錯不起。這些錯不起的事，就是要放進滷包的規矩。
       </div>
     </div>
   </section>
@@ -352,106 +354,101 @@ bash preflight.sh</code></pre>
   <section class="step" id="step2">
     <div class="step-head">
       <div class="step-num">2</div>
-      <h2>CRUD 快速完工秘笈</h2>
+      <h2>把範本跑起來、認識規矩</h2>
+      <a class="watch" href="animation-hands/index.html#s12-1">▶ 看動畫 第 12～19 段</a>
     </div>
     <div class="step-body">
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>這一步我們把課程的<strong>範本實際啟動起來，當使用者從頭操作一遍</strong>。想知道滷包（harness）跟配方（範本）裡面到底寫了什麼，就打開 <code>step2_speedrun_kit/</code> 這<strong>兩個資料夾</strong>裡的文件。照 ①→⑤ 走，<strong>每一步都會點名你此刻要打開哪一份</strong>；沒被點到的，回公司想查再翻。</p>
+      <div class="goal">
+        <b class="t">🎯 做完這一步</b>
+        <ol>
+          <li>範本「人員管理」在你的電腦跑起來，五件事都點過：新增、編輯、刪除、篩選、匯出。</li>
+          <li>知道四份規矩放在哪；Step 3 複製範本時，它們會一起帶走。</li>
+        </ol>
+      </div>
+
+      <h3>① 安裝並啟動範本 <a class="watch" href="animation-hands/index.html#s12-1">▶ 看動畫</a></h3>
+      <p>先看終端機開頭：要是 <code>…\AI_CRUD_Workshop_Frontend_EASY&gt;</code>。如果最後是 <code>step0_course_intro&gt;</code>，先打 <code>cd ..</code>。然後一行貼一次；等 <code>pnpm install</code> 出現 Done，再貼 <code>pnpm dev</code>：</p>
+      <pre><code>cd step2_speedrun_kit/2.1_sample_app/sample-app
+pnpm install
+pnpm dev</code></pre>
+      <figure><img src="images/v5/s2-1-dev.jpg" alt="pnpm dev 印出 Local 網址"><figcaption>按住 Ctrl，點 Local 後面的藍色網址。<strong>這個終端機要一直開著</strong>。數字不是 3100 也正常：被占用時它會自己換一個。</figcaption></figure>
+
+      <h3>② 當使用者玩一輪 <a class="watch" href="animation-hands/index.html#s13-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li><strong>新增</strong>：點「新增人員」。性別、證件類別都是空白的「請選擇」——這就是 Step 1 那條規矩。只有「狀態」先帶「在職」，因為規格寫了理由。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s2-2-new.jpg" alt="新增人員：性別、證件類別空白"><figcaption>下拉一開始空白，要自己選。</figcaption></figure>
+      <figure class="mid"><img src="images/v5/s2-3-errors.jpg" alt="沒選就儲存：紅字"><figcaption>沒選就按儲存：那一格下面跳紅字。</figcaption></figure>
+      <p>把紅字的欄位都填好、選好，再按儲存：右下角出現「已新增人員」，回到列表，看得到新的那一筆。</p>
+      <ol class="do" start="2">
+        <li><strong>編輯</strong>：點鉛筆圖示，改一下備註，儲存。再試一次：清空姓名按儲存，會跳紅字；試完按「取消」就好。</li>
+        <li><strong>刪除</strong>：點垃圾桶，先跳確認框，按紅色「刪除」才刪。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s2-4-delete.jpg" alt="刪除人員確認框"><figcaption>刪除前先確認。</figcaption></figure>
+      <ol class="do" start="4">
+        <li><strong>篩選</strong>：關鍵字打「陳」、狀態選「在職」，清單馬上只剩符合的。把網址複製，貼到同一台電腦的新分頁，條件原樣還原。</li>
+      </ol>
+      <figure><img src="images/v5/s2-5-filter.jpg" alt="篩選：關鍵字與狀態"><figcaption>條件會寫進網址，所以新分頁打開，看到的一樣。</figcaption></figure>
+      <ol class="do" start="5">
+        <li><strong>匯出</strong>：先按「清除」清掉條件，再按「匯出 CSV」：匯出全部 24 筆，不是只有這一頁的 20 筆。有篩選時，只匯出符合條件的全部。</li>
+      </ol>
+      <figure><img src="images/v5/s2-6-export.jpg" alt="匯出 CSV"><figcaption>沒篩選時：右下角提示「已匯出 24 筆」。</figcaption></figure>
+      <p>加分：把視窗拉窄到手機寬度，表格會變成一張一張卡片。</p>
+
+      <h3>③ 範本的 8 個核心檔：複製還是共用 <a class="watch" href="animation-hands/index.html#s17-1">▶ 看動畫</a></h3>
+      <p>左邊點開 <code>step2_speedrun_kit/2.1_sample_app/README.md</code>，按 <strong>Ctrl+Shift+V</strong> 看預覽（不然只看到一堆 # 和 |）。看「8 個核心檔」那張表：</p>
+      <figure class="wide"><img src="images/v5/s2-7-readme.jpg" alt="README 預覽"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>按 Ctrl+Shift+V 後，預覽長這樣。表格往下捲還有。</figcaption></figure>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>資料夾</th><th>是什麼</th><th>哪些步驟會用到</th></tr></thead>
+        <thead><tr><th>核心檔</th><th>做什麼</th><th>做新模組時</th></tr></thead>
         <tbody>
-          <tr><td><code>2.1_sample_app</code></td><td>範本正本（可跑的人員 CRUD）＋規格文件＋UML 圖；harness 四件的實檔也在裡面</td><td>① ② ③ ④</td></tr>
-          <tr><td><code>2.2_design_system</code></td><td>Design System：token 實檔、色票與間距手冊、元件目錄</td><td>⑤</td></tr>
+          <tr><td>列表頁 <code>index.vue</code></td><td>清單、篩選、分頁</td><td><strong>複製改名</strong></td></tr>
+          <tr><td>明細頁 <code>[id].vue</code></td><td>新增、檢視、編輯</td><td><strong>複製改名</strong></td></tr>
+          <tr><td>資料 <code>useTemplateMembers.ts</code></td><td>這種資料有哪些欄位、示範資料</td><td><strong>複製改名</strong></td></tr>
+          <tr><td>欄位外框 <code>TemplateFormField.vue</code></td><td>欄位名稱、紅星、紅字</td><td><strong>複製改名</strong></td></tr>
+          <tr><td>狀態標籤 <code>TemplateStatusBadge.vue</code></td><td>狀態的顏色</td><td><strong>複製改名</strong></td></tr>
+          <tr><td>列表狀態工廠 <code>useTemplateListPage.ts</code></td><td>篩選、排序、分頁寫進網址</td><td>直接共用</td></tr>
+          <tr><td>檢查規則 <code>templateValidation.ts</code></td><td>必填、電話、證號怎麼檢查</td><td>直接共用</td></tr>
+          <tr><td>CSV 匯出 <code>templateCsv.ts</code></td><td>匯出、Excel 不亂碼</td><td>直接共用</td></tr>
         </tbody>
       </table>
       </div>
+      <p>判斷只有一句：跟「這個資料長什麼樣子」有關的 → <strong>複製改名</strong>；通用的機制 → <strong>直接共用</strong>。</p>
+      <p>比喻：開分店。招牌、價目表要換（複製改名）；收銀機、冷氣照用（直接共用）。Step 3 你會看 AI 有沒有照這樣做。</p>
 
-      <h3>① 安裝並啟動範本</h3>
-      <pre><code>cd step2_speedrun_kit/2.1_sample_app/sample-app
-pnpm install      # 首次安裝依賴，順帶產生型別
-pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視窗要一直開著）</code></pre>
-      <p>開瀏覽器到 <code>http://localhost:3100/template/crud</code>（開根網址會自動導向）。<strong>網址裡的 <code>template</code> 就是這個範本模組在程式裡的名字</strong>——step3 你會把它整套複製改名成 <code>equipment</code>，網址也跟著變成 <code>/equipment/crud</code>。</p>
-
-      <h3>② 當使用者玩一輪：CRUD 五個檢查點</h3>
-      <p>逐一操作，確認每個都能重現（預期畫面見下面「你應該看到」）：<strong>新增一筆 → 進檢視頁編輯 → 刪除跳二次確認 → 關鍵字＋狀態篩選後複製網址開新分頁 → 匯出 CSV</strong>。</p>
-      <p>加分兩件：編輯時清空必填欄位按儲存（看欄位下方紅字）、把視窗縮到手機寬度（看表格變卡片）。</p>
-      <p><strong>新增時注意看下拉選單：</strong>性別、證件類別、編組、職務一開始都是空白的「請選擇○○」，要你自己選；沒選就按儲存，那一格下面會跳紅字。這就是 step1 血型那條規矩（<code>CLAUDE.md</code> 第 11 條）。只有「狀態」預設「在職」，因為範本的規格明文寫了：新加入的人一定在職。電話打手機或市話都可以，例如 <code>0912345678</code>、<code>089-123456</code>。</p>
-
-      <h3>③ 看懂範本結構：8 個核心檔</h3>
-      <p>打開 <code>2.1_sample_app/README.md</code>，對照裡面的「<strong>8 個核心檔（複製改名 vs 直接共用）</strong>」表看一遍。判斷準則只有一句：<strong>跟「這個實體長什麼樣子」有關的 → 複製改名；通用機制 → 直接共用。</strong>這張表就是 step3 你要叫 AI 照著做的事。</p>
-
-      <h3>④ 認識規矩：規矩放在哪、誰會去讀</h3>
-      <p><strong>你不需要讀懂裡面的每一條規則</strong>——那是寫給 AI 讀的。就像滷茶葉蛋不必知道滷包裡有幾味藥材，但你得知道<strong>滷包放在哪、什麼時候丟下去、換鍋子的時候要不要一起帶走</strong>。這一步只要弄懂三件事。</p>
-      <figure><img src="images/step2_bilingual.jpg" alt="雙語系統：HTML 給人看、Markdown 給 AI 看">
-        <figcaption>同一個專案，兩種讀者：<code>.html</code> 給人看（像這份手冊），<code>.md</code> 給 AI 看（harness 四件全是）。所以「不用讀懂每一條規則」是真的——那幾份的讀者本來就不是你。</figcaption></figure>
-      <blockquote><strong>「不用讀」講得更精準：</strong>不用<em>逐條讀懂</em>，不等於四份都不看。人至少要<strong>掃過 <code>CLAUDE.md</code></strong>——只有 49 行、30 秒看完，你會看到「鎖定技術棧不准換套件、禁止硬編碼顏色、選項欄位不准預設帶第一個」這類鐵律；<strong>開新模組前要讀 <code>使用說明-複製範本開發新模組.md</code></strong>（那份本來就是寫給人看的）。另外兩份由 AI 改碼時查。<br><strong>比喻的邊界：</strong>它只管「滷包放哪、要不要帶走」，<strong>不負責回答「滷包裡的規矩對不對」</strong>——業務規則寫錯（例如「不能匯出個資」寫反了），AI 會照著做，錯得更快更整齊。規矩的內容要有人負責、有版本、有人審。</blockquote>
-      <div class="flow">2.1_sample_app/sample-app/          ← 這一鍋就是範本專案
-
-  <b>【滷包】給 AI 的規矩 — 4 份，不用逐條讀懂</b>
-  ├─ CLAUDE.md                       專案憲法：技術棧鎖定、鐵律精華
-  ├─ CODE-RULES-ui-本專案.md          前端規則細則：樣式／驗證／行數預算
-  ├─ design-system-summary.md        視覺 token 摘要：顏色與間距怎麼用
-  └─ 使用說明-複製範本開發新模組.md     操作手冊：哪些複製、哪些共用
-     （旁邊還有 AGENTS.md，是給部分 Agent 的入口便條，內容只寫「去讀 CLAUDE.md」）
-
-  <b>【配方】範本程式 — AI 照著填的骨架，③ 對照過的 8 核心檔就在這裡</b>
-  ├─ pages/         列表頁、明細頁
-  ├─ components/    欄位元件、狀態徽章、共用 App* 元件
-  ├─ composables/   資料層、列表狀態工廠
-  └─ utils/         驗證引擎、CSV 匯出
-
-  <b>【不用管】設定檔</b>
-  └─ package.json　nuxt.config.ts　tsconfig.json　app.config.ts …</div>
-      <p><strong>滷包怎麼用？答案是你幾乎什麼都不用做：</strong></p>
+      <h3>④ 四份規矩放在哪 <a class="watch" href="animation-hands/index.html#s18-1">▶ 看動畫</a></h3>
+      <figure class="narrow"><img src="images/v5/s2-8-harness.jpg" alt="sample-app 最上層的四份規矩"><figcaption><code>sample-app</code> 最上層這四份 <code>.md</code> 就是規矩（harness）。</figcaption></figure>
       <ol>
-        <li><strong>滷包不用你端上桌。</strong><strong>不管你用哪一個 AI，規矩都會被讀到</strong>——有些 Agent 一開對話就自動讀根目錄的規則檔；不會自動讀的，step3 的起手 prompt 第一句就是「先依序讀完這四份文件再動作」。<strong>你不需要做任何設定</strong>。（哪個 Agent 屬於哪一種，見 <code>step2_speedrun_kit/README.md</code> 的對照表。）</li>
-        <li><strong>滷包跟著鍋子走。</strong>step3 你會把整個 <code>sample-app</code> 複製成 <code>my-equipment-app</code>，這四份會一起被複製過去。新模組不必重新設定，直接繼承同一套規矩。</li>
-        <li><strong>要改口味就改滷包本身。</strong>全教材只有這一份實檔，沒有第二份副本，改完立刻對 AI 生效。</li>
+        <li><code>CLAUDE.md</code>：總綱。用什麼技術、哪些檔不能動，還有 11 條程式規則。<strong>你至少要掃過一次</strong>，只有 49 行。</li>
+        <li><code>CODE-RULES-ui-本專案.md</code>：細則。</li>
+        <li><code>design-system-summary.md</code>：顏色和間距怎麼用。</li>
+        <li><code>使用說明-複製範本開發新模組.md</code>：怎麼複製範本開新模組。</li>
       </ol>
+      <p>你不用逐條讀懂，那是寫給 AI 讀的。你要知道兩件事：</p>
+      <ul>
+        <li><strong>放在哪</strong>：AI 會自己讀；不會自己讀的，Step 3 的起手 prompt 會叫它讀。你不用做任何設定。</li>
+        <li><strong>跟著鍋子走</strong>：Step 3 複製範本時，四份一起帶過去。複製後，範本和你的新專案<strong>各有一套</strong>，不會自動同步；要改你新專案的規矩，就改新專案最上層那四份。</li>
+      </ul>
+      <p>注意：規矩寫錯，AI 會照著錯，而且錯得又快又整齊。規矩的內容要有人負責確認。</p>
 
-      <h3>⑤ 認識 token：Design System</h3>
-      <p>用瀏覽器打開 <code>2.2_design_system/DESIGN_SYSTEM.html</code> 看色票與間距（開不了瀏覽器就改看同資料夾的 <code>TOKENS_SUMMARY.md</code>，純文字版，順帶解釋了「token 檔裡明明有 <code>#C8232C</code>、<code>24px</code>，為什麼不算硬編碼」），知道顏色／間距<strong>一律走 token、不硬編碼</strong>就夠了——這是 step1 右邊那版之所以像老手寫的原因。</p>
+      <h3>⑤ Design System：顏色不寫死 <a class="watch" href="animation-hands/index.html#s19-1">▶ 看動畫</a></h3>
+      <p><code>pnpm dev</code> 那個終端機還在跑，不要關。按終端機右上角的「<strong>＋</strong>」開第二個，貼：</p>
+      <pre><code>start step2_speedrun_kit\2.2_design_system\DESIGN_SYSTEM.html</code></pre>
+      <figure><img src="images/v5/s2-9-ds.jpg" alt="Design System 頁面"><figcaption>每個顏色都有名字（token）。規矩要求只寫名字，不准寫死色碼：說「品牌紅」，不說「#C8232C」。要換色，只改一個地方。</figcaption></figure>
 
-      <blockquote><strong>這三份想查才翻，現在別花時間讀：</strong><code>2.1_sample_app/SPEC-範例-人員CRUD.md</code>（需求規格：Use Cases、FR／BR／NFR、驗收清單）、<code>2.1_sample_app/DESIGN-CRUD標準範本-v1.1.md</code>（設計文件：檔案結構、行數預算、各檔實作規格）、<code>2.1_sample_app/DIAGRAMS.html</code>（7 張 UML 圖，全部中文，用瀏覽器開）。它們是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</blockquote>
-
-      <div class="block-title"><span class="ico">🚑</span>裝不起來／跑不起來怎麼辦</div>
-      <p><code>pnpm install</code> 或 <code>pnpm dev</code> 噴一大串紅字，處置跟 step0 同一套：<strong>先看訊息有沒有明講原因</strong>（最常見是公司網路擋住 npm；port 3100 被占用不算錯，pnpm dev 會自動換埠印在終端機），還是不行就<strong>把終端機從你打的指令那一行開始整段複製，貼給 AI Agent</strong>——只貼最後一行紅字它判不準。可以用這個 prompt：</p>
-      <pre><code>範本專案的 pnpm 指令失敗了，完整輸出在下面，我用 Windows 11。
+      <div class="help">
+        <b class="t">🚑 卡住時</b>
+        <ul>
+          <li><strong>網頁打不開</strong>：多半是 <code>pnpm dev</code> 那個終端機被關了。回 <code>sample-app</code> 資料夾，重跑 <code>pnpm dev</code>。</li>
+          <li><strong>pnpm 噴一大串紅字</strong>：從你打的指令那一行開始整段複製，貼給 AI：
+            <pre><code>範本專案的 pnpm 指令失敗了，完整輸出在下面，我用 Windows 11。
 請說明原因，給我可複製的修復指令；不要改專案的程式碼。
 
 （從你輸入指令那一行開始整段貼上）</code></pre>
-      <blockquote>同樣是<strong>兩次停損</strong>：同一個錯誤 AI 修兩次還是不行，就舉手找講師——講師手上有預先打包好的 <code>node_modules</code> 離線包，不會讓你卡在安裝這一關。</blockquote>
-
-      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <div class="fig-grid">
-        <figure><img src="images/step2_template_list.png" alt="範本人員 CRUD 列表頁"><figcaption>範本列表頁：表格＋篩選＋分頁＋匯出 CSV。</figcaption></figure>
-        <figure><img src="images/step2_template_form.png" alt="範本新增表單"><figcaption>新增表單：Label 在上、必填加紅星、下拉選單一開始空白（請選擇○○）、送出防重複。</figcaption></figure>
-        <figure><img src="images/step2_template_detail.png" alt="範本檢視頁"><figcaption>檢視頁：單筆明細，可切到編輯。</figcaption></figure>
-        <figure><img src="images/step2_template_confirm.png" alt="刪除二次確認框"><figcaption>刪除確認框：標題寫「刪除人員」並帶出姓名，按紅色「刪除」才刪，不是空泛的「確認」。</figcaption></figure>
+            同一個錯誤 AI 修兩次還不行，舉手找講師（講師有離線安裝包）。</li>
+        </ul>
       </div>
-      <div class="fig-grid">
-        <figure><img src="images/step2_design_system.png" alt="Design System 展示頁"><figcaption>Design System：色票、間距、字級集中管理，AI 照這份配色。</figcaption></figure>
-        <figure><img src="images/step2_diagrams.png" alt="UML 七圖"><figcaption>UML 七圖：全部中文，每張圖上面寫「怎麼看」，不懂程式也看得懂。</figcaption></figure>
-      </div>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>操作</th><th>你應該看到</th></tr></thead>
-        <tbody>
-          <tr><td>新增人員 → 看下拉選單</td><td>性別、證件類別、編組、職務都是「請選擇○○」，沒選就儲存會跳紅字；只有狀態預設「在職」</td></tr>
-          <tr><td>新增人員 → 儲存</td><td>成功 toast<span class="note">（畫面角落跳出來、幾秒後自己消失的小提示）</span>，列表出現新增那筆</td></tr>
-          <tr><td>進檢視頁 → 編輯 → 儲存</td><td>值更新，回列表反映變更</td></tr>
-          <tr><td>垃圾桶 → 二次確認</td><td>跳出「刪除人員」確認框，按紅色「刪除」才刪</td></tr>
-          <tr><td>打「陳」＋狀態篩選 → 複製網址開新分頁</td><td>表格即時過濾，新分頁完整還原篩選與排序</td></tr>
-          <tr><td>匯出 CSV</td><td>匯出的是<strong>篩選＋排序後的全量</strong>，非只當頁</td></tr>
-        </tbody>
-      </table>
-      </div>
-
-      <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>範本給骨架</strong>：列表／明細／驗證／CSV／URL 同步／刪除確認全寫好了，複製改名即繼承。<strong>harness 給規矩</strong>：<code>CLAUDE.md</code> 是專案憲法，AI 每次對話自動讀，不會亂換套件、不硬編碼顏色。<strong>AI 出勞力</strong>：改欄位、改文案這種重複勞動交給 AI，你只負責決策與驗收。三者湊齊，一個全新 CRUD 模組半小時就能長出符合規範、可跑的骨架。
-      </div>
+      <p style="font-size:16px;color:var(--ink-soft)">想查才翻：<code>2.1_sample_app/</code> 裡的 SPEC（需求規格）、DESIGN（設計文件）、DIAGRAMS.html（8 張中文圖，用瀏覽器開）是「回公司要交的文件長什麼樣」的樣板，不是這一節的功課。</p>
     </div>
   </section>
 
@@ -459,37 +456,41 @@ pnpm dev          # 啟動 dev server（開發用的網頁伺服器；這個視�
   <section class="step" id="step3">
     <div class="step-head">
       <div class="step-num">3</div>
-      <h2>複製範本開發新模組<span class="star">重頭戲</span></h2>
+      <h2>做新模組：中心裝備物資 ★</h2>
+      <a class="watch" href="animation-hands/index.html#s20-1">▶ 看動畫 第 20～41 段</a>
     </div>
     <div class="step-body">
-      <figure><img src="images/step3_paradigm.jpg" alt="典範轉移：從執行者變成指揮官">
-        <figcaption>這一步你不寫程式：<strong>提需求、做決策、驗收成果</strong>是你的事；生成程式碼、修到測試全綠、寫 SRS、設計文件和圖是 AI 的事。（本課只用一個 Agent，第二個 AI 到 step4 對抗審查才登場。）</figcaption></figure>
+      <figure><img src="images/step3_paradigm.jpg" alt="從執行者變成指揮官"><figcaption>這一步你不寫程式：<strong>講清楚要什麼、拍板、驗收</strong>是你的事；寫文件、寫程式是 AI 的事。</figcaption></figure>
       <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <b class="t">🎯 做完這一步</b>
         <ol>
-          <li>讀懂白話 PRD：它是不懂程式的人寫的，<strong>一定有沒寫清楚的地方</strong>。</li>
-          <li>把 PRD 丟給 AI，讓它<strong>自己找出沒寫清楚的地方、出選擇題</strong>，你拍板。</li>
-          <li>打開瀏覽器驗收與修正，重現列表、表單、驗證、刪除、手機五件事。</li>
+          <li>只給 AI 一份白話 PRD，它<strong>自己找出沒寫清楚的地方</strong>，用選擇題問你，你拍板。</li>
+          <li>它先交文件和五張中文圖，<strong>你看過才說「開工」</strong>。</li>
+          <li>打開網頁驗收；有小落差，附畫面講。</li>
         </ol>
       </div>
+      <p>順序一句話：<strong>白話 PRD → AI 找缺口出題 → 你拍板 → AI 交文件和圖 → 你核過 → 說「開工」→ AI 寫程式 → 你驗收。</strong>這就是 SDD：先文件、再程式。</p>
 
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>要長出的新模組是<strong>中心裝備物資</strong>（跑在 <code>/equipment/crud</code>），用的是跟 step2 同一套範本＋harness。</p>
-
-      <h3>⓪ 準備工作區：用檔案總管複製範本</h3>
-      <p>先把範本複製成自己的工作專案。用 Windows 的<strong>檔案總管</strong>就做得到，不用打指令：</p>
-      <ol>
-        <li>在 VS Code 左邊的檔案總管，對 <code>step2_speedrun_kit/2.1_sample_app/sample-app</code> 按右鍵，選「<strong>在檔案總管中顯示</strong>」。Windows 的檔案總管會打開，<code>sample-app</code> 已經選好。按兩下 <code>sample-app</code> 進去。</li>
-        <li>按 <strong>Ctrl+A</strong> 全選。再<strong>按住 Ctrl</strong>，點一下 <code>node_modules</code>、<code>.nuxt</code>、<code>.output</code>，把這三個資料夾<strong>取消選取</strong>（沒看到的就是還沒產生，跳過）。</li>
-        <li>按 <strong>Ctrl+C</strong> 複製。</li>
-        <li>按左上角的向上箭頭「↑」<strong>三次</strong>，回到教材資料夾（<code>AI_CRUD_Workshop_Frontend_EASY</code>），再點進 <code>step3_new_module</code>。按 <strong>Ctrl+Shift+N</strong> 新增資料夾，名字打 <code>my-equipment-app</code>，按 Enter。</li>
-        <li>點進 <code>my-equipment-app</code>，按 <strong>Ctrl+V</strong> 貼上。</li>
-        <li>回到 <code>step3_new_module</code>，按住 Ctrl 點選三個檔：<code>PRD-中心裝備物資.md</code>、<code>技術約定-中心裝備物資.md</code>、<code>SRS-設計文件-最小樣板.md</code>。Ctrl+C，進 <code>my-equipment-app</code>，Ctrl+V。</li>
-        <li>回 VS Code：選單「檔案」→「開啟資料夾」，選 <code>step3_new_module\my-equipment-app</code>。開一個終端機，打 <code>pnpm install</code>，看到 Done 就好。之後在這個資料夾開 AI Agent。</li>
+      <h3>⓪ 用檔案總管複製範本 <a class="watch" href="animation-hands/index.html#s20-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li>VS Code 左邊，對 <code>step2_speedrun_kit/2.1_sample_app/sample-app</code> 按右鍵，選「<strong>在檔案總管中顯示</strong>」。</li>
       </ol>
-      <blockquote><strong>為什麼要跳過那三個資料夾：</strong>它們是自動產生的。<code>node_modules</code> 有幾萬個小檔，帶過去會複製很久，還可能失敗；<code>.nuxt</code>、<code>.output</code> 帶過去，一開網頁可能就 500。跳過也沒關係，<code>pnpm install</code> 和 <code>pnpm dev</code> 會自己重建。</blockquote>
-      <p><strong>備案：會用終端機的，可以改貼指令</strong>，效果一樣。在<strong>工作坊根目錄</strong>的終端機整段貼上；出現 <code>&gt;&gt;</code> 再按一次 Enter：</p>
-      <pre><code>$src = "step2_speedrun_kit\2.1_sample_app\sample-app"
+      <figure class="mid"><img src="images/v5/s3-1-reveal.jpg" alt="右鍵：在檔案總管中顯示"><figcaption>右鍵 →「在檔案總管中顯示」。</figcaption></figure>
+      <ol class="do" start="2">
+        <li>Windows 檔案總管打開了，<code>sample-app</code> 已經選好。按兩下進去，按 <strong>Ctrl+A</strong> 全選。</li>
+        <li><strong>按住 Ctrl</strong>，點一下 <code>node_modules</code>、<code>.nuxt</code>（有 <code>.output</code> 也點），取消選取。這些是自動產生的，帶過去又慢又容易出錯。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s3-2-deselect.jpg" alt="取消選取 node_modules 和 .nuxt"><figcaption>紅框這兩個要變成「沒選」（白底）。</figcaption></figure>
+      <ol class="do" start="4">
+        <li>按 <strong>Ctrl+C</strong> 複製。</li>
+        <li>按左上角的向上箭頭「↑」<strong>三次</strong>，回到教材資料夾，點進 <code>step3_new_module</code>。</li>
+        <li>按 <strong>Ctrl+Shift+N</strong> 新增資料夾，名字打 <code>my-equipment-app</code>。點進去，按 <strong>Ctrl+V</strong> 貼上。</li>
+        <li>回到 <code>step3_new_module</code>，按住 Ctrl 選三份文件：<code>PRD-中心裝備物資.md</code>、<code>技術約定-中心裝備物資.md</code>、<code>SRS-設計文件-最小樣板.md</code>。Ctrl+C，進 <code>my-equipment-app</code>，Ctrl+V。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s3-3-done.jpg" alt="my-equipment-app 裡有規矩和三份文件"><figcaption>貼好後，<code>my-equipment-app</code> 裡有規矩（例如 <code>CLAUDE.md</code>）和 PRD；往下捲還有技術約定、最小樣板。左下角寫「已選取 3 個項目」，就是三份都貼進來了。</figcaption></figure>
+      <details><summary>會用終端機的：改貼指令，效果一樣</summary>
+        <p>在教材根目錄的終端機整段貼上；出現 <code>&gt;&gt;</code> 再按一次 Enter：</p>
+        <pre><code>$src = "step2_speedrun_kit\2.1_sample_app\sample-app"
 $dst = "step3_new_module\my-equipment-app"
 robocopy $src $dst /E /XD node_modules .nuxt .output | Out-Null
 Copy-Item step3_new_module\PRD-中心裝備物資.md $dst\
@@ -497,138 +498,162 @@ Copy-Item step3_new_module\技術約定-中心裝備物資.md $dst\
 Copy-Item step3_new_module\SRS-設計文件-最小樣板.md $dst\
 cd $dst
 pnpm install</code></pre>
-      <p>macOS／Linux（終端機）：</p>
-      <pre><code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output step2_speedrun_kit/2.1_sample_app/sample-app/ step3_new_module/my-equipment-app/
-cp step3_new_module/PRD-中心裝備物資.md step3_new_module/my-equipment-app/
-cp step3_new_module/技術約定-中心裝備物資.md step3_new_module/my-equipment-app/
-cp step3_new_module/SRS-設計文件-最小樣板.md step3_new_module/my-equipment-app/
+        <p>macOS：</p>
+        <pre><code>rsync -a --exclude node_modules --exclude .nuxt --exclude .output step2_speedrun_kit/2.1_sample_app/sample-app/ step3_new_module/my-equipment-app/
+cp step3_new_module/PRD-中心裝備物資.md step3_new_module/技術約定-中心裝備物資.md step3_new_module/SRS-設計文件-最小樣板.md step3_new_module/my-equipment-app/
 cd step3_new_module/my-equipment-app
 pnpm install</code></pre>
-      <blockquote><strong>🚑 一開頁就 500、錯誤訊息寫 <code>useColorMode is not defined</code>？</strong>不是你的程式壞了，是舊的建置快取被複製過來了。關掉 dev server，把<strong>你這個工作專案</strong>（<code>my-equipment-app</code>）裡的 <code>.nuxt</code> 和 <code>.output</code> 兩個資料夾刪掉，再 <code>pnpm dev</code> 就好——它們是產物，砍了會自動重生。<strong>注意：刪的是你的工作專案，不要去刪 <code>2.1_sample_app/sample-app</code> 的。</strong>（照上面做已經跳過這兩個資料夾，正常不會遇到；這裡留著是為了萬一。）</blockquote>
+      </details>
 
-      <h3>① 讀 PRD</h3>
-      <p>打開 <code>PRD-中心裝備物資.md</code>。這份是<strong>中心的裝備管理員用自己的話寫的</strong>：要記哪些資料、要能做什麼、這一版不做什麼。題目取材自真實災防平台（原系統 26 欄＋借用歸還＋保養提醒，課堂上做不完），這一版只留 12 項資料。</p>
-      <p>你會發現它<strong>沒有欄位英文名、沒有資料型別，也沒有選擇題</strong>——不懂程式的人本來就寫不出那些。它也<strong>一定有沒寫清楚的地方</strong>：品項編碼怎麼編、打錯了能不能刪、保管人電話收不收市話……這些不用你先想好，<strong>下一步 AI 會自己找出來問你</strong>。</p>
-      <p>旁邊的 <code>技術約定-中心裝備物資.md</code> 是<strong>資訊單位給 AI 的</strong>（網址、欄位英文名、測試要用的掛點），你不用讀。回公司也一樣：業務寫白話 PRD，資訊單位補技術約定，缺口交給 AI 問。</p>
+      <h3>① 打開新專案、裝套件 <a class="watch" href="animation-hands/index.html#s22-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li>VS Code 選單「檔案」→「開啟資料夾」，選 <code>step3_new_module\my-equipment-app</code>。視窗會整個重開，這是正常的。</li>
+        <li>開一個終端機，打 <code>pnpm install</code>，看到 Done 就好。</li>
+      </ol>
+      <figure class="narrow"><img src="images/v5/s3-4-myapp.jpg" alt="新專案左邊看得到規矩和文件"><figcaption>左邊看得到四份規矩，還有帶進來的文件。</figcaption></figure>
 
-      <h3>② 貼起手 prompt，讓 AI 先問問題</h3>
-      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔）。整段複製貼上：</p>
+      <h3>② 讀白話 PRD <a class="watch" href="animation-hands/index.html#s23-1">▶ 看動畫</a></h3>
+      <p>打開 <code>PRD-中心裝備物資.md</code>，按 Ctrl+Shift+V 看預覽。這份是<strong>中心的裝備管理員用自己的話寫的</strong>：沒有英文欄位名，也沒有選擇題。</p>
+      <figure><img src="images/v5/s3-5-prd.jpg" alt="PRD 開頭：誰寫的"><figcaption>它一定有沒寫清楚的地方，例如品項編碼只寫「系統自己編」。這些不用你先想到，<strong>下一步 AI 會自己找出來問你</strong>。</figcaption></figure>
+      <p>旁邊的 <code>技術約定-中心裝備物資.md</code> 是資訊單位寫給 AI 的（網址、欄位英文名），你不用讀。</p>
+
+      <h3>③ 打開 Claude Code、選模型 <a class="watch" href="animation-hands/index.html#s24-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li>點 VS Code <strong>右下角的「Claude Code」</strong>，打開對話。右下角沒有它，代表還沒裝好或還沒登入，舉手找講師。</li>
+      </ol>
+      <figure class="mid"><img src="images/v5/s3-6-status.jpg" alt="右下角 Claude Code"><figcaption>右下角「Claude Code」。</figcaption></figure>
+      <ol class="do" start="2">
+        <li>點輸入框下面的模型名稱，選 <strong>Opus 5.5</strong>；同一個選單裡的 <strong>Effort 拉到 High</strong>（effort＝AI 想多深）。寫文件要想得深。</li>
+      </ol>
+      <figure><img src="images/v5/s3-7-model.jpg" alt="模型選 Opus 5.5、Effort High"><figcaption>選 Opus 5.5，Effort 拉到 High。</figcaption></figure>
+      <ol class="do" start="3">
+        <li>輸入框右下角的核准模式切成 <strong>Auto</strong>。不然它每跑一個指令都會停下來問你。公司電腦照公司規定。</li>
+      </ol>
+
+      <h3>④ 貼起手 prompt <a class="watch" href="animation-hands/index.html#s25-1">▶ 看動畫</a></h3>
+      <p>這段<strong>貼在 Claude Code 的對話輸入框</strong>，按送出：</p>
       <pre><code>用 CRUD 範本做新模組「中心裝備物資」，走規格驅動開發（SDD）：先文件，再程式。
 先讀 CLAUDE.md、CODE-RULES-ui-本專案.md、使用說明-複製範本開發新模組.md、PRD-中心裝備物資.md、技術約定-中心裝備物資.md，先不要寫程式。
 PRD 沒寫清楚的地方，照 SRS-設計文件-最小樣板.md 的釐清規矩，用選擇題逐題問我，每題標出建議和一句理由。
 我拍板後，照同一份樣板產出 SRS、設計文件、UML 圖和任務清單；等我說「開工」才寫程式，每做完一個回報一行。</code></pre>
-      <blockquote><strong>模型怎麼選：</strong>文件階段（選擇題、SRS、設計文件、圖）用 <strong>Opus 5.5</strong>、effort High<span class="note">（effort＝讓 AI 想得多深的設定）</span>。說「開工」寫程式前，把模型切成 <strong>Sonnet 5.5</strong>——有 harness 和範本，寫程式不用最貴的模型。<br><strong>一直跳出「允許嗎」？</strong>Claude Code 每個指令都問你的話，可以在輸入框右下角把核准模式切成 Auto（自動核准），課堂上才走得開；公司電腦照公司規定。</blockquote>
-      <p>流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 出文件和任務 → 你確認 → AI 逐項做並回報。</strong>這就是 SDD（規格驅動開發）：先文件，再程式。</p>
-      <div class="flow">你：貼<b>【起手 prompt】</b>
-   ▼
-AI：依序讀 CLAUDE.md → CODE-RULES → 使用說明 → PRD → 技術約定
-   ▼
-AI：先不寫程式，找出 PRD 沒寫清楚的地方，用<b>「選擇題」</b>問你（每題 2-4 選項＋建議）
-   ▼
-你：一題一題拍板（可直接採納建議）
-   ▼
-AI：照最小樣板產出<b>「SRS、設計文件、圖、任務清單」</b>（任務 8-10 個），停下等你確認
-   ▼
-你：說<b>「開工」</b>
-   ▼
-AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
+      <figure class="wide"><img src="images/v5/s3-8-prompt.jpg" alt="起手 prompt 貼進輸入框"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>貼進輸入框；下面看得到 Opus 5.5 High 和 Auto。它會先讀規矩、PRD 和技術約定，先不寫程式。</figcaption></figure>
 
-      <h3>③ 一題一題拍板</h3>
-      <p>PRD 沒寫清楚的地方，AI 會一題一題問。<strong>題目的字句每次都不一樣，題數也不一定</strong>；照意思對到下表，逐題拍板：</p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>AI 可能這樣問</th><th>課堂拍板</th><th>為什麼 PRD 沒寫</th></tr></thead>
-        <tbody>
-          <tr><td>品項編碼怎麼編？</td><td><strong>類別代號－項目三碼－流水號</strong>，例 <code>PW-GEN-001</code></td><td>PRD 只說「每樣東西一個編號」，沒說規則</td></tr>
-          <tr><td>打錯了要不要能刪掉？</td><td><strong>要，刪之前跳確認框</strong></td><td>PRD 沒提刪除；舊系統根本不能刪</td></tr>
-          <tr><td>交給縣府的清冊用什麼格式？</td><td><strong>CSV</strong>（Excel 打得開），匯出篩選後的全部筆數</td><td>PRD 只說「每季要交」</td></tr>
-          <tr><td>保管人電話：一欄，還是拆成手機、市話兩欄？</td><td><strong>一欄，手機和市話都收</strong></td><td>PRD 只寫「電話」</td></tr>
-          <tr><td>新增時，狀態要不要先帶「正常」？</td><td><strong>要，預設「正常」</strong>（分類、項目還是空白）</td><td>規矩是選項不預設；要帶預設，就要你拍板</td></tr>
-          <tr><td>採購日期可以填未來的日期嗎？</td><td><strong>不行，最晚到今天</strong></td><td>PRD 沒寫</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <blockquote>題目不用背。重點是理解：<strong>PRD 是不懂程式的人寫的，缺口是正常的；找出缺口是 AI 的事，做決定的人是你。</strong>表上沒有的題目，選它標「建議」的。表上有、它卻沒問的，你在拍板時自己補問一句，例如「交給縣府的清冊要做匯出嗎？」——step4 的自動測試只驗得到其中幾題，不能靠它補。<br>如果 AI 沒問就直接開始寫程式，別讓它跑——貼這段救援 prompt 打斷它：</blockquote>
-      <pre><code>停，先不要寫程式、不要建檔案。
-先把 PRD 沒寫清楚的地方用選擇題逐題問我，我拍板後再產出文件和任務清單，等我說「開工」。</code></pre>
-
-      <h3>④ 確認文件與任務清單、說「開工」</h3>
-      <p><strong>圖一張一張看。</strong>DIAGRAMS 用瀏覽器開。圖上全是中文，每張圖上面寫「怎麼看」，下面有一題「看完你要答得出來」：</p>
-      <ol>
-        <li><strong>用例圖</strong>：管理人員能做哪幾件事？（查詢、新增、修改、刪除、匯出……）</li>
-        <li><strong>零件圖</strong>：哪 5 個零件照範本複製改名、哪 3 個直接共用？顏色分開。</li>
-        <li><strong>資料圖</strong>：一筆裝備記哪 12 項資料、哪些一定要填、狀態有哪三種？</li>
-        <li><strong>新增流程圖</strong>：從選分類、選項目、出現編碼，到儲存、檢查、存進清冊，檢查沒過會怎樣？</li>
+      <h3>⑤ AI 找缺口出題，你拍板 <a class="watch" href="animation-hands/index.html#s26-1">▶ 看動畫</a></h3>
+      <p>大約一分鐘，它就出選擇題。每題都是白話，有標「建議」的選項和一句理由。</p>
+      <figure class="wide"><img src="images/v5/s3-9-q1.jpg" alt="第一題：品項編碼長什麼樣"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>上面一排是這一批的題目；紅框是它建議的選項。</figcaption></figure>
+      <ol class="do">
+        <li><strong>建議不是你要的，就選 Other，自己打。</strong>例如編碼它建議 <code>IT-01-003</code>，我們要 <code>PW-GEN-001</code>：選 Other，打「類別代號－項目英文三碼－流水號三碼，例：PW-GEN-001」。</li>
       </ol>
-      <p>答不出來，就是圖畫得不好，叫 AI 重畫。SRS 第 1 段要有<strong>你答過的每一題</strong>。</p>
-      <p>拍板後，AI 先交出 SRS、設計文件、圖（DIAGRAMS 用瀏覽器開，看圖就好），再列一份小到能單獨驗收的任務清單（數量依 AI 怎麼拆而定，實拍那次是 14 個：複製改名、資料層、列表頁、明細頁、驗證、側欄、規則檢查、自測與文件對齊）。文件看得懂、任務順序合理，就回「開工」；覺得少了什麼先補一句再放行。</p>
-      <blockquote><strong>SRS、設計文件和圖不要用「有檔案就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-設計文件-最小樣板.md</code>——那份把最低門檻定死：SRS 四段（<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>）；設計文件四段（<strong>檔案責任、資料模型、關鍵決策實作、harness 證據</strong>）＋<strong>圖四張</strong>（用例圖、零件圖、資料圖、新增流程圖）。缺一樣就退回去補。裡面也用白話解釋了 SDD（規格驅動開發）這套流程、SRS 和設計文件對不寫程式的人到底是什麼、你只要親自核哪幾段。<br>想看<strong>填好的</strong>長什麼樣，<code>step3_new_module/docs/</code> 裡有參考解的 <code>SRS-裝備物資.md</code>、<code>DESIGN-裝備物資.md</code>、<code>DIAGRAMS-裝備物資.html</code> 與任務清單 <code>TASKS.md</code>——一樣是<strong>先自己做，卡住再開</strong>。</blockquote>
-
-      <h3>⑤ 驗收與修正</h3>
-      <p>確認 dev server 在跑，打開它印出的網址再加上 <code>/equipment/crud</code>（預設 <code>http://localhost:3100/equipment/crud</code>；3100 被占用時 pnpm dev 會自動換埠，例如 3101），拿 <code>PRD-中心裝備物資.md</code> 第 3 節的 12 項資料逐項對照——每一項檢查四件事：名稱對不對、要不要填、怎麼輸入、打錯會不會擋。再對一次你在 ③ 拍板的每一題。</p>
-
-      <div class="block-title"><span class="ico">📦</span>產出物：8 檔改名對照</div>
-      <p>AI 做完後，用這張表核對它有沒有照「複製 vs 共用」的心法做。<strong>判斷準則就一句：跟實體長相有關的 → 複製改名；通用機制 → 直接共用。</strong>這正是 step2 ③ 那張 8 核心檔表實際套用的樣子。</p>
+      <figure class="wide"><img src="images/v5/s3-10-other.jpg" alt="選 Other 自己打"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>Other：自己打答案。</figcaption></figure>
+      <ol class="do" start="2">
+        <li>其他題照下表選；<strong>表上沒有的，選它標「建議」的</strong>。</li>
+        <li>一批答完，按 <strong>Submit answers</strong>（送出答案），它會再出下一批。</li>
+      </ol>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>範本檔</th><th>新模組檔</th><th>處置</th></tr></thead>
+        <thead><tr><th>AI 可能這樣問</th><th>課堂拍板</th></tr></thead>
         <tbody>
-          <tr><td><code>pages/template/crud/index.vue</code></td><td><code>pages/equipment/crud/index.vue</code></td><td>複製改名</td></tr>
-          <tr><td><code>pages/template/crud/[id].vue</code></td><td><code>pages/equipment/crud/[id].vue</code></td><td>複製改名</td></tr>
-          <tr><td><code>composables/useTemplateMembers.ts</code></td><td><code>composables/useEquipmentItems.ts</code></td><td>複製改名</td></tr>
-          <tr><td><code>components/template/TemplateFormField.vue</code></td><td><code>components/equipment/EquipmentFormField.vue</code></td><td>複製改名</td></tr>
-          <tr><td><code>components/template/TemplateStatusBadge.vue</code></td><td><code>components/equipment/EquipmentStatusBadge.vue</code></td><td>複製改名</td></tr>
-          <tr><td><code>composables/useTemplateListPage.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
-          <tr><td><code>utils/templateValidation.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
-          <tr><td><code>utils/templateCsv.ts</code></td><td>—</td><td><strong>直接共用，不動</strong></td></tr>
+          <tr><td>品項編碼怎麼編？</td><td><strong>類別代號－項目三碼－流水號</strong>，例 <code>PW-GEN-001</code>（選 Other 自己打）</td></tr>
+          <tr><td>打錯了要不要能刪掉？</td><td><strong>要，刪之前跳確認框</strong></td></tr>
+          <tr><td>交給縣府的清冊用什麼格式？</td><td><strong>CSV</strong>（Excel 打得開），匯出篩選後的全部</td></tr>
+          <tr><td>保管人電話：一欄，還是拆成手機、市話兩欄？</td><td><strong>一欄，手機和市話都收</strong></td></tr>
+          <tr><td>新增時，狀態要不要先帶「正常」？</td><td><strong>要，預設「正常」</strong>（分類、項目還是空白）</td></tr>
+          <tr><td>採購日期可以填未來的日期嗎？</td><td><strong>不行，最晚到今天</strong></td></tr>
+          <tr><td>狀態能怎麼變？「已報廢」還能改回來嗎？</td><td>正常、維修中可以互換；<strong>已報廢就回不去</strong>（登記錯了刪掉重新新增）</td></tr>
         </tbody>
       </table>
       </div>
-      <p>AI 另外會交出 SRS、設計文件、圖（DIAGRAMS 用瀏覽器開，看圖就好；對照你的拍板有沒有漏）和 24 筆示範資料。<strong>欄位英文名照技術約定，就是未來接後端 API 的介面</strong>。</p>
-
-      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <figure><img src="images/step3_equipment_list.png" alt="裝備物資列表頁"><figcaption>裝備物資列表：24 筆種子、每頁 20 筆、「分類→項目」升冪，狀態標籤綠／黃／紅。</figcaption></figure>
-      <div class="fig-grid">
-        <figure><img src="images/step3_equipment_form.png" alt="新增表單含連動下拉與編碼預覽"><figcaption>新增表單：選定分類＋項目後，「品項編碼」那一格馬上出現編碼。</figcaption></figure>
-        <figure><img src="images/step3_cascade_dropdown.png" alt="分類→項目連動下拉"><figcaption>連動下拉：先選分類，項目才可選，且只出現該分類的項目。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/s3-11-status-q.jpg" alt="狀態怎麼變的題目"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>它也會問狀態怎麼變。PRD 只寫有三種狀態，沒寫怎麼變——這就是它自己找出來的缺口。</figcaption></figure>
+      <p><strong>題目的字句、題數每次都不一樣</strong>，照意思對到表就好。表上有、它卻沒問的，你自己補問一句。</p>
+      <div class="help">
+        <b class="t">🚑 AI 沒問就直接開始寫程式？</b>
+        別讓它跑：按停止，貼這段：
+        <pre><code>停，先不要寫程式、不要建檔案。
+先把 PRD 沒寫清楚的地方用選擇題逐題問我，我拍板後再產出文件和任務清單，等我說「開工」。</code></pre>
       </div>
-      <div class="fig-grid">
-        <figure><img src="images/step3_form_validation.png" alt="空表單驗證 4 欄紅字＋toast"><figcaption>驗證：空表單直接儲存 → 4 欄紅字＋toast，停在表單頁不離開。</figcaption></figure>
-        <figure><img src="images/step3_delete_confirm.png" alt="刪除品項確認框"><figcaption>刪除：垃圾桶 → 二次確認彈窗 → 按「刪除」才真的刪。</figcaption></figure>
-      </div>
-      <figure><img src="images/step3_equipment_mobile.png" alt="手機卡片檢視"><figcaption>手機卡片：縮到手機寬度，表格自動變卡片清單，資訊等價。</figcaption></figure>
 
+      <h3>⑥ 先看文件和圖，再說開工 <a class="watch" href="animation-hands/index.html#s29-1">▶ 看動畫</a></h3>
+      <p>拍板後，它交四個檔：<strong>SRS、設計文件、圖、任務清單</strong>。到這裡，程式一行都還沒寫。照這個順序核：</p>
+      <ol class="do">
+        <li><strong>SRS</strong>（按 Ctrl+Shift+V 看預覽）：第 1 段每題一列，問題、你選了什麼、理由。第 2 段 PRD 每一項做在哪；第 3 段這一版不做什麼。<strong>這三段你一定要核。</strong></li>
+      </ol>
+      <figure class="wide"><img src="images/v5/s3-12-srs.jpg" alt="SRS 第 1 段：已拍板決策"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>SRS 第 1 段：你答過的每一題都在這裡，理由是你的還是 AI 建議的，也寫清楚。</figcaption></figure>
+      <ol class="do" start="2">
+        <li><strong>設計文件</strong>：第 1 段哪 5 個檔照範本複製改名、哪 3 個直接共用；2.3 寫了只有狀態帶預設值。</li>
+        <li><strong>五張圖</strong>：圖要用瀏覽器開。在 <code>my-equipment-app</code> 的終端機打 <code>start DIAGRAMS-中心裝備物資.html</code>。每張圖上面寫「怎麼看」，下面有一題「看完你要答得出來」：
+          <ol>
+            <li><strong>使用案例圖</strong>：管理人員能做哪 8 件事？</li>
+            <li><strong>零件圖</strong>：橘色照範本複製、綠色直接共用。</li>
+            <li><strong>資料圖</strong>：一筆裝備記哪 12 項資料、哪些一定要填？</li>
+            <li><strong>流程圖</strong>：新增一筆裝備，檢查沒過會怎樣？</li>
+            <li><strong>狀態圖</strong>：一筆裝備的狀態怎麼變？</li>
+          </ol>
+        </li>
+      </ol>
+      <figure class="wide"><img src="images/v5/s3-13-diag5.jpg" alt="狀態圖：正常、維修中、已報廢"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 5 張狀態圖：正常、維修中可以互換；已報廢沒有往回的箭頭，就是回不去。畫的是<strong>資料</strong>的狀態，不是畫面怎麼切換。</figcaption></figure>
+      <p style="font-size:16px;color:var(--ink-soft)">文件的最低門檻寫在 <code>SRS-設計文件-最小樣板.md</code>：SRS 四段、設計文件四段、圖五張，缺一樣就退回。想看填好的樣子，<code>step3_new_module/docs/</code> 有參考文件、<code>solution-app/</code> 有參考程式——先自己做，卡兩次再開。</p>
+      <p><strong>看圖抓到落差，就一句話叫它改。</strong>實拍那次，第 1 張的說明寫「能做 7 件事」，圖上數到 8 件，一句話它就改好了。看不懂的圖，一樣叫它重畫。</p>
+      <ol class="do" start="4">
+        <li><strong>看任務清單</strong>：打開 <code>TASKS.md</code>，每一項都小到能單獨驗收；你拍板的每一題，都對得到一項任務。</li>
+        <li><strong>換模型、說開工</strong>：它還有題目在問，先答完。把模型換成 <strong>Sonnet 5.5</strong>（有規矩和範本，寫程式用便宜的就夠），在輸入框打「<strong>開工</strong>」送出。實拍這次大約 8 分鐘做完。</li>
+      </ol>
+      <figure><img src="images/v5/s3-14-sonnet.jpg" alt="開工前換 Sonnet 5.5"><figcaption>開工前換成 Sonnet 5.5。</figcaption></figure>
+
+      <h3>⑦ 打開網頁驗收 <a class="watch" href="animation-hands/index.html#s38-1">▶ 看動畫</a></h3>
+      <p>做完它會停下來問下一步，選「我自己開網頁驗收」。在 <code>my-equipment-app</code> 的終端機打：</p>
+      <pre><code>pnpm dev --port 3101</code></pre>
+      <figure><img src="images/v5/s3-15-dev.jpg" alt="pnpm dev --port 3101 印出網址"><figcaption>開它印出的網址，後面加 <code>/equipment/crud</code>，例如 <code>http://localhost:3101/equipment/crud</code>。這個終端機不要關。</figcaption></figure>
+      <figure><img src="images/v5/s3-16-list.jpg" alt="裝備清冊 24 筆"><figcaption>清冊：共 24 筆，狀態標籤綠、黃、紅。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/s3-17-code.jpg" alt="選分類、項目，編碼馬上出現"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>按「新增品項」：先選分類，項目才出現；選好，品項編碼那格馬上有號碼。</figcaption></figure>
+      <figure><img src="images/v5/s3-18-valid.jpg" alt="空表單儲存：紅字"><figcaption>什麼都不填按儲存：分類、項目、單位、規格說明四格跳紅字（數量已經先填 0，所以沒紅字），右下角提示「請修正 4 個欄位」，頁面不跳走。</figcaption></figure>
+      <figure class="mid"><img src="images/v5/s3-19-delete.jpg" alt="刪除品項確認框"><figcaption>刪除要先確認。</figcaption></figure>
+      <figure class="narrow"><img src="images/v5/s3-20-mobile.jpg" alt="手機寬度：卡片"><figcaption>視窗拉窄：表格變卡片。</figcaption></figure>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>驗收點</th><th>期望</th></tr></thead>
+        <thead><tr><th>驗收點</th><th>看到這樣就對了</th></tr></thead>
         <tbody>
-          <tr><td>列表</td><td>桌機表格、每頁 20 筆、「分類→項目」升冪、顯示總筆數</td></tr>
-          <tr><td>連動下拉</td><td>先選分類，項目才可選，只出現該分類項目</td></tr>
-          <tr><td>新增</td><td>選定分類＋項目後，「品項編碼」那一格馬上出現編碼；必填未填仍可按儲存，會顯示欄位紅字並 toast 提示「請修正 N 個欄位」</td></tr>
-          <tr><td>刪除</td><td>垃圾桶 → 二次確認 → 才刪</td></tr>
-          <tr><td>CSV 匯出</td><td>匯出全量（非當頁），含 BOM 中文不亂碼</td></tr>
-          <tr><td>保管人電話</td><td><code>0912345678</code>、<code>089-123456</code> 都收得進去；亂打（例如 <code>123</code>）會擋</td></tr>
-          <tr><td>新增時的下拉</td><td>分類、項目一開始空白；狀態預設「正常」（你拍板的）</td></tr>
-          <tr><td>設計文件和圖</td><td>用瀏覽器打開 <code>DIAGRAMS-中心裝備物資.html</code>，四張圖都是中文，每張下面那一題答得出來</td></tr>
+          <tr><td>清冊</td><td>每頁 20 筆、照「分類→項目」排、顯示總筆數</td></tr>
+          <tr><td>連動下拉</td><td>先選分類，項目才能選，只出現那一類的項目</td></tr>
+          <tr><td>新增</td><td>選好分類和項目，編碼馬上出現；沒填的按儲存跳紅字</td></tr>
+          <tr><td>刪除</td><td>先跳確認框，按「刪除」才刪</td></tr>
+          <tr><td>匯出 CSV</td><td>匯出全部（不是只有這一頁），用 Excel 開中文不亂碼</td></tr>
+          <tr><td>保管人電話</td><td><code>0912345678</code>、<code>089-123456</code> 都收；亂打 <code>123</code> 會擋</td></tr>
+          <tr><td>新增時的下拉</td><td>分類、項目空白；狀態先帶「正常」（你拍板的）</td></tr>
+          <tr><td>已報廢的裝備</td><td>編輯一筆已報廢的，狀態改不了（你拍板的）</td></tr>
         </tbody>
       </table>
       </div>
-      <p><strong>修正心法（三條）：</strong></p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>心法</th><th>怎麼做</th></tr></thead>
-        <tbody>
-          <tr><td>一次只修一個問題</td><td>一則訊息只提一件事，改完再看下一件</td></tr>
-          <tr><td>描述「看到什麼 vs 期望什麼」，附畫面</td><td>先截圖：按 Win+Shift+S 框起有落差的地方，到 AI 輸入框按 Ctrl+V 貼上（macOS：Shift+Cmd+Ctrl+4 框起來，再 Cmd+V）。再打一句：「我看到日期是 2026/7/1，期望顯示成 2026-07-01」</td></tr>
-          <tr><td>兩次修不好就重新描述</td><td>換個說法重講一次，別繼續在同一串盧</td></tr>
-        </tbody>
-      </table>
+      <p>最後拿 PRD 第 3 節的 12 項資料，一項一項對：名稱、要不要填、怎麼輸入、打錯會不會擋。</p>
+
+      <h3>⑧ 有小落差：附畫面講 <a class="watch" href="animation-hands/index.html#s39-1">▶ 看動畫</a></h3>
+      <p>驗收一定會有小落差。實拍那次，清冊太擠：名字、日期、維修中都斷成兩行。</p>
+      <figure class="mid"><img src="images/v5/s3-21-gap-before.jpg" alt="修改前：斷成兩行"><figcaption>修改前：斷成兩行。</figcaption></figure>
+      <ol class="do">
+        <li>按 <strong>Win+Shift+S</strong>，框起有問題的地方（macOS：Shift+Cmd+Ctrl+4）。</li>
+        <li>到 Claude Code 輸入框按 <strong>Ctrl+V</strong>，圖就貼上去了（macOS：Cmd+V）。</li>
+        <li>再打一句：<strong>看到什麼、期望什麼</strong>。一次只講一件。</li>
+      </ol>
+      <figure><img src="images/v5/s3-22-gap-ask.jpg" alt="圖貼進輸入框＋一句話"><figcaption>圖貼上了，再打一句話。</figcaption></figure>
+      <figure class="mid"><img src="images/v5/s3-23-gap-after.jpg" alt="修改後：一行顯示"><figcaption>修改後：都一行顯示了。</figcaption></figure>
+      <p>全部沒問題，打「驗收通過」送出。同一件事講兩次還改不好，換個說法重講，不要一直盧。</p>
+
+      <div class="help">
+        <b class="t">🚑 卡住時</b>
+        <ul>
+          <li><strong>一開頁就 500，寫著 <code>useColorMode is not defined</code></strong>：舊的快取被複製過來了。跟 Claude Code 說「請停掉網頁伺服器、刪掉 my-equipment-app 的 .nuxt 和 .output 再重開」。只刪你的工作專案，不要刪範本的。</li>
+          <li><strong>別的錯誤</strong>：把整段錯誤訊息貼給它，讓它判斷原因。</li>
+        </ul>
       </div>
-      <p><strong>做完之後還是會有小修改。</strong>驗收時發現的小落差（某個 label 不對、某欄忘了紅字），一次講一件，AI 改、你再看。這段「你看 → 你講 → AI 改」的來回，就是 step4 要交給 AI 自己跑的事：先給它一套會亮紅綠燈的驗收標準，它就能自己看、自己改，這就是 LOOP。</p>
+
+      <details><summary>對照：AI 應該怎麼處理範本的 8 個核心檔</summary>
+        <p><strong>複製改名（5 個）：</strong>列表頁 <code>index.vue</code>、明細頁 <code>[id].vue</code>、資料 <code>useEquipmentItems.ts</code>、欄位外框 <code>EquipmentFormField.vue</code>、狀態標籤 <code>EquipmentStatusBadge.vue</code>。</p>
+        <p><strong>直接共用、不動（3 個）：</strong><code>useTemplateListPage.ts</code>、<code>templateValidation.ts</code>、<code>templateCsv.ts</code>。</p>
+        <p>設計文件第 1 段和第 2 張零件圖，應該跟這個一樣。</p>
+      </details>
 
       <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        業務寫的 PRD 一定有缺口，這不是業務的錯——他本來就不知道「編碼規則」「預設值」這些要事先講。讓 AI 照規矩把缺口找出來、用選擇題攤開、你拍板，範圍才會小而完整——這跟 spec-kit 的 clarify 是同一個道理：<strong>先問對問題，再寫對程式。</strong> 另外，欄位英文名（<code>qty</code>、<code>unit</code>、<code>keeper</code>、<code>status</code>…）寫在技術約定裡，<strong>就是未來接後端 API 的介面</strong>，定好之後不再改。卡住時 <code>solution-app/</code> 有參考解，但先自己做、真的卡兩次以上再看——直接抄答案學不到「怎麼提需求、怎麼驗收」，那才是這堂課的重點。
+        <b class="t">💡 為什麼</b>
+        業務寫的 PRD 一定有缺口，這不是業務的錯——他本來就不知道「編碼規則」「預設值」「狀態怎麼變」要事先講。讓 AI 照規矩把缺口找出來、用選擇題攤開、你拍板：<strong>先問對問題，再寫對程式。</strong>
       </div>
     </div>
   </section>
@@ -637,141 +662,135 @@ AI：逐任務開發、遵守 harness、每完成一個回報一行</div>
   <section class="step" id="step4">
     <div class="step-head">
       <div class="step-num">4</div>
-      <h2>LOOP 工程 × E2E 驗證</h2>
+      <h2>LOOP：AI 自己測、自己修、分身挑錯</h2>
+      <a class="watch" href="animation-hands/index.html#s42-1">▶ 看動畫 第 42～52 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <b class="t">🎯 做完這一步</b>
         <ol>
-          <li>說得出 LOOP 是什麼、優點與限制是什麼。</li>
-          <li>貼<strong>一個 prompt</strong>，讓 AI 把<strong>你自己在 step3 生成的模組</strong>修到 E2E 全綠，<strong>再自己開子代理對抗審查</strong>。</li>
-          <li>驗收 AI 交回的報告，記住兩條鐵律：兩次停損、不准作弊。</li>
+          <li>貼<strong>一個 prompt</strong>，AI 把你的 <code>my-equipment-app</code> 修到 7 條自動測試全部通過，再叫分身挑錯。</li>
+          <li>看懂它交的報告：修改前後的圖、要你裁決的題目。</li>
+          <li>記住兩條鐵律：同一問題修兩次沒好就停；不准改測試。</li>
         </ol>
       </div>
+      <p><strong>LOOP 一句話：</strong>先給 AI 一套會亮紅綠燈的驗收標準，再叫它自己修到全綠。這堂課的驗收標準是 7 條<strong>自動測試（E2E）</strong>：程式自己開瀏覽器，照使用者的順序點一遍，再判定對不對。教材已經寫好，你不用寫。</p>
+      <ol>
+        <li>AI 改程式 → 跑 7 條測試。</li>
+        <li>有紅燈：自己找原因、修好、再跑。</li>
+        <li>全綠：叫出一個<strong>子代理</strong>（AI 的分身）挑錯。App 的問題修掉；測試本身的問題列出來給你。</li>
+        <li>交報告給你驗收。同一個問題修兩次還沒好，就停下來回報。</li>
+      </ol>
 
-      <div class="block-title"><span class="ico">📖</span>LOOP 是什麼</div>
-      <p>一句話：<strong>先給 AI 一個「可自動執行、會給出綠/紅」的驗證，再叫它自己修到綠。</strong></p>
-      <blockquote><strong>比喻：一問一答，就像主管手把手帶新人。</strong>每一步都要交代、要盯，主管的時間全耗在教。<br>LOOP 的做法是先把規矩（harness）和示範樣本（範本）放好，再給一個會亮紅綠燈的驗收標準（E2E）。<strong>你下一個指令，AI 就照公司規定自己做、自己驗，還會叫出另一個分身（子代理）挑錯；你只看最後的報告。</strong><br>LOOP 會留兩種紀錄：紀錄 MD（<code>LOOP-LOG.md</code>）是給機器看的流水帳；報告 HTML（<code>LOOP-REPORT.html</code>）才是給人看的，圖文並茂：<strong>每個修好的問題都有「修改前、修改後」兩張截圖並排</strong>，一眼看出差在哪；要你裁決的題目，跟畫面有關的也會附截圖。對抗審查會用 Playwright 真的開瀏覽器，逐頁截圖來看。</blockquote>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>沒有 LOOP（人在迴圈裡）</th><th>有 LOOP（AI 在迴圈裡）</th></tr></thead>
-        <tbody>
-          <tr><td>AI 改一版 → 人手動開瀏覽器點一點 → 回報哪裡壞 → AI 再改</td><td>AI 改一版 → 自己跑 E2E → 看到紅 → 自己修 → 再跑 → 綠了才停</td></tr>
-          <tr><td>人是瓶頸，改 5 次就累了</td><td>人只看最後結果，AI 跑幾輪都不喊累</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p><strong>關鍵前提：要先有可自動執行的驗證</strong>（本課是 7 條 Playwright <strong>E2E 測試</strong>——<strong>E2E 就是讓程式自動開一個真的瀏覽器，照使用者的操作順序點一遍，點完自己判定對不對</strong>；exit 0＝全綠、1＝有紅）。沒有這個，LOOP 就退化成 AI 自說自話。</p>
-      <p><strong>流程圖（一圈 LOOP 怎麼轉）：</strong></p>
-      <div class="flow"> 你：貼 LOOP prompt（只貼這一次）
-          │
-          ▼
- ┌── AI 跑驗證 run-e2e ──► 全綠？ ──是──► <b>子代理對抗審查（挑錯）</b>
- │        ▲                 │                   │
- │        │                否（有紅）        App 的問題 → 回去修、再跑
- │        │                 ▼               測試的問題 → 寫進報告，交你裁決
- │        │           AI 判因（App 不符規格？環境？測試本身？）
- │        │                 │                   ▼
- │        │                 │              AI 交報告 ──► <b>你驗收</b>
- │        │                 ▼              ＋ 紀錄 MD、報告 HTML、測試報告、文件同步
- │        └────────── AI 修正，再跑
- │                          │
- └──────────────────────────┘
-             │
-             │ 同一問題連修 2 次仍紅
-             ▼
-      <b>停損：AI 停下來回報，換人判斷</b></div>
-      <p><strong>優點與限制：</strong></p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>優點</th><th>說明</th></tr></thead>
-        <tbody>
-          <tr><td>省人機來回</td><td>人只出一個 prompt＋一次驗收，中間 N 輪紅綠都是 AI 自己跑</td></tr>
-          <tr><td>一個指令、多個 Agent</td><td>修程式、跑測試、挑錯分給不同的 Agent，人不用在中間傳話、交代</td></tr>
-          <tr><td>不喊累、可重複</td><td>跑 10 輪成本幾乎等於 1 輪；每輪判定標準完全一致</td></tr>
-          <tr><td>品質由驗證把關</td><td>過不過由紅綠燈說了算，不是 AI 的自我感覺</td></tr>
-          <tr><td>結果可追溯</td><td>每輪紅了什麼、修了什麼都在 <code>LOOP-LOG.md</code>，報告和測試報告是 HTML</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>限制／風險</th><th>對策（本課做法）</th></tr></thead>
-        <tbody>
-          <tr><td>AI 會作弊：把<strong>斷言</strong>放寬、或乾脆跳過測試<span class="note">（斷言＝測試裡「我期望看到什麼」的那一句；放寬就是把標準改鬆，讓不合格的也算過）</span></td><td>規矩檔（<code>LOOP-規矩.md</code>）的鐵律禁止動測試；<code>run-e2e</code> 開跑前會先比對測試檔和基準，對不上就拒跑（擋得住不小心改到，擋不住連基準一起重算，所以報告也要看）</td></tr>
-          <tr><td>AI 會鬼打牆（愈修愈亂）</td><td>兩次停損：同一問題連修 2 次仍紅就停下回報</td></tr>
-          <tr><td>驗證寫得爛＝假綠也全過</td><td>全綠後，AI 自己開子代理（另一個分身，只負責挑錯）對抗審查測試本身</td></tr>
-          <tr><td>沒有自動驗證的東西不適用</td><td>先寫驗證再開 LOOP；驗不了的（如視覺美感）回歸人工審</td></tr>
-        </tbody>
-      </table>
-      </div>
+      <h3>① 回到教材根目錄、開新對話 <a class="watch" href="animation-hands/index.html#s42-1">▶ 看動畫</a></h3>
+      <ol class="do">
+        <li>選單「檔案」→「開啟資料夾」，選回教材最外層的 <code>AI_CRUD_Workshop_Frontend_EASY</code>。左邊要同時看得到 <code>step3_new_module</code>、<code>step4_loop_e2e</code>。</li>
+        <li>打開 Claude Code，按右上角的加號開新對話。</li>
+        <li>模型選 <strong>Sonnet 5.5</strong>，核准模式一樣是 <strong>Auto</strong>。</li>
+      </ol>
+      <figure><img src="images/v5/s4-1-newchat.jpg" alt="新對話：右上角加號、Sonnet 5.5、Auto"><figcaption>右上角加號開新對話；下面選 Sonnet 5.5、Auto。</figcaption></figure>
 
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong> 紅燈不用刻意製造——你在 step3 用自己的 AI 模型生成的 <code>my-equipment-app</code>，本來就會跟驗收規格有落差，一跑 E2E 自然就紅；<strong>這 7 條測試就是可執行的驗收規格</strong>。</p>
-      <p>在工作坊根目錄開 AI Agent，整段複製貼上。<strong>子代理</strong>＝AI 自己叫出來的分身，專門做一件事；這裡專門挑錯。受測 App 不用你先開：<strong>AI 自己啟動受測 App，3100 被占就換埠</strong>，用了哪個埠會寫在報告裡。鐵律、對抗審查、要交哪些檔，都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>，AI 會自己讀，prompt 只要一句「照它做」。</p>
+      <h3>② 貼 LOOP prompt <a class="watch" href="animation-hands/index.html#s43-1">▶ 看動畫</a></h3>
       <pre><code>你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做，自己跑完，中途不要問我。
 受測 App：step3_new_module/my-equipment-app。先在背景啟動它（3100 被占就自己換一個空的埠），跑 step4_loop_e2e 的 run-e2e，修到 7 條全綠。
 全綠後開一個子代理做對抗審查：用 Playwright 開瀏覽器逐頁截圖，對照 PRD、技術約定、SRS 和 design system 挑 App 的問題，也挑測試的假綠。
 最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html、測試報告，並更新 SRS、設計文件和圖。</code></pre>
-      <p><strong>模型：</strong>開發用 Sonnet 5.5 就好；對抗審查的子代理用 Opus 5.5，審查的模型要比開發的高一級（規矩檔已寫明，AI 會照做）。</p>
+      <ul>
+        <li><strong>「中途不要問我」：</strong>它會一路跑完，不會中途停下來問。需要你決定的事（例如要不要動全站共用的檔、測試本身有沒有問題），它寫進報告，跑完後在對話裡用選擇題問你。</li>
+        <li>鐵律、埠被占怎麼辦、要交哪些檔，都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>，AI 會自己讀。</li>
+        <li><strong>送出後大約半小時。</strong>電腦不要讓它睡眠。跳出要不要開 Chrome，選 No，打「不用開瀏覽器，繼續」。</li>
+      </ul>
 
-      <div class="block-title"><span class="ico">🚑</span>LOOP 卡住怎麼辦</div>
-      <p>先分清楚兩種紅，處置完全不同：</p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>你看到的狀況</th><th>這是什麼</th><th>你要做的</th></tr></thead>
-        <tbody>
-          <tr><td>E1～E7 有幾條 fail</td><td><strong>正常</strong>，這就是 LOOP 存在的目的</td><td>別插手，讓 AI 自己修 → 再跑</td></tr>
-          <tr><td>腳本根本沒開始跑測試就掛了（Playwright 瀏覽器下載失敗、連不上受測 App、PowerShell 擋住執行）</td><td>環境問題，不是 LOOP 的活</td><td>整段輸出貼給 AI 排除，同 step0 那一套</td></tr>
-          <tr><td>AI 回報「這一條在驗 PRD、技術約定都沒寫的東西」（例如 toast 文案、編碼格式、HTML id）</td><td><strong>這是真的，不是藉口</strong>——這 7 條是照參考解寫的</td><td>照規矩檔，AI 預設走 <strong>(A)</strong>：先改 App 對齊測試，在報告標成「規格外調整」，最後問你要不要留。你也可以選 <strong>(B)</strong>：改回去、讓它紅著，把衝突寫進報告。<strong>選 (B) 也算完成這一步。</strong></td></tr>
-          <tr><td>AI 自己停下來回報（觸發兩次停損）</td><td>制度設計如此，代表該人介入了</td><td>看它的根因說法：該修 App 就叫它修；它說「測試有問題」要你點頭才准動</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p><strong>想自己看一眼紅在哪？</strong>測試失敗時 Playwright 會自動把當下的畫面存成 PNG，放在 <code>step4_loop_e2e/e2e/test-results/</code>，照失敗的測試名分資料夾。AI 判因時看的就是這張，你也可以直接打開來對——通常一眼就看得出是「元素根本沒出現」還是「文字不一樣」。跑完也可以開 <code>step4_loop_e2e/e2e/playwright-report/index.html</code> 看完整測試報告（用瀏覽器開，每條測試的綠紅和失敗截圖都在裡面）。</p>
-      <p>後兩種都可以直接把完整輸出交給 AI，用這個 prompt：</p>
-      <pre><code>step4 的 E2E 腳本還沒跑測試就失敗了，完整輸出在下面，我用 Windows 11。
+      <h3>③ 它自己起服務、自己跑測試 <a class="watch" href="animation-hands/index.html#s44-1">▶ 看動畫</a></h3>
+      <figure class="wide"><img src="images/v5/s4-2-log.jpg" alt="LOOP-LOG：3100 被占改用 3101；第 1 輪 7 passed"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>3100 被別的程式占著，它自己換 3101，沒去關別人的程式。這次第 1 輪就 7 條全綠。</figcaption></figure>
+      <p><strong>第一輪可能全綠，也可能有紅燈，兩種都正常。</strong>有紅燈，它會先找原因（App 不符規格？環境？測試本身？），再修、再跑。你不用插手。</p>
+
+      <h3>④ 全綠之後：子代理挑錯 <a class="watch" href="animation-hands/index.html#s45-1">▶ 看動畫</a></h3>
+      <figure><img src="images/v5/s4-3-agent.jpg" alt="1 agent：子代理在工作"><figcaption>下面出現「1 agent」，就是子代理正在工作。它用 Playwright（會自己開瀏覽器、自己點按鈕的工具）一頁一頁截圖，對照 PRD 和 design system 挑錯。</figcaption></figure>
+      <p>子代理用比寫程式高一級的 <strong>Opus 5.5</strong>：寫程式的 AI 審自己，就像自己改自己的考卷。規矩檔寫好了，你不用自己切。</p>
+
+      <h3>⑤ 修好的：看修改前、修改後 <a class="watch" href="animation-hands/index.html#s46-1">▶ 看動畫</a></h3>
+      <figure><img src="images/v5/s4-4-fix.jpg" alt="報告：修改前、修改後兩張圖"><figcaption>報告裡每修好一條，都放兩張圖：左邊修改前、右邊修改後。這條是「在第 2 頁點排序」：修改前停在第 2 頁，修改後回到第 1 頁。</figcaption></figure>
+
+      <h3>⑥ 要你裁決的：先看畫面再回答 <a class="watch" href="animation-hands/index.html#s47-1">▶ 看動畫</a></h3>
+      <p>要動到全站共用的檔，它不自己決定：跑完後出選擇題問你。選擇題框裡放不了圖，所以<strong>先打開報告的「要你裁決的事」，每一題都附了當下的畫面</strong>。在教材根目錄的終端機貼：</p>
+      <pre><code>start step3_new_module\my-equipment-app\loop\LOOP-REPORT.html</code></pre>
+      <figure class="wide"><img src="images/v5/s4-5-q1.jpg" alt="裁決題 Q1 附畫面"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>Q1：關鍵字框打字停一下，後面的字不見了。看圖就懂。</figcaption></figure>
+      <figure><img src="images/v5/s4-6-choice.jpg" alt="選擇題：只修手機選單斷行"><figcaption><strong>建議的不一定要選。</strong>這題建議三條都修，但會動到共用元件、人員範本頁也跟著變；實拍時選了影響最小的「只修手機選單斷行」。</figcaption></figure>
+      <p>你答完，它照做；修好的一樣附修改前後圖，再跑一輪。你說先不修的，記在報告裡，它不會偷偷改。</p>
+
+      <div class="help">
+        <b class="t">🚑 卡住時：先分清楚是哪一種</b>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>你看到的</th><th>這是什麼</th><th>你要做的</th></tr></thead>
+          <tbody>
+            <tr><td>E1～E7 有幾條紅</td><td><strong>正常</strong>，這就是 LOOP 的用途</td><td>別插手，讓它自己修</td></tr>
+            <tr><td>跑完後出選擇題（要動共用檔、規格衝突）</td><td><strong>正常</strong>，規矩要它問你</td><td>先看報告附的畫面，再回答</td></tr>
+            <tr><td>它說同一個問題修兩次還沒好，停下來</td><td>鐵律，代表該你介入</td><td>看它說的原因：該修 App 就叫它修；說「測試有問題」的，找講師</td></tr>
+            <tr><td>腳本根本沒開始跑就掛了（瀏覽器下載失敗、連不上 App）</td><td>環境問題</td><td>開新對話，貼下面這段</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>只有最後一種（腳本沒跑起來）才貼這段：</p>
+        <pre><code>step4 的 E2E 腳本還沒跑測試就失敗了，完整輸出在下面，我用 Windows 11。
 請說明原因，給我可複製的修復指令；不准改 step4_loop_e2e/e2e 的測試檔。
 （從你輸入指令那一行開始整段貼上）</code></pre>
+      </div>
 
-      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>AI 交回的東西都在 <code>step3_new_module/my-equipment-app/loop/</code> 資料夾。不用打任何指令，照這張表用眼睛核：</p>
+      <h3>⑦ 驗收：報告、測試報告、紀錄、文件 <a class="watch" href="animation-hands/index.html#s50-1">▶ 看動畫</a></h3>
+      <p><strong>東西放在兩個地方：</strong></p>
+      <ul>
+        <li>你的作品 <code>my-equipment-app/loop/</code>：結果報告 <code>LOOP-REPORT.html</code>、流水紀錄 <code>LOOP-LOG.md</code>、截圖。</li>
+        <li><code>step4_loop_e2e/e2e/playwright-report/</code>：測試報告。</li>
+      </ul>
+      <p>在教材根目錄的終端機，一行貼一次：</p>
+      <pre><code>start step3_new_module\my-equipment-app\loop\LOOP-REPORT.html
+start step4_loop_e2e\e2e\playwright-report\index.html</code></pre>
+      <figure class="wide"><img src="images/v5/s4-7-top.jpg" alt="LOOP 報告：結論在最前面"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>結果報告：結論在最前面——幾條全綠、挑到幾條、修了幾條、還有幾件要你裁決。</figcaption></figure>
+      <figure><img src="images/v5/s4-8-pw.jpg" alt="測試報告：7 條都是綠的"><figcaption>測試報告：7 條都是綠的，每一條點得開看細節。</figcaption></figure>
+      <figure><img src="images/v5/s4-9-srs.jpg" alt="SRS 標「step4 LOOP 後」"><figcaption>它修了程式，就回頭在 SRS、設計文件標上「step4 LOOP 後」：程式改了，文件跟著改。</figcaption></figure>
       <div class="table-scroll">
       <table>
-        <thead><tr><th>檢查點</th><th>怎麼核</th></tr></thead>
+        <thead><tr><th>核什麼</th><th>看到這樣就對了</th></tr></thead>
         <tbody>
-          <tr><td>結果報告 <code>LOOP-REPORT.html</code></td><td>用瀏覽器開：結論在最前面、有截圖</td></tr>
-          <tr><td>修改前、修改後</td><td>每一條修好的紅燈、每一個修好的審查問題，都有兩張截圖並排：左邊修改前、右邊修改後，圖下一句白話說差在哪</td></tr>
-          <tr><td>要你裁決的題目</td><td>每題 2～4 個選項、標出建議；跟畫面有關的題目附現在的畫面截圖。看完圖再選，在同一個對話打「Q1 選 1」這樣回覆</td></tr>
-          <tr><td>測試報告 <code>playwright-report/index.html</code></td><td>在 <code>step4_loop_e2e/e2e/</code> 底下，用瀏覽器開：7 條綠</td></tr>
-          <tr><td>每輪紀錄完整</td><td>打開 <code>LOOP-LOG.md</code>：紅了哪幾條、根因、修了哪個檔，一輪一段</td></tr>
-          <tr><td>根因說得通</td><td>「App 不符規格」就該修 App；說「測試有問題」的要有你的裁決紀錄</td></tr>
-          <tr><td>對抗審查有做</td><td>報告寫了子代理挑到什麼：App 的問題修了沒、測試的問題有沒有列給你裁決</td></tr>
-          <tr><td>畫面真的能用</td><td>打開 <code>LOOP-REPORT.html</code> 裡寫的網址自己點一遍：列表、新增、編輯、刪除。報告裡寫的那幾個改動，多看一眼</td></tr>
-          <tr><td>文件同步</td><td>SRS、設計文件、圖有標「step4 LOOP 後」：程式改了哪裡，文件就跟著改哪裡</td></tr>
-          <tr><td>最終真的綠</td><td>報告附 <code>7 passed</code>、exit 0 的總結行。<code>run-e2e</code> 開跑前會先比對測試檔和基準，對不上就拒跑，所以看得到 <code>7 passed</code> 代表測試檔跟基準一致。它擋不住「連基準一起重算」，所以還要看報告有沒有寫改了測試。<strong>若因為 (2) 類規格衝突而停在紅燈，報告要寫明停在哪一條、為什麼</strong></td></tr>
+          <tr><td>結果報告</td><td>結論在最前面；修好的每一條有修改前、修改後兩張圖</td></tr>
+          <tr><td>要你裁決的</td><td>每題附當下的畫面；寫著「講測試」的題目，找講師（補測試要重算基準）</td></tr>
+          <tr><td>測試報告</td><td>7 條綠（或停在紅燈、報告寫清楚停在哪一條、為什麼）</td></tr>
+          <tr><td>流水紀錄</td><td><code>LOOP-LOG.md</code> 一輪一段，你的裁決也記在裡面</td></tr>
+          <tr><td>文件同步</td><td>SRS、設計文件、圖有標「step4 LOOP 後」</td></tr>
+          <tr><td>自己點一遍</td><td>照報告上的網址，點列表、新增、編輯、刪除。燈綠了，還是要你親眼驗</td></tr>
         </tbody>
       </table>
       </div>
-      <p><strong>對抗審查已經寫在 LOOP prompt 和規矩檔裡。</strong>寫程式的 AI 不適合審自己，所以全綠後由子代理挑錯：<strong>App 的問題</strong>它修完再跑；<strong>測試本身的問題</strong>不准它改，寫進報告交給你（或講師）裁決。<br><strong>用量夠的話，審的要比寫的強。</strong><br>備案：你用的 AI 工具不能開子代理，或想找別家的 AI 再審一次，就開第二個 AI（例如 Codex），貼這段：</p>
-      <pre><code>請盡力挑 step4_loop_e2e/e2e 這套 E2E 測試，和 step3_new_module/my-equipment-app 的毛病，不要誇獎。
+
+      <details><summary>7 條自動測試各驗什麼</summary>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>編號</th><th>驗什麼</th></tr></thead>
+          <tbody>
+            <tr><td>E1</td><td>清冊打得開、24 筆、第一頁 20 筆</td></tr>
+            <tr><td>E2</td><td>用編碼或品名找得到，大小寫都行；清除後回到原本筆數</td></tr>
+            <tr><td>E3</td><td>新增：選分類→項目→編碼馬上出現→儲存→多 1 筆</td></tr>
+            <tr><td>E4</td><td>空表單儲存：必填各自跳紅字、頁面不跳走</td></tr>
+            <tr><td>E5</td><td>刪除：取消不變、確認少 1 筆</td></tr>
+            <tr><td>E6</td><td>範本人員頁沒被改壞</td></tr>
+            <tr><td>E7</td><td>編輯數量和存放地點，儲存後新值生效</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </details>
+      <details><summary>備案：想再找別家 AI（例如 Codex）審一次</summary>
+        <p>你的工具不能開子代理，或想要第二意見，開另一個 AI 貼這段：</p>
+        <pre><code>請盡力挑 step4_loop_e2e/e2e 這套 E2E 測試，和 step3_new_module/my-equipment-app 的毛病，不要誇獎。
 測試專找：假綠（斷言太鬆、選錯元素）、一改版就壞的 selector（例如靠 nth）、測試互相影響。
 App 專找：用 Playwright 真的開瀏覽器逐頁截圖（含手機寬度），對照 PRD-中心裝備物資.md、技術約定-中心裝備物資.md、SRS-中心裝備物資.md 和 design-system-summary.md，挑測試沒抓到的問題。
 每條附理由，能重現就附步驟和截圖；只回報，不改檔；找不到也說明你怎麼確認的。</code></pre>
-      <figure><img src="images/step4_e2e_green.png" alt="E2E 七條全綠終端輸出"><figcaption>E2E 腳本實跑 7 條全綠：E1~E7 各 ok，總結 7 passed、exit 0（截圖為 Windows 版 run-e2e.ps1；macOS 的 run-e2e.sh 輸出與判定相同）。</figcaption></figure>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>編號</th><th>驗什麼</th><th>CRUD 觀念</th></tr></thead>
-        <tbody>
-          <tr><td>E1</td><td><code>/equipment/crud</code> 看得到表格、種子 24 筆、<strong>第一頁恰好 20 列</strong></td><td>Read</td></tr>
-          <tr><td>E2</td><td>用編碼搜尋剩 1 筆、大小寫不影響、用品名搜尋會縮小、清除後回到原本筆數</td><td>Filter</td></tr>
-          <tr><td>E3</td><td>new → 選分類→項目→編碼「即時算出且不重複」（格式不限）→ 儲存 → 筆數 +1</td><td>Create</td></tr>
-          <tr><td>E4</td><td>空表單儲存 → 四個必填各自紅字、不離頁；再清空／填負數，逐欄驗到 <strong>5 個必填</strong>；狀態沒有清空入口，改驗「選項只有三個合法值、沒有清除鈕」（進不了空值）</td><td>Validation</td></tr>
-          <tr><td>E5</td><td>刪除 → 確認框 → 取消不變、確認 -1</td><td>Delete</td></tr>
-          <tr><td>E6</td><td><code>/template/crud</code> 正常載入，而且點得進人員檢視頁看到資料</td><td>Regression（沒改壞範本）</td></tr>
-          <tr><td>E7</td><td>編輯品項：改數量與存放地點，儲存後新值生效</td><td>Update</td></tr>
-        </tbody>
-      </table>
+      </details>
+
+      <div class="why">
+        <b class="t">💡 為什麼</b>
+        一問一答，就像主管手把手帶新人，時間全耗在教。把規矩、範本、驗收標準放好，你只下一個指令：AI 自己做、自己驗、分身挑錯，最後交報告。<strong>你只顧頭跟尾：頭是講清楚要什麼、拍板；尾是驗收。</strong>每多跑一輪，一樣會花時間和 AI 用量，所以兩條鐵律要守住：修兩次沒好就停、不准改測試。
       </div>
     </div>
   </section>
@@ -780,45 +799,29 @@ App 專找：用 Playwright 真的開瀏覽器逐頁截圖（含手機寬度）�
   <section class="step" id="step5">
     <div class="step-head">
       <div class="step-num">5</div>
-      <h2>課程總結與回去怎麼用</h2>
+      <h2>回公司怎麼用</h2>
+      <a class="watch" href="animation-hands/index.html#s53-1">▶ 看動畫 第 53～54 段</a>
     </div>
     <div class="step-body">
-      <div class="goal">
-        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
-        <ol>
-          <li>收攏四個 step 各帶走一個觀念。</li>
-          <li>知道回公司落地的三個步驟。</li>
-        </ol>
-      </div>
-
-      <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p><strong>課程回顧：</strong></p>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>Step</th><th>帶走的觀念</th></tr></thead>
-        <tbody>
-          <tr><td>step1</td><td>同一句需求，有沒有附「規矩」（harness），產出天差地遠——差的不是功能，是像不像同一個團隊做的。</td></tr>
-          <tr><td>step2</td><td>一個成熟模組＝範本（骨架）＋系統文件＋harness 四件＋Design System，缺一塊 AI 就會自由發揮出風險。</td></tr>
-          <tr><td>step3</td><td>正確順序是白話 PRD → AI 找出沒寫清楚的地方、出「釐清選擇題」→ 生成 SRS、設計文件和圖（全中文，看圖就懂）→ 生成程式與假資料 → 人工反覆修正；這就是 SDD（規格驅動開發）：先文件、再程式。AI 主動提問代表 harness 在運作。</td></tr>
-          <tr><td>step4</td><td>一個指令，AI 自己跑「改→驗→再改」，再叫子代理對抗審查（審查的模型比開發的高一級）；不用像帶新人那樣一問一答。最後交出紀錄、報告、測試報告，文件同步（程式改了，文件跟著改）。收尾仍要有 E2E 驗證、對抗審查和你的驗收把關。</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <figure><img src="images/step5_value_curve.jpg" alt="價值曲線：人的價值在需求分析與測試驗收兩端最高">
-        <figcaption>你的心力該花在兩端：<strong>頭</strong>是講清楚要什麼（AI 找出的缺口由你拍板，AI 替不了你），<strong>尾</strong>是驗收（燈亮不等於做對）。中間的複製改名、寫欄位、修到全綠、互相挑錯，交給 AI——規矩和範本放好了，AI 自己就有 know-how，不用你一步一步教。</figcaption></figure>
-
-      <p><strong>回去怎麼用（三步驟）：</strong></p>
+      <p><strong>下一個新模組，只有一條路：</strong></p>
       <ol>
-        <li><strong>把前端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code> 複製到你專案根目錄，內容改成你們公司的規則（色票、命名、驗證、禁止事項）。</li>
-        <li><strong>把既有標準頁面整理成範本</strong>——挑一個最成熟的 CRUD 頁面，拆成「複製區」（跟實體有關的型別、欄位、驗證）與「共用區」（跟實體無關的通用邏輯）。</li>
-        <li><strong>新需求走完整流程（SDD：規格驅動開發）</strong>——PRD → 釐清選擇題 → SRS、設計文件和圖 → 任務清單 → 生成 → LOOP 驗證；程式改了，文件跟著改。拿到新需求先用白話寫一頁 PRD（可以很簡陋，不用懂程式），資訊單位補一頁技術約定，丟給 AI 配上 harness 與範本；沒寫清楚的，AI 會問。</li>
+        <li>用白話寫一頁 PRD，像寫給同事的需求；資訊單位補一頁技術約定。</li>
+        <li>貼起手 prompt：AI 找缺口出選擇題，你拍板。</li>
+        <li>它交文件和圖，你看過才說「開工」。</li>
+        <li>新模組也要先備好自動測試，再貼 LOOP prompt：AI 自己測、自己修、分身挑錯。</li>
+        <li>看報告、自己點一遍。</li>
       </ol>
-      <p>課後驗收題：一個人做一個問卷模組並發布上線，題目與步驟在 <code>step6_survey/README.md</code>。</p>
-
-
+      <figure><img src="images/step5_value_curve.jpg" alt="你的心力花在兩端：講清楚要什麼、驗收"><figcaption>你的心力花在兩端：<strong>頭</strong>是講清楚要什麼、拍板；<strong>尾</strong>是驗收。中間交給 AI。</figcaption></figure>
+      <p><strong>回公司三步：</strong></p>
+      <ol>
+        <li><strong>帶走四份規矩</strong>：<code>CLAUDE.md</code>、<code>CODE-RULES-ui-本專案.md</code>、<code>design-system-summary.md</code>、<code>使用說明-複製範本開發新模組.md</code> 複製到你的專案，改成你們公司的規則（顏色、命名、檢查、禁止事項）。</li>
+        <li><strong>整理範本</strong>：挑一個最成熟的頁面，分成「複製改名」和「直接共用」兩區。</li>
+        <li><strong>新需求都走同一條路</strong>：白話 PRD → 選擇題拍板 → 文件和圖 → 開工 → LOOP → 驗收。程式改了，文件跟著改。</li>
+      </ol>
+      <p>課後作業：一個人做一個課程回饋問卷，做到能給別人填。題目在 <code>step6_survey/README.md</code>。</p>
       <div class="why">
-        <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        harness 方法<strong>不綁框架</strong>：不是 Nuxt 也適用，四件內容換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何前端框架都通。沒有 Design System 也不用一次到位，先從色票與間距常數開始寫進 CODE-RULES，AI 就不會亂配色、亂用魔術數字。下一門後端課會用同一套流程，做一個 .NET API CRUD 模組。
+        <b class="t">💡 為什麼</b>
+        這套方法不綁框架：換成別的技術，把四份規矩換成你們的規則就好。沒有 Design System 也不用一次到位，先把顏色和間距的代號寫進規矩，AI 就不會亂配色、亂寫數字。下一門後端課，會用同一套方法，把裝備物資接上真的資料庫。
       </div>
     </div>
   </section>
@@ -832,23 +835,29 @@ App 專找：用 Playwright 真的開瀏覽器逐頁截圖（含手機寬度）�
     <div class="step-body">
       <p>全部打勾，代表你真的走完了：</p>
       <ul class="checklist">
-        <li>前置檢查（<code>preflight.ps1</code>／<code>preflight.sh</code>）全數通過</li>
-        <li><b>step1</b>　說得出兩版差在「顏色與業務規則從哪來」，以及 harness 管不到「做多少」；找得到「選項欄位不准預設帶第一個」寫在哪</li>
-        <li><b>step2</b>　範本人員 CRUD 在本機跑起來（port 3100），五個檢查點都重現；新增時看到性別等下拉是空白「請選擇」；看過 Design System 與 harness 四件，知道顏色／間距走 token</li>
-        <li><b>step3</b>　讀懂白話 PRD；貼起手 prompt 後 AI 先找出 PRD 沒寫清楚的地方、出選擇題（不是直接寫程式），逐題拍板、看過文件和每張圖、確認任務清單才說「開工」</li>
-        <li><b>step3</b>　裝備物資模組驗收：列表、連動下拉、新增編碼、刪除確認、手機卡片都重現；SRS、設計文件和圖都交了（DIAGRAMS 用瀏覽器開，四張圖都是中文、看得懂）</li>
-        <li><b>step4</b>　貼一個 LOOP prompt，AI 把你的 <code>my-equipment-app</code> 修到 E2E 7 條全綠（或停在紅燈、報告寫清楚原因），並做過對抗審查（子代理或別家 AI）</li>
-        <li><b>step4</b>　驗收 <code>LOOP-REPORT.html</code>、<code>LOOP-LOG.md</code> 和測試報告（每輪紅了什麼／根因／修了哪個檔、修改前後截圖＋全綠總結行、文件同步），並照報告上的網址在瀏覽器把裝備物資頁點一遍</li>
-        <li><b>step4</b>　說得出 LOOP 是什麼、一個優點一個限制，以及「兩次停損」「不准作弊」兩條鐵律</li>
+        <li><b>Step 0</b>　前置檢查最後寫「可以開課」</li>
+        <li><b>Step 1</b>　點過兩個網頁，說得出差在「這個決定是誰做的」；找得到「下拉不准預設帶第一個」寫在哪</li>
+        <li><b>Step 2</b>　範本跑起來（網址是終端機印出來的那個），新增、編輯、刪除、篩選、匯出都點過；新增時下拉是空白「請選擇」</li>
+        <li><b>Step 3</b>　AI 先找缺口、出選擇題，你拍板；看過 SRS、設計文件和五張圖，才說「開工」</li>
+        <li><b>Step 3</b>　網頁驗收：清冊、連動下拉、新增編碼、刪除確認、手機卡片都有；小落差附畫面講</li>
+        <li><b>Step 4</b>　貼一個 LOOP prompt，7 條全綠（或停在紅燈、報告寫清楚原因），子代理挑過錯</li>
+        <li><b>Step 4</b>　看過報告：修改前後的圖、裁決題附的畫面；測試報告、流水紀錄都在；文件標了「step4 LOOP 後」；自己點過一遍</li>
+        <li><b>Step 4</b>　說得出兩條鐵律：同一問題修兩次沒好就停；不准改測試、不准放寬標準</li>
       </ul>
-
     </div>
   </section>
 
 </main>
+<script>
+  // 每張圖都能點開看原圖（新分頁）
+  document.querySelectorAll('figure img').forEach(function (img) {
+    var a = document.createElement('a'); a.href = img.getAttribute('src'); a.target = '_blank'; a.rel = 'noopener'; a.title = '點一下看原圖';
+    img.parentNode.insertBefore(a, img); a.appendChild(img);
+  });
+</script>
 
 <div class="footer">
-  AI CRUD 工作坊 EASY 版 · Step-by-Step 學習手冊　—　範本給骨架、harness 給規矩、AI 出勞力。
+  AI CRUD 工作坊 EASY 版 · 跟著做手冊　—　範本給骨架、規矩給方向、AI 出勞力，你負責拍板和驗收。
 </div>
 
 </body>

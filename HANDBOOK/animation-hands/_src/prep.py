@@ -25,6 +25,8 @@ FIX = {
 # 第五版：檔案總管左邊導覽窗格有使用者自己釘選的資料夾名稱，整塊蓋掉
 for _n in ['v5-ex1-reveal', 'v5-ex2-all', 'v5-ex3-deselect', 'v5-ex4-newfolder', 'v5-ex5-pasted', 'v5-ex6-three', 'v5-ex7-done']:
     FIX[_n] = [('fill', 66, 282, 472, 392, (255, 255, 255))]
+# 圖 ① 改名「使用案例圖」：舊實拍（說明還寫 7 件事）只換標題列，用改名後重拍的同一塊
+FIX['v5-diagn-1-head'] = [('paste', 'v5-diagn6-1-head', 0, 0, 2080, 100)]
 # 第五版 LOOP 對話：Read 的路徑含 Windows 帳號，換成不含帳號的寫法
 FIX['v5-cc31-t0720'] = [('fill', 730, 568, 1880, 600, (25, 26, 27)),
                         ('retext', 733, 570, 1233, 598, r'~\.claude\memory\no-chrome-for-diagram-check.md', (25, 26, 27), (79, 193, 255))]
@@ -44,6 +46,10 @@ for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
             font = ImageFont.truetype(op[8] if len(op) > 8 else 'consola.ttf', op[9] if len(op) > 9 else 19)
             l, t, r, b = d.textbbox((0, 0), op[5], font=font)
             d.text(((op[1] + op[3] - (r - l)) / 2 - l, (op[2] + op[4] - (b - t)) / 2 - t), op[5], font=font, fill=op[7])
+        elif op[0] == 'paste':
+            # ('paste', 另一張原圖, x0, y0, x1, y1)：把另一張實拍同一塊貼過來（例如只換標題列）
+            src = Image.open(os.path.join(RAW, op[1] + '.png')).convert('RGB')
+            im.paste(src.crop(op[2:6]), (op[2], op[3]))
         elif op[0] == 'crop':
             l, t, r, b = op[1], op[2], op[3] or im.size[0], op[4] or im.size[1]
             # meta 的座標是 CSS px；對話框的 meta 本來就是原始像素，一起位移
